@@ -1,0 +1,15 @@
+[package]
+name = "honzo-std"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[dependencies]
+honzo-core = { path = "../honzo-core", features = ["alloc"] }
+flate2 = "1"
+zstd = "0.13"
+crc32fast = "1"
+rmp-serde = "1"
+serde = { version = "1", features = ["derive"] }
+image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
+getrandom = "0.2"
