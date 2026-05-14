@@ -13,8 +13,7 @@ mod write;
 pub use error::HonzoError;
 pub use parse::{HonzoParser, PmapEntryIter, TocEntryIter};
 pub use types::{
-    Compression, CoverType, FontEmbedding, HonzoHead, LayoutMode, MarkupType, PmapEntry,
-    TocEntry,
+    Compression, CoverType, FontEmbedding, HonzoHead, LayoutMode, MarkupType, PmapEntry, TocEntry,
 };
 
 #[cfg(feature = "alloc")]

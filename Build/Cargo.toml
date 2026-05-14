@@ -1,6 +1,0 @@
-[workspace]
-members = [
-  "crates/honzo-core",
-  "crates/honzo-std",
-]
-resolver = "2"

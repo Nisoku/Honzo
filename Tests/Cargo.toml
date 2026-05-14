@@ -1,0 +1,12 @@
+[package]
+name = "honzo-tests"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+
+[dependencies]
+honzo-core = { path = "../Build/crates/honzo-core" }
+honzo-std = { path = "../Build/crates/honzo-std" }
+rmp-serde = "1"
+serde = { version = "1", features = ["derive"] }

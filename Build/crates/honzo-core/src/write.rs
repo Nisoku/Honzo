@@ -2,6 +2,7 @@ use crate::types::{Compression, CoverType, FontEmbedding, LayoutMode, MarkupType
 use crate::HonzoError;
 
 use alloc::string::String;
+use alloc::string::ToString;
 use alloc::vec::Vec;
 
 const MAGIC: &[u8; 4] = b"HONO";
@@ -93,12 +94,8 @@ impl HonzoBuilder {
         let mut data_offset = 0u64;
 
         for chunk in &self.chunks {
-            if chunk.compression != Compression::None {
-                return Err(HonzoError::UnknownCompression(chunk.compression as u8));
-            }
-            let compressed = chunk.data.clone();
+            let size_compressed = chunk.data.len() as u32;
             let size_raw = chunk.data.len() as u32;
-            let size_compressed = compressed.len() as u32;
             let crc32 = if &chunk.tag == b"CHAP" {
                 crc32(&chunk.data)
             } else {
@@ -124,7 +121,7 @@ impl HonzoBuilder {
             });
 
             data_offset += size_compressed as u64;
-            compressed_chunks.push(compressed);
+            compressed_chunks.push(chunk.data.clone());
         }
 
         let toc_bytes = build_toc(&toc_entries, &self.pmap)?;

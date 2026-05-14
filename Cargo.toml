@@ -1,0 +1,8 @@
+[workspace]
+resolver = "2"
+members = [
+  "Build/crates/honzo-core",
+  "Build/crates/honzo-std",
+  "Build/crates/honzo-fixtures",
+  "Tests",
+]

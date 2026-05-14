@@ -112,6 +112,16 @@ name = "honzo-core"
 version = "0.1.0"
 
 [[package]]
+name = "honzo-fixtures"
+version = "0.1.0"
+dependencies = [
+ "honzo-std",
+ "image",
+ "rmp-serde",
+ "serde",
+]
+
+[[package]]
 name = "honzo-std"
 version = "0.1.0"
 dependencies = [
@@ -123,6 +133,16 @@ dependencies = [
  "rmp-serde",
  "serde",
  "zstd",
+]
+
+[[package]]
+name = "honzo-tests"
+version = "0.1.0"
+dependencies = [
+ "honzo-core",
+ "honzo-std",
+ "rmp-serde",
+ "serde",
 ]
 
 [[package]]

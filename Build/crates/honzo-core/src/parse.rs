@@ -6,6 +6,7 @@ use crate::HonzoError;
 const MAGIC: &[u8; 4] = b"HONO";
 const HEAD_SIZE: usize = 48;
 
+#[derive(Debug)]
 pub struct HonzoParser<'buf> {
     buf: &'buf [u8],
     head: HonzoHead,
@@ -61,7 +62,7 @@ impl<'buf> HonzoParser<'buf> {
         }
 
         let (toc_entries, pmap_offset, pmap_entries) =
-            validate_toc(buf, toc_offset, toc_end)?;
+            validate_toc(buf, toc_offset, toc_end, chunk_count)?;
 
         Ok(Self {
             buf,
@@ -99,6 +100,11 @@ impl<'buf> HonzoParser<'buf> {
     }
 
     pub fn chunk_bytes(&self, entry: &TocEntry) -> Result<&'buf [u8], HonzoError> {
+        if entry.is_encrypted() {
+            return Err(HonzoError::EncryptedChunk {
+                chunk_id: entry.chunk_id,
+            });
+        }
         let start = self.data_offset + entry.offset as usize;
         let end = start + entry.size_compressed as usize;
         if end > self.data_offset + self.head.data_size as usize {
@@ -166,6 +172,9 @@ impl<'buf> Iterator for TocEntryIter<'buf> {
         let start = self.cursor;
         let mut cursor = self.cursor;
         let chunk_type = read_tag(self.buf, &mut cursor).ok()?;
+        if !is_known_chunk(&chunk_type) {
+            return None;
+        }
         let chunk_id = read_u32(self.buf, &mut cursor).ok()?;
         let offset = read_u64(self.buf, &mut cursor).ok()?;
         let size_compressed = read_u32(self.buf, &mut cursor).ok()?;
@@ -189,7 +198,7 @@ impl<'buf> Iterator for TocEntryIter<'buf> {
 
         if &chunk_type == b"FONT" {
             let embedding = read_u8(self.buf, &mut cursor).ok()?;
-            font_embedding = FontEmbedding::from_u8(embedding).ok();
+            font_embedding = Some(FontEmbedding::from_u8(embedding).ok()?);
             let url_len = read_u16(self.buf, &mut cursor).ok()? as usize;
             if url_len > 0 {
                 let bytes = read_bytes(self.buf, &mut cursor, url_len).ok()?;
@@ -272,9 +281,13 @@ fn validate_toc(
     buf: &[u8],
     toc_offset: usize,
     toc_end: usize,
+    expected_entries: u32,
 ) -> Result<(u32, usize, u32), HonzoError> {
     let mut cursor = toc_offset;
     let num_entries = read_u32_limit(buf, &mut cursor, toc_end)?;
+    if num_entries != expected_entries {
+        return Err(HonzoError::Truncated);
+    }
     for _ in 0..num_entries {
         let chunk_type = read_tag_limit(buf, &mut cursor, toc_end)?;
         if !is_known_chunk(&chunk_type) {
@@ -290,7 +303,12 @@ fn validate_toc(
         let _ = read_u8_limit(buf, &mut cursor, toc_end)?;
         let _ = read_u32_limit(buf, &mut cursor, toc_end)?;
         let alt_text_len = read_u16_limit(buf, &mut cursor, toc_end)? as usize;
-        let _ = read_bytes_limit(buf, &mut cursor, alt_text_len, toc_end)?;
+        if alt_text_len > 0 {
+            let bytes = read_bytes_limit(buf, &mut cursor, alt_text_len, toc_end)?;
+            if core::str::from_utf8(bytes).is_err() {
+                return Err(HonzoError::Truncated);
+            }
+        }
 
         Compression::from_u8(compression)?;
         MarkupType::from_u8(markup_type)?;
@@ -300,7 +318,12 @@ fn validate_toc(
             let embedding = read_u8_limit(buf, &mut cursor, toc_end)?;
             FontEmbedding::from_u8(embedding)?;
             let url_len = read_u16_limit(buf, &mut cursor, toc_end)? as usize;
-            let _ = read_bytes_limit(buf, &mut cursor, url_len, toc_end)?;
+            if url_len > 0 {
+                let bytes = read_bytes_limit(buf, &mut cursor, url_len, toc_end)?;
+                if core::str::from_utf8(bytes).is_err() {
+                    return Err(HonzoError::Truncated);
+                }
+            }
         }
     }
 

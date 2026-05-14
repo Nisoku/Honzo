@@ -10,10 +10,7 @@ pub fn parse_extra(bytes: &[u8]) -> Result<Vec<ExtraEntry>, HonzoError> {
     let mut entries = Vec::new();
     let mut cursor = 0usize;
 
-    while cursor < bytes.len() {
-        if cursor + 6 > bytes.len() {
-            return Err(HonzoError::Truncated);
-        }
+    while cursor + 6 <= bytes.len() {
         let mut tag = [0u8; 4];
         tag.copy_from_slice(&bytes[cursor..cursor + 4]);
         cursor += 4;
@@ -54,6 +51,6 @@ pub fn parse_extra(bytes: &[u8]) -> Result<Vec<ExtraEntry>, HonzoError> {
     Ok(entries)
 }
 
-pub fn find_extra(entries: &[ExtraEntry], namespace: &str) -> Option<&ExtraEntry> {
+pub fn find_extra<'a>(entries: &'a [ExtraEntry], namespace: &str) -> Option<&'a ExtraEntry> {
     entries.iter().find(|entry| entry.namespace == namespace)
 }

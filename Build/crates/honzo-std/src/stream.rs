@@ -13,7 +13,9 @@ pub struct HonzoStream<R: Read + Seek> {
 impl<R: Read + Seek> HonzoStream<R> {
     pub fn open(mut reader: R, reader_version: u16) -> Result<Self, HonzoError> {
         let mut magic = [0u8; 4];
-        reader.read_exact(&mut magic).map_err(|_| HonzoError::BufferTooShort)?;
+        reader
+            .read_exact(&mut magic)
+            .map_err(|_| HonzoError::BufferTooShort)?;
         if &magic != b"HONO" {
             return Err(HonzoError::InvalidMagic);
         }
@@ -68,8 +70,12 @@ impl<R: Read + Seek> HonzoStream<R> {
         &self.head
     }
 
-    pub fn toc(&self) -> &[TocEntry] {
+    pub fn toc(&self) -> &[TocEntry<'_>] {
         &self.toc
+    }
+
+    pub fn toc_owned(&self) -> Vec<TocEntry<'static>> {
+        self.toc.clone()
     }
 
     pub fn pmap(&self) -> &[PmapEntry] {
@@ -95,7 +101,7 @@ impl<R: Read + Seek> HonzoStream<R> {
         Ok(decompressed)
     }
 
-    pub fn chapters(&mut self) -> ChapterIter<R> {
+    pub fn chapters(&mut self) -> ChapterIter<'_, R> {
         ChapterIter {
             stream: self,
             index: 0,
@@ -137,7 +143,7 @@ impl<'a, R: Read + Seek> Iterator for ChapterIter<'a, R> {
 
     fn next(&mut self) -> Option<Self::Item> {
         while self.index < self.stream.toc.len() {
-            let entry = &self.stream.toc[self.index];
+            let entry = self.stream.toc[self.index];
             self.index += 1;
             if entry.chunk_type == *b"CHAP" {
                 if entry.is_encrypted() {
@@ -145,11 +151,16 @@ impl<'a, R: Read + Seek> Iterator for ChapterIter<'a, R> {
                         chunk_id: entry.chunk_id,
                     }));
                 }
-                return Some(self.stream.read_chunk(entry));
+                return Some(self.stream.read_chunk(&entry));
             }
         }
         None
     }
+}
+
+// TODO: NO unsafe
+fn leak_str(s: String) -> &'static str {
+    unsafe { &*(Box::into_raw(s.into_boxed_str()) as *const str) }
 }
 
 fn parse_toc_owned(
@@ -157,10 +168,10 @@ fn parse_toc_owned(
     chunk_count: u32,
 ) -> Result<(Vec<TocEntry<'static>>, Vec<PmapEntry>), HonzoError> {
     let mut cursor = 0usize;
-        let entries = read_u32_bytes(buf, &mut cursor)?;
-        if entries != chunk_count {
-            return Err(HonzoError::Truncated);
-        }
+    let entries = read_u32_bytes(buf, &mut cursor)?;
+    if entries != chunk_count {
+        return Err(HonzoError::Truncated);
+    }
 
     let mut toc = Vec::with_capacity(entries as usize);
     for _ in 0..entries {
@@ -181,8 +192,7 @@ fn parse_toc_owned(
         let alt_text = if alt_len > 0 {
             let slice = read_bytes(buf, &mut cursor, alt_len)?;
             let owned = String::from_utf8(slice.to_vec()).map_err(|_| HonzoError::Truncated)?;
-            let boxed: Box<str> = owned.into_boxed_str();
-            Some(Box::leak(boxed))
+            Some(leak_str(owned))
         } else {
             None
         };
@@ -202,8 +212,7 @@ fn parse_toc_owned(
             if url_len > 0 {
                 let slice = read_bytes(buf, &mut cursor, url_len)?;
                 let owned = String::from_utf8(slice.to_vec()).map_err(|_| HonzoError::Truncated)?;
-                let boxed: Box<str> = owned.into_boxed_str();
-                font_license_url = Some(Box::leak(boxed));
+                font_license_url = Some(leak_str(owned));
             }
         }
 
@@ -250,25 +259,33 @@ fn is_known_chunk(tag: &[u8; 4]) -> bool {
 
 fn read_u8(reader: &mut impl Read) -> Result<u8, HonzoError> {
     let mut buf = [0u8; 1];
-    reader.read_exact(&mut buf).map_err(|_| HonzoError::BufferTooShort)?;
+    reader
+        .read_exact(&mut buf)
+        .map_err(|_| HonzoError::BufferTooShort)?;
     Ok(buf[0])
 }
 
 fn read_u16(reader: &mut impl Read) -> Result<u16, HonzoError> {
     let mut buf = [0u8; 2];
-    reader.read_exact(&mut buf).map_err(|_| HonzoError::BufferTooShort)?;
+    reader
+        .read_exact(&mut buf)
+        .map_err(|_| HonzoError::BufferTooShort)?;
     Ok(u16::from_le_bytes(buf))
 }
 
 fn read_u32(reader: &mut impl Read) -> Result<u32, HonzoError> {
     let mut buf = [0u8; 4];
-    reader.read_exact(&mut buf).map_err(|_| HonzoError::BufferTooShort)?;
+    reader
+        .read_exact(&mut buf)
+        .map_err(|_| HonzoError::BufferTooShort)?;
     Ok(u32::from_le_bytes(buf))
 }
 
 fn read_u64(reader: &mut impl Read) -> Result<u64, HonzoError> {
     let mut buf = [0u8; 8];
-    reader.read_exact(&mut buf).map_err(|_| HonzoError::BufferTooShort)?;
+    reader
+        .read_exact(&mut buf)
+        .map_err(|_| HonzoError::BufferTooShort)?;
     Ok(u64::from_le_bytes(buf))
 }
 

@@ -31,7 +31,6 @@ pub fn build_sidx(chapters: &[(u32, &str)]) -> Result<Vec<u8>, HonzoError> {
                 index.entry(lower).or_default().push((*chunk_id, offset));
             }
         }
-
     }
 
     rmp_serde::to_vec(&index).map_err(|_| HonzoError::Truncated)

@@ -11,14 +11,18 @@ pub fn decompress(
         Compression::Zlib => {
             let mut decoder = flate2::read::ZlibDecoder::new(std::io::Cursor::new(data));
             let mut out = Vec::with_capacity(raw_size as usize);
-            decoder.read_to_end(&mut out).map_err(|_| HonzoError::Truncated)?;
+            decoder
+                .read_to_end(&mut out)
+                .map_err(|_| HonzoError::Truncated)?;
             Ok(out)
         }
         Compression::Zstd => {
-            let mut decoder =
-                zstd::stream::Decoder::new(std::io::Cursor::new(data)).map_err(|_| HonzoError::Truncated)?;
+            let mut decoder = zstd::stream::Decoder::new(std::io::Cursor::new(data))
+                .map_err(|_| HonzoError::Truncated)?;
             let mut out = Vec::with_capacity(raw_size as usize);
-            decoder.read_to_end(&mut out).map_err(|_| HonzoError::Truncated)?;
+            decoder
+                .read_to_end(&mut out)
+                .map_err(|_| HonzoError::Truncated)?;
             Ok(out)
         }
     }
