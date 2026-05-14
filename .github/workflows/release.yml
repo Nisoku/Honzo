@@ -1,0 +1,102 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build and package only (skip GitHub release upload)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  release:
+    name: Release libhonzo
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: libhonzo
+
+      - name: Run tests
+        run: cd libhonzo && cargo test
+
+      - name: Run clippy
+        run: cd libhonzo && cargo clippy --release --all-features -- -D warnings
+
+      - name: Check formatting
+        run: cd libhonzo && cargo fmt --check
+
+      - name: Build release
+        run: cd libhonzo && cargo build --release
+
+      - name: Build WASM adapter
+        run: cd libhonzo && wasm-pack build --release --target web
+
+      - name: Generate C bindings
+        run: |
+          cd libhonzo
+          cargo build --release --features c-ffi
+          if command -v diplomat-tool >/dev/null 2>&1; then
+            diplomat-tool c .
+          fi
+
+      - name: Create release archive
+        run: |
+          set -e
+          ROOT_DIR="${GITHUB_WORKSPACE}"
+          CRATE_DIR="${ROOT_DIR}/libhonzo"
+          ARCHIVE_NAME="libhonzo-${{ github.ref_name }}.tar.gz"
+
+          rm -rf /tmp/libhonzo-release
+          mkdir -p /tmp/libhonzo-release/lib /tmp/libhonzo-release/include
+
+          # Include platform-specific native artifacts only when present.
+          for artifact in \
+            "${CRATE_DIR}/target/release/liblibhonzo.so" \
+            "${CRATE_DIR}/target/release/liblibhonzo.dylib" \
+            "${CRATE_DIR}/target/release/liblibhonzo.a" \
+            "${CRATE_DIR}/target/release/libhonzo.dll"
+          do
+            if [ -f "$artifact" ]; then
+              cp "$artifact" /tmp/libhonzo-release/lib/
+            fi
+          done
+
+          cp -R "${CRATE_DIR}/include/." /tmp/libhonzo-release/include/
+          cp -R "${CRATE_DIR}/pkg" /tmp/libhonzo-release/pkg
+          cp "${CRATE_DIR}/README.md" /tmp/libhonzo-release/README.md
+          cp "${CRATE_DIR}/LICENSE" /tmp/libhonzo-release/LICENSE
+
+          tar -czf "${ROOT_DIR}/${ARCHIVE_NAME}" -C /tmp/libhonzo-release .
+
+      - name: Create GitHub release
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != 'true' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: libhonzo-${{ github.ref_name }}.tar.gz
+          generate_release_notes: true

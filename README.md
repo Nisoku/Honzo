@@ -1,2 +1,1 @@
-# Honzo
-The "ideal" ebook format.
+/workspaces/Honzo/libhonzo/README.md
