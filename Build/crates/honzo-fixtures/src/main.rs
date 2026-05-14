@@ -749,7 +749,7 @@ fn gen_compressed(path: &str, compression: Compression) {
     fs::write(fixtures_dir().join(path), &hzo).unwrap();
 }
 
-// --- Corpus files ---
+// Corpus files
 
 fn gen_bad_magic() {
     let mut out = Vec::new();

@@ -1,0 +1,23 @@
+[package]
+name = "honzo-convert"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[features]
+default = []
+lowmem = []
+
+[dependencies]
+honzo-std = { path = "../honzo-std" }
+futures = "0.3"
+async_zip = { version = "0.0.18", features = ["deflate", "deflate64"] }
+bytes = "1"
+quick-xml = "0.40.0"
+rmp-serde = "1"
+tl = "0.7"
+html-escape = "0.2"
+
+[dev-dependencies]
+honzo-core = { path = "../honzo-core" }
+honzo-std = { path = "../honzo-std" }
