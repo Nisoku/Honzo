@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self' blob: data:;
+    script-src 'self' 'unsafe-eval';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' blob: data:;
+    connect-src 'self';
+    frame-src 'self' blob: data:;
+    worker-src 'self';
+    manifest-src 'self';
+    upgrade-insecure-requests; block-all-mixed-content;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HonzoReader</title>
+  <link rel="icon" href="/Honzo/demo/source.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body>
+  <header>
+    <div class="title">
+      <span>HonzoReader</span>
+      <span class="book-title" id="book-title"></span>
+    </div>
+    <div class="controls">
+      <button id="toc-button" disabled>Table of Contents</button>
+      <button id="open-button">Open .hzo</button>
+      <a href="/Honzo/demo/convert.html" style="color:#fff;text-decoration:none;font-size:0.9rem;background:#16213e;padding:0.5rem 1rem;border-radius:4px;">Convert EPUB</a>
+      <select id="demo-book-select" class="demo-picker" aria-label="Built-in demo books">
+        <option value="/hzo/novel.hzo" selected>Demo: Novel</option>
+        <option value="/hzo/manga.hzo">Demo: Manga</option>
+        <option value="/hzo/with_sidx.hzo">Demo: With Search Index</option>
+        <option value="/hzo/compressed_zstd.hzo">Demo: Zstd Compressed</option>
+      </select>
+      <button id="open-demo-button">Open Demo</button>
+      <button id="library-button">Library</button>
+      <input type="file" id="file-input" class="file-input" accept=".hzo">
+      <input type="file" id="library-input" class="file-input" accept=".hzo" multiple>
+    </div>
+  </header>
+  <main>
+    <div id="viewer"></div>
+  </main>
+  <footer>
+    <button id="prev-button" disabled>⬅ Previous</button>
+    <div class="page-info">
+      <span>Page</span>
+      <input type="number" id="current-page" min="1" value="1">
+      <span>of</span>
+      <span id="total-pages">1</span>
+    </div>
+    <button id="next-button" disabled>Next ➡</button>
+  </footer>
+  <div class="toc-container" id="toc-container">
+    <div class="toc-header">
+      <h3>Table of Contents</h3>
+      <button id="close-toc">Close</button>
+    </div>
+    <div class="toc-content" id="toc-content"></div>
+  </div>
+  <div class="library-container" id="library-container">
+    <div class="library-header">
+      <h3>Library</h3>
+      <button id="close-library">Close</button>
+    </div>
+    <div class="library-content" id="library-content"></div>
+  </div>
+  <div class="overlay" id="overlay"></div>
+  <div class="message" id="loading-message">
+    <h3>Loading...</h3>
+    <p>Please wait while your book is being processed.</p>
+  </div>
+  <div class="message" id="error-message">
+    <h3>Error</h3>
+    <p id="error-text">There was an error processing your file.</p>
+    <button id="close-error">Close</button>
+  </div>
+</body>
+<script type="module" src="./src/main.js"></script>
+</html>

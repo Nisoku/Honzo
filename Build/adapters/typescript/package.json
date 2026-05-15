@@ -1,0 +1,10 @@
+{
+  "name": "@nisoku/honzo",
+  "version": "0.1.0",
+  "description": "Honzo ebook format reader and writer",
+  "type": "module",
+  "main": "wasm/honzo_wasm.js",
+  "types": "wasm/honzo_wasm.d.ts",
+  "files": ["wasm"],
+  "license": "Apache-2.0"
+}

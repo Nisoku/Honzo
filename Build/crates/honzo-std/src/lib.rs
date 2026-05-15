@@ -8,7 +8,7 @@ mod stream;
 mod utils;
 
 pub use build::Builder;
-pub use compression::{decompress, verify_crc32};
+pub use compression::{decompress, verify_crc32, verify_entry_crc32};
 pub use extra::{find_extra, parse_extra, ExtraEntry};
 pub use meta::{
     Accessibility, Contributor, HonzoMeta, Identifier, RenderHints, Revision, SeriesMeta,

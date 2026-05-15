@@ -1,0 +1,84 @@
+import { openBookFromEntry } from "./book.js";
+import { showError, toggleLibrary } from "./ui.js";
+
+let elements = {
+  libraryContent: null,
+  libraryInput: null,
+};
+
+export function setLibraryElements(nextElements) {
+  elements = {
+    ...elements,
+    ...nextElements,
+  };
+}
+
+export async function openLibrary() {
+  try {
+    const files = [];
+    if ('showDirectoryPicker' in window) {
+      const dirHandle = await window.showDirectoryPicker();
+      for await (const entry of dirHandle.values()) {
+        if (entry.kind === 'file' && entry.name.endsWith('.hzo')) {
+          files.push(entry);
+        }
+      }
+    } else {
+      elements.libraryInput?.click();
+      return;
+    }
+    displayLibraryGrid(files);
+    toggleLibrary(true);
+  } catch (err) {
+    showError('Failed to open library: ' + err.message);
+  }
+}
+
+export function handleLibraryFiles(e) {
+  const files = Array.from(e.target.files);
+  displayLibraryGrid(files);
+  toggleLibrary(true);
+}
+
+async function displayLibraryGrid(fileEntries) {
+  if (!elements.libraryContent) return;
+  elements.libraryContent.innerHTML = '';
+  if (fileEntries.length === 0) {
+    elements.libraryContent.textContent = 'No .hzo files found.';
+    return;
+  }
+  for (const entry of fileEntries) {
+    const item = await createLibraryItem(entry);
+    elements.libraryContent.appendChild(item);
+  }
+}
+
+async function createLibraryItem(fileEntry) {
+  const item = document.createElement('div');
+  item.className = 'library-item';
+
+  const titleDiv = document.createElement('div');
+  titleDiv.className = 'library-title';
+  titleDiv.textContent = fileEntry.name;
+  item.appendChild(titleDiv);
+
+  try {
+    const file = typeof fileEntry.getFile === 'function' ? await fileEntry.getFile() : fileEntry;
+    if (file.name.endsWith('.hzo')) {
+      const buf = await file.arrayBuffer();
+      const wasmMod = await import("./wasm/honzo_wasm.js");
+      await wasmMod.default();
+      const reader = new wasmMod.HonzoWasm(new Uint8Array(buf), 1);
+      const meta = reader.get_meta_parsed();
+      const firstVal = (v) => v instanceof Map ? v.values().next().value : (typeof v === 'object' ? Object.values(v)[0] : v);
+      titleDiv.textContent = firstVal(meta?.title) || fileEntry.name;
+    }
+  } catch (err) {
+    console.error('Error reading metadata for', fileEntry.name, err);
+  }
+
+  item.addEventListener('click', () => openBookFromEntry(fileEntry));
+  return item;
+}
+
+

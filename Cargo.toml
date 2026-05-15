@@ -6,5 +6,7 @@ members = [
   "Build/crates/honzo-fixtures",
   "Build/crates/honzo-convert",
   "Build/crates/honzo-c",
+  "Build/crates/honzo-wasm",
+  "Build/crates/honzo-cli",
   "Tests",
 ]

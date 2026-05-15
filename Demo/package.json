@@ -1,0 +1,23 @@
+{
+  "name": "honzo-reader",
+  "version": "0.1.0",
+  "description": "A web-based Honzo ebook reader, forked from HTMLReader",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@nisoku/sairin": "^0.1.2",
+    "lexepub": "^0.1.1",
+    "vite": "^5.0.0",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.6.0"
+  },
+  "devDependencies": {
+    "vite-plugin-pwa": "^1.0.0"
+  },
+  "private": true,
+  "license": "Apache-2.0"
+}

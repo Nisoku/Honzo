@@ -1,0 +1,43 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build Docs
+        run: |
+          cd Docs
+          npm ci
+          npm run build
+
+      - name: Build Demo
+        run: |
+          cd Build/adapters/typescript
+          npm ci
+          npm run build
+          cd ../../../Demo
+          npm ci
+          npm run build
+
+      - name: Prepare Pages assets
+        run: |
+          mkdir -p gh-pages-root
+          cp -r Docs/site/* gh-pages-root/
+          mkdir -p gh-pages-root/demo
+          cp -r Demo/dist/* gh-pages-root/demo/
+
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: gh-pages-root
