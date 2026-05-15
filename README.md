@@ -1,6 +1,6 @@
 # Honzo
 
-[![CI](https://github.com/Nisoku/Honzo/actions/workflows/ci.yml/badge.svg)](https://github.com/Nisoku/Honzo/actions/workflows/ci.yml)
+[![CI](https://github.com/Nisoku/Honzo/actions/workflows/lint.yml/badge.svg)](https://github.com/Nisoku/Honzo/actions/workflows/lint.yml)
 [![npm version](https://img.shields.io/npm/v/@nisoku/honzo.svg)](https://www.npmjs.com/package/@nisoku/honzo)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
