@@ -6,6 +6,7 @@ use std::vec::Vec;
 
 const MAGIC: &[u8; 4] = b"HONO";
 
+#[derive(Clone)]
 struct ChunkSpec {
     tag: [u8; 4],
     raw_data: Vec<u8>,
@@ -17,6 +18,7 @@ struct ChunkSpec {
     font_license_url: Option<String>,
 }
 
+#[derive(Clone)]
 pub struct Builder {
     layout: LayoutMode,
     flags: u32,

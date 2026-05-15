@@ -1,0 +1,17 @@
+[package]
+name = "honzo-c"
+version = "0.1.0"
+description = "C FFI bindings for the Honzo ebook format"
+license = "Apache-2.0"
+
+[library]
+name = "honzo_c"
+crate-type = ["cdylib", "staticlib"]
+features = []
+
+[dependencies]
+diplomat = "0.15"
+diplomat-runtime = "0.15"
+
+[output]
+c = { path = "include/", library = "Honzo" }

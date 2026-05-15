@@ -7,6 +7,7 @@ use alloc::vec::Vec;
 
 const MAGIC: &[u8; 4] = b"HONO";
 
+#[derive(Clone)]
 struct ChunkSpec {
     tag: [u8; 4],
     data: Vec<u8>,
@@ -18,6 +19,7 @@ struct ChunkSpec {
     font_license_url: Option<String>,
 }
 
+#[derive(Clone)]
 pub struct HonzoBuilder {
     layout: LayoutMode,
     flags: u32,

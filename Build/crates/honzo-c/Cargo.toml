@@ -1,0 +1,17 @@
+[package]
+name = "honzo-c"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+diplomat = "0.15"
+diplomat-runtime = "0.15"
+honzo-core = { path = "../honzo-core" }
+honzo-std = { path = "../honzo-std" }
+
+[build-dependencies]
+diplomat-tool = "0.15"
