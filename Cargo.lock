@@ -543,6 +543,7 @@ dependencies = [
  "diplomat-tool",
  "honzo-core",
  "honzo-std",
+ "rmp-serde",
 ]
 
 [[package]]

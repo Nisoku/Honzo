@@ -5,7 +5,7 @@ edition = "2021"
 license = "Apache-2.0"
 
 [lib]
-crate-type = ["cdylib", "staticlib"]
+crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
 diplomat = "0.15"
@@ -15,3 +15,7 @@ honzo-std = { path = "../honzo-std" }
 
 [build-dependencies]
 diplomat-tool = "0.15"
+
+[dev-dependencies]
+honzo-std = { path = "../honzo-std" }
+rmp-serde = "1"
