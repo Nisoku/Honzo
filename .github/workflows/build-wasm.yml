@@ -2,21 +2,16 @@ name: Build WASM
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
   workflow_dispatch:
-
-env:
-  CARGO_TERM_COLOR: always
 
 jobs:
   build-wasm:
-    name: Build WASM
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -25,17 +20,16 @@ jobs:
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: libhonzo
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Build WASM
-        run: cd libhonzo && wasm-pack build --release --target web
+        run: wasm-pack build --target web --out-dir ../../../Build/adapters/typescript/wasm
+        working-directory: Build/crates/honzo-wasm
 
       - name: Upload WASM artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: libhonzo-wasm
-          path: libhonzo/pkg/
+          name: honzo-wasm
+          path: Build/adapters/typescript/wasm/

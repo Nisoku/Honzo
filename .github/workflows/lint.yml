@@ -2,20 +2,18 @@ name: Lint
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   clippy:
-    name: Clippy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -24,18 +22,14 @@ jobs:
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: libhonzo
 
-      - name: Run clippy on libhonzo
-        run: cd libhonzo && cargo clippy -- -D warnings
+      - name: Run clippy
+        run: cargo clippy --workspace -- -D warnings
 
   fmt:
-    name: Format
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -43,5 +37,4 @@ jobs:
           components: rustfmt
 
       - name: Check formatting
-        run: |
-          cd libhonzo && cargo fmt --check
+        run: cargo fmt --check

@@ -1,4 +1,4 @@
-name: Release
+name: Release npm
 
 on:
   release:
@@ -21,8 +21,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -39,16 +38,16 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Build WASM adapter
-        run: wasm-pack build --target web
-        working-directory: libhonzo
+        run: wasm-pack build --target web --out-dir ../../../Build/adapters/typescript/wasm
+        working-directory: Build/crates/honzo-wasm
 
       - name: Publish to npm
-        working-directory: libhonzo/pkg
+        working-directory: Build/adapters/typescript
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" == "true" ]; then
-            npm publish --access public --provenance --dry-run
+            npm publish --access public --dry-run
           else
-            npm publish --access public --provenance
+            npm publish --access public
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}

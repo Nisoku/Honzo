@@ -2,34 +2,35 @@ name: Build C Bindings
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
 
 jobs:
   c-bindings:
-    name: Build C FFI Bindings
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: libhonzo
 
       - name: Install diplomat-tool
         run: cargo install diplomat-tool
 
-      - name: Build with C FFI feature
-        run: cd libhonzo && cargo build --features c-ffi
+      - name: Build C library
+        run: cargo build --release
+        working-directory: Build/crates/honzo-c
+
+      - name: Generate C headers
+        run: diplomat-tool c .
+        working-directory: Build/crates/honzo-c
 
       - name: Upload C bindings
         uses: actions/upload-artifact@v4
         with:
-          name: c-bindings
-          path: libhonzo/include/
+          name: honzo-c-bindings
+          path: Build/crates/honzo-c/include/

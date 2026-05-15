@@ -15,25 +15,14 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Build Docs
-        run: |
-          cd Docs
-          npm ci
-          npm run build
-
       - name: Build Demo
         run: |
-          cd Build/adapters/typescript
-          npm ci
-          npm run build
-          cd ../../../Demo
+          cd Demo
           npm ci
           npm run build
 
       - name: Prepare Pages assets
         run: |
-          mkdir -p gh-pages-root
-          cp -r Docs/site/* gh-pages-root/
           mkdir -p gh-pages-root/demo
           cp -r Demo/dist/* gh-pages-root/demo/
 

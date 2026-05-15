@@ -20,13 +20,11 @@ env:
 
 jobs:
   release:
-    name: Release libhonzo
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -39,64 +37,67 @@ jobs:
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: libhonzo
 
       - name: Run tests
-        run: cd libhonzo && cargo test
+        run: cargo test --workspace
 
       - name: Run clippy
-        run: cd libhonzo && cargo clippy --release --all-features -- -D warnings
+        run: cargo clippy --workspace -- -D warnings
 
       - name: Check formatting
-        run: cd libhonzo && cargo fmt --check
+        run: cargo fmt --check
 
       - name: Build release
-        run: cd libhonzo && cargo build --release
+        run: cargo build --release
 
       - name: Build WASM adapter
-        run: cd libhonzo && wasm-pack build --release --target web
+        run: wasm-pack build --target web --out-dir ../../../Build/adapters/typescript/wasm
+        working-directory: Build/crates/honzo-wasm
 
-      - name: Generate C bindings
+      - name: Build C library and generate headers
         run: |
-          cd libhonzo
-          cargo build --release --features c-ffi
+          cargo build --release
           if command -v diplomat-tool >/dev/null 2>&1; then
             diplomat-tool c .
           fi
+        working-directory: Build/crates/honzo-c
 
       - name: Create release archive
         run: |
           set -e
-          ROOT_DIR="${GITHUB_WORKSPACE}"
-          CRATE_DIR="${ROOT_DIR}/libhonzo"
-          ARCHIVE_NAME="libhonzo-${{ github.ref_name }}.tar.gz"
+          ARCHIVE_NAME="honzo-${{ github.ref_name }}.tar.gz"
+          rm -rf /tmp/honzo-release
+          mkdir -p /tmp/honzo-release/{lib,include,wasm}
 
-          rm -rf /tmp/libhonzo-release
-          mkdir -p /tmp/libhonzo-release/lib /tmp/libhonzo-release/include
-
-          # Include platform-specific native artifacts only when present.
+          # Native artifacts
           for artifact in \
-            "${CRATE_DIR}/target/release/liblibhonzo.so" \
-            "${CRATE_DIR}/target/release/liblibhonzo.dylib" \
-            "${CRATE_DIR}/target/release/liblibhonzo.a" \
-            "${CRATE_DIR}/target/release/libhonzo.dll"
+            "target/release/libhonzo_c.so" \
+            "target/release/libhonzo_c.dylib" \
+            "target/release/libhonzo_c.a" \
+            "target/release/honzo_c.dll" \
+            "target/release/honzo-c"*
           do
             if [ -f "$artifact" ]; then
-              cp "$artifact" /tmp/libhonzo-release/lib/
+              cp "$artifact" /tmp/honzo-release/lib/
             fi
-          done
+          done 2>/dev/null || true
 
-          cp -R "${CRATE_DIR}/include/." /tmp/libhonzo-release/include/
-          cp -R "${CRATE_DIR}/pkg" /tmp/libhonzo-release/pkg
-          cp "${CRATE_DIR}/README.md" /tmp/libhonzo-release/README.md
-          cp "${CRATE_DIR}/LICENSE" /tmp/libhonzo-release/LICENSE
+          # C headers
+          if [ -d "Build/crates/honzo-c/include" ]; then
+            cp -R Build/crates/honzo-c/include/. /tmp/honzo-release/include/
+          fi
 
-          tar -czf "${ROOT_DIR}/${ARCHIVE_NAME}" -C /tmp/libhonzo-release .
+          # WASM package
+          cp -R Build/adapters/typescript/wasm/. /tmp/honzo-release/wasm/
+
+          # Docs
+          cp README.md LICENSE /tmp/honzo-release/
+
+          tar -czf "${ARCHIVE_NAME}" -C /tmp/honzo-release .
 
       - name: Create GitHub release
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != 'true' }}
         uses: softprops/action-gh-release@v1
         with:
-          files: libhonzo-${{ github.ref_name }}.tar.gz
+          files: honzo-${{ github.ref_name }}.tar.gz
           generate_release_notes: true
