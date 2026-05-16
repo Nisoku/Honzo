@@ -68,11 +68,13 @@ pub mod ffi {
                 .unwrap_or(false)
         }
 
-        pub fn get_chunk(&self, index: u32) -> Option<&[u8]> {
+        #[allow(clippy::needless_lifetimes)]
+        pub fn get_chunk<'a>(&'a self, index: u32) -> Option<&'a [u8]> {
             self.chunks.get(index as usize).map(|c| c.as_slice())
         }
 
-        pub fn get_meta(&self) -> &[u8] {
+        #[allow(clippy::needless_lifetimes)]
+        pub fn get_meta<'a>(&'a self) -> &'a [u8] {
             &self.meta
         }
     }
@@ -154,7 +156,8 @@ pub mod ffi {
             }
         }
 
-        pub fn get_result(&self) -> &[u8] {
+        #[allow(clippy::needless_lifetimes)]
+        pub fn get_result<'a>(&'a self) -> &'a [u8] {
             &self.result
         }
     }
