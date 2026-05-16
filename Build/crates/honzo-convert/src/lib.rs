@@ -286,13 +286,12 @@ fn parse_container(xml: &str) -> Result<String, ConvertError> {
     let mut buf = Vec::new();
     loop {
         match reader.read_event_into(&mut buf) {
-            Ok(quick_xml::events::Event::Start(ref e))
-            | Ok(quick_xml::events::Event::Empty(ref e)) => {
-                if e.name().as_ref() == b"rootfile" {
-                    for attr in e.attributes().flatten() {
-                        if attr.key.as_ref() == b"full-path" {
-                            return Ok(String::from_utf8_lossy(&attr.value).to_string());
-                        }
+            Ok(quick_xml::events::Event::Start(ref e) | quick_xml::events::Event::Empty(ref e))
+                if e.name().as_ref() == b"rootfile" =>
+            {
+                for attr in e.attributes().flatten() {
+                    if attr.key.as_ref() == b"full-path" {
+                        return Ok(String::from_utf8_lossy(&attr.value).to_string());
                     }
                 }
             }
