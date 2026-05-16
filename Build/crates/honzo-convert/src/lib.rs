@@ -6,7 +6,7 @@ use futures::io::{BufReader, Cursor as FuturesCursor};
 use futures::AsyncReadExt;
 
 use honzo_std::{
-    build_sidx, compute_reading_time, generate_covt, new_uuid, Builder, Compression, CoverType,
+    build_sidx, compute_reading_time, generate_covt, new_uuid, HonzoBuilder, Compression, CoverType,
     HonzoMeta, Identifier, LayoutMode, MarkupType,
 };
 
@@ -89,7 +89,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         .collect();
 
     let mut chap_texts: Vec<(u32, String)> = Vec::new();
-    let mut builder = Builder::new().set_layout(LayoutMode::Reflowable);
+    let mut builder = HonzoBuilder::new().set_layout(LayoutMode::Reflowable);
 
     let resolve = |href: &str| -> String {
         if href.starts_with('/') {

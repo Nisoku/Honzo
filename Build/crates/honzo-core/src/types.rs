@@ -33,7 +33,7 @@ impl LayoutMode {
             0 => Ok(Self::Reflowable),
             1 => Ok(Self::Fixed),
             2 => Ok(Self::Scroll),
-            other => Err(HonzoError::UnknownMarkupType(other)),
+            other => Err(HonzoError::UnknownLayoutMode(other)),
         }
     }
 }
@@ -69,7 +69,7 @@ impl CoverType {
             0 => Ok(Self::Front),
             1 => Ok(Self::Back),
             2 => Ok(Self::FullSpread),
-            other => Err(HonzoError::UnknownMarkupType(other)),
+            other => Err(HonzoError::UnknownCoverType(other)),
         }
     }
 }
@@ -90,7 +90,7 @@ impl FontEmbedding {
             1 => Ok(Self::PrintOnly),
             2 => Ok(Self::NoModify),
             3 => Ok(Self::NoEmbed),
-            other => Err(HonzoError::UnknownMarkupType(other)),
+            other => Err(HonzoError::UnknownFontEmbedding(other)),
         }
     }
 }

@@ -323,7 +323,7 @@ fn cmd_build(spec: &PathBuf, out: &PathBuf) {
         std::process::exit(1);
     });
 
-    let mut builder = Builder::new();
+    let mut builder = HonzoBuilder::new();
 
     if let Some(chunks) = spec["chunks"].as_array() {
         for chunk in chunks {

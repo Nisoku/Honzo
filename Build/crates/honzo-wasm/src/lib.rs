@@ -137,7 +137,7 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
 
     let spec: BuildSpec = serde_wasm_bindgen::from_value(spec).map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
 
-    let mut builder = Builder::new();
+    let mut builder = HonzoBuilder::new();
 
     for chunk in &spec.chunks {
         if chunk.tag.len() != 4 {

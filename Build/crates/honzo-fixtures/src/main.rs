@@ -3,16 +3,16 @@ use std::fs;
 use std::path::Path;
 
 use honzo_std::{
-    build_sidx, compute_reading_time, generate_covt, new_uuid, Builder, Compression, CoverType,
+    build_sidx, compute_reading_time, generate_covt, new_uuid, HonzoBuilder, Compression, CoverType,
     HonzoMeta, Identifier, LayoutMode, MarkupType, PmapEntry, SeriesMeta,
 };
 
 fn fixtures_dir() -> &'static Path {
-    Path::new("../Tests/fixtures")
+    Path::new("../../../Tests/fixtures")
 }
 
 fn corpus_dir() -> &'static Path {
-    Path::new("../Tests/corpus")
+    Path::new("../../../Tests/corpus")
 }
 
 fn minimal_meta() -> HonzoMeta {
@@ -28,7 +28,7 @@ fn minimal_meta() -> HonzoMeta {
 
 fn gen_minimal() {
     let meta = rmp_serde::to_vec(&minimal_meta()).unwrap();
-    let hzo = Builder::new().set_meta(&meta).finalize().unwrap();
+    let hzo = HonzoBuilder::new().set_meta(&meta).finalize().unwrap();
     fs::write(fixtures_dir().join("minimal.hzo"), &hzo).unwrap();
 }
 
@@ -68,7 +68,7 @@ fn gen_novel() {
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
     let covr = make_cover_jpeg();
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .set_layout(LayoutMode::Reflowable)
         .add_chunk(
             *b"COVR",
@@ -162,7 +162,7 @@ fn gen_manga() {
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
     let covr = make_cover_jpeg();
-    let mut b = Builder::new().set_layout(LayoutMode::Scroll).add_chunk(
+    let mut b = HonzoBuilder::new().set_layout(LayoutMode::Scroll).add_chunk(
         *b"COVR",
         &covr,
         Compression::None,
@@ -203,7 +203,7 @@ fn gen_textbook() {
     };
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .set_layout(LayoutMode::Fixed)
         .add_chunk(
             *b"CHAP",
@@ -312,7 +312,7 @@ fn gen_multilang() {
     };
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .add_chunk(
             *b"CHAP",
             lorem().as_bytes(),
@@ -347,7 +347,7 @@ fn gen_with_sidx() {
     ];
     let sidx = build_sidx(&chapters).unwrap();
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .set_flags(0x20)
         .add_chunk(
             *b"CHAP",
@@ -453,7 +453,7 @@ fn gen_with_anno() {
     extra.extend_from_slice(&(anno_body.len() as u32).to_le_bytes());
     extra.extend_from_slice(&anno_body);
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .set_flags(0x40)
         .add_chunk(
             *b"CHAP",
@@ -506,7 +506,7 @@ fn gen_with_covt() {
     let covr = make_cover_jpeg();
     let covt = generate_covt(&covr).unwrap();
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .add_chunk(
             *b"COVR",
             &covr,
@@ -557,7 +557,7 @@ fn gen_translated() {
     };
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .add_chunk(
             *b"CHAP",
             lorem().as_bytes(),
@@ -595,7 +595,7 @@ fn gen_series() {
     };
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .add_chunk(
             *b"CHAP",
             lorem().as_bytes(),
@@ -632,7 +632,7 @@ fn gen_with_fonts() {
 
     let font_data = make_dummy_font();
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .add_chunk(
             *b"FONT",
             &font_data,
@@ -670,7 +670,7 @@ fn gen_max_chunks() {
     };
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
-    let mut b = Builder::new();
+    let mut b = HonzoBuilder::new();
     for i in 0..1000 {
         let text = format!("Chapter {}.\n", i);
         b = b.add_chunk(
@@ -702,7 +702,7 @@ fn gen_compressed(path: &str, compression: Compression) {
     let covr = make_cover_jpeg();
     let text = lorem().repeat(10);
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .add_chunk(
             *b"COVR",
             &covr,
@@ -827,7 +827,7 @@ fn gen_crc_mismatch() {
     };
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
-    let mut hzo = Builder::new()
+    let mut hzo = HonzoBuilder::new()
         .add_chunk(
             *b"CHAP",
             b"Some content",
@@ -842,7 +842,7 @@ fn gen_crc_mismatch() {
         .finalize()
         .unwrap();
 
-    let toc_size = u64::from_le_bytes(hzo[24..32].try_into().unwrap()) as usize;
+    let toc_size = u64::from_le_bytes(hzo[16..24].try_into().unwrap()) as usize;
     let data_start = 4 + 48 + toc_size;
     if data_start < hzo.len() {
         hzo[data_start] ^= 0xFF;
@@ -861,7 +861,7 @@ fn gen_unknown_chunk_type() {
     };
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .add_chunk(
             *b"XXXX",
             b"unknown data",
@@ -896,7 +896,7 @@ fn gen_unknown_extra_ns() {
     extra.extend_from_slice(&5u32.to_le_bytes());
     extra.extend_from_slice(b"hello");
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .add_chunk(
             *b"CHAP",
             lorem().as_bytes(),
@@ -925,7 +925,7 @@ fn gen_empty_extra() {
     };
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .add_chunk(
             *b"CHAP",
             lorem().as_bytes(),
@@ -944,7 +944,7 @@ fn gen_empty_extra() {
 }
 
 fn gen_empty_meta() {
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .add_chunk(
             *b"CHAP",
             lorem().as_bytes(),
@@ -972,7 +972,7 @@ fn gen_zero_chunks() {
     };
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
-    let hzo = Builder::new().set_meta(&meta_bytes).finalize().unwrap();
+    let hzo = HonzoBuilder::new().set_meta(&meta_bytes).finalize().unwrap();
     fs::write(corpus_dir().join("zero_chunks.hzo"), &hzo).unwrap();
 }
 
@@ -987,7 +987,7 @@ fn gen_encrypted_chunk() {
     };
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
-    let mut hzo = Builder::new()
+    let mut hzo = HonzoBuilder::new()
         .add_chunk(
             *b"CHAP",
             b"secret data",
@@ -1022,7 +1022,7 @@ fn gen_large_alt_text() {
 
     let alt = "x".repeat(500);
     let img = make_dummy_img(100, 100);
-    let hzo = Builder::new()
+    let hzo = HonzoBuilder::new()
         .add_chunk(
             *b"IMG_",
             &img,
@@ -1039,7 +1039,7 @@ fn gen_large_alt_text() {
     fs::write(corpus_dir().join("large_alt_text.hzo"), &hzo).unwrap();
 }
 
-fn main() {
+pub fn generate_all() {
     let dirs = [fixtures_dir(), corpus_dir()];
     for d in &dirs {
         fs::create_dir_all(d).unwrap();
@@ -1127,4 +1127,9 @@ fn main() {
     println!("Generated large_alt_text.hzo");
 
     println!("All fixtures generated successfully!");
+}
+
+#[allow(dead_code)]
+fn main() {
+    generate_all();
 }

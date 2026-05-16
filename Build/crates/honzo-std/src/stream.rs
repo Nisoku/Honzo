@@ -158,9 +158,8 @@ impl<'a, R: Read + Seek> Iterator for ChapterIter<'a, R> {
     }
 }
 
-// TODO: NO unsafe
 fn leak_str(s: String) -> &'static str {
-    unsafe { &*(Box::into_raw(s.into_boxed_str()) as *const str) }
+    Box::leak(s.into_boxed_str())
 }
 
 fn parse_toc_owned(
@@ -206,7 +205,7 @@ fn parse_toc_owned(
                 1 => honzo_core::FontEmbedding::PrintOnly,
                 2 => honzo_core::FontEmbedding::NoModify,
                 3 => honzo_core::FontEmbedding::NoEmbed,
-                other => return Err(HonzoError::UnknownMarkupType(other)),
+                other => return Err(HonzoError::UnknownFontEmbedding(other)),
             });
             let url_len = read_u16_bytes(buf, &mut cursor)? as usize;
             if url_len > 0 {

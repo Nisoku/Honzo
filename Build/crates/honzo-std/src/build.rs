@@ -19,7 +19,7 @@ struct ChunkSpec {
 }
 
 #[derive(Clone)]
-pub struct Builder {
+pub struct HonzoBuilder {
     layout: LayoutMode,
     flags: u32,
     chunks: Vec<ChunkSpec>,
@@ -28,7 +28,7 @@ pub struct Builder {
     extra: Vec<u8>,
 }
 
-impl Builder {
+impl HonzoBuilder {
     pub fn new() -> Self {
         Self {
             layout: LayoutMode::Reflowable,

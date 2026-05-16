@@ -9,3 +9,9 @@ honzo-std = { path = "../honzo-std" }
 image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
+
+[build-dependencies]
+honzo-std = { path = "../honzo-std" }
+image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
+rmp-serde = "1"
+serde = { version = "1", features = ["derive"] }

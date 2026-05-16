@@ -78,14 +78,14 @@ pub mod ffi {
 
     #[diplomat::opaque]
     pub struct HonzoBuilderHandle {
-        builder: Option<honzo_std::Builder>,
+        builder: Option<honzo_std::HonzoBuilder>,
         result: Vec<u8>,
     }
 
     impl HonzoBuilderHandle {
         pub fn new() -> Box<HonzoBuilderHandle> {
             Box::new(HonzoBuilderHandle {
-                builder: Some(honzo_std::Builder::new()),
+                builder: Some(honzo_std::HonzoBuilder::new()),
                 result: Vec::new(),
             })
         }

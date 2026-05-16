@@ -1,11 +1,11 @@
 use crate::compression::{decompress, verify_entry_crc32};
 use honzo_core::{HonzoError, HonzoParser, TocEntry};
 
-pub struct Reader<'a> {
+pub struct HonzoReader<'a> {
     parser: HonzoParser<'a>,
 }
 
-impl<'a> Reader<'a> {
+impl<'a> HonzoReader<'a> {
     pub fn new(buf: &'a [u8], reader_version: u16) -> Result<Self, HonzoError> {
         Ok(Self {
             parser: HonzoParser::new(buf, reader_version)?,

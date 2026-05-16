@@ -16,6 +16,9 @@ pub enum HonzoError {
         chunk_id: u32,
     },
     UnknownCompression(u8),
+    UnknownLayoutMode(u8),
+    UnknownCoverType(u8),
     UnknownMarkupType(u8),
+    UnknownFontEmbedding(u8),
     Truncated,
 }

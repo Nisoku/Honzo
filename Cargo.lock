@@ -614,6 +614,8 @@ dependencies = [
 name = "honzo-tests"
 version = "0.1.0"
 dependencies = [
+ "honzo-c",
+ "honzo-convert",
  "honzo-core",
  "honzo-std",
  "rmp-serde",
