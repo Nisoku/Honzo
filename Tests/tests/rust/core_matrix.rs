@@ -25,7 +25,13 @@ fn finds_chunks_by_tag_and_id() {
     assert_eq!(chap_by_tag.chunk_type, *b"CHAP");
     assert_eq!(chap_by_id.chunk_id, chap_by_tag.chunk_id);
     assert_eq!(chap_by_id.size_raw, chap_by_tag.size_raw);
-    assert_eq!(parser.toc_entries().filter(|entry| entry.chunk_type == *b"CHAP").count(), 3);
+    assert_eq!(
+        parser
+            .toc_entries()
+            .filter(|entry| entry.chunk_type == *b"CHAP")
+            .count(),
+        3
+    );
 }
 
 #[test]
@@ -48,7 +54,9 @@ fn exposes_pmap_entries_in_order() {
     assert_eq!(entries.len(), 10);
     assert_eq!(entries[0].print_page, 1);
     assert_eq!(entries[9].print_page, 10);
-    assert!(entries.windows(2).all(|pair| pair[0].print_page < pair[1].print_page));
+    assert!(entries
+        .windows(2)
+        .all(|pair| pair[0].print_page < pair[1].print_page));
 }
 
 #[test]

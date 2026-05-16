@@ -6,16 +6,27 @@ use honzo_std::parse_extra;
 fn rejects_truncated_and_invalid_corpus_files() {
     type Check = fn(HonzoError) -> bool;
     let cases: [(&str, Check); 4] = [
-        ("truncated_head.hzo", |err: HonzoError| matches!(err, HonzoError::BufferTooShort)),
-        ("truncated_toc.hzo", |err: HonzoError| matches!(err, HonzoError::BufferTooShort | HonzoError::Truncated)),
-        ("truncated_data.hzo", |err: HonzoError| matches!(err, HonzoError::BufferTooShort | HonzoError::Truncated)),
-        ("unknown_chunk_type.hzo", |err: HonzoError| matches!(err, HonzoError::InvalidChunkType)),
+        ("truncated_head.hzo", |err: HonzoError| {
+            matches!(err, HonzoError::BufferTooShort)
+        }),
+        ("truncated_toc.hzo", |err: HonzoError| {
+            matches!(err, HonzoError::BufferTooShort | HonzoError::Truncated)
+        }),
+        ("truncated_data.hzo", |err: HonzoError| {
+            matches!(err, HonzoError::BufferTooShort | HonzoError::Truncated)
+        }),
+        ("unknown_chunk_type.hzo", |err: HonzoError| {
+            matches!(err, HonzoError::InvalidChunkType)
+        }),
     ];
 
     for (name, check) in cases {
         let data = corpus(name);
         let result = HonzoParser::new(&data, 1);
-        assert!(result.err().is_some_and(check), "unexpected parse result for {name}");
+        assert!(
+            result.err().is_some_and(check),
+            "unexpected parse result for {name}"
+        );
     }
 }
 

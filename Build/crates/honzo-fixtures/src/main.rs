@@ -3,8 +3,8 @@ use std::fs;
 use std::path::Path;
 
 use honzo_std::{
-    build_sidx, compute_reading_time, generate_covt, new_uuid, HonzoBuilder, Compression, CoverType,
-    HonzoMeta, Identifier, LayoutMode, MarkupType, PmapEntry, SeriesMeta,
+    build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
+    HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType, PmapEntry, SeriesMeta,
 };
 
 fn fixtures_dir() -> &'static Path {
@@ -162,16 +162,18 @@ fn gen_manga() {
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
     let covr = make_cover_jpeg();
-    let mut b = HonzoBuilder::new().set_layout(LayoutMode::Scroll).add_chunk(
-        *b"COVR",
-        &covr,
-        Compression::None,
-        MarkupType::Hmd,
-        CoverType::Front,
-        None,
-        None,
-        None,
-    );
+    let mut b = HonzoBuilder::new()
+        .set_layout(LayoutMode::Scroll)
+        .add_chunk(
+            *b"COVR",
+            &covr,
+            Compression::None,
+            MarkupType::Hmd,
+            CoverType::Front,
+            None,
+            None,
+            None,
+        );
 
     let img = make_dummy_img(400, 600);
     for _ in 0..5 {
@@ -972,7 +974,10 @@ fn gen_zero_chunks() {
     };
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
 
-    let hzo = HonzoBuilder::new().set_meta(&meta_bytes).finalize().unwrap();
+    let hzo = HonzoBuilder::new()
+        .set_meta(&meta_bytes)
+        .finalize()
+        .unwrap();
     fs::write(corpus_dir().join("zero_chunks.hzo"), &hzo).unwrap();
 }
 

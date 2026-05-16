@@ -6,8 +6,8 @@ use futures::io::{BufReader, Cursor as FuturesCursor};
 use futures::AsyncReadExt;
 
 use honzo_std::{
-    build_sidx, compute_reading_time, generate_covt, new_uuid, HonzoBuilder, Compression, CoverType,
-    HonzoMeta, Identifier, LayoutMode, MarkupType,
+    build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
+    HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType,
 };
 
 #[derive(Debug)]
@@ -53,9 +53,15 @@ async fn read_zip_entry<R: futures::AsyncBufRead + futures::AsyncSeek + Unpin>(
         })
         .ok_or_else(|| ConvertError::IoError(format!("File not found: {}", path)))?;
 
-    let mut reader = archive.reader_without_entry(idx).await.map_err(|e| ConvertError::IoError(e.to_string()))?;
+    let mut reader = archive
+        .reader_without_entry(idx)
+        .await
+        .map_err(|e| ConvertError::IoError(e.to_string()))?;
     let mut buf = Vec::new();
-    reader.read_to_end(&mut buf).await.map_err(|e| ConvertError::IoError(e.to_string()))?;
+    reader
+        .read_to_end(&mut buf)
+        .await
+        .map_err(|e| ConvertError::IoError(e.to_string()))?;
     Ok(buf)
 }
 
@@ -77,7 +83,13 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
 
     let opf_xml = read_zip_entry(&mut archive, &opf_path).await?;
     let opf_str = String::from_utf8_lossy(&opf_xml).to_string();
-    let (title, creators, language, cover_id, manifest, spine) = parse_opf(&opf_str);
+    let opf = parse_opf(&opf_str);
+    let title = opf.title;
+    let creators = opf.creators;
+    let language = opf.language;
+    let cover_id = opf.cover_id;
+    let manifest = opf.manifest;
+    let spine = opf.spine;
 
     if spine.is_empty() {
         return Err(ConvertError::MissingSpine);
@@ -85,22 +97,26 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
 
     let manifest: Vec<ManifestItem> = manifest
         .into_iter()
-        .map(|(id, href, mt)| ManifestItem { id, href, media_type: mt })
+        .map(|(id, href, mt)| ManifestItem {
+            id,
+            href,
+            media_type: mt,
+        })
         .collect();
 
     let mut chap_texts: Vec<(u32, String)> = Vec::new();
     let mut builder = HonzoBuilder::new().set_layout(LayoutMode::Reflowable);
 
     let resolve = |href: &str| -> String {
-        if href.starts_with('/') {
-            href[1..].to_string()
-        } else {
-            format!("{}{}", opf_dir, href)
-        }
+        href.strip_prefix('/')
+            .map_or_else(|| format!("{}{}", opf_dir, href), ToString::to_string)
     };
 
     for (chunk_id, idref) in spine.iter().enumerate() {
-        let href = manifest.iter().find(|m| m.id == *idref).map(|m| resolve(&m.href));
+        let href = manifest
+            .iter()
+            .find(|m| m.id == *idref)
+            .map(|m| resolve(&m.href));
         if let Some(path) = href {
             if let Ok(html_bytes) = read_zip_entry(&mut archive, &path).await {
                 let html = String::from_utf8_lossy(&html_bytes).to_string();
@@ -132,8 +148,14 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                     *b"IMG_"
                 };
                 builder = builder.add_chunk(
-                    tag, &data, Compression::None, MarkupType::Hmd, CoverType::Front,
-                    None, None, None,
+                    tag,
+                    &data,
+                    Compression::None,
+                    MarkupType::Hmd,
+                    CoverType::Front,
+                    None,
+                    None,
+                    None,
                 );
             }
         }
@@ -145,8 +167,14 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
             if let Ok(covr_data) = read_zip_entry(&mut archive, &path).await {
                 if let Ok(covt) = generate_covt(&covr_data) {
                     builder = builder.add_chunk(
-                        *b"COVT", &covt, Compression::None, MarkupType::Hmd, CoverType::Front,
-                        None, None, None,
+                        *b"COVT",
+                        &covt,
+                        Compression::None,
+                        MarkupType::Hmd,
+                        CoverType::Front,
+                        None,
+                        None,
+                        None,
                     );
                 }
             }
@@ -158,8 +186,14 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
             let path = resolve(&item.href);
             if let Ok(data) = read_zip_entry(&mut archive, &path).await {
                 builder = builder.add_chunk(
-                    *b"CSS_", &data, Compression::None, MarkupType::Hmd, CoverType::Front,
-                    None, None, None,
+                    *b"CSS_",
+                    &data,
+                    Compression::None,
+                    MarkupType::Hmd,
+                    CoverType::Front,
+                    None,
+                    None,
+                    None,
                 );
             }
         }
@@ -175,8 +209,14 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
             let path = resolve(&item.href);
             if let Ok(data) = read_zip_entry(&mut archive, &path).await {
                 builder = builder.add_chunk(
-                    *b"FONT", &data, Compression::None, MarkupType::Hmd, CoverType::Front,
-                    None, Some(honzo_std::FontEmbedding::Allowed), None,
+                    *b"FONT",
+                    &data,
+                    Compression::None,
+                    MarkupType::Hmd,
+                    CoverType::Front,
+                    None,
+                    Some(honzo_std::FontEmbedding::Allowed),
+                    None,
                 );
             }
         }
@@ -184,7 +224,10 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
 
     let mut title_map = HashMap::new();
     if let Some(ref t) = title {
-        title_map.insert(language.clone().unwrap_or_else(|| "en".to_string()), t.clone());
+        title_map.insert(
+            language.clone().unwrap_or_else(|| "en".to_string()),
+            t.clone(),
+        );
     }
 
     let mut word_count: u32 = 0;
@@ -193,10 +236,17 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
     }
 
     let meta = HonzoMeta {
-        title: if title_map.is_empty() { None } else { Some(title_map) },
+        title: if title_map.is_empty() {
+            None
+        } else {
+            Some(title_map)
+        },
         authors: creators,
         language: language.unwrap_or_else(|| "en".to_string()),
-        identifiers: Some(vec![Identifier { id_type: "uuid".to_string(), value: new_uuid() }]),
+        identifiers: Some(vec![Identifier {
+            id_type: "uuid".to_string(),
+            value: new_uuid(),
+        }]),
         source_format: Some("epub".to_string()),
         word_count: Some(word_count),
         reading_time_mins: Some(compute_reading_time(word_count)),
@@ -208,8 +258,14 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         let refs: Vec<(u32, &str)> = chap_texts.iter().map(|(id, t)| (*id, t.as_str())).collect();
         if let Ok(sidx) = build_sidx(&refs) {
             builder = builder.set_flags(0x20).add_chunk(
-                *b"SIDX", &sidx, Compression::None, MarkupType::Hmd, CoverType::Front,
-                None, None, None,
+                *b"SIDX",
+                &sidx,
+                Compression::None,
+                MarkupType::Hmd,
+                CoverType::Front,
+                None,
+                None,
+                None,
             );
         }
     }
@@ -249,14 +305,16 @@ fn parse_container(xml: &str) -> Result<String, ConvertError> {
     Err(ConvertError::MissingMetadata)
 }
 
-fn parse_opf(xml: &str) -> (
-    Option<String>,
-    Vec<String>,
-    Option<String>,
-    Option<String>,
-    Vec<(String, String, String)>,
-    Vec<String>,
-) {
+struct OpfData {
+    title: Option<String>,
+    creators: Vec<String>,
+    language: Option<String>,
+    cover_id: Option<String>,
+    manifest: Vec<(String, String, String)>,
+    spine: Vec<String>,
+}
+
+fn parse_opf(xml: &str) -> OpfData {
     let mut reader = quick_xml::Reader::from_str(xml);
     reader.config_mut().trim_text(true);
     let mut buf = Vec::new();
@@ -290,7 +348,9 @@ fn parse_opf(xml: &str) -> (
                             match attr.key.as_ref() {
                                 b"id" => id = String::from_utf8_lossy(&attr.value).to_string(),
                                 b"href" => href = String::from_utf8_lossy(&attr.value).to_string(),
-                                b"media-type" => mt = String::from_utf8_lossy(&attr.value).to_string(),
+                                b"media-type" => {
+                                    mt = String::from_utf8_lossy(&attr.value).to_string()
+                                }
                                 b"properties" => {
                                     let props = String::from_utf8_lossy(&attr.value);
                                     if props.contains("cover-image") && cover_id.is_none() {
@@ -317,7 +377,9 @@ fn parse_opf(xml: &str) -> (
                         for attr in e.attributes().flatten() {
                             match attr.key.as_ref() {
                                 b"name" => name = String::from_utf8_lossy(&attr.value).to_string(),
-                                b"content" => content = String::from_utf8_lossy(&attr.value).to_string(),
+                                b"content" => {
+                                    content = String::from_utf8_lossy(&attr.value).to_string()
+                                }
                                 _ => {}
                             }
                         }
@@ -336,9 +398,15 @@ fn parse_opf(xml: &str) -> (
                 }
                 match current_tag.as_slice() {
                     b"title" | b"dc:title" => title.get_or_insert(text),
-                    b"creator" | b"dc:creator" => { creators.push(text); continue },
+                    b"creator" | b"dc:creator" => {
+                        creators.push(text);
+                        continue;
+                    }
                     b"language" | b"dc:language" => language.get_or_insert(text),
-                    _ => { buf.clear(); continue },
+                    _ => {
+                        buf.clear();
+                        continue;
+                    }
                 };
             }
             Ok(quick_xml::events::Event::End(ref e)) => {
@@ -357,7 +425,14 @@ fn parse_opf(xml: &str) -> (
         buf.clear();
     }
 
-    (title, creators, language, cover_id, manifest, spine)
+    OpfData {
+        title,
+        creators,
+        language,
+        cover_id,
+        manifest,
+        spine,
+    }
 }
 
 #[cfg(not(feature = "lowmem"))]
@@ -392,8 +467,19 @@ fn extract_text_node(handle: tl::NodeHandle, parser: &tl::Parser, output: &mut S
                 let tag_name = tag.name().as_utf8_str();
                 let is_block = matches!(
                     tag_name.as_ref(),
-                    "p" | "div" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
-                    | "br" | "li" | "tr" | "td" | "th" | "blockquote"
+                    "p" | "div"
+                        | "h1"
+                        | "h2"
+                        | "h3"
+                        | "h4"
+                        | "h5"
+                        | "h6"
+                        | "br"
+                        | "li"
+                        | "tr"
+                        | "td"
+                        | "th"
+                        | "blockquote"
                 );
                 for child_handle in tag.children().top().iter() {
                     extract_text_node(*child_handle, parser, output);
@@ -419,8 +505,11 @@ fn extract_text(html: &str) -> String {
             if c == '>' {
                 in_tag = false;
                 let tag = tag_buf.trim().trim_start_matches('/').to_ascii_lowercase();
-                if tag.starts_with('p') || tag.starts_with("div") || tag.starts_with("br")
-                    || tag.starts_with('h') || tag.starts_with("li")
+                if tag.starts_with('p')
+                    || tag.starts_with("div")
+                    || tag.starts_with("br")
+                    || tag.starts_with('h')
+                    || tag.starts_with("li")
                 {
                     out.push('\n');
                 }

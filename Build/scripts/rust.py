@@ -43,7 +43,7 @@ def wasm_check() -> int:
             "wasm-pack",
             "build",
             "--target",
-            "bundler",
+            "web",
             "--out-dir",
             "../../adapters/typescript/wasm",
         ],

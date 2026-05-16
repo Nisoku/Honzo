@@ -6,7 +6,10 @@ use honzo_std::{build_sidx, HonzoBuilder, HonzoMeta};
 fn builds_minimal_file_with_metadata_only() {
     let meta = HonzoMeta::default();
     let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
-    let file = HonzoBuilder::new().set_meta(&meta_bytes).finalize().unwrap();
+    let file = HonzoBuilder::new()
+        .set_meta(&meta_bytes)
+        .finalize()
+        .unwrap();
     let parser = HonzoParser::new(&file, 1).unwrap();
 
     assert_eq!(parser.head().chunk_count, 0);
@@ -64,7 +67,11 @@ fn builds_font_and_pmap_entries() {
             font_entry.font_embedding,
             font_entry.font_license_url,
         )
-        .add_pmap_entry(PmapEntry { print_page: 1, chunk_id: 0, byte_offset: 0 })
+        .add_pmap_entry(PmapEntry {
+            print_page: 1,
+            chunk_id: 0,
+            byte_offset: 0,
+        })
         .set_meta(&meta_bytes)
         .finalize()
         .unwrap();
@@ -83,9 +90,36 @@ fn builds_sidx_chunk_from_text() {
     let sidx = build_sidx(&chapters).unwrap();
 
     let file = HonzoBuilder::new()
-        .add_chunk(*b"CHAP", chapters[0].1.as_bytes(), Compression::None, MarkupType::Hmd, CoverType::Front, None, None, None)
-        .add_chunk(*b"CHAP", chapters[1].1.as_bytes(), Compression::None, MarkupType::Hmd, CoverType::Front, None, None, None)
-        .add_chunk(*b"SIDX", &sidx, Compression::None, MarkupType::Hmd, CoverType::Front, None, None, None)
+        .add_chunk(
+            *b"CHAP",
+            chapters[0].1.as_bytes(),
+            Compression::None,
+            MarkupType::Hmd,
+            CoverType::Front,
+            None,
+            None,
+            None,
+        )
+        .add_chunk(
+            *b"CHAP",
+            chapters[1].1.as_bytes(),
+            Compression::None,
+            MarkupType::Hmd,
+            CoverType::Front,
+            None,
+            None,
+            None,
+        )
+        .add_chunk(
+            *b"SIDX",
+            &sidx,
+            Compression::None,
+            MarkupType::Hmd,
+            CoverType::Front,
+            None,
+            None,
+            None,
+        )
         .set_meta(&meta_bytes)
         .finalize()
         .unwrap();

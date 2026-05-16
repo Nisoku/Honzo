@@ -5,7 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   root: './',
-  base: './',
+  base: '/Honzo/demo/',
   plugins: [
     {
       name: 'wasm-mime',
@@ -33,7 +33,7 @@ export default defineConfig({
       manifest: {
         name: 'HonzoReader',
         short_name: 'HonzoReader',
-        start_url: './',
+        start_url: '/Honzo/demo/',
         display: 'standalone',
         background_color: '#f5f5f5',
         theme_color: '#1a1a2e',

@@ -21,13 +21,21 @@ fn epub_conversion_preserves_chapter_content_shape() {
     let hzo = from_epub(&epub).unwrap();
     let parser = honzo_core::HonzoParser::new(&hzo, 1).unwrap();
 
-    assert!(parser.toc_entries().any(|entry| entry.chunk_type == *b"CHAP"));
+    assert!(parser
+        .toc_entries()
+        .any(|entry| entry.chunk_type == *b"CHAP"));
 }
 
 #[test]
 fn unsupported_inputs_are_rejected() {
-    assert!(matches!(from_mobi(b"data"), Err(honzo_convert::ConvertError::UnsupportedFormat)));
-    assert!(matches!(from_pdf(b"data"), Err(honzo_convert::ConvertError::UnsupportedFormat)));
+    assert!(matches!(
+        from_mobi(b"data"),
+        Err(honzo_convert::ConvertError::UnsupportedFormat)
+    ));
+    assert!(matches!(
+        from_pdf(b"data"),
+        Err(honzo_convert::ConvertError::UnsupportedFormat)
+    ));
 }
 
 #[test]

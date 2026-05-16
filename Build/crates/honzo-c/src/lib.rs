@@ -34,7 +34,8 @@ pub mod ffi {
                     continue;
                 }
                 let raw = p.chunk_bytes(entry).ok()?;
-                let decompressed = honzo_std::decompress(raw, entry.compression, entry.size_raw).ok()?;
+                let decompressed =
+                    honzo_std::decompress(raw, entry.compression, entry.size_raw).ok()?;
                 chunks.push(decompressed);
             }
 
@@ -76,7 +77,7 @@ pub mod ffi {
         }
     }
 
-    #[diplomat::opaque]
+    #[diplomat::opaque_mut]
     pub struct HonzoBuilderHandle {
         builder: Option<honzo_std::HonzoBuilder>,
         result: Vec<u8>,
@@ -117,7 +118,16 @@ pub mod ffi {
                 Some(b) => b,
                 None => return false,
             };
-            self.builder = Some(b.add_chunk(tag_arr, data, compression, markup, CoverType::Front, None, None, None));
+            self.builder = Some(b.add_chunk(
+                tag_arr,
+                data,
+                compression,
+                markup,
+                CoverType::Front,
+                None,
+                None,
+                None,
+            ));
             true
         }
 

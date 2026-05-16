@@ -85,10 +85,18 @@ fn cmd_info(file: &PathBuf) {
     println!("  Min reader version: {}", head.min_reader_version);
     println!("  Chunk count: {}", head.chunk_count);
     println!("  Layout: {:?}", head.layout_mode());
-    if head.has_drm() { println!("  DRM: present"); }
-    if head.has_sidx() { println!("  SIDX: present"); }
-    if head.has_anno() { println!("  Annotations: present"); }
-    if head.has_sync() { println!("  Sync: present"); }
+    if head.has_drm() {
+        println!("  DRM: present");
+    }
+    if head.has_sidx() {
+        println!("  SIDX: present");
+    }
+    if head.has_anno() {
+        println!("  Annotations: present");
+    }
+    if head.has_sync() {
+        println!("  Sync: present");
+    }
     println!("  TOC: {} bytes", head.toc_size);
     println!("  DATA: {} bytes", head.data_size);
     println!("  EXTRA: {} bytes", head.extra_size);
@@ -97,9 +105,10 @@ fn cmd_info(file: &PathBuf) {
     println!("\n  Chunks:");
     for entry in p.toc_entries() {
         let tag = core::str::from_utf8(&entry.chunk_type).unwrap_or("????");
-        println!("    [{}] {}  off={} packed={} raw={} crc32=0x{:08x}",
-            entry.chunk_id, tag, entry.offset,
-            entry.size_compressed, entry.size_raw, entry.crc32);
+        println!(
+            "    [{}] {}  off={} packed={} raw={} crc32=0x{:08x}",
+            entry.chunk_id, tag, entry.offset, entry.size_compressed, entry.size_raw, entry.crc32
+        );
     }
 
     if let Ok(meta_bytes) = p.meta_bytes() {
@@ -110,10 +119,16 @@ fn cmd_info(file: &PathBuf) {
                     println!("    Title ({}): {}", lang, title);
                 }
             }
-            for a in &meta.authors { println!("    Author: {}", a); }
+            for a in &meta.authors {
+                println!("    Author: {}", a);
+            }
             println!("    Language: {}", meta.language);
-            if let Some(ref wc) = meta.word_count { println!("    Words: {}", wc); }
-            if let Some(ref rt) = meta.reading_time_mins { println!("    Reading time: {} min", rt); }
+            if let Some(ref wc) = meta.word_count {
+                println!("    Words: {}", wc);
+            }
+            if let Some(ref rt) = meta.reading_time_mins {
+                println!("    Reading time: {} min", rt);
+            }
         }
     }
 }
@@ -179,39 +194,53 @@ fn cmd_inspect(file: &PathBuf, json: bool) {
     }
 
     let head = p.head();
-    let toc: Vec<_> = p.toc_entries().map(|e| TocItem {
-        chunk_type: e.chunk_type_str().to_string(),
-        chunk_id: e.chunk_id,
-        offset: e.offset,
-        size_compressed: e.size_compressed,
-        size_raw: e.size_raw,
-        compression: e.compression as u8,
-        markup_type: e.markup_type as u8,
-        cover_type: e.cover_type as u8,
-        flags: e.flags,
-        crc32: e.crc32,
-        alt_text: e.alt_text.map(|s| s.to_string()),
-        is_encrypted: e.is_encrypted(),
-    }).collect();
+    let toc: Vec<_> = p
+        .toc_entries()
+        .map(|e| TocItem {
+            chunk_type: e.chunk_type_str().to_string(),
+            chunk_id: e.chunk_id,
+            offset: e.offset,
+            size_compressed: e.size_compressed,
+            size_raw: e.size_raw,
+            compression: e.compression as u8,
+            markup_type: e.markup_type as u8,
+            cover_type: e.cover_type as u8,
+            flags: e.flags,
+            crc32: e.crc32,
+            alt_text: e.alt_text.map(|s| s.to_string()),
+            is_encrypted: e.is_encrypted(),
+        })
+        .collect();
 
-    let pmap: Vec<_> = p.pmap_entries().map(|e| PmapItem {
-        print_page: e.print_page,
-        chunk_id: e.chunk_id,
-        byte_offset: e.byte_offset,
-    }).collect();
+    let pmap: Vec<_> = p
+        .pmap_entries()
+        .map(|e| PmapItem {
+            print_page: e.print_page,
+            chunk_id: e.chunk_id,
+            byte_offset: e.byte_offset,
+        })
+        .collect();
 
-    let meta_value = p.meta_bytes().ok()
+    let meta_value = p
+        .meta_bytes()
+        .ok()
         .and_then(|b| rmp_serde::from_slice::<HonzoMeta>(b).ok())
         .map(|m| serde_json::to_value(m).unwrap_or(serde_json::Value::Null))
         .unwrap_or(serde_json::Value::Null);
 
-    let extra_entries = p.extra_bytes().ok()
+    let extra_entries = p
+        .extra_bytes()
+        .ok()
         .map(|b| {
-            honzo_std::parse_extra(b).unwrap_or_default().into_iter().map(|e| ExtraItem {
-                tag: core::str::from_utf8(&e.tag).unwrap_or("?").to_string(),
-                namespace: e.namespace,
-                body_len: e.body.len(),
-            }).collect::<Vec<_>>()
+            honzo_std::parse_extra(b)
+                .unwrap_or_default()
+                .into_iter()
+                .map(|e| ExtraItem {
+                    tag: core::str::from_utf8(&e.tag).unwrap_or("?").to_string(),
+                    namespace: e.namespace,
+                    body_len: e.body.len(),
+                })
+                .collect::<Vec<_>>()
         })
         .unwrap_or_default();
 
@@ -273,7 +302,12 @@ fn cmd_extract(file: &PathBuf, chunk_id: u32, out: &PathBuf) {
         eprintln!("Error writing {}: {}", out.display(), e);
         std::process::exit(1);
     });
-    println!("Extracted chunk {} -> {} ({} bytes)", chunk_id, out.display(), decompressed.len());
+    println!(
+        "Extracted chunk {} -> {} ({} bytes)",
+        chunk_id,
+        out.display(),
+        decompressed.len()
+    );
 }
 
 fn cmd_extract_all(file: &PathBuf, out_dir: &PathBuf) {
@@ -342,15 +376,30 @@ fn cmd_build(spec: &PathBuf, out: &PathBuf) {
                 0 => Compression::None,
                 1 => Compression::Zlib,
                 2 => Compression::Zstd,
-                _ => { eprintln!("Error: invalid compression"); std::process::exit(1); }
+                _ => {
+                    eprintln!("Error: invalid compression");
+                    std::process::exit(1);
+                }
             };
             let markup = match chunk["markup_type"].as_u64().unwrap_or(0) {
                 0 => MarkupType::Hmd,
                 1 => MarkupType::Html,
-                _ => { eprintln!("Error: invalid markup_type"); std::process::exit(1); }
+                _ => {
+                    eprintln!("Error: invalid markup_type");
+                    std::process::exit(1);
+                }
             };
 
-            builder = builder.add_chunk(tag, &data, compression, markup, CoverType::Front, None, None, None);
+            builder = builder.add_chunk(
+                tag,
+                &data,
+                compression,
+                markup,
+                CoverType::Front,
+                None,
+                None,
+                None,
+            );
         }
     }
 
@@ -403,7 +452,12 @@ fn cmd_convert(input: &PathBuf, out: &PathBuf) {
                 eprintln!("Error writing {}: {}", out.display(), e);
                 std::process::exit(1);
             });
-            println!("Converted {} -> {} ({} bytes)", input.display(), out.display(), hzo.len());
+            println!(
+                "Converted {} -> {} ({} bytes)",
+                input.display(),
+                out.display(),
+                hzo.len()
+            );
         }
         Err(e) => {
             eprintln!("Conversion failed: {:?}", e);
@@ -428,20 +482,18 @@ fn cmd_validate(file: &PathBuf) {
             continue;
         }
         match p.chunk_bytes(&entry) {
-            Ok(raw) => {
-                match decompress(raw, entry.compression, entry.size_raw) {
-                    Ok(decompressed) => {
-                        if let Err(_) = verify_entry_crc32(&entry, &decompressed) {
-                            eprintln!("  CRC mismatch on chunk {}", entry.chunk_id);
-                            errors += 1;
-                        }
-                    }
-                    Err(_) => {
-                        eprintln!("  Decompress error on chunk {}", entry.chunk_id);
+            Ok(raw) => match decompress(raw, entry.compression, entry.size_raw) {
+                Ok(decompressed) => {
+                    if verify_entry_crc32(&entry, &decompressed).is_err() {
+                        eprintln!("  CRC mismatch on chunk {}", entry.chunk_id);
                         errors += 1;
                     }
                 }
-            }
+                Err(_) => {
+                    eprintln!("  Decompress error on chunk {}", entry.chunk_id);
+                    errors += 1;
+                }
+            },
             Err(e) => {
                 eprintln!("  Error reading chunk {}: {:?}", entry.chunk_id, e);
                 errors += 1;
@@ -451,7 +503,12 @@ fn cmd_validate(file: &PathBuf) {
 
     let count = p.toc_entries().count();
     if errors > 0 {
-        eprintln!("{}: INVALID ({} chunks, {} errors)", file.display(), count, errors);
+        eprintln!(
+            "{}: INVALID ({} chunks, {} errors)",
+            file.display(),
+            count,
+            errors
+        );
         std::process::exit(1);
     } else {
         println!("{}: VALID ({} chunks)", file.display(), count);
@@ -475,15 +532,17 @@ fn cmd_search(file: &PathBuf, query: &str) {
         eprintln!("Error reading SIDX: {:?}", e);
         std::process::exit(1);
     });
-    let decompressed = decompress(raw, sidx_entry.compression, sidx_entry.size_raw).unwrap_or_else(|e| {
-        eprintln!("Error decompressing SIDX: {:?}", e);
-        std::process::exit(1);
-    });
+    let decompressed =
+        decompress(raw, sidx_entry.compression, sidx_entry.size_raw).unwrap_or_else(|e| {
+            eprintln!("Error decompressing SIDX: {:?}", e);
+            std::process::exit(1);
+        });
 
-    let index: HashMap<String, Vec<(u32, u32)>> = rmp_serde::from_slice(&decompressed).unwrap_or_else(|e| {
-        eprintln!("Error parsing SIDX: {:?}", e);
-        std::process::exit(1);
-    });
+    let index: HashMap<String, Vec<(u32, u32)>> = rmp_serde::from_slice(&decompressed)
+        .unwrap_or_else(|e| {
+            eprintln!("Error parsing SIDX: {:?}", e);
+            std::process::exit(1);
+        });
 
     let query_lower = query.to_ascii_lowercase();
     if let Some(results) = index.get(&query_lower) {

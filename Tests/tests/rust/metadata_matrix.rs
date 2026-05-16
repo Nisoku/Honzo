@@ -6,13 +6,28 @@ fn parses_novel_metadata_and_translation_metadata() {
     let novel = fixture("novel.hzo");
     let translated = fixture("translated.hzo");
 
-    let novel_meta: HonzoMeta = rmp_serde::from_slice(honzo_core::HonzoParser::new(&novel, 1).unwrap().meta_bytes().unwrap()).unwrap();
-    let translated_meta: HonzoMeta = rmp_serde::from_slice(honzo_core::HonzoParser::new(&translated, 1).unwrap().meta_bytes().unwrap()).unwrap();
+    let novel_meta: HonzoMeta = rmp_serde::from_slice(
+        honzo_core::HonzoParser::new(&novel, 1)
+            .unwrap()
+            .meta_bytes()
+            .unwrap(),
+    )
+    .unwrap();
+    let translated_meta: HonzoMeta = rmp_serde::from_slice(
+        honzo_core::HonzoParser::new(&translated, 1)
+            .unwrap()
+            .meta_bytes()
+            .unwrap(),
+    )
+    .unwrap();
 
     assert_eq!(novel_meta.language, "en");
     assert!(novel_meta.title.as_ref().unwrap().contains_key("en"));
     assert_eq!(translated_meta.original_lang.as_deref(), Some("de"));
-    assert_eq!(translated_meta.original_title.as_deref(), Some("Der Kleine Hobbit"));
+    assert_eq!(
+        translated_meta.original_title.as_deref(),
+        Some("Der Kleine Hobbit")
+    );
 }
 
 #[test]
@@ -30,7 +45,8 @@ fn computes_reading_time_and_uuid_shape() {
 fn builds_search_index_from_chapters() {
     let chapters = [(0u32, "hello world"), (1u32, "hello rust")];
     let index = build_sidx(&chapters).unwrap();
-    let map: std::collections::BTreeMap<String, Vec<(u32, u32)>> = rmp_serde::from_slice(&index).unwrap();
+    let map: std::collections::BTreeMap<String, Vec<(u32, u32)>> =
+        rmp_serde::from_slice(&index).unwrap();
 
     assert!(map.contains_key("hello"));
     assert_eq!(map["hello"].len(), 2);

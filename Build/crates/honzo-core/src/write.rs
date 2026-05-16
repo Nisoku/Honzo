@@ -51,6 +51,7 @@ impl HonzoBuilder {
         self
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn add_chunk(
         mut self,
         tag: [u8; 4],
@@ -103,8 +104,8 @@ impl HonzoBuilder {
             } else {
                 0u32
             };
-            let alt_text = chunk.alt_text.as_ref().map(|value| value.as_str());
-            let font_license_url = chunk.font_license_url.as_ref().map(|value| value.as_str());
+            let alt_text = chunk.alt_text.as_deref();
+            let font_license_url = chunk.font_license_url.as_deref();
 
             toc_entries.push(TocEntryWrite {
                 chunk_type: chunk.tag,
@@ -152,6 +153,12 @@ impl HonzoBuilder {
         out.extend_from_slice(&extra_bytes);
         out.extend_from_slice(&meta_bytes);
         Ok(out)
+    }
+}
+
+impl Default for HonzoBuilder {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

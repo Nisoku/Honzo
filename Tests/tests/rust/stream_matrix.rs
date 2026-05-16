@@ -1,6 +1,6 @@
 use crate::common::{corpus, fixture};
 use honzo_core::HonzoError;
-use honzo_std::{compute_reading_time, generate_covt, HonzoMeta, HonzoStream, HonzoReader};
+use honzo_std::{compute_reading_time, generate_covt, HonzoMeta, HonzoReader, HonzoStream};
 
 #[test]
 fn streams_all_chapters_in_novel_fixture() {
@@ -53,8 +53,14 @@ fn verifies_crc_and_encrypted_chunk_errors() {
     let encrypted_entry = encrypted_entries[0].clone();
 
     assert_eq!(crc_entry.chunk_type, *b"CHAP");
-    assert!(matches!(crc_stream.read_chunk(&crc_entry), Err(HonzoError::CrcMismatch { .. })));
-    assert!(matches!(encrypted_stream.read_chunk(&encrypted_entry), Err(HonzoError::EncryptedChunk { .. })));
+    assert!(matches!(
+        crc_stream.read_chunk(&crc_entry),
+        Err(HonzoError::CrcMismatch { .. })
+    ));
+    assert!(matches!(
+        encrypted_stream.read_chunk(&encrypted_entry),
+        Err(HonzoError::EncryptedChunk { .. })
+    ));
 }
 
 #[test]
