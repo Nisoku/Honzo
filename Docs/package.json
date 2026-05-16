@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "docmd dev",
+    "test": "npm run build",
     "build": "docmd build",
     "preview": "npx serve site"
   },

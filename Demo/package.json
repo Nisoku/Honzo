@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "npm run build",
     "build": "vite build",
     "preview": "vite preview"
   },

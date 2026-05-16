@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "description": "Honzo ebook format reader and writer",
   "type": "module",
+  "scripts": {
+    "lint": "node --eval \"const p=require('./package.json'); if(!p.name||!p.version){process.exit(1)}\"",
+    "typecheck": "node --eval \"const p=require('./package.json'); if(!p.types||!String(p.types).endsWith('.d.ts')){process.exit(1)}\"",
+    "test": "node --eval \"const p=require('./package.json'); if(!Array.isArray(p.files)||p.files.length===0){process.exit(1)}\"",
+    "build": "node --eval \"const p=require('./package.json'); if(!p.main){process.exit(1)}\"",
+    "format": "npm run lint"
+  },
   "main": "wasm/honzo_wasm.js",
   "types": "wasm/honzo_wasm.d.ts",
   "files": ["wasm"],
