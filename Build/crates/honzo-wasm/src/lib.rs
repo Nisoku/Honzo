@@ -5,8 +5,25 @@ use wasm_bindgen::prelude::*;
 pub struct HonzoWasm {
     buf: Vec<u8>,
     meta: Vec<u8>,
-    toc: Vec<TocEntry<'static>>,
+    toc: Vec<WasmTocEntry>,
     chunks: Vec<Vec<u8>>,
+}
+
+#[allow(dead_code)]
+struct WasmTocEntry {
+    chunk_type: [u8; 4],
+    chunk_id: u32,
+    offset: u64,
+    size_compressed: u32,
+    size_raw: u32,
+    compression: honzo_core::Compression,
+    markup_type: honzo_core::MarkupType,
+    cover_type: honzo_core::CoverType,
+    flags: u8,
+    crc32: u32,
+    alt_text: Option<String>,
+    font_embedding: Option<honzo_core::FontEmbedding>,
+    font_license_url: Option<String>,
 }
 
 #[wasm_bindgen]
@@ -38,22 +55,20 @@ impl HonzoWasm {
 
         let toc = entries
             .iter()
-            .map(|e| {
-                TocEntry {
-                    chunk_type: e.chunk_type,
-                    chunk_id: e.chunk_id,
-                    offset: e.offset,
-                    size_compressed: e.size_compressed,
-                    size_raw: e.size_raw,
-                    compression: e.compression,
-                    markup_type: e.markup_type,
-                    cover_type: e.cover_type,
-                    flags: e.flags,
-                    crc32: e.crc32,
-                    alt_text: e.alt_text.clone(),
-                    font_embedding: e.font_embedding,
-                    font_license_url: e.font_license_url.clone(),
-                }
+            .map(|e| WasmTocEntry {
+                chunk_type: e.chunk_type,
+                chunk_id: e.chunk_id,
+                offset: e.offset,
+                size_compressed: e.size_compressed,
+                size_raw: e.size_raw,
+                compression: e.compression,
+                markup_type: e.markup_type,
+                cover_type: e.cover_type,
+                flags: e.flags,
+                crc32: e.crc32,
+                alt_text: e.alt_text.map(|s| s.to_string()),
+                font_embedding: e.font_embedding,
+                font_license_url: e.font_license_url.map(|s| s.to_string()),
             })
             .collect();
 
@@ -120,13 +135,15 @@ impl HonzoWasm {
             .toc
             .iter()
             .map(|e| TocOut {
-                chunk_type: e.chunk_type_str().to_string(),
+                chunk_type: std::str::from_utf8(&e.chunk_type)
+                    .unwrap_or("????")
+                    .to_string(),
                 chunk_id: e.chunk_id,
                 size_compressed: e.size_compressed,
                 size_raw: e.size_raw,
                 compression: e.compression as u8,
                 markup_type: e.markup_type as u8,
-                alt_text: e.alt_text.map(|s| s.to_string()),
+                alt_text: e.alt_text.clone(),
             })
             .collect();
         serde_wasm_bindgen::to_value(&js_entries)

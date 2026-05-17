@@ -246,7 +246,8 @@ fn parse_toc<'a>(
             let url_len = read_u16_bytes(buf, &mut cursor)? as usize;
             if url_len > 0 {
                 let slice = read_bytes(buf, &mut cursor, url_len)?;
-                font_license_url = Some(core::str::from_utf8(slice).map_err(|_| HonzoError::Truncated)?);
+                font_license_url =
+                    Some(core::str::from_utf8(slice).map_err(|_| HonzoError::Truncated)?);
             }
         }
 
