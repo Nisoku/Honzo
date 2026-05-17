@@ -35,6 +35,7 @@ fn unsupported_inputs_are_rejected() {
     assert!(matches!(
         from_pdf(b"data"),
         Err(honzo_convert::ConvertError::UnsupportedFormat)
+            | Err(honzo_convert::ConvertError::IoError(_))
     ));
 }
 

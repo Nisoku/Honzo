@@ -4,9 +4,6 @@
 - [ ] When I make Dashmark, add it
 - [ ] Add auto build/some other thing to update the WASM build and `.hzo` files in Demo
 - [ ] More tests
-- honzo-convert
-  - [ ] MOBI to Honzo
-  - [ ] PDF to Honzo
 - [ ] Fix images not working properly
 - [ ] Add some sort of styling or decoration thing
 - [ ] Better organization

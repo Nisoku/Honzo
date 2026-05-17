@@ -12,3 +12,4 @@ honzo-convert = { path = "../Build/crates/honzo-convert" }
 honzo-std = { path = "../Build/crates/honzo-std" }
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
+lopdf = "0.40.0"

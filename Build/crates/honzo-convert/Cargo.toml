@@ -17,6 +17,8 @@ quick-xml = "0.40.0"
 rmp-serde = "1"
 tl = "0.7"
 html-escape = "0.2"
+mobi = "0.8"
+pdf_oxide = "0.3"
 
 [dev-dependencies]
 honzo-core = { path = "../honzo-core" }

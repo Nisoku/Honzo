@@ -9,6 +9,8 @@ use honzo_std::{
     build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
     HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType,
 };
+mod mobi;
+mod pdf;
 
 #[derive(Debug)]
 pub enum ConvertError {
@@ -30,11 +32,11 @@ pub fn from_epub(bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
 }
 
 pub fn from_mobi(_bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
-    Err(ConvertError::UnsupportedFormat)
+    mobi::convert_mobi(_bytes)
 }
 
 pub fn from_pdf(_bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
-    Err(ConvertError::UnsupportedFormat)
+    pdf::convert_pdf(_bytes)
 }
 
 async fn read_zip_entry<R: futures::AsyncBufRead + futures::AsyncSeek + Unpin>(
