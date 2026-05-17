@@ -7,26 +7,44 @@ on:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
+      # Build everything
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.19.0'
 
-      - name: Build Demo
+      # Build demo
+      - name: Install Demo deps and build demo
         run: |
           cd Demo
           npm ci
           npm run build
 
+      # Build Docs site
+      - name: Install Docs deps and build docs
+        run: |
+          cd Docs
+          npm ci
+          npm run build
+
+      # Prepare full page deploy directory
       - name: Prepare Pages assets
         run: |
+          mkdir -p gh-pages-root
+          # Docs (site) go to root
+          cp -r Docs/site/* gh-pages-root/
+          # Demo
           mkdir -p gh-pages-root/demo
           cp -r Demo/dist/* gh-pages-root/demo/
 
-      - uses: peaceiris/actions-gh-pages@v3
+      - name: Deploy all assets to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: gh-pages-root
+          keep_files: false # Or true, depending
+          commit_message: Deploy Docs, Demo
