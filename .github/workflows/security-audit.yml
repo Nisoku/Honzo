@@ -1,5 +1,4 @@
 name: Security Audit
-# TODO: may delete, I found this online and it looks useful, but I don't know how to use it yet
 
 on:
   schedule:

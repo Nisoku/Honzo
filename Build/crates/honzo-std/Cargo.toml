@@ -12,6 +12,4 @@ rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
 image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
 getrandom = "0.2"
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-zstd = "0.13"
+zstd = { version = "0.13", features = ["wasm"] }

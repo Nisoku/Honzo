@@ -5,7 +5,7 @@ use std::io::{Read, Seek, SeekFrom};
 pub struct HonzoStream<R: Read + Seek> {
     reader: R,
     head: HonzoHead,
-    toc: Vec<TocEntry<'static>>,
+    toc_buf: Vec<u8>,
     pmap: Vec<PmapEntry>,
     data_start: u64,
 }
@@ -53,14 +53,14 @@ impl<R: Read + Seek> HonzoStream<R> {
         reader
             .read_exact(&mut toc_buf)
             .map_err(|_| HonzoError::BufferTooShort)?;
-        let (toc, pmap) = parse_toc_owned(&toc_buf, chunk_count)?;
+        let (_, pmap) = parse_toc(&toc_buf, chunk_count)?;
 
         let data_start = 4 + 48 + toc_size;
 
         Ok(Self {
             reader,
             head,
-            toc,
+            toc_buf,
             pmap,
             data_start,
         })
@@ -70,12 +70,31 @@ impl<R: Read + Seek> HonzoStream<R> {
         &self.head
     }
 
-    pub fn toc(&self) -> &[TocEntry<'_>] {
-        &self.toc
+    pub fn toc(&self) -> Vec<TocEntry<'_>> {
+        parse_toc(&self.toc_buf, self.head.chunk_count)
+            .map(|(toc, _)| toc)
+            .unwrap_or_default()
     }
 
     pub fn toc_owned(&self) -> Vec<TocEntry<'static>> {
-        self.toc.clone()
+        self.toc()
+            .into_iter()
+            .map(|entry| TocEntry {
+                chunk_type: entry.chunk_type,
+                chunk_id: entry.chunk_id,
+                offset: entry.offset,
+                size_compressed: entry.size_compressed,
+                size_raw: entry.size_raw,
+                compression: entry.compression,
+                markup_type: entry.markup_type,
+                cover_type: entry.cover_type,
+                flags: entry.flags,
+                crc32: entry.crc32,
+                alt_text: None,
+                font_embedding: entry.font_embedding,
+                font_license_url: None,
+            })
+            .collect()
     }
 
     pub fn pmap(&self) -> &[PmapEntry] {
@@ -102,8 +121,29 @@ impl<R: Read + Seek> HonzoStream<R> {
     }
 
     pub fn chapters(&mut self) -> ChapterIter<'_, R> {
+        let toc = self
+            .toc()
+            .into_iter()
+            .filter(|entry| entry.chunk_type == *b"CHAP")
+            .map(|entry| TocEntry {
+                chunk_type: entry.chunk_type,
+                chunk_id: entry.chunk_id,
+                offset: entry.offset,
+                size_compressed: entry.size_compressed,
+                size_raw: entry.size_raw,
+                compression: entry.compression,
+                markup_type: entry.markup_type,
+                cover_type: entry.cover_type,
+                flags: entry.flags,
+                crc32: entry.crc32,
+                alt_text: None,
+                font_embedding: entry.font_embedding,
+                font_license_url: None,
+            })
+            .collect();
         ChapterIter {
             stream: self,
+            toc,
             index: 0,
         }
     }
@@ -135,6 +175,7 @@ impl<R: Read + Seek> HonzoStream<R> {
 
 pub struct ChapterIter<'a, R: Read + Seek> {
     stream: &'a mut HonzoStream<R>,
+    toc: Vec<TocEntry<'static>>,
     index: usize,
 }
 
@@ -142,8 +183,8 @@ impl<'a, R: Read + Seek> Iterator for ChapterIter<'a, R> {
     type Item = Result<Vec<u8>, HonzoError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while self.index < self.stream.toc.len() {
-            let entry = self.stream.toc[self.index];
+        while self.index < self.toc.len() {
+            let entry = self.toc[self.index];
             self.index += 1;
             if entry.chunk_type == *b"CHAP" {
                 if entry.is_encrypted() {
@@ -158,14 +199,10 @@ impl<'a, R: Read + Seek> Iterator for ChapterIter<'a, R> {
     }
 }
 
-fn leak_str(s: String) -> &'static str {
-    Box::leak(s.into_boxed_str())
-}
-
-fn parse_toc_owned(
-    buf: &[u8],
+fn parse_toc<'a>(
+    buf: &'a [u8],
     chunk_count: u32,
-) -> Result<(Vec<TocEntry<'static>>, Vec<PmapEntry>), HonzoError> {
+) -> Result<(Vec<TocEntry<'a>>, Vec<PmapEntry>), HonzoError> {
     let mut cursor = 0usize;
     let entries = read_u32_bytes(buf, &mut cursor)?;
     if entries != chunk_count {
@@ -190,8 +227,7 @@ fn parse_toc_owned(
         let alt_len = read_u16_bytes(buf, &mut cursor)? as usize;
         let alt_text = if alt_len > 0 {
             let slice = read_bytes(buf, &mut cursor, alt_len)?;
-            let owned = String::from_utf8(slice.to_vec()).map_err(|_| HonzoError::Truncated)?;
-            Some(leak_str(owned))
+            Some(core::str::from_utf8(slice).map_err(|_| HonzoError::Truncated)?)
         } else {
             None
         };
@@ -210,12 +246,11 @@ fn parse_toc_owned(
             let url_len = read_u16_bytes(buf, &mut cursor)? as usize;
             if url_len > 0 {
                 let slice = read_bytes(buf, &mut cursor, url_len)?;
-                let owned = String::from_utf8(slice.to_vec()).map_err(|_| HonzoError::Truncated)?;
-                font_license_url = Some(leak_str(owned));
+                font_license_url = Some(core::str::from_utf8(slice).map_err(|_| HonzoError::Truncated)?);
             }
         }
 
-        let entry = TocEntry {
+        toc.push(TocEntry {
             chunk_type,
             chunk_id,
             offset,
@@ -229,8 +264,7 @@ fn parse_toc_owned(
             alt_text,
             font_embedding,
             font_license_url,
-        };
-        toc.push(entry);
+        });
     }
 
     let pmap_count = read_u32_bytes(buf, &mut cursor)?;

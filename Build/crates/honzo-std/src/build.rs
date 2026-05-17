@@ -193,19 +193,11 @@ fn prepare_chunk(chunk: &ChunkSpec) -> Result<(Vec<u8>, u32, u32, u32), HonzoErr
             (compressed, size_compressed, size_raw)
         }
         Compression::Zstd => {
-            #[cfg(not(target_arch = "wasm32"))]
-            {
-                let compressed = zstd::encode_all(std::io::Cursor::new(&chunk.raw_data), 3)
-                    .map_err(|_| HonzoError::Truncated)?;
-                let size_raw = chunk.raw_data.len() as u32;
-                let size_compressed = compressed.len() as u32;
-                (compressed, size_compressed, size_raw)
-            }
-
-            #[cfg(target_arch = "wasm32")]
-            {
-                return Err(HonzoError::Truncated);
-            }
+            let compressed = zstd::encode_all(std::io::Cursor::new(&chunk.raw_data), 3)
+                .map_err(|_| HonzoError::Truncated)?;
+            let size_raw = chunk.raw_data.len() as u32;
+            let size_compressed = compressed.len() as u32;
+            (compressed, size_compressed, size_raw)
         }
     };
 

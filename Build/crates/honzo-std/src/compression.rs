@@ -17,21 +17,13 @@ pub fn decompress(
             Ok(out)
         }
         Compression::Zstd => {
-            #[cfg(not(target_arch = "wasm32"))]
-            {
-                let mut decoder = zstd::stream::Decoder::new(std::io::Cursor::new(data))
-                    .map_err(|_| HonzoError::Truncated)?;
-                let mut out = Vec::with_capacity(raw_size as usize);
-                decoder
-                    .read_to_end(&mut out)
-                    .map_err(|_| HonzoError::Truncated)?;
-                Ok(out)
-            }
-
-            #[cfg(target_arch = "wasm32")]
-            {
-                Err(HonzoError::Truncated)
-            }
+            let mut decoder = zstd::stream::Decoder::new(std::io::Cursor::new(data))
+                .map_err(|_| HonzoError::Truncated)?;
+            let mut out = Vec::with_capacity(raw_size as usize);
+            decoder
+                .read_to_end(&mut out)
+                .map_err(|_| HonzoError::Truncated)?;
+            Ok(out)
         }
     }
 }

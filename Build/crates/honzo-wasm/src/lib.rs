@@ -39,12 +39,6 @@ impl HonzoWasm {
         let toc = entries
             .iter()
             .map(|e| {
-                let alt_text = e
-                    .alt_text
-                    .map(|s| Box::leak(s.to_string().into_boxed_str()) as &'static str);
-                let font_url = e
-                    .font_license_url
-                    .map(|s| Box::leak(s.to_string().into_boxed_str()) as &'static str);
                 TocEntry {
                     chunk_type: e.chunk_type,
                     chunk_id: e.chunk_id,
@@ -56,9 +50,9 @@ impl HonzoWasm {
                     cover_type: e.cover_type,
                     flags: e.flags,
                     crc32: e.crc32,
-                    alt_text,
+                    alt_text: e.alt_text.clone(),
                     font_embedding: e.font_embedding,
-                    font_license_url: font_url,
+                    font_license_url: e.font_license_url.clone(),
                 }
             })
             .collect();
