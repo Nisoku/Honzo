@@ -1,4 +1,3 @@
-use getrandom::getrandom;
 use honzo_core::HonzoError;
 use image::codecs::jpeg::JpegEncoder;
 use image::imageops::FilterType;
@@ -27,7 +26,7 @@ pub fn generate_covt(covr_bytes: &[u8]) -> Result<Vec<u8>, HonzoError> {
 
 pub fn new_uuid() -> String {
     let mut bytes = [0u8; 16];
-    let _ = getrandom(&mut bytes);
+    let _ = getrandom::fill(&mut bytes);
     bytes[6] = (bytes[6] & 0x0F) | 0x40;
     bytes[8] = (bytes[8] & 0x3F) | 0x80;
     format!(

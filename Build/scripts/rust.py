@@ -38,18 +38,17 @@ def wasm_check() -> int:
     if shutil.which("wasm-pack") is None:
         print("[WARN] wasm-pack not installed; skipping wasm check.", flush=True)
         return 0
-    return 0
-    # return run(
-    #     [
-    #         "wasm-pack",
-    #         "build",
-    #         "--target",
-    #         "web",
-    #         "--out-dir",
-    #         "../../adapters/typescript/wasm",
-    #     ],
-    #     cwd=ROOT / "Build" / "crates" / "honzo-wasm",
-    # )
+    return run(
+        [
+            "wasm-pack",
+            "build",
+            "--target",
+            "web",
+            "--out-dir",
+            "../../adapters/typescript/wasm",
+        ],
+        cwd=ROOT / "Build" / "crates" / "honzo-wasm",
+    )
 
 
 def main() -> None:

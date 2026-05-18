@@ -24,9 +24,11 @@ jobs:
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-      - name: Build WASM
-        run: wasm-pack build --target web --out-dir ../../../Build/adapters/typescript/wasm
-        working-directory: Build/crates/honzo-wasm
+      - name: Install just
+        run: sudo apt-get update && sudo apt-get install -y just
+
+      - name: Build WASM (via just)
+        run: just rust wasm_check
 
       - name: Upload WASM artifacts
         uses: actions/upload-artifact@v4

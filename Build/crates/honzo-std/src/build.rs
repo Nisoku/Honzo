@@ -1,7 +1,6 @@
 use honzo_core::{
     Compression, CoverType, FontEmbedding, HonzoError, LayoutMode, MarkupType, PmapEntry,
 };
-use std::io::Write;
 use std::vec::Vec;
 
 const MAGIC: &[u8; 4] = b"HONO";
@@ -181,20 +180,8 @@ fn prepare_chunk(chunk: &ChunkSpec) -> Result<(Vec<u8>, u32, u32, u32), HonzoErr
             let len = raw.len() as u32;
             (raw, len, len)
         }
-        Compression::Zlib => {
-            let mut encoder =
-                flate2::write::ZlibEncoder::new(Vec::new(), flate2::Compression::default());
-            encoder
-                .write_all(&chunk.raw_data)
-                .map_err(|_| HonzoError::Truncated)?;
-            let compressed = encoder.finish().map_err(|_| HonzoError::Truncated)?;
-            let size_raw = chunk.raw_data.len() as u32;
-            let size_compressed = compressed.len() as u32;
-            (compressed, size_compressed, size_raw)
-        }
-        Compression::Zstd => {
-            let compressed = zstd::encode_all(std::io::Cursor::new(&chunk.raw_data), 3)
-                .map_err(|_| HonzoError::Truncated)?;
+        Compression::Lz4 => {
+            let compressed = lz4_flex::compress_prepend_size(&chunk.raw_data);
             let size_raw = chunk.raw_data.len() as u32;
             let size_compressed = compressed.len() as u32;
             (compressed, size_compressed, size_raw)

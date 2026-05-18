@@ -30,8 +30,7 @@ doc: |
   
   Compression (per-chunk, flag in TOC entry):
     0 = none
-    1 = zlib
-    2 = zstd
+    1 = lz4
   
   Markup types (for CHAP chunks):
     0 = HMD (Honzo Markdown, default)
@@ -193,7 +192,7 @@ types:
         type: u4
         doc: |
           Bit flags (u32 for future-proofing):
-          Bits 0-1: Default compression (0=none, 1=zlib, 2=zstd)
+          Bits 0-1: Default compression (0=none, 1=lz4)
           Bits 2-3: Layout mode (0=reflowable, 1=fixed, 2=scroll)
           Bit  4:   DRM present (0=no, 1=yes, see org.nisoku.drm in EXTRA)
           Bit  5:   Has search index (SIDX chunk present in DATA)
@@ -304,7 +303,7 @@ types:
 
       - id: compression
         type: u1
-        doc: Compression method (0=none, 1=zlib, 2=zstd)
+        doc: Compression method (0=none, 1=lz4)
 
       - id: markup_type
         type: u1
@@ -497,8 +496,7 @@ types:
 enums:
   compression_type:
     0: none
-    1: zlib
-    2: zstd
+    1: lz4
 
   layout_mode:
     0: reflowable

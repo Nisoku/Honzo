@@ -1,28 +1,15 @@
 use honzo_core::{Compression, HonzoError, TocEntry};
-use std::io::Read;
 
 pub fn decompress(
     data: &[u8],
     compression: Compression,
-    raw_size: u32,
+    _raw_size: u32,
 ) -> Result<Vec<u8>, HonzoError> {
     match compression {
         Compression::None => Ok(data.to_vec()),
-        Compression::Zlib => {
-            let mut decoder = flate2::read::ZlibDecoder::new(std::io::Cursor::new(data));
-            let mut out = Vec::with_capacity(raw_size as usize);
-            decoder
-                .read_to_end(&mut out)
-                .map_err(|_| HonzoError::Truncated)?;
-            Ok(out)
-        }
-        Compression::Zstd => {
-            let mut decoder = zstd::stream::Decoder::new(std::io::Cursor::new(data))
-                .map_err(|_| HonzoError::Truncated)?;
-            let mut out = Vec::with_capacity(raw_size as usize);
-            decoder
-                .read_to_end(&mut out)
-                .map_err(|_| HonzoError::Truncated)?;
+        Compression::Lz4 => {
+            let out =
+                lz4_flex::decompress_size_prepended(data).map_err(|_| HonzoError::Truncated)?;
             Ok(out)
         }
     }

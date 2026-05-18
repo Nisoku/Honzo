@@ -4,16 +4,14 @@ use crate::HonzoError;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Compression {
     None = 0,
-    Zlib = 1,
-    Zstd = 2,
+    Lz4 = 1,
 }
 
 impl Compression {
     pub fn from_u8(value: u8) -> Result<Self, HonzoError> {
         match value {
             0 => Ok(Self::None),
-            1 => Ok(Self::Zlib),
-            2 => Ok(Self::Zstd),
+            1 => Ok(Self::Lz4),
             other => Err(HonzoError::UnknownCompression(other)),
         }
     }

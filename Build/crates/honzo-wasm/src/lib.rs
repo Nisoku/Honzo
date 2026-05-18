@@ -190,8 +190,7 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
         tag_arr.copy_from_slice(chunk.tag.as_bytes());
         let compression = match chunk.compression {
             0 => Compression::None,
-            1 => Compression::Zlib,
-            2 => Compression::Zstd,
+            1 => Compression::Lz4,
             _ => return Err(JsValue::from_str("invalid compression")),
         };
         let markup = match chunk.markup_type {

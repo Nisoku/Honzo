@@ -12,16 +12,16 @@ Honzo is a binary ebook format designed for simplicity, performance, and portabi
 
 ## Features
 
-| Feature                      | Description                                                                   |
-|------------------------------|-------------------------------------------------------------------------------|
+| Feature                      | Description                                                                 |
+|------------------------------|-----------------------------------------------------------------------------|
 | **Zero-copy parsing**        | Read without allocating: embeddable on bare metal                           |
-| **Pull-based streaming**     | Decompress chapters on demand, never hold the whole book in memory            |
-| **Per-chunk compression**    | zlib or zstd, selected per chapter via TOC flag                               |
+| **Pull-based streaming**     | Decompress chapters on demand, never hold the whole book in memory          |
+| **Per-chunk compression**    | lz4, selected per chapter via TOC flag                                      |
 | **Separately editable tail** | META is last: edit title, tags, revision without touching DATA              |
 | **Portable annotations**     | org.nisoku.anno in EXTRA: highlights, bookmarks, notes travel with the file |
-| **Search index**             | SIDX chunk with inverted term index (MessagePack)                             |
-| **Encryption envelope**      | org.nisoku.drm for AES-256-CBC content protection                             |
-| **Multi-language metadata**  | Titles and descriptions localized per BCP 47 language tag                     |
+| **Search index**             | SIDX chunk with inverted term index (MessagePack)                           |
+| **Encryption envelope**      | org.nisoku.drm for AES-256-CBC content protection                           |
+| **Multi-language metadata**  | Titles and descriptions localized per BCP 47 language tag                   |
 
 ## Quick Start
 

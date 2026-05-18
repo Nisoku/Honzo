@@ -16,20 +16,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.19.0'
+      - name: Install just
+        run: sudo apt-get update && sudo apt-get install -y just
 
       # Build demo
-      - name: Install Demo deps and build demo
-        run: |
-          cd Demo
-          npm ci
-          npm run build
+      - name: Build Demo
+        run: just demo build
 
       # Build Docs site
-      - name: Install Docs deps and build docs
-        run: |
-          cd Docs
-          npm ci
-          npm run build
+      - name: Build Docs
+        run: just docs build
 
       # Prepare full page deploy directory
       - name: Prepare Pages assets

@@ -6,10 +6,9 @@ license = "Apache-2.0"
 
 [dependencies]
 honzo-core = { path = "../honzo-core", features = ["alloc"] }
-flate2 = "1"
 crc32fast = "1"
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
 image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
-getrandom = "0.2"
-zstd = { version = "0.13", default-features = false, features = ["wasm"] }
+getrandom = { version = "0.4.2", features = ["wasm_js"] }
+lz4_flex = "0.13.1"

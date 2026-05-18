@@ -12,5 +12,16 @@
 - [ ] Native converter via CLI (properly)
 - [ ] Book Maker online
 - [ ] Better API
-- [ ] Fix WASM build/make it better
+- [ ] Fix WASM build
+- [ ] make wasm api better
 - [ ] Docs
+- [ ] HonzoStream
+- [ ] DRM is envelope-only, no actual encrypt/decrypt anywhere
+- [ ] org.nisoku.anno is defined in EXTRA format but there's no API to actually build or query annotations programmatically
+- [ ] org.nisoku.sync same, struct defined, no tooling sob
+- [ ] COVT auto-generation is not wired into HonzoBuilder automatically, caller has to do it manually
+- [ ] min_reader_version is written as hardcoded 1 everywhere, never actually validated meaningfully
+- [ ] The TypeScript wrapper is basically just re-exporting WASM with no real typed API layer (wasm-pack gives really good APIs)
+- [ ] The search UI in the demo doesn't exist despite SIDX being fully implemented
+- [ ] The META inspector panel in the demo doesn't exist
+- [ ] Reading progress / bookmarks in EXTRA have no demo or API

@@ -374,8 +374,7 @@ fn cmd_build(spec: &PathBuf, out: &PathBuf) {
 
             let compression = match chunk["compression"].as_u64().unwrap_or(0) {
                 0 => Compression::None,
-                1 => Compression::Zlib,
-                2 => Compression::Zstd,
+                1 => Compression::Lz4,
                 _ => {
                     eprintln!("Error: invalid compression");
                     std::process::exit(1);

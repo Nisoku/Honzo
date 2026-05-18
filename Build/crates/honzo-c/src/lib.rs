@@ -107,8 +107,7 @@ pub mod ffi {
             tag_arr.copy_from_slice(tag);
             let compression = match compression {
                 0 => Compression::None,
-                1 => Compression::Zlib,
-                2 => Compression::Zstd,
+                1 => Compression::Lz4,
                 _ => return false,
             };
             let markup = match markup_type {

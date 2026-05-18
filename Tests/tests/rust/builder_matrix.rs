@@ -26,7 +26,7 @@ fn builds_compressed_chapters_that_stream_cleanly() {
         .add_chunk(
             *b"CHAP",
             chapter,
-            Compression::Zlib,
+            Compression::Lz4,
             MarkupType::Hmd,
             CoverType::Front,
             None,
@@ -44,7 +44,7 @@ fn builds_compressed_chapters_that_stream_cleanly() {
         .read_chunk(&entry)
         .unwrap();
 
-    assert_eq!(entry.compression, Compression::Zlib);
+    assert_eq!(entry.compression, Compression::Lz4);
     assert_eq!(decompressed, chapter);
 }
 

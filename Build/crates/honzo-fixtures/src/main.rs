@@ -1086,11 +1086,8 @@ pub fn generate_all() {
     gen_max_chunks();
     println!("Generated max_chunks.hzo");
 
-    gen_compressed("compressed_zlib.hzo", Compression::Zlib);
-    println!("Generated compressed_zlib.hzo");
-
-    gen_compressed("compressed_zstd.hzo", Compression::Zstd);
-    println!("Generated compressed_zstd.hzo");
+    gen_compressed("compressed_lz4.hzo", Compression::Lz4);
+    println!("Generated compressed_lz4.hzo");
 
     gen_bad_magic();
     println!("Generated bad_magic.hzo");

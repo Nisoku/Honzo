@@ -23,8 +23,11 @@ jobs:
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
+      - name: Install just
+        run: sudo apt-get update && sudo apt-get install -y just
+
       - name: Run clippy
-        run: cargo clippy --workspace -- -D warnings
+        run: just rust lint
 
   fmt:
     runs-on: ubuntu-latest
@@ -37,4 +40,6 @@ jobs:
           components: rustfmt
 
       - name: Check formatting
-        run: cargo fmt --check
+        run: |
+          sudo apt-get update && sudo apt-get install -y just
+          just format

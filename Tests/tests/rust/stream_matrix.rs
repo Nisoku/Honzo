@@ -13,20 +13,14 @@ fn streams_all_chapters_in_novel_fixture() {
 }
 
 #[test]
-fn decompresses_zlib_and_zstd_fixtures() {
-    let zlib_data = fixture("compressed_zlib.hzo");
-    let zstd_data = fixture("compressed_zstd.hzo");
+fn decompresses_lz4_fixture() {
+    let lz4_data = fixture("compressed_lz4.hzo");
 
-    let mut zlib = HonzoStream::open(std::io::Cursor::new(&zlib_data), 1).unwrap();
-    let mut zstd = HonzoStream::open(std::io::Cursor::new(&zstd_data), 1).unwrap();
+    let mut lz4 = HonzoStream::open(std::io::Cursor::new(&lz4_data), 1).unwrap();
+    let lz4_entries = lz4.toc_owned();
+    let lz4_entry = lz4_entries[1].clone();
 
-    let zlib_entries = zlib.toc_owned();
-    let zstd_entries = zstd.toc_owned();
-    let zlib_entry = zlib_entries[1].clone();
-    let zstd_entry = zstd_entries[1].clone();
-
-    assert!(zlib.read_chunk(&zlib_entry).unwrap().len() > zlib_entry.size_compressed as usize);
-    assert!(zstd.read_chunk(&zstd_entry).unwrap().len() > zstd_entry.size_compressed as usize);
+    assert!(lz4.read_chunk(&lz4_entry).unwrap().len() > lz4_entry.size_compressed as usize);
 }
 
 #[test]
