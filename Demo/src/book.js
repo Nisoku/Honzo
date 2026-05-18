@@ -43,6 +43,16 @@ function getMetaStr(obj, field) {
   return v || null;
 }
 
+function formatError(err) {
+  if (err instanceof Error && err.message) {
+    return err.message;
+  }
+  if (typeof err === 'string') {
+    return err;
+  }
+  return String(err);
+}
+
 async function ensureWasmReady() {
   if (!wasmInitPromise) {
     wasmInitPromise = init();
@@ -58,7 +68,7 @@ export async function openBook(e) {
     const data = await file.arrayBuffer();
     await loadBook(new Uint8Array(data));
   } catch (err) {
-    showError('Error loading book: ' + err.message);
+    showError('Error loading book: ' + formatError(err));
   } finally {
     hideLoading();
   }
@@ -73,7 +83,7 @@ export async function openBuiltinBook(bookPath) {
     const data = await resp.arrayBuffer();
     await loadBook(new Uint8Array(data));
   } catch (err) {
-    showError('Error loading demo: ' + err.message);
+    showError('Error loading demo: ' + formatError(err));
   } finally {
     hideLoading();
   }
@@ -88,7 +98,7 @@ export async function openBookFromEntry(entry) {
     await loadBook(new Uint8Array(data));
   } catch (err) {
     toggleLibrary(true);
-    showError('Error opening book: ' + err.message);
+    showError('Error opening book: ' + formatError(err));
   } finally {
     hideLoading();
   }

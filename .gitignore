@@ -26,3 +26,4 @@ tmp/
 __pycache__/
 site/
 .DS_Store
+Demo/src/wasm/

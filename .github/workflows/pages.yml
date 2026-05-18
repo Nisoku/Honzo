@@ -16,10 +16,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.19.0'
+
       - name: Install just
         run: sudo apt-get update && sudo apt-get install -y just
 
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
       # Build demo
+      - name: Run setup
+        run: just setup
+
       - name: Build Demo
         run: just demo build
 

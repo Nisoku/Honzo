@@ -20,8 +20,15 @@ jobs:
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
+
       - name: Install just
         run: sudo apt-get update && sudo apt-get install -y just
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Run setup
+        run: just setup
 
       - name: Run tests
         run: just test

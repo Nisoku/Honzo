@@ -1,10 +1,29 @@
 import { openBookFromEntry } from "./book.js";
 import { showError, toggleLibrary } from "./ui.js";
+import init, { HonzoWasm } from "./wasm/honzo_wasm.js";
 
 let elements = {
   libraryContent: null,
   libraryInput: null,
 };
+let wasmInitPromise = null;
+
+async function ensureWasmReady() {
+  if (!wasmInitPromise) {
+    wasmInitPromise = init();
+  }
+  await wasmInitPromise;
+}
+
+function formatError(err) {
+  if (err instanceof Error && err.message) {
+    return err.message;
+  }
+  if (typeof err === 'string') {
+    return err;
+  }
+  return String(err);
+}
 
 export function setLibraryElements(nextElements) {
   elements = {
@@ -30,7 +49,7 @@ export async function openLibrary() {
     displayLibraryGrid(files);
     toggleLibrary(true);
   } catch (err) {
-    showError('Failed to open library: ' + err.message);
+    showError('Failed to open library: ' + formatError(err));
   }
 }
 
@@ -66,9 +85,8 @@ async function createLibraryItem(fileEntry) {
     const file = typeof fileEntry.getFile === 'function' ? await fileEntry.getFile() : fileEntry;
     if (file.name.endsWith('.hzo')) {
       const buf = await file.arrayBuffer();
-      const wasmMod = await import("./wasm/honzo_wasm.js");
-      await wasmMod.default();
-      const reader = new wasmMod.HonzoWasm(new Uint8Array(buf), 1);
+      await ensureWasmReady();
+      const reader = new HonzoWasm(new Uint8Array(buf), 1);
       const meta = reader.get_meta_parsed();
       const firstVal = (v) => v instanceof Map ? v.values().next().value : (typeof v === 'object' ? Object.values(v)[0] : v);
       titleDiv.textContent = firstVal(meta?.title) || fileEntry.name;

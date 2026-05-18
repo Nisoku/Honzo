@@ -2,12 +2,17 @@
 """TypeScript adapter commands for Honzo."""
 
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
-DIR = Path(__file__).resolve().parents[1] / "adapters" / "typescript"
+ROOT = Path(__file__).resolve().parents[2]
+DIR = ROOT / "Build" / "adapters" / "typescript"
 PACKAGE_JSON = DIR / "package.json"
+WASM_SOURCE = ROOT / "Build" / "crates" / "honzo-wasm"
+WASM_OUT = DIR / "wasm"
+DEMO_WASM_OUT = ROOT / "Demo" / "src" / "wasm"
 
 
 def read_scripts() -> dict[str, str]:
@@ -19,6 +24,10 @@ def read_scripts() -> dict[str, str]:
 
 def run(cmd: list[str]) -> int:
     return subprocess.run(cmd, cwd=DIR).returncode
+
+
+def run_root(cmd: list[str], cwd: Path = ROOT) -> int:
+    return subprocess.run(cmd, cwd=cwd).returncode
 
 
 def run_script(name: str) -> int:
@@ -38,6 +47,33 @@ def setup() -> int:
     return run(["npm", "install"])
 
 
+def sync_wasm_outputs() -> None:
+    if DEMO_WASM_OUT.exists():
+        shutil.rmtree(DEMO_WASM_OUT)
+    shutil.copytree(WASM_OUT, DEMO_WASM_OUT)
+
+
+def wasm() -> int:
+    if shutil.which("wasm-pack") is None:
+        print("[ERROR] wasm-pack is not installed.", flush=True)
+        return 1
+    result = run_root(
+        [
+            "wasm-pack",
+            "build",
+            "--target",
+            "web",
+            "--out-dir",
+            str(WASM_OUT),
+        ],
+        cwd=WASM_SOURCE,
+    )
+    if result != 0:
+        return result
+    sync_wasm_outputs()
+    return 0
+
+
 def run_required_scripts(names: list[str]) -> int:
     for name in names:
         code = run_script(name)
@@ -51,6 +87,8 @@ def main() -> None:
 
     if cmd == "setup":
         sys.exit(setup())
+    elif cmd == "wasm":
+        sys.exit(wasm())
     elif cmd == "check":
         sys.exit(run_required_scripts(["lint", "typecheck", "test", "build"]))
     elif cmd == "test":
@@ -62,7 +100,7 @@ def main() -> None:
     elif cmd == "fmt_check":
         sys.exit(run_script("format"))
     else:
-        print(f"Usage: {sys.argv[0]} <check|setup|build|test|lint|fmt_check>")
+        print(f"Usage: {sys.argv[0]} <check|setup|wasm|build|test|lint|fmt_check>")
         sys.exit(1)
 
 

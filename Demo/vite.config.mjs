@@ -11,16 +11,24 @@ export default defineConfig({
       name: 'wasm-mime',
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
-          if (req.url?.endsWith('.wasm')) {
+          const pathname = req.url?.split('?')[0] ?? '';
+          if (pathname.endsWith('.wasm')) {
             res.setHeader('Content-Type', 'application/wasm');
+          }
+          if (pathname.endsWith('.hzo')) {
+            res.setHeader('Content-Type', 'application/x-hzo');
           }
           next();
         });
       },
       configurePreviewServer(server) {
         server.middlewares.use((req, res, next) => {
-          if (req.url?.endsWith('.wasm')) {
+          const pathname = req.url?.split('?')[0] ?? '';
+          if (pathname.endsWith('.wasm')) {
             res.setHeader('Content-Type', 'application/wasm');
+          }
+          if (pathname.endsWith('.hzo')) {
+            res.setHeader('Content-Type', 'application/x-hzo');
           }
           next();
         });

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Rust workspace commands for Honzo."""
 
-import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+SCRIPTS = Path(__file__).resolve().parent
 CMDS = {
     "setup": ["rustup", "target", "add", "wasm32-unknown-unknown"],
     "test": ["cargo", "test", "--workspace"],
@@ -35,20 +35,7 @@ def fmt_check() -> int:
 
 
 def wasm_check() -> int:
-    if shutil.which("wasm-pack") is None:
-        print("[WARN] wasm-pack not installed; skipping wasm check.", flush=True)
-        return 0
-    return run(
-        [
-            "wasm-pack",
-            "build",
-            "--target",
-            "web",
-            "--out-dir",
-            "../../adapters/typescript/wasm",
-        ],
-        cwd=ROOT / "Build" / "crates" / "honzo-wasm",
-    )
+    return subprocess.run([sys.executable, str(SCRIPTS / "typescript.py"), "wasm"], cwd=ROOT).returncode
 
 
 def main() -> None:
