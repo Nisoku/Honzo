@@ -3,7 +3,6 @@ mod compression;
 mod extra;
 mod meta;
 mod reader;
-mod sidx;
 mod stream;
 mod utils;
 
@@ -14,11 +13,14 @@ pub use meta::{
     Accessibility, Contributor, HonzoMeta, Identifier, RenderHints, Revision, SeriesMeta,
 };
 pub use reader::HonzoReader;
-pub use sidx::build_sidx;
 pub use stream::{ChapterIter, HonzoStream};
-pub use utils::{compute_reading_time, generate_covt, new_uuid};
+pub use utils::{compute_reading_time, new_uuid};
 
 pub use honzo_core::{
     Compression, CoverType, FontEmbedding, HonzoError, HonzoHead, LayoutMode, MarkupType,
     PmapEntry, TocEntry,
 };
+
+pub use honzo_chunks::{data, extra as extra_types};
+pub use honzo_chunks::data::covr::{generate_covt, generate_covr};
+pub use honzo_chunks::data::sidx::build_sidx;

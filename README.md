@@ -81,30 +81,30 @@ uint32_t count = HonzoHandle_chunk_count(handle);
 
 ```txt
 Honzo/
+  Cargo.toml                # Rust workspace root
   Build/
-    Cargo.toml              # Rust workspace root
     crates/
-      honzo-core/           # no_std core, allocator-optional
-      honzo-std/            # std wrapper, compression, streaming
+      honzo-core/           # no_std wire-format + parser
+      honzo-chunks/         # chunk semantics (SIDX, COVT, extras)
+      honzo-io/             # builder/reader/stream + compression (std)
       honzo-convert/        # epub/mobi/pdf import
       honzo-c/              # C FFI bindings (Diplomat)
       honzo-wasm/           # wasm-pack target
       honzo-cli/            # CLI binary
     adapters/typescript/    # npm @nisoku/honzo
-  Demo/                     # Vite + TypeScript web demo
+  Demo/                     # Vite web demo
   Docs/                     # Documentation site
   Tests/
-    fixtures/               # Sample .hzo files
+    fixtures/                # Sample .hzo files
     corpus/                 # Edge case files
     tests/                  # Rust integration tests
-  Spec/
-    honzo.ksy               # Kaitai Struct spec
+  honzo.ksy                 # Kaitai Struct spec
 ```
 
 ## Documentation
 
 - [Getting Started](https://nisoku.github.io/Honzo/getting-started/quickstart/)
-- [Format Specification](Spec/honzo.ksy)
+- [Format Specification](honzo.ksy)
 - [API Reference](https://nisoku.github.io/Honzo/api/)
 
 ## Contributing

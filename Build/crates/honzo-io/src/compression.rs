@@ -3,13 +3,13 @@ use honzo_core::{Compression, HonzoError, TocEntry};
 pub fn decompress(
     data: &[u8],
     compression: Compression,
-    _raw_size: u32,
+    raw_size: u32,
 ) -> Result<Vec<u8>, HonzoError> {
     match compression {
         Compression::None => Ok(data.to_vec()),
         Compression::Lz4 => {
-            let out =
-                lz4_flex::decompress_size_prepended(data).map_err(|_| HonzoError::Truncated)?;
+            let mut out = vec![0u8; raw_size as usize];
+            lz4_flex::decompress_into(data, &mut out).map_err(|_| HonzoError::Truncated)?;
             Ok(out)
         }
     }

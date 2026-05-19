@@ -1,6 +1,6 @@
 use crate::common::corpus;
 use honzo_core::{HonzoError, HonzoParser};
-use honzo_std::parse_extra;
+use honzo_io::parse_extra;
 
 #[test]
 fn rejects_truncated_and_invalid_corpus_files() {

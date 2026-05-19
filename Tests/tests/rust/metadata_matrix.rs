@@ -1,5 +1,5 @@
 use crate::common::fixture;
-use honzo_std::{build_sidx, compute_reading_time, find_extra, new_uuid, HonzoMeta};
+use honzo_io::{build_sidx, compute_reading_time, find_extra, new_uuid, HonzoMeta};
 
 #[test]
 fn parses_novel_metadata_and_translation_metadata() {
@@ -56,7 +56,7 @@ fn builds_search_index_from_chapters() {
 fn finds_extra_annotations_by_namespace() {
     let data = fixture("with_anno.hzo");
     let parser = honzo_core::HonzoParser::new(&data, 1).unwrap();
-    let entries = honzo_std::parse_extra(parser.extra_bytes().unwrap()).unwrap();
+    let entries = honzo_io::parse_extra(parser.extra_bytes().unwrap()).unwrap();
 
     assert!(find_extra(&entries, "org.nisoku.anno").is_some());
     assert!(find_extra(&entries, "com.unknown.thing").is_none());

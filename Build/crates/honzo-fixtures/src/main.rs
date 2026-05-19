@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
-use honzo_std::{
+use honzo_io::{
     build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
     HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType, PmapEntry, SeriesMeta,
 };
@@ -642,7 +642,7 @@ fn gen_with_fonts() {
             MarkupType::Hmd,
             CoverType::Front,
             None,
-            Some(honzo_std::FontEmbedding::Allowed),
+            Some(honzo_io::FontEmbedding::Allowed),
             Some("https://example.com/font-license"),
         )
         .add_chunk(

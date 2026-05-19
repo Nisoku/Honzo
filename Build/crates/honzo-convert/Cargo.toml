@@ -9,7 +9,7 @@ default = []
 lowmem = []
 
 [dependencies]
-honzo-std = { path = "../honzo-std" }
+honzo-io = { path = "../honzo-io" }
 futures = "0.3"
 async_zip = { version = "0.0.18", features = ["deflate", "deflate64"] }
 bytes = "1"
@@ -22,4 +22,4 @@ pdf_oxide = "0.3"
 
 [dev-dependencies]
 honzo-core = { path = "../honzo-core" }
-honzo-std = { path = "../honzo-std" }
+honzo-io = { path = "../honzo-io" }

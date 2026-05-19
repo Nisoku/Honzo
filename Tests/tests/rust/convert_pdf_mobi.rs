@@ -1,6 +1,6 @@
 use crate::common::fixture;
 use honzo_convert::{from_epub, from_mobi, from_pdf};
-use honzo_std::HonzoMeta;
+use honzo_io::HonzoMeta;
 use lopdf::{Dictionary, Document, Object, Stream};
 
 #[test]

@@ -1,7 +1,7 @@
 //! PDF conversion using `pdf_oxide`
 
 use crate::ConvertError;
-use honzo_std::{Compression, CoverType, HonzoBuilder, MarkupType};
+use honzo_io::{Compression, CoverType, HonzoBuilder, MarkupType};
 use pdf_oxide::PdfDocument;
 
 pub fn convert_pdf(bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
@@ -16,7 +16,7 @@ pub fn convert_pdf(bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
         return Err(ConvertError::MissingSpine);
     }
 
-    let mut builder = HonzoBuilder::new().set_layout(honzo_std::LayoutMode::Reflowable);
+    let mut builder = HonzoBuilder::new().set_layout(honzo_io::LayoutMode::Reflowable);
 
     for i in 0..page_count {
         // Extract page text; fall back to empty page marker
@@ -62,7 +62,7 @@ pub fn convert_pdf(bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
         }
     }
 
-    let meta = honzo_std::HonzoMeta {
+    let meta = honzo_io::HonzoMeta {
         source_format: Some("pdf".to_string()),
         ..Default::default()
     };

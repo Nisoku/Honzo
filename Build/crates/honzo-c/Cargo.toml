@@ -11,11 +11,11 @@ crate-type = ["cdylib", "staticlib", "rlib"]
 diplomat = "0.15"
 diplomat-runtime = "0.15"
 honzo-core = { path = "../honzo-core" }
-honzo-std = { path = "../honzo-std" }
+honzo-io = { path = "../honzo-io" }
 
 [build-dependencies]
 diplomat-tool = "0.15"
 
 [dev-dependencies]
-honzo-std = { path = "../honzo-std" }
+honzo-io = { path = "../honzo-io" }
 rmp-serde = "1"

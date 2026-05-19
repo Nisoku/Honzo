@@ -1,6 +1,6 @@
 #[diplomat::bridge]
 pub mod ffi {
-    use honzo_std::{Compression, CoverType, MarkupType};
+    use honzo_io::{Compression, CoverType, MarkupType};
 
     #[repr(C)]
     pub enum HonzoErrorCode {
@@ -35,7 +35,7 @@ pub mod ffi {
                 }
                 let raw = p.chunk_bytes(entry).ok()?;
                 let decompressed =
-                    honzo_std::decompress(raw, entry.compression, entry.size_raw).ok()?;
+                    honzo_io::decompress(raw, entry.compression, entry.size_raw).ok()?;
                 chunks.push(decompressed);
             }
 
@@ -81,14 +81,14 @@ pub mod ffi {
 
     #[diplomat::opaque_mut]
     pub struct HonzoBuilderHandle {
-        builder: Option<honzo_std::HonzoBuilder>,
+        builder: Option<honzo_io::HonzoBuilder>,
         result: Vec<u8>,
     }
 
     impl HonzoBuilderHandle {
         pub fn new() -> Box<HonzoBuilderHandle> {
             Box::new(HonzoBuilderHandle {
-                builder: Some(honzo_std::HonzoBuilder::new()),
+                builder: Some(honzo_io::HonzoBuilder::new()),
                 result: Vec::new(),
             })
         }

@@ -77,7 +77,7 @@ fn ffi_builder_roundtrip() {
 
 #[test]
 fn ffi_builder_set_meta() {
-    let meta = rmp_serde::to_vec(&honzo_std::HonzoMeta::default()).unwrap();
+    let meta = rmp_serde::to_vec(&honzo_io::HonzoMeta::default()).unwrap();
     let mut builder = honzo_c::ffi::HonzoBuilderHandle::new();
     builder.add_chunk(b"CHAP", b"content", 0, 0);
     builder.set_meta(&meta);

@@ -1,4 +1,4 @@
-use honzo_std::*;
+use honzo_io::*;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

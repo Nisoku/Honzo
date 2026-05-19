@@ -4,7 +4,7 @@ use std::io::Read;
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
-use honzo_std::*;
+use honzo_io::*;
 
 #[derive(Parser)]
 #[command(name = "honzo", about = "Honzo ebook format tool")]
@@ -232,7 +232,7 @@ fn cmd_inspect(file: &PathBuf, json: bool) {
         .extra_bytes()
         .ok()
         .map(|b| {
-            honzo_std::parse_extra(b)
+            honzo_io::parse_extra(b)
                 .unwrap_or_default()
                 .into_iter()
                 .map(|e| ExtraItem {

@@ -1,6 +1,6 @@
 use crate::common::fixture;
 use honzo_core::{Compression, CoverType, HonzoParser, LayoutMode, MarkupType, PmapEntry};
-use honzo_std::{build_sidx, HonzoBuilder, HonzoMeta};
+use honzo_io::{build_sidx, HonzoBuilder, HonzoMeta};
 
 #[test]
 fn builds_minimal_file_with_metadata_only() {
@@ -39,7 +39,7 @@ fn builds_compressed_chapters_that_stream_cleanly() {
 
     let parser = HonzoParser::new(&file, 1).unwrap();
     let entry = parser.find_chunk(b"CHAP").unwrap();
-    let decompressed = honzo_std::HonzoStream::open(std::io::Cursor::new(&file), 1)
+    let decompressed = honzo_io::HonzoStream::open(std::io::Cursor::new(&file), 1)
         .unwrap()
         .read_chunk(&entry)
         .unwrap();

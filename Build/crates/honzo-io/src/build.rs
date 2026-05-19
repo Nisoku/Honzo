@@ -181,7 +181,7 @@ fn prepare_chunk(chunk: &ChunkSpec) -> Result<(Vec<u8>, u32, u32, u32), HonzoErr
             (raw, len, len)
         }
         Compression::Lz4 => {
-            let compressed = lz4_flex::compress_prepend_size(&chunk.raw_data);
+            let compressed = lz4_flex::compress(&chunk.raw_data);
             let size_raw = chunk.raw_data.len() as u32;
             let size_compressed = compressed.len() as u32;
             (compressed, size_compressed, size_raw)

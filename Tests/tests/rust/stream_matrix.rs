@@ -1,6 +1,6 @@
 use crate::common::{corpus, fixture};
 use honzo_core::HonzoError;
-use honzo_std::{compute_reading_time, generate_covt, HonzoMeta, HonzoReader, HonzoStream};
+use honzo_io::{compute_reading_time, generate_covt, HonzoMeta, HonzoReader, HonzoStream};
 
 #[test]
 fn streams_all_chapters_in_novel_fixture() {

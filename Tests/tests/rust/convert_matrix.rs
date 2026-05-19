@@ -1,6 +1,6 @@
 use crate::common::{fixture, workspace_root};
 use honzo_convert::{from_epub, from_mobi, from_pdf};
-use honzo_std::HonzoMeta;
+use honzo_io::HonzoMeta;
 
 #[test]
 fn converts_epub_fixture_into_parseable_honzo() {

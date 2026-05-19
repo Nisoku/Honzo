@@ -2,7 +2,8 @@
 resolver = "2"
 members = [
   "Build/crates/honzo-core",
-  "Build/crates/honzo-std",
+  "Build/crates/honzo-chunks",
+  "Build/crates/honzo-io",
   "Build/crates/honzo-fixtures",
   "Build/crates/honzo-convert",
   "Build/crates/honzo-c",

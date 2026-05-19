@@ -1,14 +1,16 @@
 [package]
-name = "honzo-std"
+name = "honzo-io"
 version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
 
 [dependencies]
 honzo-core = { path = "../honzo-core", features = ["alloc"] }
+honzo-chunks = { path = "../honzo-chunks" }
+
+lz4_flex = "0.13.1"
 crc32fast = "1"
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
-image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "bmp", "tiff", "webp", "ico", "pnm"] }
 getrandom = { version = "0.4.2", features = ["wasm_js"] }
-lz4_flex = "0.13.1"

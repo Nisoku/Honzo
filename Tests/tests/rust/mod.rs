@@ -1,5 +1,6 @@
 mod builder_matrix;
 mod c_matrix;
+mod covr;
 mod convert_matrix;
 mod convert_pdf_mobi;
 mod core_matrix;

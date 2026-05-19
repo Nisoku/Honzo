@@ -1,7 +1,7 @@
 //! MOBI conversion using the `mobi` crate.
 
 use crate::ConvertError;
-use honzo_std::{Compression, CoverType, HonzoBuilder, MarkupType};
+use honzo_io::{Compression, CoverType, HonzoBuilder, MarkupType};
 
 pub fn convert_mobi(bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
     // Heuristic: if file is a ZIP (EPUB), delegate
@@ -20,7 +20,7 @@ pub fn convert_mobi(bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
                 Err(_) => m.content_as_string_lossy(),
             };
 
-            let mut builder = HonzoBuilder::new().set_layout(honzo_std::LayoutMode::Reflowable);
+            let mut builder = HonzoBuilder::new().set_layout(honzo_io::LayoutMode::Reflowable);
 
             if !content.trim().is_empty() {
                 builder = builder.add_chunk(
@@ -35,7 +35,7 @@ pub fn convert_mobi(bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
                 );
             }
 
-            let meta = honzo_std::HonzoMeta {
+            let meta = honzo_io::HonzoMeta {
                 source_format: Some("mobi".to_string()),
                 ..Default::default()
             };

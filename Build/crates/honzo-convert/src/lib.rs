@@ -5,7 +5,7 @@ use bytes::Bytes;
 use futures::io::{BufReader, Cursor as FuturesCursor};
 use futures::AsyncReadExt;
 
-use honzo_std::{
+use honzo_io::{
     build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
     HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType,
 };
@@ -18,11 +18,11 @@ pub enum ConvertError {
     MissingSpine,
     MissingMetadata,
     IoError(String),
-    HonzoError(honzo_std::HonzoError),
+    HonzoError(honzo_io::HonzoError),
 }
 
-impl From<honzo_std::HonzoError> for ConvertError {
-    fn from(e: honzo_std::HonzoError) -> Self {
+impl From<honzo_io::HonzoError> for ConvertError {
+    fn from(e: honzo_io::HonzoError) -> Self {
         ConvertError::HonzoError(e)
     }
 }
@@ -217,7 +217,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                     MarkupType::Hmd,
                     CoverType::Front,
                     None,
-                    Some(honzo_std::FontEmbedding::Allowed),
+                    Some(honzo_io::FontEmbedding::Allowed),
                     None,
                 );
             }

@@ -6,7 +6,7 @@
 - [ ] More tests
 - [ ] Fix images not working properly
 - [ ] Add some sort of styling or decoration thing
-- [ ] Better organization
+- [O] Better organization
   - maybe divided by chunks?
   - Extra/ has all extra stuff and the "stdlib" of sorts for the DRM, MATH, etc all EXTRA chunks
 - [ ] Native converter via CLI (properly)
