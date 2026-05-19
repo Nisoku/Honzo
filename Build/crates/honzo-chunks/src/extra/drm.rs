@@ -7,15 +7,15 @@ pub const NAMESPACE: &str = "org.nisoku.drm";
 // TODO: Finalize the envelope format and update this schema accordingly.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DrmEnvelope {
-	pub algorithm: String,
-	pub iv: Vec<u8>,
-	pub ciphertext: Vec<u8>,
+    pub algorithm: String,
+    pub iv: Vec<u8>,
+    pub ciphertext: Vec<u8>,
 }
 
 pub fn parse_drm(body: &[u8]) -> Result<DrmEnvelope, HonzoError> {
-	rmp_serde::from_slice(body).map_err(|_| HonzoError::Truncated)
+    rmp_serde::from_slice(body).map_err(|_| HonzoError::Truncated)
 }
 
 pub fn build_drm(envelope: &DrmEnvelope) -> Result<Vec<u8>, HonzoError> {
-	rmp_serde::to_vec(envelope).map_err(|_| HonzoError::Truncated)
+    rmp_serde::to_vec(envelope).map_err(|_| HonzoError::Truncated)
 }

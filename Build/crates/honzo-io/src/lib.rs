@@ -21,6 +21,6 @@ pub use honzo_core::{
     PmapEntry, TocEntry,
 };
 
-pub use honzo_chunks::{data, extra as extra_types};
-pub use honzo_chunks::data::covr::{generate_covt, generate_covr};
+pub use honzo_chunks::data::covr::{generate_covr, generate_covt};
 pub use honzo_chunks::data::sidx::build_sidx;
+pub use honzo_chunks::{data, extra as extra_types};

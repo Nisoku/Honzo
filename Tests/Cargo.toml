@@ -9,6 +9,7 @@ publish = false
 honzo-c = { path = "../Build/crates/honzo-c" }
 honzo-core = { path = "../Build/crates/honzo-core" }
 honzo-convert = { path = "../Build/crates/honzo-convert" }
+honzo-chunks = { path = "../Build/crates/honzo-chunks" }
 honzo-io = { path = "../Build/crates/honzo-io" }
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }

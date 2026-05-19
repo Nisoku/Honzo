@@ -1167,6 +1167,7 @@ name = "honzo-tests"
 version = "0.1.0"
 dependencies = [
  "honzo-c",
+ "honzo-chunks",
  "honzo-convert",
  "honzo-core",
  "honzo-io",

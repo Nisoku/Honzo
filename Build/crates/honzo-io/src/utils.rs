@@ -26,5 +26,9 @@ pub fn new_uuid() -> String {
 
 pub fn compute_reading_time(word_count: u32) -> u32 {
     let mins = word_count.div_ceil(238);
-    if mins == 0 { 1 } else { mins }
+    if mins == 0 {
+        1
+    } else {
+        mins
+    }
 }
