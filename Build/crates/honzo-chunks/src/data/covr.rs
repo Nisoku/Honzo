@@ -21,7 +21,7 @@ fn check_dims(width: u32, height: u32) -> Result<(), HonzoError> {
 /// - `COVT`: an optional cover thumbnail derived from `COVR` for quick previews
 ///
 /// `COVT` is not for in-chapter images; those are `IMG_` chunks.
-pub fn generate_covr<'a>(bytes: &'a [u8]) -> Result<&'a [u8], HonzoError> {
+pub fn generate_covr(bytes: &[u8]) -> Result<&[u8], HonzoError> {
     let img = image::load_from_memory(bytes).map_err(|_| HonzoError::Truncated)?;
     let (w, h) = img.dimensions();
     check_dims(w, h)?;
