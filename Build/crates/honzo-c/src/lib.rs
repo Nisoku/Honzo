@@ -1,12 +1,21 @@
+extern crate honzo_chunks;
+extern crate honzo_core;
+extern crate honzo_io;
+
+pub use honzo_chunks::data::math::{
+    latex_to_mathml_bytes, render_math_bytes, validate_mathml_bytes,
+};
+pub use honzo_core::HonzoParser;
+pub use honzo_core::MathType;
+pub use honzo_io::{decompress, Compression, CoverType, HonzoBuilder, MarkupType};
+
 #[diplomat::bridge]
 pub mod ffi {
-    use honzo_chunks::data::math::{
-        latex_to_mathml as latex_to_mathml_impl, render_math as render_math_impl,
-        validate_mathml as validate_mathml_impl,
+    use crate::{
+        decompress, latex_to_mathml_bytes, render_math_bytes, validate_mathml_bytes, Compression,
+        CoverType, HonzoBuilder, HonzoParser, MarkupType, MathType,
     };
-    use honzo_core::HonzoError;
-    use honzo_core::MathType;
-    use honzo_io::{Compression, CoverType, MarkupType};
+    use core::fmt::Write as _;
 
     #[repr(C)]
     pub enum HonzoErrorCode {
@@ -30,7 +39,7 @@ pub mod ffi {
 
     impl HonzoHandle {
         pub fn parse(data: &[u8], _reader_version: u16) -> Option<Box<HonzoHandle>> {
-            let p = honzo_core::HonzoParser::new(data, 1).ok()?;
+            let p = HonzoParser::new(data, 1).ok()?;
             let meta = p.meta_bytes().ok()?.to_vec();
 
             let entries: Vec<_> = p.toc_entries().collect();
@@ -42,8 +51,7 @@ pub mod ffi {
                     continue;
                 }
                 let raw = p.chunk_bytes(entry).ok()?;
-                let decompressed =
-                    honzo_io::decompress(raw, entry.compression, entry.size_raw).ok()?;
+                let decompressed = decompress(raw, entry.compression, entry.size_raw).ok()?;
                 chunks.push(decompressed);
             }
 
@@ -59,19 +67,19 @@ pub mod ffi {
         }
 
         pub fn layout_mode(&self) -> u8 {
-            honzo_core::HonzoParser::new(&self.buf, 1)
+            HonzoParser::new(&self.buf, 1)
                 .map(|p| p.head().layout_mode() as u8)
                 .unwrap_or(0)
         }
 
         pub fn has_drm(&self) -> bool {
-            honzo_core::HonzoParser::new(&self.buf, 1)
+            HonzoParser::new(&self.buf, 1)
                 .map(|p| p.head().has_drm())
                 .unwrap_or(false)
         }
 
         pub fn has_sidx(&self) -> bool {
-            honzo_core::HonzoParser::new(&self.buf, 1)
+            HonzoParser::new(&self.buf, 1)
                 .map(|p| p.head().has_sidx())
                 .unwrap_or(false)
         }
@@ -89,14 +97,14 @@ pub mod ffi {
 
     #[diplomat::opaque_mut]
     pub struct HonzoBuilderHandle {
-        builder: Option<honzo_io::HonzoBuilder>,
+        builder: Option<HonzoBuilder>,
         result: Vec<u8>,
     }
 
     impl HonzoBuilderHandle {
         pub fn new() -> Box<HonzoBuilderHandle> {
             Box::new(HonzoBuilderHandle {
-                builder: Some(honzo_io::HonzoBuilder::new()),
+                builder: Some(HonzoBuilder::new()),
                 result: Vec::new(),
             })
         }
@@ -188,22 +196,45 @@ pub mod ffi {
     }
 
     pub fn validate_mathml(bytes: &[u8]) -> bool {
-        validate_mathml_impl(bytes).is_ok()
+        validate_mathml_bytes(bytes).is_ok()
     }
 
-    pub fn latex_to_mathml(bytes: &[u8]) -> Result<String, HonzoErrorCode> {
-        latex_to_mathml_impl(bytes).map_err(map_math_error)
+    pub fn latex_to_mathml(
+        bytes: &[u8],
+        write: &mut diplomat_runtime::DiplomatWrite,
+    ) -> Result<(), HonzoErrorCode> {
+        match latex_to_mathml_bytes(bytes) {
+            Ok(v) => {
+                write
+                    .write_str(core::str::from_utf8(&v).unwrap())
+                    .map_err(|_| HonzoErrorCode::Unknown)?;
+                Ok(())
+            }
+            Err(code) => match code {
+                6 => Err(HonzoErrorCode::InvalidMathML),
+                7 => Err(HonzoErrorCode::Truncated),
+                _ => Err(HonzoErrorCode::Unknown),
+            },
+        }
     }
 
-    pub fn render_math(bytes: &[u8], math_type: MathType) -> Result<String, HonzoErrorCode> {
-        render_math_impl(bytes, math_type).map_err(map_math_error)
-    }
-
-    fn map_math_error(err: HonzoError) -> HonzoErrorCode {
-        match err {
-            HonzoError::InvalidMathML => HonzoErrorCode::InvalidMathML,
-            HonzoError::Truncated => HonzoErrorCode::Truncated,
-            _ => HonzoErrorCode::Unknown,
+    pub fn render_math(
+        bytes: &[u8],
+        math_type: u8,
+        write: &mut diplomat_runtime::DiplomatWrite,
+    ) -> Result<(), HonzoErrorCode> {
+        match render_math_bytes(bytes, math_type) {
+            Ok(v) => {
+                write
+                    .write_str(core::str::from_utf8(&v).unwrap())
+                    .map_err(|_| HonzoErrorCode::Unknown)?;
+                Ok(())
+            }
+            Err(code) => match code {
+                6 => Err(HonzoErrorCode::InvalidMathML),
+                7 => Err(HonzoErrorCode::Truncated),
+                _ => Err(HonzoErrorCode::Unknown),
+            },
         }
     }
 }

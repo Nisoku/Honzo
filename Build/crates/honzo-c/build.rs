@@ -1,4 +1,10 @@
 fn main() {
+    let manifest_dir =
+        std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is set by Cargo");
+    let entry = format!("{}/src/lib.rs", manifest_dir);
+    let config_file = format!("{}/diplomat.toml", manifest_dir);
+    let out_dir = format!("{}/include", manifest_dir);
+
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=diplomat.toml");
     println!("cargo:rerun-if-changed=include");
@@ -9,18 +15,27 @@ fn main() {
     });
 
     match std::process::Command::new(&diplomat_bin)
-        .args(["c", "include/"])
+        .args([
+            "c",
+            &out_dir,
+            "--entry",
+            &entry,
+            "--config-file",
+            &config_file,
+        ])
         .output()
     {
         Ok(output) if output.status.success() => {}
         Ok(output) => {
-            println!(
-                "diplomat-tool stderr: {}",
+            panic!(
+                "diplomat-tool failed with status {}\nstdout:\n{}\nstderr:\n{}",
+                output.status,
+                String::from_utf8_lossy(&output.stdout),
                 String::from_utf8_lossy(&output.stderr)
             );
         }
         Err(e) => {
-            println!(
+            panic!(
                 "failed to run diplomat-tool (install with: cargo install diplomat-tool): {}",
                 e
             );

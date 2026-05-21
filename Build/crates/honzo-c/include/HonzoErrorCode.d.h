@@ -18,6 +18,8 @@ typedef enum HonzoErrorCode {
   HonzoErrorCode_BufferTooShort = 3,
   HonzoErrorCode_CrcMismatch = 4,
   HonzoErrorCode_EncryptedChunk = 5,
+  HonzoErrorCode_InvalidMathML = 6,
+  HonzoErrorCode_Truncated = 7,
   HonzoErrorCode_Unknown = 255,
 } HonzoErrorCode;
 
