@@ -1,4 +1,4 @@
-import init, { HonzoWasm } from "./wasm/honzo_wasm.js";
+import init, { HonzoWasm, render_math as renderMath } from "./wasm/honzo_wasm.js";
 import { showLoading, hideLoading, showError, toggleLibrary, toggleToc as setTocOpen } from "./ui.js";
 import {
   bookTitle,
@@ -118,7 +118,7 @@ async function loadBook(data) {
   tocEntries = reader.get_toc();
 
   chapters = tocEntries
-    .filter(e => e.chunk_type === 'CHAP' || e.chunk_type === 'NOTE')
+    .filter(e => e.chunk_type === 'CHAP' || e.chunk_type === 'NOTE' || e.chunk_type === 'MATH')
     .map((e, i) => ({ index: i, chunk_id: e.chunk_id, ...e }));
 
   if (chapters.length === 0) {
@@ -155,6 +155,7 @@ function renderCurrentChapter() {
   container.className = 'chapter-view';
 
   const isImage = chapter.chunk_type === 'IMG_' || chapter.chunk_type === 'COVR' || chapter.chunk_type === 'COVT';
+  const isMath = chapter.chunk_type === 'MATH';
 
   if (isImage) {
     const blob = new Blob([data], { type: 'image/jpeg' });
@@ -163,7 +164,15 @@ function renderCurrentChapter() {
     img.src = url;
     img.alt = chapter.alt_text || '';
     container.appendChild(img);
-  } else if (chapter.chunk_type === 'SIDX' || chapter.chunk_type === 'MATH' || chapter.chunk_type === 'CSS_' || chapter.chunk_type === 'FONT') {
+  } else if (isMath) {
+    const raw = new TextDecoder().decode(data);
+    try {
+      const rendered = renderMath(data, chapter.content_type_value);
+      container.innerHTML = '<div class="math-block">' + rendered + '</div>';
+    } catch {
+      container.innerHTML = '<pre class="math-latex">' + esc(raw) + '</pre>';
+    }
+  } else if (chapter.chunk_type === 'SIDX' || chapter.chunk_type === 'CSS_' || chapter.chunk_type === 'FONT') {
     container.innerHTML = '<p class="meta">[' + chapter.chunk_type + ' chunk ' + chapter.chunk_id + ' - ' + data.length + ' bytes]</p>';
   } else {
     const raw = new TextDecoder().decode(data);

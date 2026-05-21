@@ -1,5 +1,10 @@
 #[diplomat::bridge]
 pub mod ffi {
+    use honzo_chunks::data::math::{
+        latex_to_mathml as latex_to_mathml_impl, render_math as render_math_impl,
+        validate_mathml as validate_mathml_impl,
+    };
+    use honzo_core::HonzoError;
     use honzo_core::MathType;
     use honzo_io::{Compression, CoverType, MarkupType};
 
@@ -11,6 +16,8 @@ pub mod ffi {
         BufferTooShort = 3,
         CrcMismatch = 4,
         EncryptedChunk = 5,
+        InvalidMathML = 6,
+        Truncated = 7,
         Unknown = 255,
     }
 
@@ -177,6 +184,26 @@ pub mod ffi {
         #[allow(clippy::needless_lifetimes)]
         pub fn get_result<'a>(&'a self) -> &'a [u8] {
             &self.result
+        }
+    }
+
+    pub fn validate_mathml(bytes: &[u8]) -> bool {
+        validate_mathml_impl(bytes).is_ok()
+    }
+
+    pub fn latex_to_mathml(bytes: &[u8]) -> Result<String, HonzoErrorCode> {
+        latex_to_mathml_impl(bytes).map_err(map_math_error)
+    }
+
+    pub fn render_math(bytes: &[u8], math_type: MathType) -> Result<String, HonzoErrorCode> {
+        render_math_impl(bytes, math_type).map_err(map_math_error)
+    }
+
+    fn map_math_error(err: HonzoError) -> HonzoErrorCode {
+        match err {
+            HonzoError::InvalidMathML => HonzoErrorCode::InvalidMathML,
+            HonzoError::Truncated => HonzoErrorCode::Truncated,
+            _ => HonzoErrorCode::Unknown,
         }
     }
 }

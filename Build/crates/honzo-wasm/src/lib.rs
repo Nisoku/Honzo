@@ -1,3 +1,7 @@
+use honzo_chunks::data::math::{
+    latex_to_mathml as latex_to_mathml_impl, render_math as render_math_impl,
+    validate_mathml as validate_mathml_impl,
+};
 use honzo_core::{Compression, CoverType, MarkupType, MathType};
 use honzo_io::*;
 use wasm_bindgen::prelude::*;
@@ -248,4 +252,21 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
     builder
         .finalize()
         .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+}
+
+#[wasm_bindgen]
+pub fn validate_mathml(bytes: &[u8]) -> bool {
+    validate_mathml_impl(bytes).is_ok()
+}
+
+#[wasm_bindgen]
+pub fn latex_to_mathml(bytes: &[u8]) -> Result<String, JsValue> {
+    latex_to_mathml_impl(bytes).map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+}
+
+#[wasm_bindgen]
+pub fn render_math(bytes: &[u8], math_type: u8) -> Result<String, JsValue> {
+    let math_type =
+        MathType::from_u8(math_type).map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+    render_math_impl(bytes, math_type).map_err(|e| JsValue::from_str(&format!("{:?}", e)))
 }

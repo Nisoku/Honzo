@@ -1088,6 +1088,7 @@ dependencies = [
  "diplomat",
  "diplomat-runtime",
  "diplomat-tool",
+ "honzo-chunks",
  "honzo-core",
  "honzo-io",
  "rmp-serde",
@@ -1184,6 +1185,7 @@ name = "honzo-wasm"
 version = "0.1.0"
 dependencies = [
  "getrandom",
+ "honzo-chunks",
  "honzo-core",
  "honzo-io",
  "js-sys",

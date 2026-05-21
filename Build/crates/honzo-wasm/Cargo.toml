@@ -8,6 +8,7 @@ license = "Apache-2.0"
 crate-type = ["cdylib"]
 
 [dependencies]
+honzo-chunks = { path = "../honzo-chunks" }
 honzo-core = { path = "../honzo-core" }
 honzo-io = { path = "../honzo-io" }
 wasm-bindgen = "0.2"

@@ -288,6 +288,48 @@ fn gen_textbook() {
     fs::write(fixtures_dir().join("textbook.hzo"), &hzo).unwrap();
 }
 
+fn gen_math_demo() {
+    let mut title = HashMap::new();
+    title.insert("en".to_string(), "Math Demo".to_string());
+    let meta = HonzoMeta {
+        title: Some(title),
+        authors: vec!["Honzo".to_string()],
+        language: "en".to_string(),
+        layout: Some(1),
+        ..Default::default()
+    };
+    let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
+
+    let hzo = HonzoBuilder::new()
+        .set_layout(LayoutMode::Fixed)
+        .add_chunk(
+            *b"CHAP",
+            br#"<h1>Math Demo</h1><p>This demo has three pages: a short intro, a MathML page, and a LaTeX page.</p>"#,
+            Compression::None,
+            MarkupType::Html,
+            CoverType::Front,
+            None,
+            None,
+            None,
+        )
+        .add_math_chunk(
+            br#"<math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>E</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow></math>"#,
+            MathType::MathML,
+            Compression::None,
+        )
+        .add_math_chunk(
+            br#"\int_0^1 x^2 \, dx"#,
+            MathType::LaTeX,
+            Compression::None,
+        )
+        .set_meta(&meta_bytes)
+        .finalize()
+        .unwrap();
+
+    let fixture_path = fixtures_dir().join("math.hzo");
+    fs::write(&fixture_path, &hzo).unwrap();
+}
+
 fn gen_multilang() {
     let mut title = HashMap::new();
     title.insert("en".to_string(), "Multilingual".to_string());
@@ -1062,6 +1104,9 @@ pub fn generate_all() {
 
     gen_textbook();
     println!("Generated textbook.hzo");
+
+    gen_math_demo();
+    println!("Generated math.hzo");
 
     gen_multilang();
     println!("Generated multilang.hzo");

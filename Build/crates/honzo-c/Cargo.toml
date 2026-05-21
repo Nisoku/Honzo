@@ -10,6 +10,7 @@ crate-type = ["cdylib", "staticlib", "rlib"]
 [dependencies]
 diplomat = "0.15"
 diplomat-runtime = "0.15"
+honzo-chunks = { path = "../honzo-chunks" }
 honzo-core = { path = "../honzo-core" }
 honzo-io = { path = "../honzo-io" }
 
