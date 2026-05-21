@@ -38,6 +38,9 @@ jobs:
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
+      - name: Run Rust setup
+        run: just rust setup
+
       - name: Run tests
         run: cargo test --workspace
 

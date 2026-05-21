@@ -48,6 +48,10 @@ def main() -> None:
     elif cmd == "wasm_check":
         sys.exit(wasm_check())
     elif cmd in CMDS:
+        if cmd == "setup":
+            setup_status = run(["cargo", "install", "diplomat-tool"])
+            if setup_status != 0:
+                sys.exit(setup_status)
         sys.exit(run(CMDS[cmd]))
     else:
         print(f"Usage: {sys.argv[0]} <check|fmt_check|wasm_check|{'|'.join(CMDS)}>")
