@@ -18,7 +18,7 @@ doc: |
   Magic: "HONO" (0x484F4E4F)
   
   Chunk types (4-byte ASCII tags):
-    CHAP  - Chapter content (markup_type swappable per chunk)
+    CHAP  - Chapter content (content_type swappable per chunk)
     IMG_  - Image
     CSS_  - Stylesheet
     FONT  - Font file
@@ -227,7 +227,7 @@ types:
     instances:
       compression_default:
         value: flags & 0x03
-        doc: Default compression mode (0=none, 1=zlib, 2=zstd)
+        doc: Default compression mode (0=none, 1=lz4)
 
       layout_mode:
         value: (flags >> 2) & 0x03
@@ -305,12 +305,21 @@ types:
         type: u1
         doc: Compression method (0=none, 1=lz4)
 
-      - id: markup_type
+      - id: content_type_kind
         type: u1
         doc: |
-          Markup/content type. Meaningful for CHAP chunks:
-          0 = HMD (Honzo Markdown)
-          1 = HTML
+          Content type interpretation selector (first of two bytes):
+          1 = interpret `content_type_value` as MarkupType (CHAP/NOTE)
+          2 = interpret `content_type_value` as MathType (MATH)
+          Other values: reserved for future use.
+
+      - id: content_type_value
+        type: u1
+        doc: |
+          Content subtype value (second of two bytes). Meaning depends on
+          `content_type_kind`:
+          For CHAP/NOTE (kind=1): 0 = HMD (Honzo Markdown), 1 = HTML
+          For MATH (kind=2): 0 = MathML, 1 = LaTeX
           For all other chunk types: 0
 
       - id: cover_type
@@ -403,7 +412,7 @@ types:
           Chunk payload formats by type:
           
           CHAP / NOTE:
-            Raw markup bytes (HMD or HTML per toc_entry.markup_type).
+            Raw markup bytes (HMD or HTML per toc_entry.content_type).
             Footnotes are named anchors within the chunk.
             Endnote chunks (NOTE) are typed differently so renderers
             treat them as reference sections, not linear reading content.
@@ -514,6 +523,14 @@ enums:
     2: no_modify
     3: no_embed
 
+  content_type_kind:
+    1: markup
+    2: math
+
   markup_type:
     0: hmd
     1: html
+
+  math_type:
+    0: mathml
+    1: latex

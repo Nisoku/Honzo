@@ -1,5 +1,5 @@
 use honzo_core::{
-    Compression, CoverType, FontEmbedding, HonzoError, LayoutMode, MarkupType, PmapEntry,
+    Compression, CoverType, FontEmbedding, HonzoError, LayoutMode, MarkupType, MathType, PmapEntry,
 };
 use std::vec::Vec;
 
@@ -10,7 +10,8 @@ struct ChunkSpec {
     tag: [u8; 4],
     raw_data: Vec<u8>,
     compression: Compression,
-    markup_type: MarkupType,
+    content_type_kind: u8,
+    content_type_value: u8,
     cover_type: CoverType,
     alt_text: Option<String>,
     font_embedding: Option<FontEmbedding>,
@@ -65,11 +66,32 @@ impl HonzoBuilder {
             tag,
             raw_data: data.to_vec(),
             compression,
-            markup_type,
+            content_type_kind: 1,
+            content_type_value: markup_type as u8,
             cover_type,
             alt_text: alt_text.map(String::from),
             font_embedding,
             font_license_url: font_license_url.map(String::from),
+        });
+        self
+    }
+
+    pub fn add_math_chunk(
+        mut self,
+        data: &[u8],
+        math_type: MathType,
+        compression: Compression,
+    ) -> Self {
+        self.chunks.push(ChunkSpec {
+            tag: *b"MATH",
+            raw_data: data.to_vec(),
+            compression,
+            content_type_kind: 2,
+            content_type_value: math_type as u8,
+            cover_type: CoverType::Front,
+            alt_text: None,
+            font_embedding: None,
+            font_license_url: None,
         });
         self
     }
@@ -106,7 +128,8 @@ impl HonzoBuilder {
             toc_bytes.extend_from_slice(&size_compressed.to_le_bytes());
             toc_bytes.extend_from_slice(&size_raw.to_le_bytes());
             toc_bytes.push(chunk.compression as u8);
-            toc_bytes.push(chunk.markup_type as u8);
+            toc_bytes.push(chunk.content_type_kind);
+            toc_bytes.push(chunk.content_type_value);
             toc_bytes.push(chunk.cover_type as u8);
             toc_bytes.push(0);
             toc_bytes.extend_from_slice(&crc32.to_le_bytes());

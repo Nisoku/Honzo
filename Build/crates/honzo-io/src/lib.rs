@@ -17,7 +17,7 @@ pub use stream::{ChapterIter, HonzoStream};
 pub use utils::{compute_reading_time, new_uuid};
 
 pub use honzo_core::{
-    Compression, CoverType, FontEmbedding, HonzoError, HonzoHead, LayoutMode, MarkupType,
+    Compression, CoverType, FontEmbedding, HonzoError, HonzoHead, LayoutMode, MarkupType, MathType,
     PmapEntry, TocEntry,
 };
 

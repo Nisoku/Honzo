@@ -12,7 +12,8 @@ struct ChunkSpec {
     tag: [u8; 4],
     data: Vec<u8>,
     compression: Compression,
-    markup_type: MarkupType,
+    content_type_kind: u8,
+    content_type_value: u8,
     cover_type: CoverType,
     alt_text: Option<String>,
     font_embedding: Option<FontEmbedding>,
@@ -67,7 +68,8 @@ impl HonzoBuilder {
             tag,
             data: data.to_vec(),
             compression,
-            markup_type,
+            content_type_kind: 1,
+            content_type_value: markup_type as u8,
             cover_type,
             alt_text: alt_text.map(|value| value.to_string()),
             font_embedding,
@@ -114,7 +116,8 @@ impl HonzoBuilder {
                 size_compressed,
                 size_raw,
                 compression: chunk.compression,
-                markup_type: chunk.markup_type,
+                content_type_kind: chunk.content_type_kind,
+                content_type_value: chunk.content_type_value,
                 cover_type: chunk.cover_type,
                 flags: 0,
                 crc32,
@@ -181,7 +184,8 @@ struct TocEntryWrite<'a> {
     size_compressed: u32,
     size_raw: u32,
     compression: Compression,
-    markup_type: MarkupType,
+    content_type_kind: u8,
+    content_type_value: u8,
     cover_type: CoverType,
     flags: u8,
     crc32: u32,
@@ -200,7 +204,8 @@ fn build_toc(entries: &[TocEntryWrite<'_>], pmap: &[PmapEntry]) -> Result<Vec<u8
         write_u32(&mut out, entry.size_compressed);
         write_u32(&mut out, entry.size_raw);
         out.push(entry.compression as u8);
-        out.push(entry.markup_type as u8);
+        out.push(entry.content_type_kind);
+        out.push(entry.content_type_value);
         out.push(entry.cover_type as u8);
         out.push(entry.flags);
         write_u32(&mut out, entry.crc32);

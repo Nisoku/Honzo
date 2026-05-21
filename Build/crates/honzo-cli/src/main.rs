@@ -171,7 +171,8 @@ fn cmd_inspect(file: &PathBuf, json: bool) {
         size_compressed: u32,
         size_raw: u32,
         compression: u8,
-        markup_type: u8,
+        content_type_kind: u8,
+        content_type_value: u8,
         cover_type: u8,
         flags: u8,
         crc32: u32,
@@ -203,7 +204,8 @@ fn cmd_inspect(file: &PathBuf, json: bool) {
             size_compressed: e.size_compressed,
             size_raw: e.size_raw,
             compression: e.compression as u8,
-            markup_type: e.markup_type as u8,
+            content_type_kind: e.content_type_kind,
+            content_type_value: e.content_type_value,
             cover_type: e.cover_type as u8,
             flags: e.flags,
             crc32: e.crc32,
@@ -380,25 +382,46 @@ fn cmd_build(spec: &PathBuf, out: &PathBuf) {
                     std::process::exit(1);
                 }
             };
-            let markup = match chunk["markup_type"].as_u64().unwrap_or(0) {
-                0 => MarkupType::Hmd,
-                1 => MarkupType::Html,
-                _ => {
-                    eprintln!("Error: invalid markup_type");
+            let kind = chunk["content_type_kind"].as_u64().unwrap_or(0) as u8;
+            let value = chunk["content_type_value"].as_u64().unwrap_or(0) as u8;
+            if &tag == b"MATH" {
+                if kind != 2 {
+                    eprintln!("Error: invalid content_type_kind for MATH");
                     std::process::exit(1);
                 }
-            };
-
-            builder = builder.add_chunk(
-                tag,
-                &data,
-                compression,
-                markup,
-                CoverType::Front,
-                None,
-                None,
-                None,
-            );
+                let math = match value {
+                    0 => honzo_core::MathType::MathML,
+                    1 => honzo_core::MathType::LaTeX,
+                    _ => {
+                        eprintln!("Error: invalid content_type_value for MATH");
+                        std::process::exit(1);
+                    }
+                };
+                builder = builder.add_math_chunk(&data, math, compression);
+            } else {
+                if kind != 1 {
+                    eprintln!("Error: invalid content_type_kind for markup chunk");
+                    std::process::exit(1);
+                }
+                let markup = match value {
+                    0 => MarkupType::Hmd,
+                    1 => MarkupType::Html,
+                    _ => {
+                        eprintln!("Error: invalid content_type_value");
+                        std::process::exit(1);
+                    }
+                };
+                builder = builder.add_chunk(
+                    tag,
+                    &data,
+                    compression,
+                    markup,
+                    CoverType::Front,
+                    None,
+                    None,
+                    None,
+                );
+            }
         }
     }
 

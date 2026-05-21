@@ -19,6 +19,8 @@ pub enum HonzoError {
     UnknownLayoutMode(u8),
     UnknownCoverType(u8),
     UnknownMarkupType(u8),
+    UnknownMathType(u8),
+    InvalidMathML,
     UnknownFontEmbedding(u8),
     Truncated,
 }

@@ -1,5 +1,6 @@
 #[diplomat::bridge]
 pub mod ffi {
+    use honzo_core::MathType;
     use honzo_io::{Compression, CoverType, MarkupType};
 
     #[repr(C)]
@@ -98,7 +99,8 @@ pub mod ffi {
             tag: &[u8],
             data: &[u8],
             compression: u8,
-            markup_type: u8,
+            content_type_kind: u8,
+            content_type_value: u8,
         ) -> bool {
             if tag.len() != 4 {
                 return false;
@@ -110,14 +112,31 @@ pub mod ffi {
                 1 => Compression::Lz4,
                 _ => return false,
             };
-            let markup = match markup_type {
-                0 => MarkupType::Hmd,
-                1 => MarkupType::Html,
-                _ => return false,
-            };
             let b = match self.builder.take() {
                 Some(b) => b,
                 None => return false,
+            };
+            // dispatch based on tag and content type kind
+            if &tag_arr == b"MATH" {
+                if content_type_kind != 2 {
+                    return false;
+                }
+                let math = match content_type_value {
+                    0 => MathType::MathML,
+                    1 => MathType::LaTeX,
+                    _ => return false,
+                };
+                self.builder = Some(b.add_math_chunk(data, math, compression));
+                return true;
+            }
+
+            if content_type_kind != 1 {
+                return false;
+            }
+            let markup = match content_type_value {
+                0 => MarkupType::Hmd,
+                1 => MarkupType::Html,
+                _ => return false,
             };
             self.builder = Some(b.add_chunk(
                 tag_arr,

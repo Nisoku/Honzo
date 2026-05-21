@@ -12,6 +12,7 @@ mod write;
 
 pub use error::HonzoError;
 pub use parse::{HonzoParser, PmapEntryIter, TocEntryIter};
+pub use types::MathType;
 pub use types::{
     Compression, CoverType, FontEmbedding, HonzoHead, LayoutMode, MarkupType, PmapEntry, TocEntry,
 };

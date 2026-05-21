@@ -1,5 +1,5 @@
 use crate::types::{
-    Compression, CoverType, FontEmbedding, HonzoHead, MarkupType, PmapEntry, TocEntry,
+    Compression, CoverType, FontEmbedding, HonzoHead, MarkupType, MathType, PmapEntry, TocEntry,
 };
 use crate::HonzoError;
 
@@ -180,7 +180,8 @@ impl<'buf> Iterator for TocEntryIter<'buf> {
         let size_compressed = read_u32(self.buf, &mut cursor).ok()?;
         let size_raw = read_u32(self.buf, &mut cursor).ok()?;
         let compression = read_u8(self.buf, &mut cursor).ok()?;
-        let markup_type = read_u8(self.buf, &mut cursor).ok()?;
+        let content_type_kind = read_u8(self.buf, &mut cursor).ok()?;
+        let content_type_value = read_u8(self.buf, &mut cursor).ok()?;
         let cover_type = read_u8(self.buf, &mut cursor).ok()?;
         let flags = read_u8(self.buf, &mut cursor).ok()?;
         let crc32 = read_u32(self.buf, &mut cursor).ok()?;
@@ -216,7 +217,8 @@ impl<'buf> Iterator for TocEntryIter<'buf> {
             size_compressed,
             size_raw,
             compression: Compression::from_u8(compression).ok()?,
-            markup_type: MarkupType::from_u8(markup_type).ok()?,
+            content_type_kind,
+            content_type_value,
             cover_type: CoverType::from_u8(cover_type).ok()?,
             flags,
             crc32,
@@ -298,7 +300,8 @@ fn validate_toc(
         let _ = read_u32_limit(buf, &mut cursor, toc_end)?;
         let _ = read_u32_limit(buf, &mut cursor, toc_end)?;
         let compression = read_u8_limit(buf, &mut cursor, toc_end)?;
-        let markup_type = read_u8_limit(buf, &mut cursor, toc_end)?;
+        let content_type_kind = read_u8_limit(buf, &mut cursor, toc_end)?;
+        let content_type_value = read_u8_limit(buf, &mut cursor, toc_end)?;
         let cover_type = read_u8_limit(buf, &mut cursor, toc_end)?;
         let _ = read_u8_limit(buf, &mut cursor, toc_end)?;
         let _ = read_u32_limit(buf, &mut cursor, toc_end)?;
@@ -311,7 +314,26 @@ fn validate_toc(
         }
 
         Compression::from_u8(compression)?;
-        MarkupType::from_u8(markup_type)?;
+        match &chunk_type {
+            b"CHAP" | b"NOTE" => {
+                if content_type_kind != 1 {
+                    return Err(HonzoError::UnknownMarkupType(content_type_kind));
+                }
+                MarkupType::from_u8(content_type_value)?;
+            }
+            b"MATH" => {
+                if content_type_kind != 2 {
+                    return Err(HonzoError::UnknownMathType(content_type_kind));
+                }
+                MathType::from_u8(content_type_value)?;
+            }
+            _ => {
+                // for other chunk types we expect kind==1 and value==0
+                if content_type_kind != 1 || content_type_value != 0 {
+                    return Err(HonzoError::Truncated);
+                }
+            }
+        }
         CoverType::from_u8(cover_type)?;
 
         if &chunk_type == b"FONT" {

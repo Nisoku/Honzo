@@ -67,7 +67,7 @@ fn ffi_encrypted_chunk_skipped() {
 #[test]
 fn ffi_builder_roundtrip() {
     let mut builder = honzo_c::ffi::HonzoBuilderHandle::new();
-    builder.add_chunk(b"CHAP", b"hello world", 0, 0);
+    builder.add_chunk(b"CHAP", b"hello world", 0, 1, 0);
     assert!(builder.finalize());
     let output = builder.get_result();
     assert!(!output.is_empty());
@@ -79,7 +79,7 @@ fn ffi_builder_roundtrip() {
 fn ffi_builder_set_meta() {
     let meta = rmp_serde::to_vec(&honzo_io::HonzoMeta::default()).unwrap();
     let mut builder = honzo_c::ffi::HonzoBuilderHandle::new();
-    builder.add_chunk(b"CHAP", b"content", 0, 0);
+    builder.add_chunk(b"CHAP", b"content", 0, 1, 0);
     builder.set_meta(&meta);
     assert!(builder.finalize());
     let output = builder.get_result();
@@ -90,13 +90,13 @@ fn ffi_builder_set_meta() {
 #[test]
 fn ffi_builder_invalid_compression() {
     let mut builder = honzo_c::ffi::HonzoBuilderHandle::new();
-    assert!(!builder.add_chunk(b"CHAP", b"data", 99, 0));
+    assert!(!builder.add_chunk(b"CHAP", b"data", 99, 1, 0));
 }
 
 #[test]
 fn ffi_builder_invalid_markup() {
     let mut builder = honzo_c::ffi::HonzoBuilderHandle::new();
-    assert!(!builder.add_chunk(b"CHAP", b"data", 0, 99));
+    assert!(!builder.add_chunk(b"CHAP", b"data", 0, 1, 99));
 }
 
 #[test]

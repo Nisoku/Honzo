@@ -55,6 +55,23 @@ impl MarkupType {
 
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum MathType {
+    MathML = 0,
+    LaTeX = 1,
+}
+
+impl MathType {
+    pub fn from_u8(value: u8) -> Result<Self, HonzoError> {
+        match value {
+            0 => Ok(Self::MathML),
+            1 => Ok(Self::LaTeX),
+            other => Err(HonzoError::UnknownMathType(other)),
+        }
+    }
+}
+
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CoverType {
     Front = 0,
     Back = 1,
@@ -142,7 +159,13 @@ pub struct TocEntry<'a> {
     pub size_compressed: u32,
     pub size_raw: u32,
     pub compression: Compression,
-    pub markup_type: MarkupType,
+    // content type is encoded as two bytes: `content_type_kind` and `content_type_value`.
+    // `content_type_kind` selects interpretation:
+    //   1 = `content_type_value` is a `MarkupType` (used for CHAP/NOTE)
+    //   2 = `content_type_value` is a `MathType` (used for MATH)
+    // Other values are reserved; for non-markup/non-math chunks the value should be 0.
+    pub content_type_kind: u8,
+    pub content_type_value: u8,
     pub cover_type: CoverType,
     pub flags: u8,
     pub crc32: u32,

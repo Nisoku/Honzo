@@ -17,7 +17,7 @@
 
 HonzoBuilderHandle* HonzoBuilderHandle_new(void);
 
-bool HonzoBuilderHandle_add_chunk(HonzoBuilderHandle* self, DiplomatU8View tag, DiplomatU8View data, uint8_t compression, uint8_t markup_type);
+bool HonzoBuilderHandle_add_chunk(HonzoBuilderHandle* self, DiplomatU8View tag, DiplomatU8View data, uint8_t compression, uint8_t content_type_kind, uint8_t content_type_value);
 
 bool HonzoBuilderHandle_set_meta(HonzoBuilderHandle* self, DiplomatU8View msgpack);
 

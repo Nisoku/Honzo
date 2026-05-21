@@ -4,7 +4,7 @@ use std::path::Path;
 
 use honzo_io::{
     build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
-    HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType, PmapEntry, SeriesMeta,
+    HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType, MathType, PmapEntry, SeriesMeta,
 };
 
 fn fixtures_dir() -> &'static Path {
@@ -227,15 +227,10 @@ fn gen_textbook() {
             None,
             None,
         )
-        .add_chunk(
-            *b"MATH",
+        .add_math_chunk(
             br"<math><mi>x</mi><mo>+</mo><mn>1</mn></math>",
+            MathType::MathML,
             Compression::None,
-            MarkupType::Hmd,
-            CoverType::Front,
-            None,
-            None,
-            None,
         )
         .add_pmap_entry(PmapEntry {
             print_page: 1,
@@ -1007,9 +1002,15 @@ fn gen_encrypted_chunk() {
         .finalize()
         .unwrap();
 
-    const FLAGS_OFFSET: usize = 56 + 4 + 4 + 8 + 4 + 4 + 1 + 1 + 1;
-    if hzo.len() > FLAGS_OFFSET {
-        hzo[FLAGS_OFFSET] |= 0x01;
+    const HEAD_SIZE: usize = 48;
+    let toc_offset = 4 + HEAD_SIZE;
+    let num_entries =
+        u32::from_le_bytes(hzo[toc_offset..toc_offset + 4].try_into().unwrap()) as usize;
+    if num_entries > 0 {
+        let entry_flags_offset = toc_offset + 4 + (4 + 4 + 8 + 4 + 4 + 1 + 1 + 1 + 1);
+        if hzo.len() > entry_flags_offset {
+            hzo[entry_flags_offset] |= 0x01;
+        }
     }
     fs::write(corpus_dir().join("encrypted_chunk.hzo"), &hzo).unwrap();
 }

@@ -1,5 +1,6 @@
 use crate::compression::{decompress, verify_entry_crc32};
 use honzo_core::{HonzoError, HonzoHead, PmapEntry, TocEntry};
+use honzo_core::{MarkupType, MathType};
 use std::io::{Read, Seek, SeekFrom};
 
 pub struct HonzoStream<R: Read + Seek> {
@@ -86,7 +87,8 @@ impl<R: Read + Seek> HonzoStream<R> {
                 size_compressed: entry.size_compressed,
                 size_raw: entry.size_raw,
                 compression: entry.compression,
-                markup_type: entry.markup_type,
+                content_type_kind: entry.content_type_kind,
+                content_type_value: entry.content_type_value,
                 cover_type: entry.cover_type,
                 flags: entry.flags,
                 crc32: entry.crc32,
@@ -132,7 +134,8 @@ impl<R: Read + Seek> HonzoStream<R> {
                 size_compressed: entry.size_compressed,
                 size_raw: entry.size_raw,
                 compression: entry.compression,
-                markup_type: entry.markup_type,
+                content_type_kind: entry.content_type_kind,
+                content_type_value: entry.content_type_value,
                 cover_type: entry.cover_type,
                 flags: entry.flags,
                 crc32: entry.crc32,
@@ -220,7 +223,8 @@ fn parse_toc<'a>(
         let size_compressed = read_u32_bytes(buf, &mut cursor)?;
         let size_raw = read_u32_bytes(buf, &mut cursor)?;
         let compression = read_u8_bytes(buf, &mut cursor)?;
-        let markup_type = read_u8_bytes(buf, &mut cursor)?;
+        let content_type_kind = read_u8_bytes(buf, &mut cursor)?;
+        let content_type_value = read_u8_bytes(buf, &mut cursor)?;
         let cover_type = read_u8_bytes(buf, &mut cursor)?;
         let flags = read_u8_bytes(buf, &mut cursor)?;
         let crc32 = read_u32_bytes(buf, &mut cursor)?;
@@ -251,6 +255,24 @@ fn parse_toc<'a>(
             }
         }
 
+        // validate content_type depending on chunk
+        if &chunk_type == b"CHAP" || &chunk_type == b"NOTE" {
+            if content_type_kind != 1 {
+                return Err(HonzoError::UnknownMarkupType(content_type_kind));
+            }
+            MarkupType::from_u8(content_type_value)?;
+        } else if &chunk_type == b"MATH" {
+            if content_type_kind != 2 {
+                return Err(HonzoError::UnknownMathType(content_type_kind));
+            }
+            MathType::from_u8(content_type_value)?;
+        } else {
+            // for other chunk types we expect kind==1 and value==0
+            if content_type_kind != 1 || content_type_value != 0 {
+                return Err(HonzoError::Truncated);
+            }
+        }
+
         toc.push(TocEntry {
             chunk_type,
             chunk_id,
@@ -258,7 +280,8 @@ fn parse_toc<'a>(
             size_compressed,
             size_raw,
             compression: honzo_core::Compression::from_u8(compression)?,
-            markup_type: honzo_core::MarkupType::from_u8(markup_type)?,
+            content_type_kind,
+            content_type_value,
             cover_type: honzo_core::CoverType::from_u8(cover_type)?,
             flags,
             crc32,

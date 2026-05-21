@@ -120,7 +120,8 @@ async function handleFile(file) {
       tag: "CHAP",
       data: new TextEncoder().encode(text),
       compression: 0,
-      markup_type: 1,
+      content_type_kind: 1,
+      content_type_value: 1,
     }));
 
     // Read container.xml and OPF to find images, CSS, fonts
@@ -152,20 +153,22 @@ async function handleFile(file) {
             const path = resolve(href);
             const data = await extractor.get_resource(path);
 
-            if (mt.startsWith("image/")) {
+              if (mt.startsWith("image/")) {
               chunks.push({
                 tag: id === coverId ? "COVR" : "IMG_",
                 data: new Uint8Array(data),
                 compression: 0,
-                markup_type: 0,
+                  content_type_kind: 1,
+                  content_type_value: 0,
                 alt_text: null,
               });
-            } else if (mt === "text/css") {
+              } else if (mt === "text/css") {
               chunks.push({
                 tag: "CSS_",
                 data: new Uint8Array(data),
                 compression: 0,
-                markup_type: 0,
+                  content_type_kind: 1,
+                  content_type_value: 0,
                 alt_text: null,
               });
             } else if (mt.startsWith("font/") || mt.includes("font")) {
@@ -173,7 +176,8 @@ async function handleFile(file) {
                 tag: "FONT",
                 data: new Uint8Array(data),
                 compression: 0,
-                markup_type: 0,
+                  content_type_kind: 1,
+                  content_type_value: 0,
                 alt_text: null,
               });
             }
@@ -199,7 +203,8 @@ async function handleFile(file) {
         tag: c.tag,
         data: c.data,
         compression: c.compression,
-        markup_type: c.markup_type,
+        content_type_kind: c.content_type_kind,
+        content_type_value: c.content_type_value,
       })),
       meta: {
         title: { [lang]: title },

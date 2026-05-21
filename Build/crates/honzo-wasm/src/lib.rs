@@ -1,3 +1,4 @@
+use honzo_core::{Compression, CoverType, MarkupType, MathType};
 use honzo_io::*;
 use wasm_bindgen::prelude::*;
 
@@ -17,7 +18,8 @@ struct WasmTocEntry {
     size_compressed: u32,
     size_raw: u32,
     compression: honzo_core::Compression,
-    markup_type: honzo_core::MarkupType,
+    content_type_kind: u8,
+    content_type_value: u8,
     cover_type: honzo_core::CoverType,
     flags: u8,
     crc32: u32,
@@ -62,7 +64,8 @@ impl HonzoWasm {
                 size_compressed: e.size_compressed,
                 size_raw: e.size_raw,
                 compression: e.compression,
-                markup_type: e.markup_type,
+                content_type_kind: e.content_type_kind,
+                content_type_value: e.content_type_value,
                 cover_type: e.cover_type,
                 flags: e.flags,
                 crc32: e.crc32,
@@ -127,7 +130,8 @@ impl HonzoWasm {
             size_compressed: u32,
             size_raw: u32,
             compression: u8,
-            markup_type: u8,
+            content_type_kind: u8,
+            content_type_value: u8,
             #[serde(skip_serializing_if = "Option::is_none")]
             alt_text: Option<String>,
         }
@@ -142,7 +146,8 @@ impl HonzoWasm {
                 size_compressed: e.size_compressed,
                 size_raw: e.size_raw,
                 compression: e.compression as u8,
-                markup_type: e.markup_type as u8,
+                content_type_kind: e.content_type_kind,
+                content_type_value: e.content_type_value,
                 alt_text: e.alt_text.clone(),
             })
             .collect();
@@ -161,8 +166,8 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
         data: Vec<u8>,
         #[serde(default)]
         compression: u8,
-        #[serde(default)]
-        markup_type: u8,
+        content_type_kind: u8,
+        content_type_value: u8,
         #[serde(default)]
         alt_text: Option<String>,
     }
@@ -193,21 +198,39 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
             1 => Compression::Lz4,
             _ => return Err(JsValue::from_str("invalid compression")),
         };
-        let markup = match chunk.markup_type {
-            0 => MarkupType::Hmd,
-            1 => MarkupType::Html,
-            _ => return Err(JsValue::from_str("invalid markup_type")),
-        };
-        builder = builder.add_chunk(
-            tag_arr,
-            &chunk.data,
-            compression,
-            markup,
-            CoverType::Front,
-            chunk.alt_text.as_deref(),
-            None,
-            None,
-        );
+        // interpret content type according to new two-byte format
+        if &tag_arr == b"MATH" {
+            if chunk.content_type_kind != 2 {
+                return Err(JsValue::from_str("invalid content_type_kind for MATH"));
+            }
+            let m = match chunk.content_type_value {
+                0 => MathType::MathML,
+                1 => MathType::LaTeX,
+                _ => return Err(JsValue::from_str("invalid content_type_value for MATH")),
+            };
+            builder = builder.add_math_chunk(&chunk.data, m, compression);
+        } else {
+            if chunk.content_type_kind != 1 {
+                return Err(JsValue::from_str(
+                    "invalid content_type_kind for markup chunk",
+                ));
+            }
+            let markup = match chunk.content_type_value {
+                0 => MarkupType::Hmd,
+                1 => MarkupType::Html,
+                _ => return Err(JsValue::from_str("invalid content_type_value")),
+            };
+            builder = builder.add_chunk(
+                tag_arr,
+                &chunk.data,
+                compression,
+                markup,
+                CoverType::Front,
+                chunk.alt_text.as_deref(),
+                None,
+                None,
+            );
+        }
     }
 
     if let Some(ref meta_value) = spec.meta {

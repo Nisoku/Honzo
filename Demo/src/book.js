@@ -167,7 +167,7 @@ function renderCurrentChapter() {
     container.innerHTML = '<p class="meta">[' + chapter.chunk_type + ' chunk ' + chapter.chunk_id + ' - ' + data.length + ' bytes]</p>';
   } else {
     const raw = new TextDecoder().decode(data);
-    const isHtml = chapter.markup_type === 1;
+    const isHtml = chapter.content_type_kind === 1 && chapter.content_type_value === 1;
 
     if (isHtml) {
       container.innerHTML = sanitizeHtml(raw);
