@@ -1,3 +1,4 @@
+import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import wasm from 'vite-plugin-wasm';
 import topLevelAwait from 'vite-plugin-top-level-await';
@@ -57,5 +58,11 @@ export default defineConfig({
     outDir: './dist',
     emptyOutDir: true,
     target: 'esnext',
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        convert: resolve(__dirname, 'convert.html'),
+      },
+    },
   },
 });
