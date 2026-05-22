@@ -8,6 +8,7 @@ export const errorText = signal(
 );
 export const libraryOpen = signal(path("ui", "libraryOpen"), false);
 export const tocOpen = signal(path("ui", "tocOpen"), false);
+export const searchOpen = signal(path("ui", "searchOpen"), false);
 
 export const bookTitle = signal(path("reader", "bookTitle"), "");
 export const currentPage = signal(path("reader", "currentPage"), 1);
@@ -34,6 +35,10 @@ export const tocDisabled = derived(path("reader", "tocDisabled"), () => {
   return !hasBook.get();
 });
 
+export const searchDisabled = derived(path("reader", "searchDisabled"), () => {
+  return !hasBook.get();
+});
+
 export const currentPageText = derived(path("reader", "currentPageText"), () => {
   return String(currentPage.get());
 });
@@ -51,7 +56,8 @@ export const errorClass = derived(path("ui", "errorClass"), () => {
 });
 
 export const overlayClass = derived(path("ui", "overlayClass"), () => {
-  const open = libraryOpen.get() || tocOpen.get() || loadingVisible.get() || errorVisible.get();
+  const open =
+    libraryOpen.get() || tocOpen.get() || searchOpen.get() || loadingVisible.get() || errorVisible.get();
   return `overlay${open ? " open" : ""}`;
 });
 
@@ -63,9 +69,14 @@ export const tocClass = derived(path("ui", "tocClass"), () => {
   return `toc-container${tocOpen.get() ? " open" : ""}`;
 });
 
+export const searchClass = derived(path("ui", "searchClass"), () => {
+  return `search-container${searchOpen.get() ? " open" : ""}`;
+});
+
 export function resetReaderState() {
   bookTitle.set("");
   currentPage.set(1);
   totalPages.set(1);
   hasBook.set(false);
+  searchOpen.set(false);
 }

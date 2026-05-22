@@ -5,6 +5,7 @@ extern crate honzo_io;
 pub use honzo_chunks::data::math::{
     latex_to_mathml_bytes, render_math_bytes, validate_mathml_bytes,
 };
+pub use honzo_chunks::data::sidx::normalize_search_term;
 pub use honzo_core::HonzoParser;
 pub use honzo_core::MathType;
 pub use honzo_io::{decompress, Compression, CoverType, HonzoBuilder, MarkupType};
@@ -12,8 +13,9 @@ pub use honzo_io::{decompress, Compression, CoverType, HonzoBuilder, MarkupType}
 #[diplomat::bridge]
 pub mod ffi {
     use crate::{
-        decompress, latex_to_mathml_bytes, render_math_bytes, validate_mathml_bytes, Compression,
-        CoverType, HonzoBuilder, HonzoParser, MarkupType, MathType,
+        decompress, latex_to_mathml_bytes, normalize_search_term as normalize_search_term_impl,
+        render_math_bytes, validate_mathml_bytes, Compression, CoverType, HonzoBuilder,
+        HonzoParser, MarkupType, MathType,
     };
     use core::fmt::Write as _;
 
@@ -236,5 +238,16 @@ pub mod ffi {
                 _ => Err(HonzoErrorCode::Unknown),
             },
         }
+    }
+
+    pub fn normalize_search_term(
+        term: &str,
+        write: &mut diplomat_runtime::DiplomatWrite,
+    ) -> Result<(), HonzoErrorCode> {
+        let normalized = normalize_search_term_impl(term);
+        write
+            .write_str(&normalized)
+            .map_err(|_| HonzoErrorCode::Unknown)?;
+        Ok(())
     }
 }

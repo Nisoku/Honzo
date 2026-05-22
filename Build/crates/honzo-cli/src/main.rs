@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fs;
 use std::io::Read;
 use std::path::PathBuf;
@@ -566,14 +567,67 @@ fn cmd_search(file: &PathBuf, query: &str) {
             std::process::exit(1);
         });
 
-    let query_lower = query.to_ascii_lowercase();
-    if let Some(results) = index.get(&query_lower) {
-        println!("Found '{}' in {} location(s):", query, results.len());
-        for (chunk_id, byte_offset) in results {
-            println!("  chunk {} at byte offset {}", chunk_id, byte_offset);
-        }
-    } else {
+    // Support multi-term queries by normalizing each token and intersecting hits.
+    let terms: Vec<String> = query
+        .split_whitespace()
+        .map(|t| normalize_search_term(t))
+        .filter(|s| !s.is_empty())
+        .collect();
+
+    if terms.is_empty() {
         println!("No results for '{}'", query);
+        return;
+    }
+
+    let mut hits_by_chunk: HashMap<u32, (u32, Vec<u32>)> = HashMap::new();
+
+    for term in &terms {
+        if let Some(bucket) = index.get(term) {
+            let mut seen_offsets: HashSet<(u32, u32)> = HashSet::new();
+            let mut seen_chunks: HashSet<u32> = HashSet::new();
+            for (chunk_id, offset) in bucket {
+                let off_key = (*chunk_id, *offset);
+                if !seen_offsets.contains(&off_key) {
+                    seen_offsets.insert(off_key);
+                    let entry = hits_by_chunk.entry(*chunk_id).or_insert((0u32, Vec::new()));
+                    entry.1.push(*offset);
+                }
+                if !seen_chunks.contains(chunk_id) {
+                    seen_chunks.insert(*chunk_id);
+                    let entry = hits_by_chunk.entry(*chunk_id).or_insert((0u32, Vec::new()));
+                    entry.0 += 1; // count this term once for the chunk
+                }
+            }
+        } else {
+            eprintln!("Term '{}' not found in index.", term);
+            println!("No results for '{}'", query);
+            return;
+        }
+    }
+
+    // Only keep chunks that matched all terms
+    let mut matches: Vec<(u32, u32, Vec<u32>)> = hits_by_chunk
+        .into_iter()
+        .filter(|(_, (score, _))| *score == terms.len() as u32)
+        .map(|(chunk_id, (score, offsets))| (chunk_id, score, offsets))
+        .collect();
+
+    if matches.is_empty() {
+        println!("No results for '{}'", query);
+        return;
+    }
+
+    // Sort by score desc then chunk id asc
+    matches.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+
+    println!("Found '{}' in {} chunk(s):", query, matches.len());
+    for (chunk_id, score, offsets) in matches {
+        for offset in offsets {
+            println!(
+                "  chunk {} at byte offset {} (score={})",
+                chunk_id, offset, score
+            );
+        }
     }
 }
 

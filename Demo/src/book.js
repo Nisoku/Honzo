@@ -1,11 +1,15 @@
-import init, { HonzoWasm, render_math as renderMath } from "./wasm/honzo_wasm.js";
+import { decode as decodeMsgPack } from "@msgpack/msgpack";
+import init, {
+  HonzoWasm,
+  normalize_search_term as normalizeSearchTerm,
+  render_math as renderMath,
+} from "./wasm/honzo_wasm.js";
 import { showLoading, hideLoading, showError, toggleLibrary, toggleToc as setTocOpen } from "./ui.js";
 import {
   bookTitle,
   currentPage,
   hasBook,
   resetReaderState,
-  tocOpen,
   totalPages,
 } from "./state.js";
 
@@ -13,10 +17,14 @@ let reader = null;
 let meta = null;
 let chapters = [];
 let tocEntries = [];
+let searchIndex = null;
 let currentChapterIndex = 0;
 let wasmInitPromise = null;
 let elements = {
   currentPageInput: null,
+  searchInput: null,
+  searchResults: null,
+  searchStatus: null,
   tocContent: null,
   viewer: null,
 };
@@ -26,6 +34,134 @@ export function setBookElements(nextElements) {
     ...elements,
     ...nextElements,
   };
+}
+
+function setSearchStatus(message) {
+  if (elements.searchStatus) {
+    elements.searchStatus.textContent = message;
+  }
+}
+
+function clearSearchResults() {
+  if (elements.searchResults) {
+    elements.searchResults.innerHTML = '';
+  }
+}
+
+function setSearchResults(results) {
+  if (!elements.searchResults) return;
+  elements.searchResults.innerHTML = '';
+
+  if (!searchIndex) {
+    setSearchStatus('This book does not include a search index.');
+    return;
+  }
+
+  if (results.length === 0) {
+    setSearchStatus('No matches.');
+    return;
+  }
+
+  setSearchStatus(`${results.length} result${results.length === 1 ? '' : 's'}`);
+
+  for (const result of results) {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'search-result';
+    const chapterLabel = `${result.chapter.chunk_type} #${result.chapter.chunk_id}`;
+    const summary = `${chapterLabel} • ${result.score} match${result.score === 1 ? '' : 'es'}`;
+    const excerpt = result.excerpt ? `<span>${esc(result.excerpt)}</span>` : '';
+    item.innerHTML = `<strong>${esc(summary)}</strong>${excerpt}`;
+    item.addEventListener('click', () => {
+      goToChapter(result.chapter.index);
+      setTocOpen(false);
+    });
+    elements.searchResults.appendChild(item);
+  }
+}
+
+function parseSearchIndex(bytes) {
+  if (!bytes || bytes.length === 0) return null;
+  const decoded = decodeMsgPack(bytes);
+  if (decoded instanceof Map) return decoded;
+  if (decoded && typeof decoded === 'object') return new Map(Object.entries(decoded));
+  return null;
+}
+
+function getIndexBucket(term) {
+  if (!searchIndex) return null;
+  if (searchIndex instanceof Map) return searchIndex.get(term) || null;
+  return searchIndex[term] || null;
+}
+
+function searchChapters(query) {
+  if (!searchIndex) return [];
+  const terms = query
+    .trim()
+    .split(/\s+/)
+    .map((term) => normalizeSearchTerm(term))
+    .filter(Boolean);
+
+  if (terms.length === 0) {
+    setSearchStatus('Type a word to search.');
+    return [];
+  }
+
+  const hitsByChunk = new Map();
+  for (const term of terms) {
+    const bucket = getIndexBucket(term);
+    if (!bucket) {
+      return [];
+    }
+      const seenOffsets = new Set();
+      const seenChunks = new Set();
+      for (const [chunkId, offset] of bucket) {
+        const key = `${chunkId}:${offset}`;
+        if (!seenOffsets.has(key)) {
+          seenOffsets.add(key);
+          const entry = hitsByChunk.get(chunkId) || { score: 0, offsets: [] };
+          entry.offsets.push(offset);
+          hitsByChunk.set(chunkId, entry);
+        }
+        if (!seenChunks.has(chunkId)) {
+          seenChunks.add(chunkId);
+          const entry = hitsByChunk.get(chunkId) || { score: 0, offsets: [] };
+          entry.score += 1;
+          hitsByChunk.set(chunkId, entry);
+        }
+      }
+  }
+
+  const matches = [];
+  for (const [chunkId, entry] of hitsByChunk.entries()) {
+    if (entry.score !== terms.length) continue;
+    const chapter = chapters.find((item) => item.chunk_id === chunkId);
+    if (!chapter) continue;
+    const raw = reader.get_chunk(chunkId);
+    const firstOffset = entry.offsets[0] || 0;
+    const start = Math.max(0, firstOffset - 24);
+    const end = Math.min(raw.length, firstOffset + 72);
+    const excerpt = new TextDecoder().decode(raw.slice(start, end)).replace(/\s+/g, ' ').trim();
+    matches.push({ chapter, score: entry.score, excerpt });
+  }
+
+  matches.sort((left, right) => right.score - left.score || left.chapter.index - right.chapter.index);
+  return matches.slice(0, 25);
+}
+
+export function runSearch(query) {
+  if (!elements.searchResults) return;
+  if (!searchIndex) {
+    clearSearchResults();
+    setSearchStatus('This book does not include a search index.');
+    return;
+  }
+  if (!query.trim()) {
+    clearSearchResults();
+    setSearchStatus('Type a word to search.');
+    return;
+  }
+  setSearchResults(searchChapters(query));
 }
 
 function val(maybeMap) {
@@ -113,9 +249,21 @@ async function loadBook(data) {
   resetReaderState();
   elements.viewer.innerHTML = '';
   elements.tocContent.innerHTML = '';
+  if (elements.searchInput) elements.searchInput.value = '';
+  clearSearchResults();
+  setSearchStatus('Type a word to search.');
   reader = new HonzoWasm(data, 1);
   meta = reader.get_meta_parsed();
   tocEntries = reader.get_toc();
+  const sidxEntry = tocEntries.find((entry) => entry.chunk_type === 'SIDX');
+  searchIndex = null;
+  if (sidxEntry) {
+    try {
+      searchIndex = parseSearchIndex(reader.get_chunk(sidxEntry.chunk_id));
+    } catch {
+      searchIndex = null;
+    }
+  }
 
   chapters = tocEntries
     .filter(e => e.chunk_type === 'CHAP' || e.chunk_type === 'NOTE' || e.chunk_type === 'MATH')
@@ -187,6 +335,12 @@ function renderCurrentChapter() {
 
   elements.viewer.appendChild(container);
   currentPage.set(currentChapterIndex + 1);
+}
+
+function goToChapter(index) {
+  if (!chapters.length) return;
+  currentChapterIndex = clampChapterIndex(index);
+  renderCurrentChapter();
 }
 
 function sanitizeHtml(html) {
@@ -272,11 +426,6 @@ function clampChapterIndex(index) {
   return Math.max(0, Math.min(index, chapters.length - 1));
 }
 
-function goToChapter(index) {
-  if (!hasBookLoaded()) return;
-  currentChapterIndex = clampChapterIndex(index);
-  renderCurrentChapter();
-}
 
 function normalizedPageNumber() {
   const p = parseInt(elements.currentPageInput?.value ?? '', 10);
@@ -310,4 +459,9 @@ export function toggleToc() {
 
 export function closeToc() {
   setTocOpen(false);
+}
+
+export function focusSearch() {
+  elements.searchInput?.focus();
+  elements.searchInput?.select();
 }

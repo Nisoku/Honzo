@@ -25,6 +25,7 @@
     </div>
     <div class="controls">
       <button id="toc-button" disabled>Table of Contents</button>
+      <button id="search-button" disabled>Search</button>
       <button id="open-button">Open .hzo</button>
       <a href="/Honzo/demo/convert.html" style="color:#fff;text-decoration:none;font-size:0.9rem;background:#16213e;padding:0.5rem 1rem;border-radius:4px;">Convert EPUB</a>
       <select id="demo-book-select" class="demo-picker" aria-label="Built-in demo books">
@@ -59,6 +60,17 @@
       <button id="close-toc">Close</button>
     </div>
     <div class="toc-content" id="toc-content"></div>
+  </div>
+  <div class="search-container" id="search-container">
+    <div class="search-header">
+      <h3>Search</h3>
+      <button id="close-search">Close</button>
+    </div>
+    <div class="search-body">
+      <input id="search-input" type="search" placeholder="Search the book" autocomplete="off">
+      <div class="search-status" id="search-status"></div>
+      <div class="search-results" id="search-results"></div>
+    </div>
   </div>
   <div class="library-container" id="library-container">
     <div class="library-header">

@@ -1,7 +1,29 @@
 use honzo_core::HonzoError;
+use rust_stemmers::{Algorithm, Stemmer};
 use std::collections::BTreeMap;
 
-// TODO: Look into how proper search indexes are made
+pub fn normalize_search_term(term: &str) -> String {
+    let stemmer = Stemmer::create(Algorithm::English);
+    stemmer.stem(&term.to_lowercase()).into_owned()
+}
+
+fn push_token(
+    index: &mut BTreeMap<String, Vec<(u32, u32)>>,
+    chunk_id: u32,
+    token: &str,
+    offset: usize,
+) {
+    if token.is_empty() {
+        return;
+    }
+    let normalized = normalize_search_term(token);
+    if !normalized.is_empty() {
+        index
+            .entry(normalized)
+            .or_default()
+            .push((chunk_id, offset as u32));
+    }
+}
 
 pub fn build_sidx(chapters: &[(u32, &str)]) -> Result<Vec<u8>, HonzoError> {
     let mut index: BTreeMap<String, Vec<(u32, u32)>> = BTreeMap::new();
@@ -14,11 +36,7 @@ pub fn build_sidx(chapters: &[(u32, &str)]) -> Result<Vec<u8>, HonzoError> {
             if is_delim {
                 if let Some(start) = token_start.take() {
                     let token = &text[start..i];
-                    if !token.is_empty() {
-                        let lower = token.to_ascii_lowercase();
-                        let offset = start as u32;
-                        index.entry(lower).or_default().push((*chunk_id, offset));
-                    }
+                    push_token(&mut index, *chunk_id, token, start);
                 }
             } else if token_start.is_none() {
                 token_start = Some(i);
@@ -27,11 +45,7 @@ pub fn build_sidx(chapters: &[(u32, &str)]) -> Result<Vec<u8>, HonzoError> {
 
         if let Some(start) = token_start.take() {
             let token = &text[start..];
-            if !token.is_empty() {
-                let lower = token.to_ascii_lowercase();
-                let offset = start as u32;
-                index.entry(lower).or_default().push((*chunk_id, offset));
-            }
+            push_token(&mut index, *chunk_id, token, start);
         }
     }
 

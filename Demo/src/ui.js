@@ -3,6 +3,7 @@ import {
   errorVisible,
   libraryOpen,
   loadingVisible,
+  searchOpen,
   tocOpen,
 } from "./state.js";
 
@@ -40,5 +41,15 @@ export function toggleToc(forceOpen) {
     tocOpen.set(false);
   } else {
     tocOpen.set(!tocOpen.get());
+  }
+}
+
+export function toggleSearch(forceOpen) {
+  if (forceOpen === true) {
+    searchOpen.set(true);
+  } else if (forceOpen === false) {
+    searchOpen.set(false);
+  } else {
+    searchOpen.set(!searchOpen.get());
   }
 }

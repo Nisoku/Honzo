@@ -8,4 +8,5 @@ mod corpus_matrix;
 mod covr;
 mod math_matrix;
 mod metadata_matrix;
+mod sidx_matrix;
 mod stream_matrix;

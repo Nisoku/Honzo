@@ -65,7 +65,7 @@ fn builds_font_and_pmap_entries() {
             CoverType::Front,
             Some("sample font"),
             font_entry.font_embedding,
-            font_entry.font_license_url.as_deref(),
+            font_entry.font_license_url,
         )
         .add_pmap_entry(PmapEntry {
             print_page: 1,
@@ -80,7 +80,7 @@ fn builds_font_and_pmap_entries() {
     assert_eq!(parser.head().layout_mode(), LayoutMode::Fixed);
     assert_eq!(parser.pmap_entries().count(), 1);
     let entry = parser.find_chunk(b"FONT").unwrap();
-    assert_eq!(entry.alt_text.as_deref(), Some("sample font"));
+    assert_eq!(entry.alt_text, Some("sample font"));
 }
 
 #[test]

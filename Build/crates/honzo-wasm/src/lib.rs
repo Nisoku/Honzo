@@ -2,6 +2,7 @@ use honzo_chunks::data::math::{
     latex_to_mathml as latex_to_mathml_impl, render_math as render_math_impl,
     validate_mathml as validate_mathml_impl,
 };
+use honzo_chunks::data::sidx::normalize_search_term as normalize_search_term_impl;
 use honzo_core::{Compression, CoverType, MarkupType, MathType};
 use honzo_io::*;
 use wasm_bindgen::prelude::*;
@@ -252,6 +253,11 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
     builder
         .finalize()
         .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+}
+
+#[wasm_bindgen]
+pub fn normalize_search_term(term: &str) -> String {
+    normalize_search_term_impl(term)
 }
 
 #[wasm_bindgen]

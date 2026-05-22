@@ -18,7 +18,7 @@ fn decompresses_lz4_fixture() {
 
     let mut lz4 = HonzoStream::open(std::io::Cursor::new(&lz4_data), 1).unwrap();
     let lz4_entries = lz4.toc_owned();
-    let lz4_entry = lz4_entries[1].clone();
+    let lz4_entry = lz4_entries[1];
 
     assert!(lz4.read_chunk(&lz4_entry).unwrap().len() > lz4_entry.size_compressed as usize);
 }
@@ -43,8 +43,8 @@ fn verifies_crc_and_encrypted_chunk_errors() {
 
     let crc_entries = crc_stream.toc_owned();
     let encrypted_entries = encrypted_stream.toc_owned();
-    let crc_entry = crc_entries[0].clone();
-    let encrypted_entry = encrypted_entries[0].clone();
+    let crc_entry = crc_entries[0];
+    let encrypted_entry = encrypted_entries[0];
 
     assert_eq!(crc_entry.chunk_type, *b"CHAP");
     assert!(matches!(

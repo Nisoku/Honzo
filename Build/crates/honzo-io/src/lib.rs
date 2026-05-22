@@ -22,5 +22,5 @@ pub use honzo_core::{
 };
 
 pub use honzo_chunks::data::covr::{generate_covr, generate_covt};
-pub use honzo_chunks::data::sidx::build_sidx;
+pub use honzo_chunks::data::sidx::{build_sidx, normalize_search_term};
 pub use honzo_chunks::{data, extra as extra_types};
