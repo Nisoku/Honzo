@@ -570,7 +570,7 @@ fn cmd_search(file: &PathBuf, query: &str) {
     // Support multi-term queries by normalizing each token and intersecting hits.
     let terms: Vec<String> = query
         .split_whitespace()
-        .map(|t| normalize_search_term(t))
+        .map(normalize_search_term)
         .filter(|s| !s.is_empty())
         .collect();
 

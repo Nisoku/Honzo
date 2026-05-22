@@ -19,3 +19,18 @@ fn validates_utf8_text_chunks() {
     assert_eq!(text, "chapter text");
     assert!(validate_text_chunk(&[0xff, 0xfe]).is_err());
 }
+
+#[test]
+fn non_text_tags_are_rejected() {
+    assert!(!is_text_chunk(b"IMG_"));
+    assert!(!is_chap_tag(b"FOO "));
+    assert_eq!(chunk_name(b"IMG_"), None);
+}
+
+#[test]
+fn validate_multibyte_utf8() {
+    let sample = "こんにちは"; // multibyte UTF-8
+    let bytes = sample.as_bytes();
+    let decoded = validate_text_chunk(bytes).unwrap();
+    assert_eq!(decoded, sample);
+}
