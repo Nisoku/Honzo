@@ -1,6 +1,7 @@
 use honzo_core::{
     Compression, CoverType, FontEmbedding, HonzoError, LayoutMode, MarkupType, MathType, PmapEntry,
 };
+use honzo_chunks::data::sidx::build_sidx;
 use std::vec::Vec;
 
 const MAGIC: &[u8; 4] = b"HONO";
@@ -26,6 +27,8 @@ pub struct HonzoBuilder {
     pmap: Vec<PmapEntry>,
     meta: Vec<u8>,
     extra: Vec<u8>,
+    auto_sidx: bool,
+    language: String,
 }
 
 impl HonzoBuilder {
@@ -37,7 +40,19 @@ impl HonzoBuilder {
             pmap: Vec::new(),
             meta: Vec::new(),
             extra: Vec::new(),
+            auto_sidx: true,
+            language: "en".to_string(),
         }
+    }
+
+    pub fn set_auto_sidx(mut self, enable: bool) -> Self {
+        self.auto_sidx = enable;
+        self
+    }
+
+    pub fn set_language(mut self, lang: &str) -> Self {
+        self.language = lang.to_string();
+        self
     }
 
     pub fn set_layout(mut self, layout: LayoutMode) -> Self {
@@ -112,13 +127,41 @@ impl HonzoBuilder {
     }
 
     pub fn finalize(self) -> Result<Vec<u8>, HonzoError> {
-        let chunk_count = self.chunks.len() as u32;
+        let mut final_builder = self;
+        if final_builder.auto_sidx {
+            let mut chapters = Vec::new();
+            for (id, chunk) in final_builder.chunks.iter().enumerate() {
+                if chunk.tag == *b"CHAP" {
+                    chapters.push((id as u32, chunk.raw_data.clone()));
+                }
+            }
+            if !chapters.is_empty() {
+                let chapters_refs: Vec<(u32, &str)> = chapters
+                    .iter()
+                    .map(|(id, data)| (*id, std::str::from_utf8(data).unwrap_or("")))
+                    .collect();
+
+                let sidx_data = build_sidx(&chapters_refs, &final_builder.language)?;
+                final_builder = final_builder.add_chunk(
+                    *b"SIDX",
+                    &sidx_data,
+                    Compression::Lz4,
+                    MarkupType::Markdown,
+                    CoverType::Front,
+                    None,
+                    None,
+                    None,
+                );
+            }
+        }
+
+        let chunk_count = final_builder.chunks.len() as u32;
         let mut toc_bytes = Vec::new();
         let mut data_bytes = Vec::new();
 
         toc_bytes.extend_from_slice(&chunk_count.to_le_bytes());
 
-        for (chunk_id, chunk) in self.chunks.iter().enumerate() {
+        for (chunk_id, chunk) in final_builder.chunks.iter().enumerate() {
             let (compressed, size_compressed, size_raw, crc32) = prepare_chunk(chunk)?;
 
             toc_bytes.extend_from_slice(&chunk.tag);
@@ -155,8 +198,8 @@ impl HonzoBuilder {
             data_bytes.extend_from_slice(&compressed);
         }
 
-        toc_bytes.extend_from_slice(&(self.pmap.len() as u32).to_le_bytes());
-        for entry in &self.pmap {
+        toc_bytes.extend_from_slice(&(final_builder.pmap.len() as u32).to_le_bytes());
+        for entry in &final_builder.pmap {
             toc_bytes.extend_from_slice(&entry.print_page.to_le_bytes());
             toc_bytes.extend_from_slice(&entry.chunk_id.to_le_bytes());
             toc_bytes.extend_from_slice(&entry.byte_offset.to_le_bytes());
@@ -164,10 +207,10 @@ impl HonzoBuilder {
 
         let toc_size = toc_bytes.len() as u64;
         let data_size = data_bytes.len() as u64;
-        let extra_size = self.extra.len() as u64;
-        let meta_size = self.meta.len() as u64;
+        let extra_size = final_builder.extra.len() as u64;
+        let meta_size = final_builder.meta.len() as u64;
 
-        let flags = (self.flags & !0x0C) | ((self.layout as u32) << 2);
+        let flags = (final_builder.flags & !0x0C) | ((final_builder.layout as u32) << 2);
 
         let mut out = Vec::new();
         out.extend_from_slice(MAGIC);
@@ -183,8 +226,8 @@ impl HonzoBuilder {
         out.extend_from_slice(&0u32.to_le_bytes());
         out.extend_from_slice(&toc_bytes);
         out.extend_from_slice(&data_bytes);
-        out.extend_from_slice(&self.extra);
-        out.extend_from_slice(&self.meta);
+        out.extend_from_slice(&final_builder.extra);
+        out.extend_from_slice(&final_builder.meta);
 
         Ok(out)
     }

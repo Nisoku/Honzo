@@ -385,7 +385,7 @@ fn gen_with_sidx() {
         (1u32, "Pack my box with five dozen liquor jugs."),
         (2u32, "How vexingly quick daft zebras jump!"),
     ];
-    let sidx = build_sidx(&chapters).unwrap();
+    let sidx = build_sidx(&chapters, "en").unwrap();
 
     let hzo = HonzoBuilder::new()
         .set_flags(0x20)

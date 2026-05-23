@@ -4,18 +4,12 @@
 
 - [ ] `min_reader_version` is hardcoded to 1 everywhere, never validated meaningfully
 
-## Core Implementation
-
-- [X] HonzoStream silently drops fields: `toc_owned()` and `chapters()` set `alt_text: None` and `font_license_url: None`
-- [X] NOTE chunks are excluded from chapter iteration
-- [X] `honzo-io/src/extra.rs` doesn't use the known-namespace registry (`is_known_namespace`)
-
 ## Chunk Types (empty stub modules)
 
 - [ ] `honzo-chunks/src/data/css.rs`
 - [ ] `honzo-chunks/src/data/font.rs`
 - [ ] `honzo-chunks/src/data/img.rs`
-- [ ] SIDX is always stored uncompressed even though it would benefit from LZ4
+- [X] SIDX is always stored uncompressed even though it would benefit from LZ4
 
 ## EXTRA Namespaces
 
