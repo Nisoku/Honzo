@@ -1,4 +1,4 @@
-import { s as B, p as S, g as ot, b as st, f as at, e as ct, c as T, h as _t, _ as it } from "./honzo_wasm-B7nTe1NJ.js";
+import { s as B, p as S, g as ot, b as st, f as at, e as ct, c as T, h as _t, _ as it } from "./honzo_wasm-D8y5rwif.js";
 (async ()=>{
     const ut = "modulepreload", lt = function(e) {
         return "/Honzo/demo/" + e;
@@ -477,7 +477,7 @@ import { s as B, p as S, g as ot, b as st, f as at, e as ct, c as T, h as _t, _ 
                         }
                         if (b.find((u)=>u.tag === "COVR")) try {
                             const { honzo_std: u } = await ft(async ()=>{
-                                const { honzo_std: R } = await import("./honzo_wasm-B7nTe1NJ.js").then((L)=>L.i);
+                                const { honzo_std: R } = await import("./honzo_wasm-D8y5rwif.js").then((L)=>L.i);
                                 return {
                                     honzo_std: R
                                 };
