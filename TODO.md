@@ -2,8 +2,8 @@
 
 ## Format / Spec
 
-- [ ] Use Markdown instead of HMD for now; add Dashmark when it exists
-- [ ] HMD has no spec or parser, the demo `renderHmd` is ~20 lines handling only `#`, `-`, and `<p>`
+- [x] Use Markdown instead of HMD for now; add Dashmark when it exists
+- [x] HMD has no spec or parser, the demo `renderHmd` is ~20 lines handling only `#`, `-`, and `<p>`
 - [ ] `min_reader_version` is hardcoded to 1 everywhere, never validated meaningfully
 
 ## Core Implementation
@@ -74,7 +74,6 @@
 
 ## Housekeeping
 
-- [X] `honzo-core` HonzoBuilder: aligned with the `honzo-io` builder (real compression, `add_math_chunk`, `crc32fast`)
 - [ ] `honzo-io/src/extra.rs` should validate against the known-namespace registry
 - [ ] HonzoStream should preserve alt_text and font_license_url on TOC entry clones
 - [ ] NOTE chunks should be included in chapter iteration or exposed as a separate method

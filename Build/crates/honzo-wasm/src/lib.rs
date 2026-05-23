@@ -237,7 +237,7 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
                 ));
             }
             let markup = match chunk.content_type_value {
-                0 => MarkupType::Hmd,
+                0 => MarkupType::Markdown,
                 1 => MarkupType::Html,
                 _ => return Err(JsValue::from_str("invalid content_type_value")),
             };

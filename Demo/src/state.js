@@ -39,9 +39,12 @@ export const searchDisabled = derived(path("reader", "searchDisabled"), () => {
   return !hasBook.get();
 });
 
-export const currentPageText = derived(path("reader", "currentPageText"), () => {
-  return String(currentPage.get());
-});
+export const currentPageText = derived(
+  path("reader", "currentPageText"),
+  () => {
+    return String(currentPage.get());
+  },
+);
 
 export const totalPagesText = derived(path("reader", "totalPagesText"), () => {
   return String(totalPages.get());
@@ -57,7 +60,11 @@ export const errorClass = derived(path("ui", "errorClass"), () => {
 
 export const overlayClass = derived(path("ui", "overlayClass"), () => {
   const open =
-    libraryOpen.get() || tocOpen.get() || searchOpen.get() || loadingVisible.get() || errorVisible.get();
+    libraryOpen.get() ||
+    tocOpen.get() ||
+    searchOpen.get() ||
+    loadingVisible.get() ||
+    errorVisible.get();
   return `overlay${open ? " open" : ""}`;
 });
 

@@ -365,10 +365,26 @@ input[type="number"] {
 }
 
 @media (max-width: 768px) {
-  .controls { flex-wrap: wrap; }
-  .demo-picker { max-width: 12rem; }
-  .title { font-size: 1.2rem; }
-  button { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
-  .toc-container { width: 80%; }
-  .library-container { width: 95%; height: 95%; top: 2.5%; left: 2.5%; }
+  .controls {
+    flex-wrap: wrap;
+  }
+  .demo-picker {
+    max-width: 12rem;
+  }
+  .title {
+    font-size: 1.2rem;
+  }
+  button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  .toc-container {
+    width: 80%;
+  }
+  .library-container {
+    width: 95%;
+    height: 95%;
+    top: 2.5%;
+    left: 2.5%;
+  }
 }

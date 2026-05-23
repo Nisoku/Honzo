@@ -7,17 +7,20 @@
     "dev": "vite",
     "test": "npm run build",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "make-pretty": "prettier --write ."
   },
   "dependencies": {
     "@msgpack/msgpack": "^3.1.3",
     "@nisoku/sairin": "^0.1.2",
     "lexepub": "^0.1.1",
+    "marked": "^18.0.4",
     "vite": "^5.0.0",
     "vite-plugin-top-level-await": "^1.6.0",
     "vite-plugin-wasm": "^3.6.0"
   },
   "devDependencies": {
+    "prettier": "^3.8.3",
     "vite-plugin-pwa": "^1.0.0"
   },
   "private": true,

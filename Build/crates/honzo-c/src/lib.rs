@@ -221,7 +221,7 @@ pub mod ffi {
                 return false;
             }
             let markup = match content_type_value {
-                0 => MarkupType::Hmd,
+                0 => MarkupType::Markdown,
                 1 => MarkupType::Html,
                 _ => return false,
             };

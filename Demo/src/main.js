@@ -1,4 +1,10 @@
-import { bindClass, bindDisabled, bindEvent, bindProperty, bindText } from "@nisoku/sairin";
+import {
+  bindClass,
+  bindDisabled,
+  bindEvent,
+  bindProperty,
+  bindText,
+} from "@nisoku/sairin";
 import {
   bookTitle,
   canGoNext,
@@ -29,7 +35,11 @@ import {
   setBookElements,
   toggleToc,
 } from "./book.js";
-import { handleLibraryFiles, openLibrary, setLibraryElements } from "./library.js";
+import {
+  handleLibraryFiles,
+  openLibrary,
+  setLibraryElements,
+} from "./library.js";
 import { hideError, toggleLibrary, toggleSearch } from "./ui.js";
 
 const openButton = document.getElementById("open-button");

@@ -405,7 +405,7 @@ fn cmd_build(spec: &PathBuf, out: &PathBuf) {
                     std::process::exit(1);
                 }
                 let markup = match value {
-                    0 => MarkupType::Hmd,
+                    0 => MarkupType::Markdown,
                     1 => MarkupType::Html,
                     _ => {
                         eprintln!("Error: invalid content_type_value");

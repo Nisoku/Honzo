@@ -51,7 +51,7 @@ pub fn convert_pdf(bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
                         tag,
                         &buf,
                         Compression::None,
-                        MarkupType::Hmd,
+                        MarkupType::Markdown,
                         CoverType::Front,
                         None,
                         None,

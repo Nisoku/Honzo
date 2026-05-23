@@ -49,7 +49,7 @@ for chapter in stream.chapters() {
 // Build
 let hzo = Builder::new()
     .add_chunk(*b"CHAP", b"Hello, world!", Compression::None,
-               MarkupType::Hmd, CoverType::Front, None, None, None)
+               MarkupType::Markdown, CoverType::Front, None, None, None)
     .finalize()
     .unwrap();
 ```

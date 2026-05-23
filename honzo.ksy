@@ -33,7 +33,7 @@ doc: |
     1 = lz4
   
   Markup types (for CHAP chunks):
-    0 = HMD (Honzo Markdown, default)
+    0 = Markdown (default)
     1 = HTML (fallback)
   
   Layout modes (in META):
@@ -318,7 +318,7 @@ types:
         doc: |
           Content subtype value (second of two bytes). Meaning depends on
           `content_type_kind`:
-          For CHAP/NOTE (kind=1): 0 = HMD (Honzo Markdown), 1 = HTML
+          For CHAP/NOTE (kind=1): 0 = Markdown, 1 = HTML
           For MATH (kind=2): 0 = MathML, 1 = LaTeX
           For all other chunk types: 0
 
@@ -412,7 +412,7 @@ types:
           Chunk payload formats by type:
           
           CHAP / NOTE:
-            Raw markup bytes (HMD or HTML per toc_entry.content_type).
+            Raw markup bytes (Markdown or HTML per toc_entry.content_type).
             Footnotes are named anchors within the chunk.
             Endnote chunks (NOTE) are typed differently so renderers
             treat them as reference sections, not linear reading content.
@@ -528,7 +528,7 @@ enums:
     2: math
 
   markup_type:
-    0: hmd
+    0: markdown
     1: html
 
   math_type:

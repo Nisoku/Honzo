@@ -39,14 +39,14 @@ impl LayoutMode {
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum MarkupType {
-    Hmd = 0,
+    Markdown = 0,
     Html = 1,
 }
 
 impl MarkupType {
     pub fn from_u8(value: u8) -> Result<Self, HonzoError> {
         match value {
-            0 => Ok(Self::Hmd),
+            0 => Ok(Self::Markdown),
             1 => Ok(Self::Html),
             other => Err(HonzoError::UnknownMarkupType(other)),
         }
