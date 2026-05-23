@@ -10,6 +10,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub struct HonzoWasm {
     buf: Vec<u8>,
+    reader_version: u16,
     meta: Vec<u8>,
     toc: Vec<WasmTocEntry>,
     chunks: Vec<Vec<u8>>,
@@ -82,6 +83,7 @@ impl HonzoWasm {
 
         Ok(HonzoWasm {
             buf: buf.to_vec(),
+            reader_version,
             meta,
             toc,
             chunks,
@@ -93,19 +95,19 @@ impl HonzoWasm {
     }
 
     pub fn layout_mode(&self) -> u8 {
-        honzo_core::HonzoParser::new(&self.buf, 1)
+        honzo_core::HonzoParser::new(&self.buf, self.reader_version)
             .map(|p| p.head().layout_mode() as u8)
             .unwrap_or(0)
     }
 
     pub fn has_drm(&self) -> bool {
-        honzo_core::HonzoParser::new(&self.buf, 1)
+        honzo_core::HonzoParser::new(&self.buf, self.reader_version)
             .map(|p| p.head().has_drm())
             .unwrap_or(false)
     }
 
     pub fn has_sidx(&self) -> bool {
-        honzo_core::HonzoParser::new(&self.buf, 1)
+        honzo_core::HonzoParser::new(&self.buf, self.reader_version)
             .map(|p| p.head().has_sidx())
             .unwrap_or(false)
     }
@@ -132,13 +134,21 @@ impl HonzoWasm {
         struct TocOut {
             chunk_type: String,
             chunk_id: u32,
+            offset: u64,
             size_compressed: u32,
             size_raw: u32,
             compression: u8,
             content_type_kind: u8,
             content_type_value: u8,
+            cover_type: u8,
+            flags: u8,
+            crc32: u32,
             #[serde(skip_serializing_if = "Option::is_none")]
             alt_text: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            font_embedding: Option<u8>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            font_license_url: Option<String>,
         }
         let js_entries: Vec<TocOut> = self
             .toc
@@ -148,12 +158,18 @@ impl HonzoWasm {
                     .unwrap_or("????")
                     .to_string(),
                 chunk_id: e.chunk_id,
+                offset: e.offset,
                 size_compressed: e.size_compressed,
                 size_raw: e.size_raw,
                 compression: e.compression as u8,
                 content_type_kind: e.content_type_kind,
                 content_type_value: e.content_type_value,
+                cover_type: e.cover_type as u8,
+                flags: e.flags,
+                crc32: e.crc32,
                 alt_text: e.alt_text.clone(),
+                font_embedding: e.font_embedding.map(|e| e as u8),
+                font_license_url: e.font_license_url.clone(),
             })
             .collect();
         serde_wasm_bindgen::to_value(&js_entries)

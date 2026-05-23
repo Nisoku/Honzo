@@ -43,6 +43,28 @@ fn ffi_get_meta() {
 }
 
 #[test]
+fn ffi_get_meta_parsed() {
+    let handle = honzo_c::ffi::HonzoHandle::parse(&fixture("novel.hzo"), 1).unwrap();
+    let mut buffer = diplomat_runtime::rust_interop::RustWriteVec::with_capacity(256);
+    let result = handle.get_meta_parsed(unsafe { buffer.borrow_mut() });
+    assert!(result.is_ok());
+    let meta_json = std::str::from_utf8(buffer.borrow().as_bytes()).unwrap();
+    assert!(meta_json.contains("\"language\":\"en\""));
+    assert!(meta_json.contains("\"title\""));
+}
+
+#[test]
+fn ffi_get_toc() {
+    let handle = honzo_c::ffi::HonzoHandle::parse(&fixture("novel.hzo"), 1).unwrap();
+    let mut buffer = diplomat_runtime::rust_interop::RustWriteVec::with_capacity(512);
+    let result = handle.get_toc(unsafe { buffer.borrow_mut() });
+    assert!(result.is_ok());
+    let toc_json = std::str::from_utf8(buffer.borrow().as_bytes()).unwrap();
+    assert!(toc_json.contains("\"chunk_type\":\"COVR\""));
+    assert!(toc_json.contains("\"chunk_type\":\"CHAP\""));
+}
+
+#[test]
 fn ffi_bad_magic() {
     assert!(honzo_c::ffi::HonzoHandle::parse(&corpus("bad_magic.hzo"), 1).is_none());
 }
@@ -71,6 +93,20 @@ fn ffi_builder_roundtrip() {
     assert!(builder.finalize());
     let output = builder.get_result();
     assert!(!output.is_empty());
+    let handle = honzo_c::ffi::HonzoHandle::parse(output, 1).unwrap();
+    assert_eq!(handle.chunk_count(), 1);
+}
+
+#[test]
+fn ffi_builder_math_chunk_roundtrip() {
+    let mut builder = honzo_c::ffi::HonzoBuilderHandle::new();
+    assert!(builder.add_math_chunk(
+        b"<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>x</mi></math>",
+        0,
+        0,
+    ));
+    assert!(builder.finalize());
+    let output = builder.get_result();
     let handle = honzo_c::ffi::HonzoHandle::parse(output, 1).unwrap();
     assert_eq!(handle.chunk_count(), 1);
 }

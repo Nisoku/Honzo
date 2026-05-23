@@ -8,13 +8,13 @@ pub use honzo_chunks::data::math::{
 pub use honzo_chunks::data::sidx::normalize_search_term;
 pub use honzo_core::HonzoParser;
 pub use honzo_core::MathType;
-pub use honzo_io::{decompress, Compression, CoverType, HonzoBuilder, MarkupType};
+pub use honzo_io::{decompress, Compression, CoverType, HonzoBuilder, HonzoMeta, MarkupType};
 
 #[diplomat::bridge]
 pub mod ffi {
     use crate::{
         decompress, latex_to_mathml_bytes, normalize_search_term as normalize_search_term_impl,
-        render_math_bytes, validate_mathml_bytes, Compression, CoverType, HonzoBuilder,
+        render_math_bytes, validate_mathml_bytes, Compression, CoverType, HonzoBuilder, HonzoMeta,
         HonzoParser, MarkupType, MathType,
     };
     use core::fmt::Write as _;
@@ -37,11 +37,12 @@ pub mod ffi {
         buf: Vec<u8>,
         meta: Vec<u8>,
         chunks: Vec<Vec<u8>>,
+        reader_version: u16,
     }
 
     impl HonzoHandle {
-        pub fn parse(data: &[u8], _reader_version: u16) -> Option<Box<HonzoHandle>> {
-            let p = HonzoParser::new(data, 1).ok()?;
+        pub fn parse(data: &[u8], reader_version: u16) -> Option<Box<HonzoHandle>> {
+            let p = HonzoParser::new(data, reader_version).ok()?;
             let meta = p.meta_bytes().ok()?.to_vec();
 
             let entries: Vec<_> = p.toc_entries().collect();
@@ -61,6 +62,7 @@ pub mod ffi {
                 buf: data.to_vec(),
                 meta,
                 chunks,
+                reader_version,
             }))
         }
 
@@ -69,19 +71,19 @@ pub mod ffi {
         }
 
         pub fn layout_mode(&self) -> u8 {
-            HonzoParser::new(&self.buf, 1)
+            HonzoParser::new(&self.buf, self.reader_version)
                 .map(|p| p.head().layout_mode() as u8)
                 .unwrap_or(0)
         }
 
         pub fn has_drm(&self) -> bool {
-            HonzoParser::new(&self.buf, 1)
+            HonzoParser::new(&self.buf, self.reader_version)
                 .map(|p| p.head().has_drm())
                 .unwrap_or(false)
         }
 
         pub fn has_sidx(&self) -> bool {
-            HonzoParser::new(&self.buf, 1)
+            HonzoParser::new(&self.buf, self.reader_version)
                 .map(|p| p.head().has_sidx())
                 .unwrap_or(false)
         }
@@ -94,6 +96,74 @@ pub mod ffi {
         #[allow(clippy::needless_lifetimes)]
         pub fn get_meta<'a>(&'a self) -> &'a [u8] {
             &self.meta
+        }
+
+        pub fn get_meta_parsed(
+            &self,
+            write: &mut diplomat_runtime::DiplomatWrite,
+        ) -> Result<(), HonzoErrorCode> {
+            let meta: HonzoMeta =
+                rmp_serde::from_slice(&self.meta).map_err(|_| HonzoErrorCode::Truncated)?;
+            let json = serde_json::to_string(&meta).map_err(|_| HonzoErrorCode::Unknown)?;
+            write
+                .write_str(&json)
+                .map_err(|_| HonzoErrorCode::Unknown)?;
+            Ok(())
+        }
+
+        pub fn get_toc(
+            &self,
+            write: &mut diplomat_runtime::DiplomatWrite,
+        ) -> Result<(), HonzoErrorCode> {
+            #[derive(serde::Serialize)]
+            struct TocOut {
+                chunk_type: String,
+                chunk_id: u32,
+                offset: u64,
+                size_compressed: u32,
+                size_raw: u32,
+                compression: u8,
+                content_type_kind: u8,
+                content_type_value: u8,
+                cover_type: u8,
+                flags: u8,
+                crc32: u32,
+                #[serde(skip_serializing_if = "Option::is_none")]
+                alt_text: Option<String>,
+                #[serde(skip_serializing_if = "Option::is_none")]
+                font_embedding: Option<u8>,
+                #[serde(skip_serializing_if = "Option::is_none")]
+                font_license_url: Option<String>,
+            }
+
+            let parser = HonzoParser::new(&self.buf, self.reader_version)
+                .map_err(|_| HonzoErrorCode::Unknown)?;
+            let entries: Vec<TocOut> = parser
+                .toc_entries()
+                .map(|entry| TocOut {
+                    chunk_type: std::str::from_utf8(&entry.chunk_type)
+                        .unwrap_or("????")
+                        .to_string(),
+                    chunk_id: entry.chunk_id,
+                    offset: entry.offset,
+                    size_compressed: entry.size_compressed,
+                    size_raw: entry.size_raw,
+                    compression: entry.compression as u8,
+                    content_type_kind: entry.content_type_kind,
+                    content_type_value: entry.content_type_value,
+                    cover_type: entry.cover_type as u8,
+                    flags: entry.flags,
+                    crc32: entry.crc32,
+                    alt_text: entry.alt_text.map(|s| s.to_string()),
+                    font_embedding: entry.font_embedding.map(|e| e as u8),
+                    font_license_url: entry.font_license_url.map(|s| s.to_string()),
+                })
+                .collect();
+            let json = serde_json::to_string(&entries).map_err(|_| HonzoErrorCode::Unknown)?;
+            write
+                .write_str(&json)
+                .map_err(|_| HonzoErrorCode::Unknown)?;
+            Ok(())
         }
     }
 
@@ -166,6 +236,10 @@ pub mod ffi {
                 None,
             ));
             true
+        }
+
+        pub fn add_math_chunk(&mut self, data: &[u8], math_type: u8, compression: u8) -> bool {
+            self.add_chunk(b"MATH", data, compression, 2, math_type)
         }
 
         pub fn set_meta(&mut self, msgpack: &[u8]) -> bool {

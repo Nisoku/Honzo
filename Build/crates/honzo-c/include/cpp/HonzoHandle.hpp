@@ -11,6 +11,7 @@
 #include <functional>
 #include <optional>
 #include <cstdlib>
+#include "HonzoErrorCode.hpp"
 #include "diplomat_runtime.hpp"
 
 
@@ -18,7 +19,7 @@ namespace diplomat {
 namespace capi {
     extern "C" {
 
-    diplomat::capi::HonzoHandle* HonzoHandle_parse(diplomat::capi::DiplomatU8View data, uint16_t _reader_version);
+    diplomat::capi::HonzoHandle* HonzoHandle_parse(diplomat::capi::DiplomatU8View data, uint16_t reader_version);
 
     uint32_t HonzoHandle_chunk_count(const diplomat::capi::HonzoHandle* self);
 
@@ -33,15 +34,21 @@ namespace capi {
 
     diplomat::capi::DiplomatU8View HonzoHandle_get_meta(const diplomat::capi::HonzoHandle* self);
 
+    typedef struct HonzoHandle_get_meta_parsed_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} HonzoHandle_get_meta_parsed_result;
+    HonzoHandle_get_meta_parsed_result HonzoHandle_get_meta_parsed(const diplomat::capi::HonzoHandle* self, diplomat::capi::DiplomatWrite* write);
+
+    typedef struct HonzoHandle_get_toc_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} HonzoHandle_get_toc_result;
+    HonzoHandle_get_toc_result HonzoHandle_get_toc(const diplomat::capi::HonzoHandle* self, diplomat::capi::DiplomatWrite* write);
+
     void HonzoHandle_destroy(HonzoHandle* self);
 
     } // extern "C"
 } // namespace capi
 } // namespace
 
-inline std::unique_ptr<HonzoHandle> HonzoHandle::parse(diplomat::span<const uint8_t> data, uint16_t _reader_version) {
+inline std::unique_ptr<HonzoHandle> HonzoHandle::parse(diplomat::span<const uint8_t> data, uint16_t reader_version) {
     auto result = diplomat::capi::HonzoHandle_parse({data.data(), data.size()},
-        _reader_version);
+        reader_version);
     return std::unique_ptr<HonzoHandle>(HonzoHandle::FromFFI(result));
 }
 
@@ -74,6 +81,36 @@ inline std::optional<diplomat::span<const uint8_t>> HonzoHandle::get_chunk(uint3
 inline diplomat::span<const uint8_t> HonzoHandle::get_meta() const {
     auto result = diplomat::capi::HonzoHandle_get_meta(this->AsFFI());
     return diplomat::span<const uint8_t>(result.data, result.len);
+}
+
+inline diplomat::result<std::string, HonzoErrorCode> HonzoHandle::get_meta_parsed() const {
+    std::string output;
+    diplomat::capi::DiplomatWrite write = diplomat::WriteFromString(output);
+    auto result = diplomat::capi::HonzoHandle_get_meta_parsed(this->AsFFI(),
+        &write);
+    return result.is_ok ? diplomat::result<std::string, HonzoErrorCode>(diplomat::Ok<std::string>(std::move(output))) : diplomat::result<std::string, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+template<typename W>
+inline diplomat::result<std::monostate, HonzoErrorCode> HonzoHandle::get_meta_parsed_write(W& writeable) const {
+    diplomat::capi::DiplomatWrite write = diplomat::WriteTrait<W>::Construct(writeable);
+    auto result = diplomat::capi::HonzoHandle_get_meta_parsed(this->AsFFI(),
+        &write);
+    return result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+
+inline diplomat::result<std::string, HonzoErrorCode> HonzoHandle::get_toc() const {
+    std::string output;
+    diplomat::capi::DiplomatWrite write = diplomat::WriteFromString(output);
+    auto result = diplomat::capi::HonzoHandle_get_toc(this->AsFFI(),
+        &write);
+    return result.is_ok ? diplomat::result<std::string, HonzoErrorCode>(diplomat::Ok<std::string>(std::move(output))) : diplomat::result<std::string, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+template<typename W>
+inline diplomat::result<std::monostate, HonzoErrorCode> HonzoHandle::get_toc_write(W& writeable) const {
+    diplomat::capi::DiplomatWrite write = diplomat::WriteTrait<W>::Construct(writeable);
+    auto result = diplomat::capi::HonzoHandle_get_toc(this->AsFFI(),
+        &write);
+    return result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
 }
 
 inline const diplomat::capi::HonzoHandle* HonzoHandle::AsFFI() const {

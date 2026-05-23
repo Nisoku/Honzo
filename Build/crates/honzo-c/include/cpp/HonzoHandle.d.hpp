@@ -11,6 +11,10 @@
 #include <cstdlib>
 #include "diplomat_runtime.hpp"
 
+class HonzoErrorCode;
+
+
+
 
 namespace diplomat {
 namespace capi {
@@ -21,7 +25,7 @@ namespace capi {
 class HonzoHandle {
 public:
 
-  inline static std::unique_ptr<HonzoHandle> parse(diplomat::span<const uint8_t> data, uint16_t _reader_version);
+  inline static std::unique_ptr<HonzoHandle> parse(diplomat::span<const uint8_t> data, uint16_t reader_version);
 
   inline uint32_t chunk_count() const;
 
@@ -34,6 +38,14 @@ public:
   inline std::optional<diplomat::span<const uint8_t>> get_chunk(uint32_t index) const;
 
   inline diplomat::span<const uint8_t> get_meta() const;
+
+  inline diplomat::result<std::string, HonzoErrorCode> get_meta_parsed() const;
+  template<typename W>
+  inline diplomat::result<std::monostate, HonzoErrorCode> get_meta_parsed_write(W& writeable_output) const;
+
+  inline diplomat::result<std::string, HonzoErrorCode> get_toc() const;
+  template<typename W>
+  inline diplomat::result<std::monostate, HonzoErrorCode> get_toc_write(W& writeable_output) const;
 
     inline const diplomat::capi::HonzoHandle* AsFFI() const;
     inline diplomat::capi::HonzoHandle* AsFFI();

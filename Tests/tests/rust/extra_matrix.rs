@@ -1,4 +1,12 @@
-use honzo_chunks::extra::{anno, drm, is_known_namespace, parse_known, sync, KnownExtra};
+use honzo_chunks::extra::{
+    anno, boxed_extra, drm, is_known_namespace, parse_extra, parse_known, register_extra_parser,
+    sync, KnownExtra, ParsedExtra,
+};
+
+#[derive(Debug, PartialEq, Eq)]
+struct CustomExtra {
+    label: String,
+}
 
 #[test]
 fn registry_recognizes_official_namespaces() {
@@ -54,4 +62,34 @@ fn parse_known_routes_to_typed_payloads() {
 #[test]
 fn unknown_namespaces_are_skipped() {
     assert!(parse_known("com.example.custom", b"ignored").is_none());
+}
+
+#[test]
+fn registered_namespaces_use_custom_parsers() {
+    let namespace = "com.example.custom.registry";
+
+    register_extra_parser(namespace, |body| {
+        let label = std::str::from_utf8(body)
+            .map_err(|_| honzo_core::HonzoError::Truncated)?
+            .to_string();
+        Ok(boxed_extra(CustomExtra { label }))
+    });
+
+    let parsed = parse_extra(namespace, b"hello")
+        .expect("registered namespace")
+        .unwrap();
+
+    match parsed {
+        ParsedExtra::Registered(extra) => {
+            assert_eq!(extra.namespace(), namespace);
+            let value = extra.downcast_ref::<CustomExtra>().expect("custom payload");
+            assert_eq!(
+                value,
+                &CustomExtra {
+                    label: "hello".into()
+                }
+            );
+        }
+        other => panic!("expected registered payload, got {other:?}"),
+    }
 }

@@ -1092,6 +1092,8 @@ dependencies = [
  "honzo-core",
  "honzo-io",
  "rmp-serde",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -1171,6 +1173,7 @@ dependencies = [
 name = "honzo-tests"
 version = "0.1.0"
 dependencies = [
+ "diplomat-runtime",
  "honzo-c",
  "honzo-chunks",
  "honzo-convert",
