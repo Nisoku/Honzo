@@ -28,17 +28,18 @@ impl<'buf> HonzoParser<'buf> {
             return Err(HonzoError::InvalidMagic);
         }
 
+        let end = buf.len();
         let mut cursor = 4;
-        let version_major = read_u8(buf, &mut cursor)?;
-        let version_minor = read_u8(buf, &mut cursor)?;
-        let min_reader_version = read_u16(buf, &mut cursor)?;
-        let flags = read_u32(buf, &mut cursor)?;
-        let chunk_count = read_u32(buf, &mut cursor)?;
-        let toc_size = read_u64(buf, &mut cursor)?;
-        let data_size = read_u64(buf, &mut cursor)?;
-        let extra_size = read_u64(buf, &mut cursor)?;
-        let meta_size = read_u64(buf, &mut cursor)?;
-        let _reserved = read_u32(buf, &mut cursor)?;
+        let version_major = read_u8(buf, &mut cursor, end)?;
+        let version_minor = read_u8(buf, &mut cursor, end)?;
+        let min_reader_version = read_u16(buf, &mut cursor, end)?;
+        let flags = read_u32(buf, &mut cursor, end)?;
+        let chunk_count = read_u32(buf, &mut cursor, end)?;
+        let toc_size = read_u64(buf, &mut cursor, end)?;
+        let data_size = read_u64(buf, &mut cursor, end)?;
+        let extra_size = read_u64(buf, &mut cursor, end)?;
+        let meta_size = read_u64(buf, &mut cursor, end)?;
+        let _reserved = read_u32(buf, &mut cursor, end)?;
 
         if reader_version < min_reader_version {
             return Err(HonzoError::ReaderVersionTooOld {
@@ -152,7 +153,7 @@ pub struct TocEntryIter<'buf> {
 impl<'buf> TocEntryIter<'buf> {
     fn new(buf: &'buf [u8], toc_offset: usize, chunk_count: u32) -> Self {
         let mut cursor = toc_offset;
-        let _ = read_u32(buf, &mut cursor).ok();
+        let _ = read_u32(buf, &mut cursor, buf.len()).ok();
         Self {
             buf,
             cursor,
@@ -169,26 +170,27 @@ impl<'buf> Iterator for TocEntryIter<'buf> {
             return None;
         }
 
+        let end = self.buf.len();
         let start = self.cursor;
         let mut cursor = self.cursor;
-        let chunk_type = read_tag(self.buf, &mut cursor).ok()?;
+        let chunk_type = read_tag(self.buf, &mut cursor, end).ok()?;
         if !is_known_chunk(&chunk_type) {
             return None;
         }
-        let chunk_id = read_u32(self.buf, &mut cursor).ok()?;
-        let offset = read_u64(self.buf, &mut cursor).ok()?;
-        let size_compressed = read_u32(self.buf, &mut cursor).ok()?;
-        let size_raw = read_u32(self.buf, &mut cursor).ok()?;
-        let compression = read_u8(self.buf, &mut cursor).ok()?;
-        let content_type_kind = read_u8(self.buf, &mut cursor).ok()?;
-        let content_type_value = read_u8(self.buf, &mut cursor).ok()?;
-        let cover_type = read_u8(self.buf, &mut cursor).ok()?;
-        let flags = read_u8(self.buf, &mut cursor).ok()?;
-        let crc32 = read_u32(self.buf, &mut cursor).ok()?;
-        let alt_text_len = read_u16(self.buf, &mut cursor).ok()? as usize;
+        let chunk_id = read_u32(self.buf, &mut cursor, end).ok()?;
+        let offset = read_u64(self.buf, &mut cursor, end).ok()?;
+        let size_compressed = read_u32(self.buf, &mut cursor, end).ok()?;
+        let size_raw = read_u32(self.buf, &mut cursor, end).ok()?;
+        let compression = read_u8(self.buf, &mut cursor, end).ok()?;
+        let content_type_kind = read_u8(self.buf, &mut cursor, end).ok()?;
+        let content_type_value = read_u8(self.buf, &mut cursor, end).ok()?;
+        let cover_type = read_u8(self.buf, &mut cursor, end).ok()?;
+        let flags = read_u8(self.buf, &mut cursor, end).ok()?;
+        let crc32 = read_u32(self.buf, &mut cursor, end).ok()?;
+        let alt_text_len = read_u16(self.buf, &mut cursor, end).ok()? as usize;
 
         let alt_text = if alt_text_len > 0 {
-            let bytes = read_bytes(self.buf, &mut cursor, alt_text_len).ok()?;
+            let bytes = read_bytes(self.buf, &mut cursor, alt_text_len, end).ok()?;
             core::str::from_utf8(bytes).ok()
         } else {
             None
@@ -198,11 +200,11 @@ impl<'buf> Iterator for TocEntryIter<'buf> {
         let mut font_license_url = None;
 
         if &chunk_type == b"FONT" {
-            let embedding = read_u8(self.buf, &mut cursor).ok()?;
+            let embedding = read_u8(self.buf, &mut cursor, end).ok()?;
             font_embedding = Some(FontEmbedding::from_u8(embedding).ok()?);
-            let url_len = read_u16(self.buf, &mut cursor).ok()? as usize;
+            let url_len = read_u16(self.buf, &mut cursor, end).ok()? as usize;
             if url_len > 0 {
-                let bytes = read_bytes(self.buf, &mut cursor, url_len).ok()?;
+                let bytes = read_bytes(self.buf, &mut cursor, url_len, end).ok()?;
                 font_license_url = core::str::from_utf8(bytes).ok();
             }
         }
@@ -258,10 +260,11 @@ impl<'buf> Iterator for PmapEntryIter<'buf> {
         if self.remaining == 0 {
             return None;
         }
+        let end = self.buf.len();
         let mut cursor = self.cursor;
-        let print_page = read_u32(self.buf, &mut cursor).ok()?;
-        let chunk_id = read_u32(self.buf, &mut cursor).ok()?;
-        let byte_offset = read_u32(self.buf, &mut cursor).ok()?;
+        let print_page = read_u32(self.buf, &mut cursor, end).ok()?;
+        let chunk_id = read_u32(self.buf, &mut cursor, end).ok()?;
+        let byte_offset = read_u32(self.buf, &mut cursor, end).ok()?;
         self.cursor = cursor;
         self.remaining -= 1;
         Some(PmapEntry {
@@ -286,28 +289,28 @@ fn validate_toc(
     expected_entries: u32,
 ) -> Result<(u32, usize, u32), HonzoError> {
     let mut cursor = toc_offset;
-    let num_entries = read_u32_limit(buf, &mut cursor, toc_end)?;
+    let num_entries = read_u32(buf, &mut cursor, toc_end)?;
     if num_entries != expected_entries {
         return Err(HonzoError::Truncated);
     }
     for _ in 0..num_entries {
-        let chunk_type = read_tag_limit(buf, &mut cursor, toc_end)?;
+        let chunk_type = read_tag(buf, &mut cursor, toc_end)?;
         if !is_known_chunk(&chunk_type) {
             return Err(HonzoError::InvalidChunkType);
         }
-        let _ = read_u32_limit(buf, &mut cursor, toc_end)?;
-        let _ = read_u64_limit(buf, &mut cursor, toc_end)?;
-        let _ = read_u32_limit(buf, &mut cursor, toc_end)?;
-        let _ = read_u32_limit(buf, &mut cursor, toc_end)?;
-        let compression = read_u8_limit(buf, &mut cursor, toc_end)?;
-        let content_type_kind = read_u8_limit(buf, &mut cursor, toc_end)?;
-        let content_type_value = read_u8_limit(buf, &mut cursor, toc_end)?;
-        let cover_type = read_u8_limit(buf, &mut cursor, toc_end)?;
-        let _ = read_u8_limit(buf, &mut cursor, toc_end)?;
-        let _ = read_u32_limit(buf, &mut cursor, toc_end)?;
-        let alt_text_len = read_u16_limit(buf, &mut cursor, toc_end)? as usize;
+        let _ = read_u32(buf, &mut cursor, toc_end)?;
+        let _ = read_u64(buf, &mut cursor, toc_end)?;
+        let _ = read_u32(buf, &mut cursor, toc_end)?;
+        let _ = read_u32(buf, &mut cursor, toc_end)?;
+        let compression = read_u8(buf, &mut cursor, toc_end)?;
+        let content_type_kind = read_u8(buf, &mut cursor, toc_end)?;
+        let content_type_value = read_u8(buf, &mut cursor, toc_end)?;
+        let cover_type = read_u8(buf, &mut cursor, toc_end)?;
+        let _ = read_u8(buf, &mut cursor, toc_end)?;
+        let _ = read_u32(buf, &mut cursor, toc_end)?;
+        let alt_text_len = read_u16(buf, &mut cursor, toc_end)? as usize;
         if alt_text_len > 0 {
-            let bytes = read_bytes_limit(buf, &mut cursor, alt_text_len, toc_end)?;
+            let bytes = read_bytes(buf, &mut cursor, alt_text_len, toc_end)?;
             if core::str::from_utf8(bytes).is_err() {
                 return Err(HonzoError::Truncated);
             }
@@ -337,11 +340,11 @@ fn validate_toc(
         CoverType::from_u8(cover_type)?;
 
         if &chunk_type == b"FONT" {
-            let embedding = read_u8_limit(buf, &mut cursor, toc_end)?;
+            let embedding = read_u8(buf, &mut cursor, toc_end)?;
             FontEmbedding::from_u8(embedding)?;
-            let url_len = read_u16_limit(buf, &mut cursor, toc_end)? as usize;
+            let url_len = read_u16(buf, &mut cursor, toc_end)? as usize;
             if url_len > 0 {
-                let bytes = read_bytes_limit(buf, &mut cursor, url_len, toc_end)?;
+                let bytes = read_bytes(buf, &mut cursor, url_len, toc_end)?;
                 if core::str::from_utf8(bytes).is_err() {
                     return Err(HonzoError::Truncated);
                 }
@@ -350,27 +353,17 @@ fn validate_toc(
     }
 
     let pmap_offset = cursor;
-    let num_pmap_entries = read_u32_limit(buf, &mut cursor, toc_end)?;
+    let num_pmap_entries = read_u32(buf, &mut cursor, toc_end)?;
     for _ in 0..num_pmap_entries {
-        let _ = read_u32_limit(buf, &mut cursor, toc_end)?;
-        let _ = read_u32_limit(buf, &mut cursor, toc_end)?;
-        let _ = read_u32_limit(buf, &mut cursor, toc_end)?;
+        let _ = read_u32(buf, &mut cursor, toc_end)?;
+        let _ = read_u32(buf, &mut cursor, toc_end)?;
+        let _ = read_u32(buf, &mut cursor, toc_end)?;
     }
 
     Ok((num_entries, pmap_offset + 4, num_pmap_entries))
 }
 
-fn read_bytes<'a>(buf: &'a [u8], cursor: &mut usize, len: usize) -> Result<&'a [u8], HonzoError> {
-    let end = *cursor + len;
-    if end > buf.len() {
-        return Err(HonzoError::BufferTooShort);
-    }
-    let out = &buf[*cursor..end];
-    *cursor = end;
-    Ok(out)
-}
-
-fn read_bytes_limit<'a>(
+fn read_bytes<'a>(
     buf: &'a [u8],
     cursor: &mut usize,
     len: usize,
@@ -388,59 +381,30 @@ fn read_bytes_limit<'a>(
     Ok(out)
 }
 
-fn read_tag_limit(buf: &[u8], cursor: &mut usize, limit: usize) -> Result<[u8; 4], HonzoError> {
-    let bytes = read_bytes_limit(buf, cursor, 4, limit)?;
+fn read_tag(buf: &[u8], cursor: &mut usize, limit: usize) -> Result<[u8; 4], HonzoError> {
+    let bytes = read_bytes(buf, cursor, 4, limit)?;
     let mut tag = [0u8; 4];
     tag.copy_from_slice(bytes);
     Ok(tag)
 }
 
-fn read_tag(buf: &[u8], cursor: &mut usize) -> Result<[u8; 4], HonzoError> {
-    let bytes = read_bytes(buf, cursor, 4)?;
-    let mut tag = [0u8; 4];
-    tag.copy_from_slice(bytes);
-    Ok(tag)
-}
-
-fn read_u8(buf: &[u8], cursor: &mut usize) -> Result<u8, HonzoError> {
-    let bytes = read_bytes(buf, cursor, 1)?;
+fn read_u8(buf: &[u8], cursor: &mut usize, limit: usize) -> Result<u8, HonzoError> {
+    let bytes = read_bytes(buf, cursor, 1, limit)?;
     Ok(bytes[0])
 }
 
-fn read_u8_limit(buf: &[u8], cursor: &mut usize, limit: usize) -> Result<u8, HonzoError> {
-    let bytes = read_bytes_limit(buf, cursor, 1, limit)?;
-    Ok(bytes[0])
-}
-
-fn read_u16(buf: &[u8], cursor: &mut usize) -> Result<u16, HonzoError> {
-    let bytes = read_bytes(buf, cursor, 2)?;
+fn read_u16(buf: &[u8], cursor: &mut usize, limit: usize) -> Result<u16, HonzoError> {
+    let bytes = read_bytes(buf, cursor, 2, limit)?;
     Ok(u16::from_le_bytes([bytes[0], bytes[1]]))
 }
 
-fn read_u16_limit(buf: &[u8], cursor: &mut usize, limit: usize) -> Result<u16, HonzoError> {
-    let bytes = read_bytes_limit(buf, cursor, 2, limit)?;
-    Ok(u16::from_le_bytes([bytes[0], bytes[1]]))
-}
-
-fn read_u32(buf: &[u8], cursor: &mut usize) -> Result<u32, HonzoError> {
-    let bytes = read_bytes(buf, cursor, 4)?;
+fn read_u32(buf: &[u8], cursor: &mut usize, limit: usize) -> Result<u32, HonzoError> {
+    let bytes = read_bytes(buf, cursor, 4, limit)?;
     Ok(u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]))
 }
 
-fn read_u32_limit(buf: &[u8], cursor: &mut usize, limit: usize) -> Result<u32, HonzoError> {
-    let bytes = read_bytes_limit(buf, cursor, 4, limit)?;
-    Ok(u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]))
-}
-
-fn read_u64(buf: &[u8], cursor: &mut usize) -> Result<u64, HonzoError> {
-    let bytes = read_bytes(buf, cursor, 8)?;
-    Ok(u64::from_le_bytes([
-        bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
-    ]))
-}
-
-fn read_u64_limit(buf: &[u8], cursor: &mut usize, limit: usize) -> Result<u64, HonzoError> {
-    let bytes = read_bytes_limit(buf, cursor, 8, limit)?;
+fn read_u64(buf: &[u8], cursor: &mut usize, limit: usize) -> Result<u64, HonzoError> {
+    let bytes = read_bytes(buf, cursor, 8, limit)?;
     Ok(u64::from_le_bytes([
         bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
     ]))

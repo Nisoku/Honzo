@@ -7,5 +7,8 @@ license = "Apache-2.0"
 [features]
 default = []
 alloc = []
+compression = ["alloc", "lz4_flex"]
 
 [dependencies]
+crc32fast = { version = "1.4", default-features = false }
+lz4_flex = { version = "0.13.1", optional = true, default-features = false, features = ["safe-encode", "safe-decode"] }

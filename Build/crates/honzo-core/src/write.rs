@@ -1,9 +1,14 @@
-use crate::types::{Compression, CoverType, FontEmbedding, LayoutMode, MarkupType, PmapEntry};
+use crate::types::{
+    Compression, CoverType, FontEmbedding, LayoutMode, MarkupType, MathType, PmapEntry,
+};
 use crate::HonzoError;
 
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
+
+#[cfg(feature = "compression")]
+use lz4_flex::compress_prepend_size;
 
 const MAGIC: &[u8; 4] = b"HONO";
 
@@ -78,6 +83,26 @@ impl HonzoBuilder {
         self
     }
 
+    pub fn add_math_chunk(
+        mut self,
+        data: &[u8],
+        math_type: MathType,
+        compression: Compression,
+    ) -> Self {
+        self.chunks.push(ChunkSpec {
+            tag: *b"MATH",
+            data: data.to_vec(),
+            compression,
+            content_type_kind: 2,
+            content_type_value: math_type as u8,
+            cover_type: CoverType::Front,
+            alt_text: None,
+            font_embedding: None,
+            font_license_url: None,
+        });
+        self
+    }
+
     pub fn add_pmap_entry(mut self, entry: PmapEntry) -> Self {
         self.pmap.push(entry);
         self
@@ -99,8 +124,27 @@ impl HonzoBuilder {
         let mut data_offset = 0u64;
 
         for chunk in &self.chunks {
-            let size_compressed = chunk.data.len() as u32;
-            let size_raw = chunk.data.len() as u32;
+            let (compressed_data, size_compressed, size_raw) = match chunk.compression {
+                Compression::None => {
+                    let len = chunk.data.len() as u32;
+                    (chunk.data.clone(), len, len)
+                }
+                Compression::Lz4 => {
+                    #[cfg(not(feature = "compression"))]
+                    {
+                        let _ = &chunk.compression;
+                        return Err(HonzoError::UnknownCompression(1));
+                    }
+                    #[cfg(feature = "compression")]
+                    {
+                        let compressed = compress_prepend_size(&chunk.data);
+                        let size_raw = chunk.data.len() as u32;
+                        let size_compressed = compressed.len() as u32;
+                        (compressed, size_compressed, size_raw)
+                    }
+                }
+            };
+
             let crc32 = if &chunk.tag == b"CHAP" {
                 crc32(&chunk.data)
             } else {
@@ -127,7 +171,7 @@ impl HonzoBuilder {
             });
 
             data_offset += size_compressed as u64;
-            compressed_chunks.push(chunk.data.clone());
+            compressed_chunks.push(compressed_data);
         }
 
         let toc_bytes = build_toc(&toc_entries, &self.pmap)?;
@@ -196,42 +240,42 @@ struct TocEntryWrite<'a> {
 
 fn build_toc(entries: &[TocEntryWrite<'_>], pmap: &[PmapEntry]) -> Result<Vec<u8>, HonzoError> {
     let mut out = Vec::new();
-    write_u32(&mut out, entries.len() as u32);
+    out.extend_from_slice(&(entries.len() as u32).to_le_bytes());
     for entry in entries {
         out.extend_from_slice(&entry.chunk_type);
-        write_u32(&mut out, entry.chunk_id);
-        write_u64(&mut out, entry.offset);
-        write_u32(&mut out, entry.size_compressed);
-        write_u32(&mut out, entry.size_raw);
+        out.extend_from_slice(&entry.chunk_id.to_le_bytes());
+        out.extend_from_slice(&entry.offset.to_le_bytes());
+        out.extend_from_slice(&entry.size_compressed.to_le_bytes());
+        out.extend_from_slice(&entry.size_raw.to_le_bytes());
         out.push(entry.compression as u8);
         out.push(entry.content_type_kind);
         out.push(entry.content_type_value);
         out.push(entry.cover_type as u8);
         out.push(entry.flags);
-        write_u32(&mut out, entry.crc32);
+        out.extend_from_slice(&entry.crc32.to_le_bytes());
         if let Some(text) = entry.alt_text {
-            write_u16(&mut out, text.len() as u16);
+            out.extend_from_slice(&(text.len() as u16).to_le_bytes());
             out.extend_from_slice(text.as_bytes());
         } else {
-            write_u16(&mut out, 0);
+            out.extend_from_slice(&0u16.to_le_bytes());
         }
 
         if entry.chunk_type == *b"FONT" {
             out.push(entry.font_embedding.unwrap_or(FontEmbedding::Allowed) as u8);
             if let Some(url) = entry.font_license_url {
-                write_u16(&mut out, url.len() as u16);
+                out.extend_from_slice(&(url.len() as u16).to_le_bytes());
                 out.extend_from_slice(url.as_bytes());
             } else {
-                write_u16(&mut out, 0);
+                out.extend_from_slice(&0u16.to_le_bytes());
             }
         }
     }
 
-    write_u32(&mut out, pmap.len() as u32);
+    out.extend_from_slice(&(pmap.len() as u32).to_le_bytes());
     for entry in pmap {
-        write_u32(&mut out, entry.print_page);
-        write_u32(&mut out, entry.chunk_id);
-        write_u32(&mut out, entry.byte_offset);
+        out.extend_from_slice(&entry.print_page.to_le_bytes());
+        out.extend_from_slice(&entry.chunk_id.to_le_bytes());
+        out.extend_from_slice(&entry.byte_offset.to_le_bytes());
     }
     Ok(out)
 }
@@ -248,36 +292,18 @@ fn concat_chunks(chunks: &[Vec<u8>]) -> Vec<u8> {
 fn write_head(out: &mut Vec<u8>, head: HonzoHeadWrite) {
     out.push(head.version_major);
     out.push(head.version_minor);
-    write_u16(out, head.min_reader_version);
-    write_u32(out, head.flags);
-    write_u32(out, head.chunk_count);
-    write_u64(out, head.toc_size);
-    write_u64(out, head.data_size);
-    write_u64(out, head.extra_size);
-    write_u64(out, head.meta_size);
-    write_u32(out, 0);
-}
-
-fn write_u16(out: &mut Vec<u8>, value: u16) {
-    out.extend_from_slice(&value.to_le_bytes());
-}
-
-fn write_u32(out: &mut Vec<u8>, value: u32) {
-    out.extend_from_slice(&value.to_le_bytes());
-}
-
-fn write_u64(out: &mut Vec<u8>, value: u64) {
-    out.extend_from_slice(&value.to_le_bytes());
+    out.extend_from_slice(&head.min_reader_version.to_le_bytes());
+    out.extend_from_slice(&head.flags.to_le_bytes());
+    out.extend_from_slice(&head.chunk_count.to_le_bytes());
+    out.extend_from_slice(&head.toc_size.to_le_bytes());
+    out.extend_from_slice(&head.data_size.to_le_bytes());
+    out.extend_from_slice(&head.extra_size.to_le_bytes());
+    out.extend_from_slice(&head.meta_size.to_le_bytes());
+    out.extend_from_slice(&0u32.to_le_bytes());
 }
 
 fn crc32(data: &[u8]) -> u32 {
-    let mut crc: u32 = 0xFFFF_FFFF;
-    for byte in data {
-        crc ^= *byte as u32;
-        for _ in 0..8 {
-            let mask = 0u32.wrapping_sub(crc & 1);
-            crc = (crc >> 1) ^ (0xEDB8_8320 & mask);
-        }
-    }
-    !crc
+    let mut hasher = crc32fast::Hasher::new();
+    hasher.update(data);
+    hasher.finalize()
 }

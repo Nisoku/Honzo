@@ -1,12 +1,11 @@
-mod build;
 mod compression;
 mod extra;
 mod meta;
 mod reader;
 mod stream;
 mod utils;
+mod writer;
 
-pub use build::HonzoBuilder;
 pub use compression::{decompress, verify_crc32, verify_entry_crc32};
 pub use extra::{find_extra, parse_extra, ExtraEntry};
 pub use meta::{
@@ -15,6 +14,7 @@ pub use meta::{
 pub use reader::HonzoReader;
 pub use stream::{ChapterIter, HonzoStream};
 pub use utils::{compute_reading_time, new_uuid};
+pub use writer::HonzoBuilder;
 
 pub use honzo_core::{
     Compression, CoverType, FontEmbedding, HonzoError, HonzoHead, LayoutMode, MarkupType, MathType,

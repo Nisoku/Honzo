@@ -7,8 +7,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
+
+NO_STD_TARGET = "aarch64-unknown-none"
+
 CMDS = {
-    "setup": ["rustup", "target", "add", "wasm32-unknown-unknown"],
     "test": ["cargo", "test", "--workspace"],
     "fmt": ["cargo", "fmt", "--all"],
     "lint": ["cargo", "clippy", "--workspace", "--", "-D", "warnings"],
@@ -38,23 +40,52 @@ def wasm_check() -> int:
     return subprocess.run([sys.executable, str(SCRIPTS / "typescript.py"), "wasm"], cwd=ROOT).returncode
 
 
+def no_std_check() -> int:
+    code = 0
+    features = [
+        "--no-default-features",
+        "--no-default-features --features alloc",
+        "--no-default-features --features compression",
+        "--no-default-features --features alloc,compression",
+    ]
+    for feat in features:
+        result = subprocess.run(
+            ["cargo", "check", "-p", "honzo-core"]
+            + feat.split()
+            + ["--target", NO_STD_TARGET],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            print(f"[FAIL] honzo-core {feat} on {NO_STD_TARGET}", flush=True)
+            print(result.stdout, result.stderr, sep="", end="", flush=True)
+            code = 1
+        else:
+            print(f"[OK]   honzo-core {feat} on {NO_STD_TARGET}", flush=True)
+    return code
+
+
 def main() -> None:
     cmd = sys.argv[1] if len(sys.argv) > 1 else "check"
 
     if cmd == "fmt_check":
         sys.exit(fmt_check())
     elif cmd == "check":
-        sys.exit(sum([fmt_check(), run(CMDS["lint"]), run(CMDS["test"]), wasm_check()]))
+        sys.exit(sum([fmt_check(), run(CMDS["lint"]), run(CMDS["test"]), wasm_check(), no_std_check()]))
     elif cmd == "wasm_check":
         sys.exit(wasm_check())
+    elif cmd == "no_std_check":
+        sys.exit(no_std_check())
     elif cmd in CMDS:
-        if cmd == "setup":
-            setup_status = run(["cargo", "install", "diplomat-tool"])
-            if setup_status != 0:
-                sys.exit(setup_status)
         sys.exit(run(CMDS[cmd]))
+    elif cmd == "setup":
+        code = 0
+        code += run(["cargo", "install", "diplomat-tool"])
+        code += run(["rustup", "target", "add", "wasm32-unknown-unknown", NO_STD_TARGET])
+        sys.exit(code)
     else:
-        print(f"Usage: {sys.argv[0]} <check|fmt_check|wasm_check|{'|'.join(CMDS)}>")
+        print(f"Usage: {sys.argv[0]} <check|fmt_check|wasm_check|no_std_check|{'|'.join(CMDS)}>")
         sys.exit(1)
 
 
