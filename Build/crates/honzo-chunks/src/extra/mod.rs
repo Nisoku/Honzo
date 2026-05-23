@@ -84,7 +84,13 @@ impl KnownExtra {
 }
 
 pub fn is_known_namespace(namespace: &str) -> bool {
-    matches!(namespace, ANNO_NAMESPACE | DRM_NAMESPACE | SYNC_NAMESPACE)
+    if matches!(namespace, ANNO_NAMESPACE | DRM_NAMESPACE | SYNC_NAMESPACE) {
+        return true;
+    }
+    registry()
+        .read()
+        .expect("extra registry poisoned")
+        .contains_key(namespace)
 }
 
 pub fn parse_known(namespace: &str, body: &[u8]) -> Option<Result<KnownExtra, HonzoError>> {

@@ -80,21 +80,29 @@ impl<R: Read + Seek> HonzoStream<R> {
     pub fn toc_owned(&self) -> Vec<TocEntry<'static>> {
         self.toc()
             .into_iter()
-            .map(|entry| TocEntry {
-                chunk_type: entry.chunk_type,
-                chunk_id: entry.chunk_id,
-                offset: entry.offset,
-                size_compressed: entry.size_compressed,
-                size_raw: entry.size_raw,
-                compression: entry.compression,
-                content_type_kind: entry.content_type_kind,
-                content_type_value: entry.content_type_value,
-                cover_type: entry.cover_type,
-                flags: entry.flags,
-                crc32: entry.crc32,
-                alt_text: None,
-                font_embedding: entry.font_embedding,
-                font_license_url: None,
+            .map(|entry| {
+                let alt_text = entry
+                    .alt_text
+                    .map(|s| &*Box::leak(s.to_string().into_boxed_str()));
+                let font_license_url = entry
+                    .font_license_url
+                    .map(|s| &*Box::leak(s.to_string().into_boxed_str()));
+                TocEntry {
+                    chunk_type: entry.chunk_type,
+                    chunk_id: entry.chunk_id,
+                    offset: entry.offset,
+                    size_compressed: entry.size_compressed,
+                    size_raw: entry.size_raw,
+                    compression: entry.compression,
+                    content_type_kind: entry.content_type_kind,
+                    content_type_value: entry.content_type_value,
+                    cover_type: entry.cover_type,
+                    flags: entry.flags,
+                    crc32: entry.crc32,
+                    alt_text,
+                    font_embedding: entry.font_embedding,
+                    font_license_url,
+                }
             })
             .collect()
     }
@@ -126,22 +134,30 @@ impl<R: Read + Seek> HonzoStream<R> {
         let toc = self
             .toc()
             .into_iter()
-            .filter(|entry| entry.chunk_type == *b"CHAP")
-            .map(|entry| TocEntry {
-                chunk_type: entry.chunk_type,
-                chunk_id: entry.chunk_id,
-                offset: entry.offset,
-                size_compressed: entry.size_compressed,
-                size_raw: entry.size_raw,
-                compression: entry.compression,
-                content_type_kind: entry.content_type_kind,
-                content_type_value: entry.content_type_value,
-                cover_type: entry.cover_type,
-                flags: entry.flags,
-                crc32: entry.crc32,
-                alt_text: None,
-                font_embedding: entry.font_embedding,
-                font_license_url: None,
+            .filter(|entry| entry.chunk_type == *b"CHAP" || entry.chunk_type == *b"NOTE")
+            .map(|entry| {
+                let alt_text = entry
+                    .alt_text
+                    .map(|s| &*Box::leak(s.to_string().into_boxed_str()));
+                let font_license_url = entry
+                    .font_license_url
+                    .map(|s| &*Box::leak(s.to_string().into_boxed_str()));
+                TocEntry {
+                    chunk_type: entry.chunk_type,
+                    chunk_id: entry.chunk_id,
+                    offset: entry.offset,
+                    size_compressed: entry.size_compressed,
+                    size_raw: entry.size_raw,
+                    compression: entry.compression,
+                    content_type_kind: entry.content_type_kind,
+                    content_type_value: entry.content_type_value,
+                    cover_type: entry.cover_type,
+                    flags: entry.flags,
+                    crc32: entry.crc32,
+                    alt_text,
+                    font_embedding: entry.font_embedding,
+                    font_license_url,
+                }
             })
             .collect();
         ChapterIter {
@@ -189,7 +205,7 @@ impl<'a, R: Read + Seek> Iterator for ChapterIter<'a, R> {
         while self.index < self.toc.len() {
             let entry = self.toc[self.index];
             self.index += 1;
-            if entry.chunk_type == *b"CHAP" {
+            if entry.chunk_type == *b"CHAP" || entry.chunk_type == *b"NOTE" {
                 if entry.is_encrypted() {
                     return Some(Err(HonzoError::EncryptedChunk {
                         chunk_id: entry.chunk_id,

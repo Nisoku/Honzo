@@ -2,15 +2,13 @@
 
 ## Format / Spec
 
-- [x] Use Markdown instead of HMD for now; add Dashmark when it exists
-- [x] HMD has no spec or parser, the demo `renderHmd` is ~20 lines handling only `#`, `-`, and `<p>`
 - [ ] `min_reader_version` is hardcoded to 1 everywhere, never validated meaningfully
 
 ## Core Implementation
 
-- [ ] HonzoStream silently drops fields: `toc_owned()` and `chapters()` set `alt_text: None` and `font_license_url: None`
-- [ ] NOTE chunks are excluded from chapter iteration
-- [ ] `honzo-io/src/extra.rs` doesn't use the known-namespace registry (`is_known_namespace`)
+- [X] HonzoStream silently drops fields: `toc_owned()` and `chapters()` set `alt_text: None` and `font_license_url: None`
+- [X] NOTE chunks are excluded from chapter iteration
+- [X] `honzo-io/src/extra.rs` doesn't use the known-namespace registry (`is_known_namespace`)
 
 ## Chunk Types (empty stub modules)
 

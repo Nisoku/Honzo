@@ -1,9 +1,11 @@
+use honzo_chunks::extra::is_known_namespace;
 use honzo_core::HonzoError;
 
 pub struct ExtraEntry {
     pub tag: [u8; 4],
     pub namespace: String,
     pub body: Vec<u8>,
+    pub known: bool,
 }
 
 pub fn parse_extra(bytes: &[u8]) -> Result<Vec<ExtraEntry>, HonzoError> {
@@ -23,6 +25,7 @@ pub fn parse_extra(bytes: &[u8]) -> Result<Vec<ExtraEntry>, HonzoError> {
         let namespace = std::str::from_utf8(&bytes[cursor..cursor + namespace_len])
             .map_err(|_| HonzoError::Truncated)?
             .to_string();
+        let known = is_known_namespace(&namespace);
         cursor += namespace_len;
 
         if cursor + 4 > bytes.len() {
@@ -45,6 +48,7 @@ pub fn parse_extra(bytes: &[u8]) -> Result<Vec<ExtraEntry>, HonzoError> {
             tag,
             namespace,
             body,
+            known,
         });
     }
 
