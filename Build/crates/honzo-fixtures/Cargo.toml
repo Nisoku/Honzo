@@ -5,12 +5,14 @@ edition = "2021"
 license = "Apache-2.0"
 
 [dependencies]
+honzo-chunks = { path = "../honzo-chunks" }
 honzo-io = { path = "../honzo-io" }
 image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
 
 [build-dependencies]
+honzo-chunks = { path = "../honzo-chunks" }
 honzo-io = { path = "../honzo-io" }
 image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
 rmp-serde = "1"

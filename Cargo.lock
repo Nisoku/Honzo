@@ -1146,6 +1146,7 @@ version = "0.1.0"
 name = "honzo-fixtures"
 version = "0.1.0"
 dependencies = [
+ "honzo-chunks",
  "honzo-io",
  "image",
  "rmp-serde",

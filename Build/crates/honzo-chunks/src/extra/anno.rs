@@ -1,8 +1,7 @@
 use honzo_core::HonzoError;
 use serde::{Deserialize, Serialize};
 
-// TODO: Make sure all EXTRA chunks have namespace consts
-pub const NAMESPACE: &str = "org.nisoku.anno";
+pub const NAMESPACE: &str = super::ANNO_NAMESPACE;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Annotation {

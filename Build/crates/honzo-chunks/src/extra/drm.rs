@@ -1,7 +1,7 @@
 use honzo_core::HonzoError;
 use serde::{Deserialize, Serialize};
 
-pub const NAMESPACE: &str = "org.nisoku.drm";
+pub const NAMESPACE: &str = super::DRM_NAMESPACE;
 
 // Placeholder schema until the AES-256-CBC envelope format is finalized.
 // TODO: Finalize the envelope format and update this schema accordingly.

@@ -1,7 +1,7 @@
 use honzo_core::HonzoError;
 use serde::{Deserialize, Serialize};
 
-pub const NAMESPACE: &str = "org.nisoku.sync";
+pub const NAMESPACE: &str = super::SYNC_NAMESPACE;
 
 // Placeholder schema for sync cues.
 // TODO: Finalize the schema and implement

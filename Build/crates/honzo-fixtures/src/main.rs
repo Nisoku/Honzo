@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
+use honzo_chunks::extra::anno::{self, Annotation};
 use honzo_io::{
     build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
     HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType, MathType, PmapEntry, SeriesMeta,
@@ -434,18 +435,6 @@ fn gen_with_sidx() {
     fs::write(fixtures_dir().join("with_sidx.hzo"), &hzo).unwrap();
 }
 
-#[derive(serde::Serialize)]
-struct Annotation {
-    chunk_id: u32,
-    offset: u32,
-    length: u32,
-    r#type: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    note: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    color: Option<String>,
-}
-
 fn gen_with_anno() {
     let mut title = HashMap::new();
     title.insert("en".to_string(), "With Annotations".to_string());
@@ -483,12 +472,12 @@ fn gen_with_anno() {
             color: None,
         },
     ];
-    let anno_body = rmp_serde::to_vec(&annotations).unwrap();
+    let anno_body = anno::build_anno(&annotations).unwrap();
 
     let mut extra = Vec::new();
     extra.extend_from_slice(b"ANNO");
-    extra.extend_from_slice(&(15u16).to_le_bytes());
-    extra.extend_from_slice(b"org.nisoku.anno");
+    extra.extend_from_slice(&(anno::NAMESPACE.len() as u16).to_le_bytes());
+    extra.extend_from_slice(anno::NAMESPACE.as_bytes());
     extra.extend_from_slice(&(anno_body.len() as u32).to_le_bytes());
     extra.extend_from_slice(&anno_body);
 
