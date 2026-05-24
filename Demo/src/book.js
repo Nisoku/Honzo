@@ -146,12 +146,13 @@ function searchChapters(query) {
     if (entry.score !== terms.length) continue;
     const chapter = chapters.find((item) => item.chunk_id === chunkId);
     if (!chapter) continue;
-    const raw = reader.get_chunk(chunkId);
+    const chapterText = reader.get_chapter_text(chapter.index) || "";
+    const encodedText = new TextEncoder().encode(chapterText);
     const firstOffset = entry.offsets[0] || 0;
     const start = Math.max(0, firstOffset - 24);
-    const end = Math.min(raw.length, firstOffset + 72);
+    const end = Math.min(encodedText.length, firstOffset + 72);
     const excerpt = new TextDecoder()
-      .decode(raw.slice(start, end))
+      .decode(encodedText.slice(start, end))
       .replace(/\s+/g, " ")
       .trim();
     matches.push({ chapter, score: entry.score, excerpt });
@@ -177,13 +178,6 @@ export function runSearch(query) {
     return;
   }
   setSearchResults(searchChapters(query));
-}
-
-function val(maybeMap) {
-  if (!maybeMap) return null;
-  if (maybeMap instanceof Map) return maybeMap.values().next().value || null;
-  if (typeof maybeMap === "object") return Object.values(maybeMap)[0] || null;
-  return maybeMap;
 }
 
 function getMetaStr(obj, field) {

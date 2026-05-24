@@ -175,6 +175,113 @@ impl HonzoWasm {
         serde_wasm_bindgen::to_value(&js_entries)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
     }
+
+    pub fn get_chapters_text(&self) -> Vec<String> {
+        self.toc
+            .iter()
+            .filter(|entry| {
+                matches!(
+                    std::str::from_utf8(&entry.chunk_type).unwrap_or("????"),
+                    "CHAP" | "NOTE" | "MATH"
+                )
+            })
+            .filter_map(|entry| {
+                self.chunks
+                    .get(entry.chunk_id as usize)
+                    .map(|bytes| chapter_text_for_entry(entry, bytes))
+            })
+            .collect()
+    }
+
+    pub fn get_chapter_text(&self, index: u32) -> Result<String, JsValue> {
+        let chapter_entries: Vec<_> = self
+            .toc
+            .iter()
+            .filter(|entry| {
+                matches!(
+                    std::str::from_utf8(&entry.chunk_type).unwrap_or("????"),
+                    "CHAP" | "NOTE" | "MATH"
+                )
+            })
+            .collect();
+
+        let entry = chapter_entries
+            .get(index as usize)
+            .ok_or_else(|| JsValue::from_str("chapter index out of bounds"))?;
+        let bytes = self
+            .chunks
+            .get(entry.chunk_id as usize)
+            .ok_or_else(|| JsValue::from_str("chunk index out of bounds"))?;
+        Ok(chapter_text_for_entry(entry, bytes))
+    }
+}
+
+fn chapter_text_for_entry(entry: &WasmTocEntry, bytes: &[u8]) -> String {
+    let raw = String::from_utf8_lossy(bytes);
+    let chunk_type = std::str::from_utf8(&entry.chunk_type).unwrap_or("????");
+    let is_html = entry.content_type_kind == 1 && entry.content_type_value == 1;
+
+    if is_html && matches!(chunk_type, "CHAP" | "NOTE") {
+        strip_html_for_text(&raw)
+    } else {
+        raw.lines()
+            .map(|line| line.trim())
+            .filter(|line| !line.is_empty())
+            .collect::<Vec<_>>()
+            .join("\n")
+    }
+}
+
+fn strip_html_for_text(html: &str) -> String {
+    let mut out = String::with_capacity(html.len());
+    let mut in_tag = false;
+    let mut tag_buf = String::new();
+    let mut last_was_space = false;
+
+    for c in html.chars() {
+        if in_tag {
+            if c == '>' {
+                in_tag = false;
+                let tag = tag_buf.trim().trim_start_matches('/').to_ascii_lowercase();
+                if tag.starts_with('p')
+                    || tag.starts_with("div")
+                    || tag.starts_with("br")
+                    || tag.starts_with('h')
+                    || tag.starts_with("li")
+                    || tag.starts_with("blockquote")
+                    || tag.starts_with("tr")
+                    || tag.starts_with("td")
+                    || tag.starts_with("th")
+                {
+                    out.push('\n');
+                    last_was_space = false;
+                }
+                tag_buf.clear();
+            } else {
+                tag_buf.push(c);
+            }
+        } else if c == '<' {
+            in_tag = true;
+            tag_buf.clear();
+        } else if c == '&' {
+            out.push('&');
+            last_was_space = false;
+        } else if c.is_whitespace() {
+            if !last_was_space {
+                out.push(' ');
+                last_was_space = true;
+            }
+        } else {
+            out.push(c);
+            last_was_space = false;
+        }
+    }
+
+    out.lines()
+        .map(|line| line.trim())
+        .filter(|line| !line.is_empty())
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 #[wasm_bindgen]

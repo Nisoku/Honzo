@@ -4,8 +4,8 @@ use bytes::Bytes;
 use lexepub::LexEpub;
 
 use honzo_io::{
-    compute_reading_time, generate_covt, new_uuid, Compression, CoverType, HonzoBuilder, HonzoMeta,
-    Identifier, LayoutMode, MarkupType,
+    build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
+    HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType,
 };
 mod mobi;
 mod pdf;
@@ -113,7 +113,10 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
 
     let mut builder = HonzoBuilder::new()
         .set_layout(LayoutMode::Reflowable)
-        .set_language(&language);
+        .set_language(&language)
+        .set_auto_sidx(false);
+
+    let mut next_chunk_id: u32 = 0;
 
     // Cover image
     if let Some(ref cid) = opf.cover_id {
@@ -130,6 +133,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                     None,
                     None,
                 );
+                next_chunk_id += 1;
                 if let Ok(covt) = generate_covt(&covr_data) {
                     builder = builder.add_chunk(
                         *b"COVT",
@@ -141,6 +145,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                         None,
                         None,
                     );
+                    next_chunk_id += 1;
                 }
             }
         }
@@ -162,6 +167,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                     None,
                     None,
                 );
+                next_chunk_id += 1;
             }
         }
     }
@@ -180,6 +186,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                     None,
                     None,
                 );
+                next_chunk_id += 1;
             }
         }
     }
@@ -203,13 +210,28 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                     Some(honzo_io::FontEmbedding::Allowed),
                     None,
                 );
+                next_chunk_id += 1;
             }
         }
     }
 
-    let mut chap_texts: Vec<(u32, String)> = Vec::new();
+    let mut chapter_texts: Vec<String> = Vec::new();
+    let mut chapter_chunk_ids: Vec<u32> = Vec::new();
 
-    for (chunk_id, path) in spine.iter().enumerate() {
+    // Extract text only for valid HTML chapters
+    for path in &spine {
+        let item = manifest.iter().find(|m| resolve(&m.href) == *path);
+        let Some(item) = item else { continue };
+        if is_html_type(&item.media_type) {
+            let Ok(html_bytes) = epub.read_resource(path).await else {
+                continue;
+            };
+            let text = String::from_utf8_lossy(&html_bytes).to_string();
+            chapter_texts.push(text);
+        }
+    }
+
+    for path in &spine {
         let item = manifest.iter().find(|m| resolve(&m.href) == *path);
         let Some(item) = item else { continue };
         if !is_html_type(&item.media_type) {
@@ -219,15 +241,9 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         let Ok(html_bytes) = epub.read_resource(path).await else {
             continue;
         };
-        let html_str = String::from_utf8_lossy(&html_bytes);
-        let text = extract_text_for_index(&html_str);
-
-        if text.is_empty() {
-            continue;
-        }
 
         let chap_title = chap_titles.get(path).map(|s| s.as_str());
-        chap_texts.push((chunk_id as u32, text));
+        chapter_chunk_ids.push(next_chunk_id);
 
         builder = builder.add_chunk(
             *b"CHAP",
@@ -239,6 +255,36 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
             None,
             None,
         );
+        next_chunk_id += 1;
+    }
+
+    if chapter_chunk_ids.len() != chapter_texts.len() {
+        return Err(ConvertError::IoError(format!(
+            "chapter text count mismatch: {} text entries for {} chapter chunks",
+            chapter_texts.len(),
+            chapter_chunk_ids.len()
+        )));
+    }
+
+    let sidx_refs: Vec<(u32, &str)> = chapter_chunk_ids
+        .iter()
+        .zip(chapter_texts.iter())
+        .map(|(chunk_id, text)| (*chunk_id, text.as_str()))
+        .collect();
+
+    if !sidx_refs.is_empty() {
+        let sidx = build_sidx(&sidx_refs, &language)?;
+        builder = builder.add_chunk(
+            *b"SIDX",
+            &sidx,
+            Compression::Lz4,
+            MarkupType::Markdown,
+            CoverType::Front,
+            None,
+            None,
+            None,
+        );
+        builder = builder.set_flags(0x20);
     }
 
     let mut title_map = HashMap::new();
@@ -246,9 +292,9 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         title_map.insert(language.clone(), t.clone());
     }
 
-    let word_count: u32 = chap_texts
+    let word_count: u32 = chapter_texts
         .iter()
-        .map(|(_, t)| t.split_whitespace().count() as u32)
+        .map(|t| t.split_whitespace().count() as u32)
         .sum();
 
     let honzo_meta = HonzoMeta {
@@ -272,111 +318,6 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
     builder = builder.set_meta(&meta_bytes);
 
     builder.finalize().map_err(Into::into)
-}
-
-/// Extract text from HTML for search indexing only.
-/// Chunks store raw HTML; this is used solely for building the SIDX search index.
-#[cfg(not(feature = "lowmem"))]
-fn extract_text_for_index(html: &str) -> String {
-    let dom = match tl::parse(html, tl::ParserOptions::default()) {
-        Ok(d) => d,
-        Err(_) => return String::new(),
-    };
-    let parser = dom.parser();
-    let mut out = String::new();
-    for &handle in dom.children() {
-        extract_text_node(handle, parser, &mut out);
-    }
-    out.lines()
-        .map(|l| l.trim())
-        .filter(|l| !l.is_empty())
-        .collect::<Vec<_>>()
-        .join("\n")
-}
-
-#[cfg(not(feature = "lowmem"))]
-fn extract_text_node(handle: tl::NodeHandle, parser: &tl::Parser, output: &mut String) {
-    use html_escape::decode_html_entities;
-    if let Some(node) = handle.get(parser) {
-        match node {
-            tl::Node::Raw(text_bytes) => {
-                let s = text_bytes.as_utf8_str().to_string();
-                let decoded = decode_html_entities(&s);
-                output.push_str(&decoded);
-            }
-            tl::Node::Tag(tag) => {
-                let tag_name = tag.name().as_utf8_str();
-                let is_block = matches!(
-                    tag_name.as_ref(),
-                    "p" | "div"
-                        | "h1"
-                        | "h2"
-                        | "h3"
-                        | "h4"
-                        | "h5"
-                        | "h6"
-                        | "br"
-                        | "li"
-                        | "tr"
-                        | "td"
-                        | "th"
-                        | "blockquote"
-                );
-                for child_handle in tag.children().top().iter() {
-                    extract_text_node(*child_handle, parser, output);
-                }
-                if is_block {
-                    output.push('\n');
-                }
-            }
-            _ => {}
-        }
-    }
-}
-
-#[cfg(feature = "lowmem")]
-fn extract_text_for_index(html: &str) -> String {
-    let mut out = String::new();
-    let mut in_tag = false;
-    let mut tag_buf = String::new();
-    let mut last_was_space = false;
-
-    for c in html.chars() {
-        if in_tag {
-            if c == '>' {
-                in_tag = false;
-                let tag = tag_buf.trim().trim_start_matches('/').to_ascii_lowercase();
-                if tag.starts_with('p')
-                    || tag.starts_with("div")
-                    || tag.starts_with("br")
-                    || tag.starts_with('h')
-                    || tag.starts_with("li")
-                {
-                    out.push('\n');
-                }
-                tag_buf.clear();
-            } else {
-                tag_buf.push(c);
-            }
-        } else if c == '<' {
-            in_tag = true;
-            tag_buf.clear();
-        } else if c.is_whitespace() {
-            if !last_was_space {
-                out.push(' ');
-                last_was_space = true;
-            }
-        } else {
-            out.push(c);
-            last_was_space = false;
-        }
-    }
-
-    out.lines()
-        .map(|l| l.trim())
-        .filter(|l| !l.is_empty())
-        .collect::<Vec<_>>()
-        .join("\n")
 }
 
 #[allow(dead_code)]

@@ -44,11 +44,7 @@ enum Commands {
         out: PathBuf,
     },
     /// Convert epub/mobi/pdf to .hzo
-    Convert {
-        input: PathBuf,
-        #[arg(long)]
-        out: PathBuf,
-    },
+    Convert { input: PathBuf, out: PathBuf },
     /// Parse and validate .hzo file
     Validate { file: PathBuf },
     /// Query SIDX search index

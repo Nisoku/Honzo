@@ -22,33 +22,23 @@
 
 - [ ] Native converter works but format detection is heuristic and error messages are poor
 - [ ] Search command shows chunk IDs but doesn't resolve excerpts (demo does this in JS)
-- [x] `honzo tree` command renders .hzo file tree with HEAD/DATA/EXTRA/META sections and type-grouped folders
 
 ## WASM / TypeScript
 
-- [X] WASM API is bare-minimum, no typed wrapper, just re-exports wasm-pack output
-- [X] TypeScript wrapper has no typed API layer
 - [ ] WASM `HonzoWasm` constructor eagerly reads *all* chunks into memory (no streaming)
 - [ ] WASM API can't pass `alt_text` or `font_embedding` through `honzo_build`
 - [ ] C FFI via Diplomat is similarly limited (no alt_text, font_embedding, or extra support on builder)
 
-## EPUB Conversion
-
-- [x] EPUB conversion logic is duplicated in Rust (`honzo-convert`) and JS (`convert.js` using lexepub)
-- [x] Rust `from_epub` strips HTML to text (no image embedding, CSS, fonts in output)
-- [x] Rust `from_epub` doesn't preserve chapter structure from nav/toc, only spine order
-- [x] Builder auto-generates clean SIDX (HTML stripped) instead of requiring manual build_sidx
-- [x] Converter embeds images, CSS, fonts from EPUB manifest into .hzo chunks
-
 ## Demo
 
-- [ ] Search UI doesn't exist yet
+- [ ] Search UI is kinda bad
 - [ ] META inspector panel doesn't exist
 - [ ] Reading progress / bookmarks have no demo or API
 - [ ] No settings panel (theme, font size, layout mode)
 - [ ] No reading progress persistence (localStorage/IndexedDB)
 - [ ] Images don't work properly in chapter rendering
 - [ ] No styling/decoration system for chapters
+- [ ] Links don't work (<https://nisoku.org/Honzo/demo/endnotes.xhtml#note-209>)
 
 ## Tests
 
