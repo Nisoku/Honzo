@@ -214,7 +214,7 @@ fn all_epubs_fully_validated() {
             }
 
             let first_content =
-                String::from_utf8_lossy(parser.chunk_bytes(&chap_entries[0]).unwrap());
+                String::from_utf8_lossy(parser.chunk_bytes(chap_entries[0]).unwrap());
             if !first_content.contains("</html>") {
                 failures.push(format!(
                     "{}: first CHAP should contain full HTML structure",
@@ -245,15 +245,15 @@ fn all_epubs_fully_validated() {
         let mut first_chap = entries.len();
         for (i, entry) in entries.iter().enumerate() {
             match &entry.chunk_type {
-                t if t == b"COVR"
-                    || t == b"COVT"
-                    || t == b"IMG_"
-                    || t == b"CSS_"
-                    || t == b"FONT" =>
+                t if *t == *b"COVR"
+                    || *t == *b"COVT"
+                    || *t == *b"IMG_"
+                    || *t == *b"CSS_"
+                    || *t == *b"FONT" =>
                 {
                     last_resource = i;
                 }
-                t if t == b"CHAP" => {
+                b"CHAP" => {
                     if i < first_chap {
                         first_chap = i;
                     }

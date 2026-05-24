@@ -333,14 +333,46 @@ fn gen_math_demo() {
 
 fn gen_multilang() {
     let mut title = HashMap::new();
-    title.insert("en".to_string(), "Multilingual".to_string());
-    title.insert("ja".to_string(), "多言語".to_string());
     title.insert("ar".to_string(), "متعدد اللغات".to_string());
+    title.insert("da".to_string(), "Flersproget".to_string());
+    title.insert("nl".to_string(), "Meertalig".to_string());
+    title.insert("en".to_string(), "Multilingual".to_string());
+    title.insert("fi".to_string(), "Monikielinen".to_string());
+    title.insert("fr".to_string(), "Multilingue".to_string());
+    title.insert("de".to_string(), "Mehrsprachig".to_string());
+    title.insert("el".to_string(), "Πολύγλωσσο".to_string());
+    title.insert("hu".to_string(), "Többnyelvű".to_string());
+    title.insert("it".to_string(), "Multilingue".to_string());
+    title.insert("ja".to_string(), "多言語".to_string());
+    title.insert("no".to_string(), "Flerspråklig".to_string());
+    title.insert("pt".to_string(), "Multilíngue".to_string());
+    title.insert("ro".to_string(), "Multilingv".to_string());
+    title.insert("ru".to_string(), "Многоязычный".to_string());
+    title.insert("es".to_string(), "Multilingüe".to_string());
+    title.insert("sv".to_string(), "Flerspråkig".to_string());
+    title.insert("ta".to_string(), "பன்மொழி".to_string());
+    title.insert("tr".to_string(), "Çok dilli".to_string());
 
     let mut desc = HashMap::new();
-    desc.insert("en".to_string(), "English description".to_string());
-    desc.insert("ja".to_string(), "日本語の説明".to_string());
     desc.insert("ar".to_string(), "وصف باللغة العربية".to_string());
+    desc.insert("da".to_string(), "Dansk beskrivelse".to_string());
+    desc.insert("nl".to_string(), "Nederlandse beschrijving".to_string());
+    desc.insert("en".to_string(), "English description".to_string());
+    desc.insert("fi".to_string(), "Suomenkielinen kuvaus".to_string());
+    desc.insert("fr".to_string(), "Description en français".to_string());
+    desc.insert("de".to_string(), "Deutsche Beschreibung".to_string());
+    desc.insert("el".to_string(), "Περιγραφή στα ελληνικά".to_string());
+    desc.insert("hu".to_string(), "Magyar leírás".to_string());
+    desc.insert("it".to_string(), "Descrizione in italiano".to_string());
+    desc.insert("ja".to_string(), "日本語の説明".to_string());
+    desc.insert("no".to_string(), "Norsk beskrivelse".to_string());
+    desc.insert("pt".to_string(), "Descrição em português".to_string());
+    desc.insert("ro".to_string(), "Descriere în limba română".to_string());
+    desc.insert("ru".to_string(), "Описание на русском языке".to_string());
+    desc.insert("es".to_string(), "Descripción en español".to_string());
+    desc.insert("sv".to_string(), "Svensk beskrivning".to_string());
+    desc.insert("ta".to_string(), "தமிழ் விளக்கம்".to_string());
+    desc.insert("tr".to_string(), "Türkçe açıklama".to_string());
 
     let meta = HonzoMeta {
         title: Some(title),

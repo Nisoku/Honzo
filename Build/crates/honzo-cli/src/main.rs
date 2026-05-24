@@ -711,10 +711,26 @@ fn cmd_tree(file: &PathBuf) {
         format!("flags: {}", flag_line),
         format!("layout: {:?}", head.layout_mode()),
         format!("chunk_count: {}", head.chunk_count),
-        format!("TOC: {} ({} B)", human_size(head.toc_size as u32), head.toc_size),
-        format!("DATA: {} ({} B)", human_size(head.data_size as u32), head.data_size),
-        format!("EXTRA: {} ({} B)", human_size(head.extra_size as u32), head.extra_size),
-        format!("META: {} ({} B)", human_size(head.meta_size as u32), head.meta_size),
+        format!(
+            "TOC: {} ({} B)",
+            human_size(head.toc_size as u32),
+            head.toc_size
+        ),
+        format!(
+            "DATA: {} ({} B)",
+            human_size(head.data_size as u32),
+            head.data_size
+        ),
+        format!(
+            "EXTRA: {} ({} B)",
+            human_size(head.extra_size as u32),
+            head.extra_size
+        ),
+        format!(
+            "META: {} ({} B)",
+            human_size(head.meta_size as u32),
+            head.meta_size
+        ),
     ];
     let hf_count = head_fields.len();
     for (i, line) in head_fields.iter().enumerate() {
@@ -730,11 +746,21 @@ fn cmd_tree(file: &PathBuf) {
             let title_str = meta
                 .title
                 .as_ref()
-                .and_then(|t| t.values().next().map(|s| s.as_str()))
+                .and_then(|t| {
+                    t.get(&meta.language)
+                        .or_else(|| t.values().next())
+                        .map(|s| s.as_str())
+                })
                 .unwrap_or("?");
             let meta_lines: Vec<String> = {
                 let mut ml = Vec::new();
                 ml.push(format!("title: {} ({})", title_str, meta.language));
+                if let Some(ref t) = meta.title {
+                    if t.len() > 1 {
+                        let langs: Vec<&str> = t.keys().map(|k| k.as_str()).collect();
+                        ml.push(format!("translations: {}", langs.join(", ")));
+                    }
+                }
                 for a in &meta.authors {
                     ml.push(format!("author: {}", a));
                 }
@@ -759,8 +785,7 @@ fn cmd_tree(file: &PathBuf) {
     println!("{conn} TOC (entries: {})", entries.len());
 
     // DATA
-    let data_idx = if has_extra { 3 } else { 3 };
-    let (conn, child) = tl(data_idx, top_count);
+    let (conn, child) = tl(3, top_count);
     println!("{conn} DATA ({})", human_size(head.data_size as u32));
 
     // Group entries by tag type

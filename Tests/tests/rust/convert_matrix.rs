@@ -246,11 +246,11 @@ fn epub_conversion_chunks_ordered_resources_before_chapters() {
 
     for entry in &entries {
         match &entry.chunk_type {
-            t if t == b"COVR" => found_cover = true,
-            t if t == b"IMG_" => found_img = true,
-            t if t == b"CSS_" => found_css = true,
-            t if t == b"FONT" => found_font = true,
-            t if t == b"CHAP" => found_chap = true,
+            b"COVR" => found_cover = true,
+            b"IMG_" => found_img = true,
+            b"CSS_" => found_css = true,
+            b"FONT" => found_font = true,
+            b"CHAP" => found_chap = true,
             _ => {}
         }
     }
@@ -274,10 +274,10 @@ fn epub_conversion_resources_appear_before_chapters() {
 
     for (i, entry) in entries.iter().enumerate() {
         match &entry.chunk_type {
-            t if t == b"COVR" || t == b"IMG_" || t == b"CSS_" || t == b"FONT" => {
+            t if *t == *b"COVR" || *t == *b"IMG_" || *t == *b"CSS_" || *t == *b"FONT" => {
                 last_resource_idx = i;
             }
-            t if t == b"CHAP" => {
+            b"CHAP" => {
                 if i < first_chap_idx {
                     first_chap_idx = i;
                 }

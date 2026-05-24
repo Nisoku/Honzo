@@ -39,6 +39,9 @@ export default defineConfig({
     topLevelAwait(),
     VitePWA({
       registerType: "autoUpdate",
+      workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+      },
       manifest: {
         name: "HonzoReader",
         short_name: "HonzoReader",

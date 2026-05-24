@@ -32,36 +32,36 @@ fn strip_html_tags(s: &str) -> String {
             }
         } else if in_tag {
             tag_buf.push(c);
-        } else {
-            if c == '&' {
-                let mut entity = String::new();
-                for ec in s.chars().skip(1) {
-                    if ec == ';' { break; }
-                    entity.push(ec);
+        } else if c == '&' {
+            let mut entity = String::new();
+            for ec in s.chars().skip(1) {
+                if ec == ';' {
+                    break;
                 }
-                let decoded = match entity.as_str() {
-                    "amp" => "&",
-                    "lt" => "<",
-                    "gt" => ">",
-                    "quot" => "\"",
-                    "apos" => "'",
-                    "nbsp" => " ",
-                    _ => "",
-                };
-                if !decoded.is_empty() {
-                    out.push_str(decoded);
+                entity.push(ec);
+            }
+            let decoded = match entity.as_str() {
+                "amp" => "&",
+                "lt" => "<",
+                "gt" => ">",
+                "quot" => "\"",
+                "apos" => "'",
+                "nbsp" => " ",
+                _ => "",
+            };
+            if !decoded.is_empty() {
+                out.push_str(decoded);
+                last_was_newline = false;
+            }
+        } else if c.is_alphanumeric() || c.is_whitespace() || c.is_ascii_punctuation() {
+            if c.is_whitespace() && c != '\n' {
+                if !last_was_newline {
+                    out.push(' ');
                     last_was_newline = false;
                 }
-            } else if c.is_alphanumeric() || c.is_whitespace() || c.is_ascii_punctuation() {
-                if c.is_whitespace() && c != '\n' {
-                    if !last_was_newline {
-                        out.push(' ');
-                        last_was_newline = false;
-                    }
-                } else {
-                    out.push(c);
-                    last_was_newline = false;
-                }
+            } else {
+                out.push(c);
+                last_was_newline = false;
             }
         }
     }

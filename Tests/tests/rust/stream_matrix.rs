@@ -62,10 +62,14 @@ fn parses_metadata_and_utils() {
     let data = fixture("multilang.hzo");
     let mut stream = HonzoStream::open(std::io::Cursor::new(&data), 1).unwrap();
     let meta: HonzoMeta = rmp_serde::from_slice(&stream.meta_bytes().unwrap()).unwrap();
+    let title = meta.title.as_ref().unwrap();
 
-    assert!(meta.title.as_ref().unwrap().contains_key("en"));
-    assert!(meta.title.as_ref().unwrap().contains_key("ja"));
-    assert!(meta.title.as_ref().unwrap().contains_key("ar"));
+    for lang in &[
+        "ar", "da", "nl", "en", "fi", "fr", "de", "el", "hu", "it", "ja", "no", "pt", "ro", "ru",
+        "es", "sv", "ta", "tr",
+    ] {
+        assert!(title.contains_key(*lang), "missing title for lang {}", lang);
+    }
     assert_eq!(compute_reading_time(0), 1);
     assert_eq!(compute_reading_time(476), 2);
 }

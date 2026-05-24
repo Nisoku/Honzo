@@ -4,8 +4,8 @@ use bytes::Bytes;
 use lexepub::LexEpub;
 
 use honzo_io::{
-    compute_reading_time, generate_covt, new_uuid, Compression, CoverType, HonzoBuilder,
-    HonzoMeta, Identifier, LayoutMode, MarkupType,
+    compute_reading_time, generate_covt, new_uuid, Compression, CoverType, HonzoBuilder, HonzoMeta,
+    Identifier, LayoutMode, MarkupType,
 };
 mod mobi;
 mod pdf;
@@ -361,16 +361,14 @@ fn extract_text_for_index(html: &str) -> String {
         } else if c == '<' {
             in_tag = true;
             tag_buf.clear();
-        } else {
-            if c.is_whitespace() {
-                if !last_was_space {
-                    out.push(' ');
-                    last_was_space = true;
-                }
-            } else {
-                out.push(c);
-                last_was_space = false;
+        } else if c.is_whitespace() {
+            if !last_was_space {
+                out.push(' ');
+                last_was_space = true;
             }
+        } else {
+            out.push(c);
+            last_was_space = false;
         }
     }
 
