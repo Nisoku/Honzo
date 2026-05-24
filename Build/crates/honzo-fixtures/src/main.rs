@@ -388,6 +388,7 @@ fn gen_with_sidx() {
     let sidx = build_sidx(&chapters, "en").unwrap();
 
     let hzo = HonzoBuilder::new()
+        .set_auto_sidx(false)
         .set_flags(0x20)
         .add_chunk(
             *b"CHAP",

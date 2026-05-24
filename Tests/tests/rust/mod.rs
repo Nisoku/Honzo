@@ -1,6 +1,7 @@
 mod builder_matrix;
 mod c_matrix;
 mod chap;
+mod convert_epub_corpus;
 mod convert_matrix;
 mod convert_pdf_mobi;
 mod core_matrix;

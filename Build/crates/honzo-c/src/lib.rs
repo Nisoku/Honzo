@@ -199,11 +199,10 @@ pub mod ffi {
                 1 => Compression::Lz4,
                 _ => return false,
             };
-            let b = match self.builder.take() {
-                Some(b) => b,
+            let builder = match self.builder.as_mut() {
+                Some(b) => std::mem::take(b),
                 None => return false,
             };
-            // dispatch based on tag and content type kind
             if &tag_arr == b"MATH" {
                 if content_type_kind != 2 {
                     return false;
@@ -213,10 +212,9 @@ pub mod ffi {
                     1 => MathType::LaTeX,
                     _ => return false,
                 };
-                self.builder = Some(b.add_math_chunk(data, math, compression));
+                self.builder = Some(builder.add_math_chunk(data, math, compression));
                 return true;
             }
-
             if content_type_kind != 1 {
                 return false;
             }
@@ -225,7 +223,7 @@ pub mod ffi {
                 1 => MarkupType::Html,
                 _ => return false,
             };
-            self.builder = Some(b.add_chunk(
+            self.builder = Some(builder.add_chunk(
                 tag_arr,
                 data,
                 compression,
@@ -235,6 +233,24 @@ pub mod ffi {
                 None,
                 None,
             ));
+            true
+        }
+
+        pub fn set_language(&mut self, lang: &str) -> bool {
+            let b = match self.builder.as_mut() {
+                Some(b) => std::mem::take(b),
+                None => return false,
+            };
+            self.builder = Some(b.set_language(lang));
+            true
+        }
+
+        pub fn set_auto_sidx(&mut self, enable: bool) -> bool {
+            let b = match self.builder.as_mut() {
+                Some(b) => std::mem::take(b),
+                None => return false,
+            };
+            self.builder = Some(b.set_auto_sidx(enable));
             true
         }
 
@@ -316,9 +332,10 @@ pub mod ffi {
 
     pub fn normalize_search_term(
         term: &str,
+        lang: &str,
         write: &mut diplomat_runtime::DiplomatWrite,
     ) -> Result<(), HonzoErrorCode> {
-        let normalized = normalize_search_term_impl(term);
+        let normalized = normalize_search_term_impl(term, lang);
         write
             .write_str(&normalized)
             .map_err(|_| HonzoErrorCode::Unknown)?;

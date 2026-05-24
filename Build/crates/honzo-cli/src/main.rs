@@ -1,5 +1,4 @@
-use std::collections::HashMap;
-use std::collections::HashSet;
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs;
 use std::io::Read;
 use std::path::PathBuf;
@@ -58,6 +57,8 @@ enum Commands {
         #[arg(long)]
         query: String,
     },
+    /// Render .hzo as a file tree
+    Tree { file: PathBuf },
 }
 
 fn read_file(path: &PathBuf) -> Vec<u8> {
@@ -550,6 +551,13 @@ fn cmd_search(file: &PathBuf, query: &str) {
         std::process::exit(1);
     }
 
+    let lang = p
+        .meta_bytes()
+        .ok()
+        .and_then(|b| rmp_serde::from_slice::<HonzoMeta>(b).ok())
+        .map(|m| m.language)
+        .unwrap_or_else(|| "en".to_string());
+
     let sidx_entry = p.find_chunk(b"SIDX").unwrap();
     let raw = p.chunk_bytes(&sidx_entry).unwrap_or_else(|e| {
         eprintln!("Error reading SIDX: {:?}", e);
@@ -568,9 +576,10 @@ fn cmd_search(file: &PathBuf, query: &str) {
         });
 
     // Support multi-term queries by normalizing each token and intersecting hits.
+    let lang_ref = &lang;
     let terms: Vec<String> = query
         .split_whitespace()
-        .map(normalize_search_term)
+        .map(|t| normalize_search_term(t, lang_ref))
         .filter(|s| !s.is_empty())
         .collect();
 
@@ -631,6 +640,206 @@ fn cmd_search(file: &PathBuf, query: &str) {
     }
 }
 
+fn human_size(bytes: u32) -> String {
+    if bytes >= 1024 * 1024 {
+        format!("{:.1} MB", bytes as f64 / (1024.0 * 1024.0))
+    } else if bytes >= 1024 {
+        format!("{:.1} KB", bytes as f64 / 1024.0)
+    } else {
+        format!("{} B", bytes)
+    }
+}
+
+fn cmd_tree(file: &PathBuf) {
+    let data = read_file(file);
+    let p = honzo_core::HonzoParser::new(&data, 1).unwrap_or_else(|e| {
+        eprintln!("Parse error: {:?}", e);
+        std::process::exit(1);
+    });
+    let head = p.head();
+    let total_size = data.len() as u64;
+
+    let entries: Vec<_> = p.toc_entries().collect();
+    let label = file
+        .file_name()
+        .map(|s| s.to_string_lossy())
+        .unwrap_or_default()
+        .to_string();
+    println!(
+        "{}  [{}.{} | {} chunks | {}]",
+        label,
+        head.version_major,
+        head.version_minor,
+        head.chunk_count,
+        human_size(total_size as u32),
+    );
+
+    let has_extra = head.extra_size > 0;
+
+    // Top-level connectors
+    // Order: HEAD, META, TOC, DATA[, EXTRA]
+    let tl = |idx: usize, count: usize| {
+        if idx == count - 1 {
+            ("└", "    ")
+        } else {
+            ("├", "│   ")
+        }
+    };
+
+    // HEAD
+    let top_count = if has_extra { 5 } else { 4 };
+    let (conn, child) = tl(0, top_count);
+    println!("{conn} HEAD (48 B)");
+    let flag_strs: Vec<&str> = [
+        head.has_sidx().then_some("has_sidx"),
+        head.has_drm().then_some("has_drm"),
+        head.has_anno().then_some("has_anno"),
+        head.has_sync().then_some("has_sync"),
+    ]
+    .into_iter()
+    .flatten()
+    .collect();
+    let flag_line = if flag_strs.is_empty() {
+        "none".to_string()
+    } else {
+        flag_strs.join(", ")
+    };
+
+    let head_fields = [
+        format!("version: {}.{}", head.version_major, head.version_minor),
+        format!("min_reader_version: {}", head.min_reader_version),
+        format!("flags: {}", flag_line),
+        format!("layout: {:?}", head.layout_mode()),
+        format!("chunk_count: {}", head.chunk_count),
+        format!("TOC: {} ({} B)", human_size(head.toc_size as u32), head.toc_size),
+        format!("DATA: {} ({} B)", human_size(head.data_size as u32), head.data_size),
+        format!("EXTRA: {} ({} B)", human_size(head.extra_size as u32), head.extra_size),
+        format!("META: {} ({} B)", human_size(head.meta_size as u32), head.meta_size),
+    ];
+    let hf_count = head_fields.len();
+    for (i, line) in head_fields.iter().enumerate() {
+        let (hconn, _) = tl(i, hf_count);
+        println!("{child}{hconn} {line}");
+    }
+
+    // META
+    let (conn, child) = tl(1, top_count);
+    println!("{conn} META ({})", human_size(head.meta_size as u32));
+    if let Ok(meta_bytes) = p.meta_bytes() {
+        if let Ok(meta) = rmp_serde::from_slice::<HonzoMeta>(meta_bytes) {
+            let title_str = meta
+                .title
+                .as_ref()
+                .and_then(|t| t.values().next().map(|s| s.as_str()))
+                .unwrap_or("?");
+            let meta_lines: Vec<String> = {
+                let mut ml = Vec::new();
+                ml.push(format!("title: {} ({})", title_str, meta.language));
+                for a in &meta.authors {
+                    ml.push(format!("author: {}", a));
+                }
+                if let Some(ref wc) = meta.word_count {
+                    ml.push(format!("words: {}", wc));
+                }
+                if let Some(ref rt) = meta.reading_time_mins {
+                    ml.push(format!("reading_time: {} min", rt));
+                }
+                ml
+            };
+            let mc = meta_lines.len();
+            for (i, line) in meta_lines.iter().enumerate() {
+                let (mconn, _) = tl(i, mc);
+                println!("{child}{mconn} {line}");
+            }
+        }
+    }
+
+    // TOC
+    let (conn, _child) = tl(2, top_count);
+    println!("{conn} TOC (entries: {})", entries.len());
+
+    // DATA
+    let data_idx = if has_extra { 3 } else { 3 };
+    let (conn, child) = tl(data_idx, top_count);
+    println!("{conn} DATA ({})", human_size(head.data_size as u32));
+
+    // Group entries by tag type
+    let mut groups: BTreeMap<&str, Vec<&TocEntry>> = BTreeMap::new();
+    for entry in &entries {
+        let tag = core::str::from_utf8(&entry.chunk_type).unwrap_or("????");
+        groups.entry(tag).or_default().push(entry);
+    }
+
+    let group_count = groups.len();
+    for (gi, (tag, group_entries)) in groups.iter().enumerate() {
+        let is_last_group = gi == group_count - 1;
+        let (gconn, gchild) = if is_last_group {
+            ("└", "    ")
+        } else {
+            ("├", "│   ")
+        };
+        println!(
+            "{child}{gconn} {tag} ({} chunk{})",
+            group_entries.len(),
+            if group_entries.len() == 1 { "" } else { "s" },
+        );
+
+        let ec = group_entries.len();
+        for (ei, entry) in group_entries.iter().enumerate() {
+            let is_last = ei == ec - 1;
+            let (econn, _) = if is_last { ("└", "") } else { ("├", "") };
+
+            let desc = match *tag {
+                "CHAP" => entry.alt_text.unwrap_or("chapter"),
+                "COVR" | "COVT" | "IMG_" => entry.alt_text.unwrap_or("image"),
+                "CSS_" => "stylesheet",
+                "FONT" => "font",
+                "SIDX" => "search index",
+                "MATH" => "math",
+                "NOTE" => entry.alt_text.unwrap_or("note"),
+                _ => "",
+            };
+            let ct = match *tag {
+                "CHAP" | "NOTE" => match (entry.content_type_kind, entry.content_type_value) {
+                    (1, 1) => Some("html"),
+                    (1, 0) => Some("markdown"),
+                    _ => None,
+                },
+                "MATH" => match (entry.content_type_kind, entry.content_type_value) {
+                    (2, 0) => Some("mathml"),
+                    (2, 1) => Some("latex"),
+                    _ => None,
+                },
+                _ => None,
+            };
+            let compressed = if entry.compression != honzo_core::Compression::None {
+                format!(
+                    " [lz4: {}→{}]",
+                    human_size(entry.size_compressed),
+                    human_size(entry.size_raw)
+                )
+            } else {
+                String::new()
+            };
+            let qualifier = match ct {
+                Some(c) => format!(" ({})", c),
+                None => String::new(),
+            };
+
+            println!(
+                "{child}{gchild}{econn} [{:>3}] {}{}{}",
+                entry.chunk_id, desc, qualifier, compressed,
+            );
+        }
+    }
+
+    // EXTRA
+    if has_extra {
+        let (conn, _child) = tl(4, top_count);
+        println!("{conn} EXTRA ({})", human_size(head.extra_size as u32));
+    }
+}
+
 fn main() {
     let cli = Cli::parse();
     match cli.command {
@@ -642,5 +851,6 @@ fn main() {
         Commands::Convert { input, out } => cmd_convert(&input, &out),
         Commands::Validate { file } => cmd_validate(&file),
         Commands::Search { file, query } => cmd_search(&file, &query),
+        Commands::Tree { file } => cmd_tree(&file),
     }
 }

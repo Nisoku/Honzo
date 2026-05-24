@@ -9,7 +9,6 @@
 - [ ] `honzo-chunks/src/data/css.rs`
 - [ ] `honzo-chunks/src/data/font.rs`
 - [ ] `honzo-chunks/src/data/img.rs`
-- [X] SIDX is always stored uncompressed even though it would benefit from LZ4
 
 ## EXTRA Namespaces
 
@@ -23,22 +22,23 @@
 
 - [ ] Native converter works but format detection is heuristic and error messages are poor
 - [ ] Search command shows chunk IDs but doesn't resolve excerpts (demo does this in JS)
+- [x] `honzo tree` command renders .hzo file tree with HEAD/DATA/EXTRA/META sections and type-grouped folders
 
 ## WASM / TypeScript
 
-- [ ] WASM API is bare-minimum, no typed wrapper, just re-exports wasm-pack output
-- [ ] TypeScript wrapper has no typed API layer
+- [X] WASM API is bare-minimum, no typed wrapper, just re-exports wasm-pack output
+- [X] TypeScript wrapper has no typed API layer
 - [ ] WASM `HonzoWasm` constructor eagerly reads *all* chunks into memory (no streaming)
 - [ ] WASM API can't pass `alt_text` or `font_embedding` through `honzo_build`
 - [ ] C FFI via Diplomat is similarly limited (no alt_text, font_embedding, or extra support on builder)
 
 ## EPUB Conversion
 
-- [ ] EPUB conversion logic is duplicated in Rust (`honzo-convert`) and JS (`convert.js` using lexepub)
-- [ ] Rust `from_epub` strips HTML to text (no image embedding, CSS, fonts in output)
-- [ ] Rust `from_epub` doesn't preserve chapter structure from nav/toc, only spine order
-- [ ] PDF conversion uses `pdf_oxide` which may not handle all PDFs well
-- [ ] MOBI conversion delegates to EPUB for ZIP files, falls back to `mobi` crate otherwise
+- [x] EPUB conversion logic is duplicated in Rust (`honzo-convert`) and JS (`convert.js` using lexepub)
+- [x] Rust `from_epub` strips HTML to text (no image embedding, CSS, fonts in output)
+- [x] Rust `from_epub` doesn't preserve chapter structure from nav/toc, only spine order
+- [x] Builder auto-generates clean SIDX (HTML stripped) instead of requiring manual build_sidx
+- [x] Converter embeds images, CSS, fonts from EPUB manifest into .hzo chunks
 
 ## Demo
 
@@ -53,7 +53,7 @@
 ## Tests
 
 - [ ] More tests needed (round-trip, edge cases, corpus)
-- [ ] No tests for CSS_/FONT/IMG_ chunk handling (stubs)
+- [ ] No tests for CSS_/FONT/IMG_ chunk handling
 - [ ] No tests for DRM/anno/sync EXTRA round-trips
 - [ ] No tests for WASM or C FFI paths
 

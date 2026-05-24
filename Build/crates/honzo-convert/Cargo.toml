@@ -10,15 +10,15 @@ lowmem = []
 
 [dependencies]
 honzo-io = { path = "../honzo-io" }
-futures = "0.3"
-async_zip = { version = "0.0.18", features = ["deflate", "deflate64"] }
+lexepub = "0.1"
 bytes = "1"
-quick-xml = "0.40.0"
+quick-xml = "0.39"
 rmp-serde = "1"
 tl = "0.7"
 html-escape = "0.2"
 mobi = "0.8"
 pdf_oxide = "0.3"
+futures = "0.3"
 
 [dev-dependencies]
 honzo-core = { path = "../honzo-core" }

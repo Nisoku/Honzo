@@ -1104,7 +1104,7 @@ dependencies = [
  "image",
  "lz4_flex",
  "pulldown-latex",
- "quick-xml 0.40.0",
+ "quick-xml 0.40.1",
  "rmp-serde",
  "rust-stemmers",
  "serde",
@@ -1127,15 +1127,15 @@ dependencies = [
 name = "honzo-convert"
 version = "0.1.0"
 dependencies = [
- "async_zip",
  "bytes",
  "futures",
  "honzo-core",
  "honzo-io",
  "html-escape",
+ "lexepub",
  "mobi",
  "pdf_oxide",
- "quick-xml 0.40.0",
+ "quick-xml 0.39.4",
  "rmp-serde",
  "tl",
 ]
@@ -1185,8 +1185,10 @@ dependencies = [
  "honzo-io",
  "image",
  "lopdf",
+ "quick-xml 0.40.1",
  "rmp-serde",
  "serde",
+ "zip",
 ]
 
 [[package]]
@@ -1195,6 +1197,7 @@ version = "0.1.0"
 dependencies = [
  "getrandom",
  "honzo-chunks",
+ "honzo-convert",
  "honzo-core",
  "honzo-io",
  "js-sys",
@@ -1431,6 +1434,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 
 [[package]]
+name = "lexepub"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "67b3d75f3165c80f8899761629f3e03550dbbf1c6921563d9d4714979a06c3a8"
+dependencies = [
+ "async_zip",
+ "bytes",
+ "diplomat",
+ "diplomat-runtime",
+ "futures",
+ "getrandom",
+ "html-escape",
+ "js-sys",
+ "quick-xml 0.39.4",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tl",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.186"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1586,7 +1614,7 @@ dependencies = [
  "fast-float2",
  "libc",
  "log",
- "quick-xml 0.40.0",
+ "quick-xml 0.40.1",
  "serde",
  "serde_json",
  "thiserror 2.0.18",
@@ -1842,9 +1870,9 @@ dependencies = [
 
 [[package]]
 name = "quick-xml"
-version = "0.40.0"
+version = "0.40.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b7315c86b26aaef0321fba33c9dcc160da659c6a9d278f0f6a5656d6561c03b"
+checksum = "2474bd2e5029e7ccb6abb2ba48cf2383a333851dedf495901544281590c7da7f"
 dependencies = [
  "memchr",
  "serde",
@@ -2482,6 +2510,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "wasm-bindgen-futures"
+version = "0.4.71"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96492d0d3ffba25305a7dc88720d250b1401d7edca02cc3bcd50633b424673b8"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "wasm-bindgen-macro"
 version = "0.2.121"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2545,6 +2583,16 @@ dependencies = [
  "hashbrown 0.15.5",
  "indexmap 2.14.0",
  "semver",
+]
+
+[[package]]
+name = "web-sys"
+version = "0.3.98"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b572dff8bcf38bad0fa19729c89bb5748b2b9b1d8be70cf90df697e3a8f32aa"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
 ]
 
 [[package]]

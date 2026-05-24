@@ -25,6 +25,10 @@ public:
 
   inline bool add_chunk(diplomat::span<const uint8_t> tag, diplomat::span<const uint8_t> data, uint8_t compression, uint8_t content_type_kind, uint8_t content_type_value);
 
+  inline diplomat::result<bool, diplomat::Utf8Error> set_language(std::string_view lang);
+
+  inline bool set_auto_sidx(bool enable);
+
   inline bool add_math_chunk(diplomat::span<const uint8_t> data, uint8_t math_type, uint8_t compression);
 
   inline bool set_meta(diplomat::span<const uint8_t> msgpack);

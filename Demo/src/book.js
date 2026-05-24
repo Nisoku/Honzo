@@ -25,6 +25,7 @@ let meta = null;
 let chapters = [];
 let tocEntries = [];
 let searchIndex = null;
+let imageBlobs = [];
 let currentChapterIndex = 0;
 let wasmInitPromise = null;
 let elements = {
@@ -107,7 +108,7 @@ function searchChapters(query) {
   const terms = query
     .trim()
     .split(/\s+/)
-    .map((term) => normalizeSearchTerm(term))
+    .map((term) => normalizeSearchTerm(term, meta?.language || "en"))
     .filter(Boolean);
 
   if (terms.length === 0) {
@@ -280,6 +281,18 @@ async function loadBook(data) {
     }
   }
 
+  imageBlobs = tocEntries
+    .filter((e) => e.chunk_type === "IMG_" || e.chunk_type === "COVR")
+    .map((e) => {
+      const data = reader.get_chunk(e.chunk_id);
+      const ext = (e.alt_text || "").split(".").pop().toLowerCase();
+      const mime =
+        { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", gif: "image/gif", webp: "image/webp", svg: "image/svg+xml" }[ext] ||
+        "image/jpeg";
+      const blob = new Blob([data], { type: mime });
+      return { path: e.alt_text || null, blob, url: URL.createObjectURL(blob) };
+    });
+
   chapters = tocEntries
     .filter(
       (e) =>
@@ -337,7 +350,6 @@ function renderCurrentChapter() {
     const url = URL.createObjectURL(blob);
     const img = document.createElement("img");
     img.src = url;
-    img.alt = chapter.alt_text || "";
     container.appendChild(img);
   } else if (isMath) {
     const raw = new TextDecoder().decode(data);
@@ -369,6 +381,16 @@ function renderCurrentChapter() {
       container.innerHTML = sanitizeHtml(raw);
     } else {
       container.innerHTML = renderMarkdown(raw);
+    }
+  }
+
+  for (const img of container.querySelectorAll("img")) {
+    const src = img.getAttribute("src");
+    if (!src || src.startsWith("blob:") || src.startsWith("data:")) continue;
+    const filename = src.split("/").pop().split("\\").pop();
+    const match = imageBlobs.find((b) => b.path && b.path.endsWith(filename));
+    if (match) {
+      img.src = match.url;
     }
   }
 

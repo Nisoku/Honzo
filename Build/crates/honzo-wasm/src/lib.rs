@@ -198,12 +198,26 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
         chunks: Vec<ChunkSpec>,
         meta: Option<serde_json::Value>,
         extra: Option<Vec<u8>>,
+        #[serde(default = "default_language")]
+        language: String,
+        #[serde(default = "default_auto_sidx")]
+        auto_sidx: bool,
+    }
+
+    fn default_language() -> String {
+        "en".to_string()
+    }
+
+    fn default_auto_sidx() -> bool {
+        true
     }
 
     let spec: BuildSpec =
         serde_wasm_bindgen::from_value(spec).map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
 
-    let mut builder = HonzoBuilder::new();
+    let mut builder = HonzoBuilder::new()
+        .set_language(&spec.language)
+        .set_auto_sidx(spec.auto_sidx);
 
     for chunk in &spec.chunks {
         if chunk.tag.len() != 4 {
@@ -272,8 +286,13 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn normalize_search_term(term: &str) -> String {
-    normalize_search_term_impl(term)
+pub fn convert_epub(bytes: &[u8]) -> Result<Vec<u8>, JsValue> {
+    honzo_convert::from_epub(bytes).map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+}
+
+#[wasm_bindgen]
+pub fn normalize_search_term(term: &str, lang: &str) -> String {
+    normalize_search_term_impl(term, lang)
 }
 
 #[wasm_bindgen]

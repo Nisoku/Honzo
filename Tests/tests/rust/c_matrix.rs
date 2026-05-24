@@ -10,10 +10,10 @@ fn ffi_parse_minimal() {
 #[test]
 fn ffi_parse_novel() {
     let handle = honzo_c::ffi::HonzoHandle::parse(&fixture("novel.hzo"), 1).unwrap();
-    assert_eq!(handle.chunk_count(), 5);
+    assert_eq!(handle.chunk_count(), 6);
     assert_eq!(handle.layout_mode(), 0);
     assert!(!handle.has_drm());
-    assert!(!handle.has_sidx());
+    assert!(handle.has_sidx());
 }
 
 #[test]
@@ -94,7 +94,7 @@ fn ffi_builder_roundtrip() {
     let output = builder.get_result();
     assert!(!output.is_empty());
     let handle = honzo_c::ffi::HonzoHandle::parse(output, 1).unwrap();
-    assert_eq!(handle.chunk_count(), 1);
+    assert_eq!(handle.chunk_count(), 2);
 }
 
 #[test]
@@ -120,7 +120,8 @@ fn ffi_builder_set_meta() {
     assert!(builder.finalize());
     let output = builder.get_result();
     let handle = honzo_c::ffi::HonzoHandle::parse(output, 1).unwrap();
-    assert_eq!(handle.chunk_count(), 1);
+    assert_eq!(handle.chunk_count(), 2);
+    assert!(handle.has_sidx());
 }
 
 #[test]

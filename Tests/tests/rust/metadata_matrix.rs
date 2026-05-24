@@ -44,7 +44,7 @@ fn computes_reading_time_and_uuid_shape() {
 #[test]
 fn builds_search_index_from_chapters() {
     let chapters = [(0u32, "hello world"), (1u32, "hello rust")];
-    let index = build_sidx(&chapters).unwrap();
+    let index = build_sidx(&chapters, "en").unwrap();
     let map: std::collections::BTreeMap<String, Vec<(u32, u32)>> =
         rmp_serde::from_slice(&index).unwrap();
 

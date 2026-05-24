@@ -1,8 +1,77 @@
+use honzo_chunks::data::sidx::build_sidx;
 use honzo_core::{
     Compression, CoverType, FontEmbedding, HonzoError, LayoutMode, MarkupType, MathType, PmapEntry,
 };
-use honzo_chunks::data::sidx::build_sidx;
 use std::vec::Vec;
+
+fn strip_html_tags(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    let mut in_tag = false;
+    let mut tag_buf = String::new();
+    let mut last_was_newline = false;
+
+    for c in s.chars() {
+        if c == '<' {
+            tag_buf.clear();
+            in_tag = true;
+        } else if c == '>' {
+            in_tag = false;
+            let tag = tag_buf.trim().trim_start_matches('/').to_ascii_lowercase();
+            let is_block = tag.is_empty()
+                || tag.starts_with('p')
+                || tag.starts_with("div")
+                || tag.starts_with("br")
+                || tag.starts_with("li")
+                || tag.starts_with('h')
+                || tag.starts_with("blockquote")
+                || tag.starts_with("tr")
+                || tag.starts_with("td");
+            if is_block && !last_was_newline {
+                out.push('\n');
+                last_was_newline = true;
+            }
+        } else if in_tag {
+            tag_buf.push(c);
+        } else {
+            if c == '&' {
+                let mut entity = String::new();
+                for ec in s.chars().skip(1) {
+                    if ec == ';' { break; }
+                    entity.push(ec);
+                }
+                let decoded = match entity.as_str() {
+                    "amp" => "&",
+                    "lt" => "<",
+                    "gt" => ">",
+                    "quot" => "\"",
+                    "apos" => "'",
+                    "nbsp" => " ",
+                    _ => "",
+                };
+                if !decoded.is_empty() {
+                    out.push_str(decoded);
+                    last_was_newline = false;
+                }
+            } else if c.is_alphanumeric() || c.is_whitespace() || c.is_ascii_punctuation() {
+                if c.is_whitespace() && c != '\n' {
+                    if !last_was_newline {
+                        out.push(' ');
+                        last_was_newline = false;
+                    }
+                } else {
+                    out.push(c);
+                    last_was_newline = false;
+                }
+            }
+        }
+    }
+
+    out.lines()
+        .map(|l| l.trim())
+        .filter(|l| !l.is_empty())
+        .collect::<Vec<_>>()
+        .join("\n")
+}
 
 const MAGIC: &[u8; 4] = b"HONO";
 
@@ -136,12 +205,18 @@ impl HonzoBuilder {
                 }
             }
             if !chapters.is_empty() {
+                let chapter_texts: Vec<String> = chapters
+                    .iter()
+                    .map(|(_, data)| strip_html_tags(std::str::from_utf8(data).unwrap_or("")))
+                    .collect();
                 let chapters_refs: Vec<(u32, &str)> = chapters
                     .iter()
-                    .map(|(id, data)| (*id, std::str::from_utf8(data).unwrap_or("")))
+                    .zip(chapter_texts.iter())
+                    .map(|((id, _), text)| (*id, text.as_str()))
                     .collect();
 
                 let sidx_data = build_sidx(&chapters_refs, &final_builder.language)?;
+                final_builder.flags |= 0x20;
                 final_builder = final_builder.add_chunk(
                     *b"SIDX",
                     &sidx_data,

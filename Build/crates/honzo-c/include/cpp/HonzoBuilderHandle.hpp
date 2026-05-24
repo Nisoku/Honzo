@@ -22,6 +22,10 @@ namespace capi {
 
     bool HonzoBuilderHandle_add_chunk(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View tag, diplomat::capi::DiplomatU8View data, uint8_t compression, uint8_t content_type_kind, uint8_t content_type_value);
 
+    bool HonzoBuilderHandle_set_language(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatStringView lang);
+
+    bool HonzoBuilderHandle_set_auto_sidx(diplomat::capi::HonzoBuilderHandle* self, bool enable);
+
     bool HonzoBuilderHandle_add_math_chunk(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View data, uint8_t math_type, uint8_t compression);
 
     bool HonzoBuilderHandle_set_meta(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View msgpack);
@@ -48,6 +52,21 @@ inline bool HonzoBuilderHandle::add_chunk(diplomat::span<const uint8_t> tag, dip
         compression,
         content_type_kind,
         content_type_value);
+    return result;
+}
+
+inline diplomat::result<bool, diplomat::Utf8Error> HonzoBuilderHandle::set_language(std::string_view lang) {
+    if (!diplomat::capi::diplomat_is_str(lang.data(), lang.size())) {
+    return diplomat::Err<diplomat::Utf8Error>();
+  }
+    auto result = diplomat::capi::HonzoBuilderHandle_set_language(this->AsFFI(),
+        {lang.data(), lang.size()});
+    return diplomat::Ok<bool>(result);
+}
+
+inline bool HonzoBuilderHandle::set_auto_sidx(bool enable) {
+    auto result = diplomat::capi::HonzoBuilderHandle_set_auto_sidx(this->AsFFI(),
+        enable);
     return result;
 }
 

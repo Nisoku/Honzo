@@ -21,7 +21,7 @@ namespace capi {
     diplomat_external_latex_to_mathml_result diplomat_external_latex_to_mathml(diplomat::capi::DiplomatU8View bytes, diplomat::capi::DiplomatWrite* write);
 
     typedef struct diplomat_external_normalize_search_term_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} diplomat_external_normalize_search_term_result;
-    diplomat_external_normalize_search_term_result diplomat_external_normalize_search_term(diplomat::capi::DiplomatStringView term, diplomat::capi::DiplomatWrite* write);
+    diplomat_external_normalize_search_term_result diplomat_external_normalize_search_term(diplomat::capi::DiplomatStringView term, diplomat::capi::DiplomatStringView lang, diplomat::capi::DiplomatWrite* write);
 
     typedef struct diplomat_external_render_math_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} diplomat_external_render_math_result;
     diplomat_external_render_math_result diplomat_external_render_math(diplomat::capi::DiplomatU8View bytes, uint8_t math_type, diplomat::capi::DiplomatWrite* write);
@@ -47,23 +47,31 @@ inline diplomat::result<std::monostate, HonzoErrorCode> latex_to_mathml_write(di
         &write);
     return result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
 }
-inline diplomat::result<diplomat::result<std::string, HonzoErrorCode>, diplomat::Utf8Error> normalize_search_term(std::string_view term) {
+inline diplomat::result<diplomat::result<std::string, HonzoErrorCode>, diplomat::Utf8Error> normalize_search_term(std::string_view term, std::string_view lang) {
     if (!diplomat::capi::diplomat_is_str(term.data(), term.size())) {
+    return diplomat::Err<diplomat::Utf8Error>();
+  }
+    if (!diplomat::capi::diplomat_is_str(lang.data(), lang.size())) {
     return diplomat::Err<diplomat::Utf8Error>();
   }
     std::string output;
     diplomat::capi::DiplomatWrite write = diplomat::WriteFromString(output);
     auto result = diplomat::capi::diplomat_external_normalize_search_term({term.data(), term.size()},
+        {lang.data(), lang.size()},
         &write);
     return diplomat::Ok<diplomat::result<std::string, HonzoErrorCode>>(result.is_ok ? diplomat::result<std::string, HonzoErrorCode>(diplomat::Ok<std::string>(std::move(output))) : diplomat::result<std::string, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err))));
 }
 template<typename W>
-inline diplomat::result<diplomat::result<std::monostate, HonzoErrorCode>, diplomat::Utf8Error> normalize_search_term_write(std::string_view term, W& writeable) {
+inline diplomat::result<diplomat::result<std::monostate, HonzoErrorCode>, diplomat::Utf8Error> normalize_search_term_write(std::string_view term, std::string_view lang, W& writeable) {
     if (!diplomat::capi::diplomat_is_str(term.data(), term.size())) {
+    return diplomat::Err<diplomat::Utf8Error>();
+  }
+    if (!diplomat::capi::diplomat_is_str(lang.data(), lang.size())) {
     return diplomat::Err<diplomat::Utf8Error>();
   }
     diplomat::capi::DiplomatWrite write = diplomat::WriteTrait<W>::Construct(writeable);
     auto result = diplomat::capi::diplomat_external_normalize_search_term({term.data(), term.size()},
+        {lang.data(), lang.size()},
         &write);
     return diplomat::Ok<diplomat::result<std::monostate, HonzoErrorCode>>(result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err))));
 }

@@ -19,6 +19,10 @@ HonzoBuilderHandle* HonzoBuilderHandle_new(void);
 
 bool HonzoBuilderHandle_add_chunk(HonzoBuilderHandle* self, DiplomatU8View tag, DiplomatU8View data, uint8_t compression, uint8_t content_type_kind, uint8_t content_type_value);
 
+bool HonzoBuilderHandle_set_language(HonzoBuilderHandle* self, DiplomatStringView lang);
+
+bool HonzoBuilderHandle_set_auto_sidx(HonzoBuilderHandle* self, bool enable);
+
 bool HonzoBuilderHandle_add_math_chunk(HonzoBuilderHandle* self, DiplomatU8View data, uint8_t math_type, uint8_t compression);
 
 bool HonzoBuilderHandle_set_meta(HonzoBuilderHandle* self, DiplomatU8View msgpack);

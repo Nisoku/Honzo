@@ -9,6 +9,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 honzo-chunks = { path = "../honzo-chunks" }
+honzo-convert = { path = "../honzo-convert" }
 honzo-core = { path = "../honzo-core" }
 honzo-io = { path = "../honzo-io" }
 wasm-bindgen = "0.2"

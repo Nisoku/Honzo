@@ -24,3 +24,12 @@ pub fn corpus(name: &str) -> Vec<u8> {
     )
     .unwrap()
 }
+
+pub fn epub(name: &str) -> Vec<u8> {
+    std::fs::read(
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("epubs")
+            .join(name),
+    )
+    .unwrap()
+}
