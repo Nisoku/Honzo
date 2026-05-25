@@ -10,6 +10,7 @@ lowmem = []
 
 [dependencies]
 honzo-io = { path = "../honzo-io" }
+honzo-chunks = { path = "../honzo-chunks" }
 lexepub = "0.1"
 bytes = "1"
 quick-xml = "0.39"

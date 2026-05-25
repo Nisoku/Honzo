@@ -1,19 +1,7 @@
+use super::img::{encode_jpeg, load_image};
 use honzo_core::HonzoError;
-use image::codecs::jpeg::JpegEncoder;
 use image::imageops::FilterType;
 use image::GenericImageView;
-
-const MAX_IMAGE_DIM_PX: u32 = 20_000;
-
-fn check_dims(width: u32, height: u32) -> Result<(), HonzoError> {
-    if width == 0 || height == 0 {
-        return Err(HonzoError::Truncated);
-    }
-    if width > MAX_IMAGE_DIM_PX || height > MAX_IMAGE_DIM_PX {
-        return Err(HonzoError::Truncated);
-    }
-    Ok(())
-}
 
 /// Cover-related helpers.
 ///
@@ -22,16 +10,13 @@ fn check_dims(width: u32, height: u32) -> Result<(), HonzoError> {
 ///
 /// `COVT` is not for in-chapter images; those are `IMG_` chunks.
 pub fn generate_covr(bytes: &[u8]) -> Result<&[u8], HonzoError> {
-    let img = image::load_from_memory(bytes).map_err(|_| HonzoError::Truncated)?;
-    let (w, h) = img.dimensions();
-    check_dims(w, h)?;
+    let _img = load_image(bytes)?;
     Ok(bytes)
 }
 
 pub fn generate_covt(covr_bytes: &[u8]) -> Result<Vec<u8>, HonzoError> {
-    let img = image::load_from_memory(covr_bytes).map_err(|_| HonzoError::Truncated)?;
+    let img = load_image(covr_bytes)?;
     let (width, height) = img.dimensions();
-    check_dims(width, height)?;
     let longest = width.max(height);
     if longest <= 300 {
         return Ok(covr_bytes.to_vec());
@@ -41,11 +26,5 @@ pub fn generate_covt(covr_bytes: &[u8]) -> Result<Vec<u8>, HonzoError> {
     let new_width = (width as f32 * scale).round() as u32;
     let new_height = (height as f32 * scale).round() as u32;
     let resized = img.resize_exact(new_width, new_height, FilterType::Lanczos3);
-    let mut out = Vec::new();
-    let mut encoder = JpegEncoder::new_with_quality(&mut out, 75);
-    let rgb = resized.to_rgb8();
-    encoder
-        .encode(&rgb, new_width, new_height, image::ExtendedColorType::Rgb8)
-        .map_err(|_| HonzoError::Truncated)?;
-    Ok(out)
+    encode_jpeg(&resized, 75)
 }

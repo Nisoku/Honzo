@@ -1102,6 +1102,7 @@ version = "0.1.0"
 dependencies = [
  "honzo-core",
  "image",
+ "lexepub",
  "lz4_flex",
  "pulldown-latex",
  "quick-xml 0.40.1",
@@ -1129,6 +1130,7 @@ version = "0.1.0"
 dependencies = [
  "bytes",
  "futures",
+ "honzo-chunks",
  "honzo-core",
  "honzo-io",
  "html-escape",

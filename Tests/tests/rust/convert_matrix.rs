@@ -1,6 +1,7 @@
 use std::io::{Cursor, Write};
 
 use crate::common::{fixture, workspace_root};
+use honzo_chunks::data::img as img_utils;
 use honzo_convert::{from_epub, from_mobi, from_pdf};
 use honzo_core::{Compression, HonzoParser};
 use honzo_io::HonzoMeta;
@@ -396,11 +397,7 @@ fn build_epub_with_resources() -> Vec<u8> {
     {
         let img = image::RgbImage::new(100, 100);
         let dyn_img = image::DynamicImage::ImageRgb8(img);
-        let mut cursor = Cursor::new(Vec::new());
-        dyn_img
-            .write_to(&mut cursor, image::ImageFormat::Jpeg)
-            .unwrap();
-        let jpg_buf = cursor.into_inner();
+        let jpg_buf = img_utils::encode_jpeg(&dyn_img, 75).unwrap();
         zip.write_all(&jpg_buf).unwrap();
     }
 
@@ -470,11 +467,7 @@ fn build_epub_with_cover() -> Vec<u8> {
     {
         let img = image::RgbImage::new(200, 300);
         let dyn_img = image::DynamicImage::ImageRgb8(img);
-        let mut cursor = Cursor::new(Vec::new());
-        dyn_img
-            .write_to(&mut cursor, image::ImageFormat::Jpeg)
-            .unwrap();
-        let jpg_buf = cursor.into_inner();
+        let jpg_buf = img_utils::encode_jpeg(&dyn_img, 75).unwrap();
         zip.start_file("cover.jpg", FileOpts::default()).unwrap();
         zip.write_all(&jpg_buf).unwrap();
     }
@@ -663,4 +656,152 @@ fn build_epub_no_html_chapters() -> Vec<u8> {
     zip.write_all(b"body { }").unwrap();
 
     zip.finish().unwrap().into_inner()
+}
+
+#[test]
+fn epub_conversion_preserves_img_alt_text() {
+    let epub = build_epub_with_img_alt();
+    let hzo = from_epub(&epub).unwrap();
+    let parser = HonzoParser::new(&hzo, 1).unwrap();
+
+    let img_entry = parser
+        .toc_entries()
+        .find(|e| e.chunk_type == *b"IMG_")
+        .expect("should have IMG_ chunk");
+
+    assert_eq!(img_entry.alt_text, Some("An image description"));
+}
+
+fn build_epub_with_img_alt() -> Vec<u8> {
+    let buf = Cursor::new(Vec::new());
+    let mut zip = zip::ZipWriter::new(buf);
+
+    zip.start_file("mimetype", FileOpts::default()).unwrap();
+    zip.write_all(b"application/epub+zip").unwrap();
+
+    zip.add_directory("META-INF/", FileOpts::default()).unwrap();
+    zip.start_file("META-INF/container.xml", FileOpts::default())
+        .unwrap();
+    zip.write_all(
+                br#"<?xml version="1.0"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+    <rootfiles><rootfile full-path="content.opf" media-type="application/oebps-package+xml"/></rootfiles>
+</container>"#,
+        )
+        .unwrap();
+
+    zip.start_file("content.opf", FileOpts::default()).unwrap();
+    zip.write_all(
+        br#"<?xml version="1.0"?>
+<package version="2.0" xmlns="http://www.idpf.org/2007/opf">
+    <metadata>
+        <dc:title>Img Alt Test</dc:title>
+        <dc:creator>Test Author</dc:creator>
+        <dc:language>en</dc:language>
+    </metadata>
+    <manifest>
+        <item id="img1" href="image1.jpg" media-type="image/jpeg"/>
+        <item id="chap1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>
+    </manifest>
+    <spine>
+        <itemref idref="chap1"/>
+    </spine>
+</package>"#,
+    )
+    .unwrap();
+
+    // Write an actual JPEG image
+    zip.start_file("image1.jpg", FileOpts::default()).unwrap();
+    {
+        let img = image::RgbImage::new(10, 10);
+        let dyn_img = image::DynamicImage::ImageRgb8(img);
+        let jpg_buf = img_utils::encode_jpeg(&dyn_img, 75).unwrap();
+        zip.write_all(&jpg_buf).unwrap();
+    }
+
+    zip.start_file("chapter1.xhtml", FileOpts::default())
+        .unwrap();
+    zip.write_all(
+        br#"<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Img Chapter</title></head>
+<body><h1>Img Chapter</h1><p><img src="image1.jpg" alt="An image description"/></p></body>
+</html>"#,
+    )
+    .unwrap();
+
+    zip.finish().unwrap().into_inner()
+}
+
+#[test]
+fn epub_conversion_preserves_img_alt_text_with_subdir() {
+    // manifest href is in a subdir but chapter references basename only
+    let buf = Cursor::new(Vec::new());
+    let mut zip = zip::ZipWriter::new(buf);
+
+    zip.start_file("mimetype", FileOpts::default()).unwrap();
+    zip.write_all(b"application/epub+zip").unwrap();
+
+    zip.add_directory("META-INF/", FileOpts::default()).unwrap();
+    zip.start_file("META-INF/container.xml", FileOpts::default())
+        .unwrap();
+    zip.write_all(
+        br#"<?xml version="1.0"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+    <rootfiles><rootfile full-path="content.opf" media-type="application/oebps-package+xml"/></rootfiles>
+</container>"#,
+    )
+    .unwrap();
+
+    zip.start_file("content.opf", FileOpts::default()).unwrap();
+    zip.write_all(
+        br#"<?xml version="1.0"?>
+<package version="2.0" xmlns="http://www.idpf.org/2007/opf">
+    <metadata>
+        <dc:title>Img Alt Subdir Test</dc:title>
+        <dc:creator>Test Author</dc:creator>
+        <dc:language>en</dc:language>
+    </metadata>
+    <manifest>
+        <item id="img1" href="images/image1.jpg" media-type="image/jpeg"/>
+        <item id="chap1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>
+    </manifest>
+    <spine>
+        <itemref idref="chap1"/>
+    </spine>
+</package>"#,
+    )
+    .unwrap();
+
+    // Write image under images/
+    zip.start_file("images/image1.jpg", FileOpts::default())
+        .unwrap();
+    {
+        let img = image::RgbImage::new(10, 10);
+        let dyn_img = image::DynamicImage::ImageRgb8(img);
+        let jpg_buf = img_utils::encode_jpeg(&dyn_img, 75).unwrap();
+        zip.write_all(&jpg_buf).unwrap();
+    }
+
+    zip.start_file("chapter1.xhtml", FileOpts::default())
+        .unwrap();
+    zip.write_all(
+        br#"<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Img Chapter</title></head>
+<body><h1>Img Chapter</h1><p><img src="image1.jpg" alt="Subdir image alt"/></p></body>
+</html>"#,
+    )
+    .unwrap();
+
+    let epub = zip.finish().unwrap().into_inner();
+    let hzo = from_epub(&epub).unwrap();
+    let parser = HonzoParser::new(&hzo, 1).unwrap();
+
+    let img_entry = parser
+        .toc_entries()
+        .find(|e| e.chunk_type == *b"IMG_")
+        .expect("should have IMG_ chunk");
+
+    assert_eq!(img_entry.alt_text, Some("Subdir image alt"));
 }

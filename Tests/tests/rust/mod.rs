@@ -8,6 +8,7 @@ mod core_matrix;
 mod corpus_matrix;
 mod covr;
 mod extra_matrix;
+mod img_matrix;
 mod math_matrix;
 mod metadata_matrix;
 mod sidx_matrix;

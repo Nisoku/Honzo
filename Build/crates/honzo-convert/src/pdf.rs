@@ -1,6 +1,7 @@
 //! PDF conversion using `pdf_oxide`
 
 use crate::ConvertError;
+use honzo_chunks::data::img as img_utils;
 use honzo_io::{Compression, CoverType, HonzoBuilder, MarkupType};
 use pdf_oxide::PdfDocument;
 
@@ -46,6 +47,10 @@ pub fn convert_pdf(bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
             for img in images.into_iter() {
                 // Prefer PNG conversion; skip image on conversion errors.
                 if let Ok(buf) = img.to_png_bytes() {
+                    // Validate image bytes before adding as IMG_
+                    if img_utils::validate_img(&buf).is_err() {
+                        continue;
+                    }
                     let tag = *b"IMG_";
                     builder = builder.add_chunk(
                         tag,

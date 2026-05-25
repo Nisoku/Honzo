@@ -14,3 +14,4 @@ serde = { version = "1", features = ["derive"] }
 pulldown-latex = "0.7"
 quick-xml = "0.40"
 rust-stemmers = "1"
+lexepub = "0.1"

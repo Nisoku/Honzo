@@ -118,6 +118,30 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
 
     let mut next_chunk_id: u32 = 0;
 
+    // Extract image alts from parsed ASTs via shared helper
+    let mut img_alt_map: std::collections::HashMap<String, String> =
+        std::collections::HashMap::new();
+
+    // Build parsed chapters with ASTs from spine entries
+    let mut parsed_chapters: Vec<lexepub::ParsedChapter> = Vec::new();
+    let parser = lexepub::ChapterParser::new().with_both();
+    for chap_path in spine.iter() {
+        if let Ok(ch_data) = epub.read_resource(chap_path).await {
+            let chapter = lexepub::Chapter::new(chap_path.clone(), String::new(), ch_data);
+            if let Ok(parsed) = parser.parse_chapter(chapter) {
+                parsed_chapters.push(parsed);
+            }
+        }
+    }
+
+    if !parsed_chapters.is_empty() {
+        img_alt_map = honzo_chunks::data::img::collect_and_resolve_img_alts_async(
+            &parsed_chapters,
+            &mut epub,
+        )
+        .await;
+    }
+
     // Cover image
     if let Some(ref cid) = opf.cover_id {
         if let Some(item) = manifest.iter().find(|m| m.id == *cid) {
@@ -157,13 +181,45 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         {
             let path = resolve(&item.href);
             if let Ok(data) = epub.read_resource(&path).await {
+                // Determine alt text: prefer exact manifest href -> alt, then basename match, else fall back to resource path
+                let mut alt_text_opt: Option<String> = None;
+                // Prefer lookup by resolved resource path
+                if let Some(a) = img_alt_map
+                    .get(&path)
+                    .or_else(|| img_alt_map.get(&item.href))
+                {
+                    if !a.is_empty() {
+                        alt_text_opt = Some(a.clone());
+                    }
+                }
+                if alt_text_opt.is_none() {
+                    // Try basename fallback: match filename portion of any collected keys
+                    if let Some(fname) = std::path::Path::new(&path)
+                        .file_name()
+                        .and_then(|s| s.to_str())
+                    {
+                        for (k, v) in &img_alt_map {
+                            if let Some(kfn) =
+                                std::path::Path::new(k).file_name().and_then(|s| s.to_str())
+                            {
+                                if kfn == fname && !v.is_empty() {
+                                    alt_text_opt = Some(v.clone());
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                let alt_ref: Option<&str> = alt_text_opt.as_deref().or(Some(&path));
+
                 builder = builder.add_chunk(
                     *b"IMG_",
                     &data,
                     Compression::None,
                     MarkupType::Markdown,
                     CoverType::Front,
-                    Some(&path),
+                    alt_ref,
                     None,
                     None,
                 );

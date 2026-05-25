@@ -1,15 +1,11 @@
+use honzo_chunks::data::img as img_utils;
 use honzo_io::{generate_covr, generate_covt};
-use image::codecs::jpeg::JpegEncoder;
-use image::ExtendedColorType;
+use image::ImageBuffer;
 
 fn make_1x1_jpeg() -> Vec<u8> {
-    let mut out = Vec::new();
-    let pixel = [0u8, 0u8, 0u8];
-    let mut encoder = JpegEncoder::new(&mut out);
-    encoder
-        .encode(&pixel, 1, 1, ExtendedColorType::Rgb8)
-        .expect("encode jpeg");
-    out
+    let img = ImageBuffer::from_fn(1, 1, |_, _| image::Rgb([0u8, 0u8, 0u8]));
+    let dyn_img = image::DynamicImage::ImageRgb8(img);
+    img_utils::encode_jpeg(&dyn_img, 75).expect("encode jpeg")
 }
 
 #[test]
@@ -36,12 +32,11 @@ fn invalid_jpeg_returns_error() {
 #[test]
 fn covt_resizes_large_image() {
     // create a 800x600 image and ensure thumbnailing produces different bytes
-    let mut out = Vec::new();
-    let img = image::ImageBuffer::from_fn(800, 600, |x, y| {
+    let img = ImageBuffer::from_fn(800, 600, |x, y| {
         image::Rgb([(x % 256) as u8, (y % 256) as u8, 128u8])
     });
-    let mut enc = JpegEncoder::new_with_quality(&mut out, 75);
-    enc.encode(&img, 800, 600, ExtendedColorType::Rgb8).unwrap();
+    let dyn_img = image::DynamicImage::ImageRgb8(img);
+    let out = img_utils::encode_jpeg(&dyn_img, 75).unwrap();
 
     let thumb = generate_covt(&out).unwrap();
     assert!(!thumb.is_empty());

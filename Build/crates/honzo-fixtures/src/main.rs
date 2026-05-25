@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
+use honzo_chunks::data::img as img_utils;
 use honzo_chunks::extra::anno::{self, Annotation};
 use honzo_io::{
     build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
@@ -128,25 +129,17 @@ fn gen_novel() {
 }
 
 fn make_cover_jpeg() -> Vec<u8> {
-    let mut buf = Vec::new();
     let img = image::ImageBuffer::from_fn(200, 300, |_, _| image::Rgb([200u8, 150u8, 100u8]));
-    let mut encoder = image::codecs::jpeg::JpegEncoder::new_with_quality(&mut buf, 75);
-    encoder
-        .encode(&img, 200, 300, image::ExtendedColorType::Rgb8)
-        .unwrap();
-    buf
+    let dyn_img = image::DynamicImage::ImageRgb8(img);
+    img_utils::encode_jpeg(&dyn_img, 75).unwrap()
 }
 
 fn make_dummy_img(w: u32, h: u32) -> Vec<u8> {
-    let mut buf = Vec::new();
     let img = image::ImageBuffer::from_fn(w, h, |x, y| {
         image::Rgb([(x * 255 / w) as u8, (y * 255 / h) as u8, 128u8])
     });
-    let mut encoder = image::codecs::jpeg::JpegEncoder::new_with_quality(&mut buf, 75);
-    encoder
-        .encode(&img, w, h, image::ExtendedColorType::Rgb8)
-        .unwrap();
-    buf
+    let dyn_img = image::DynamicImage::ImageRgb8(img);
+    img_utils::encode_jpeg(&dyn_img, 75).unwrap()
 }
 
 fn gen_manga() {
