@@ -275,17 +275,18 @@ async function loadBook(data) {
     }
   }
 
-  imageBlobs = tocEntries
-    .filter((e) => e.chunk_type === "IMG_" || e.chunk_type === "COVR")
-    .map((e) => {
+  imageBlobs = new Map();
+  for (const e of tocEntries) {
+    if (e.chunk_type === "IMG_" || e.chunk_type === "COVR") {
       const data = reader.get_chunk(e.chunk_id);
       const ext = (e.alt_text || "").split(".").pop().toLowerCase();
       const mime =
         { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", gif: "image/gif", webp: "image/webp", svg: "image/svg+xml" }[ext] ||
         "image/jpeg";
       const blob = new Blob([data], { type: mime });
-      return { path: e.alt_text || null, blob, url: URL.createObjectURL(blob) };
-    });
+      imageBlobs.set(e.chunk_id, { path: e.alt_text || null, blob, url: URL.createObjectURL(blob) });
+    }
+  }
 
   chapters = tocEntries
     .filter(
@@ -378,13 +379,18 @@ function renderCurrentChapter() {
     }
   }
 
-  for (const img of container.querySelectorAll("img")) {
-    const src = img.getAttribute("src");
-    if (!src || src.startsWith("blob:") || src.startsWith("data:")) continue;
-    const filename = src.split("/").pop().split("\\").pop();
-    const match = imageBlobs.find((b) => b.path && b.path.endsWith(filename));
-    if (match) {
-      img.src = match.url;
+  for (const ref of container.querySelectorAll("ref")) {
+    const type = ref.getAttribute("type");
+    const chunkId = parseInt(ref.getAttribute("chunk"), 10);
+    if (type === "image" && !isNaN(chunkId)) {
+      const match = imageBlobs.get(chunkId);
+      if (match) {
+        const img = document.createElement("img");
+        img.src = match.url;
+        const alt = ref.getAttribute("alt");
+        if (alt) img.alt = alt;
+        ref.replaceWith(img);
+      }
     }
   }
 
@@ -443,6 +449,7 @@ function sanitizeHtml(html) {
     "header",
     "main",
     "aside",
+    "ref",
   ];
   const allowedAttrs = [
     "href",
@@ -456,6 +463,9 @@ function sanitizeHtml(html) {
     "rel",
     "width",
     "height",
+    "type",
+    "chunk",
+    "anchor",
   ];
   const doc = new DOMParser().parseFromString(html, "text/html");
   const walk = (node) => {

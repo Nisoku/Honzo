@@ -15,12 +15,6 @@
 - [ ] No actual AES-256-CBC encrypt/decrypt anywhere
 - [ ] `org.nisoku.anno` struct is defined but no programmatic API to build/query annotations
 - [ ] `org.nisoku.sync` struct is defined with an explicit `// TODO: Finalize the schema and implement`
-- [X] COVT auto-generation not wired into HonzoBuilder, caller must do it manually
-
-## CLI
-
-- [X] Native converter works but format detection is heuristic and error messages are poor
-- [X] Search command shows chunk IDs but doesn't resolve excerpts (demo does this in JS)
 
 ## WASM / TypeScript
 
@@ -35,7 +29,7 @@
 - [ ] Reading progress / bookmarks have no demo or API
 - [ ] No settings panel (theme, font size, layout mode)
 - [ ] No reading progress persistence (localStorage/IndexedDB)
-- [ ] Images don't work properly in chapter rendering
+- [X] Images don't work properly in chapter rendering
 - [ ] No styling/decoration system for chapters
 - [ ] Links don't work (<https://nisoku.org/Honzo/demo/endnotes.xhtml#note-209>)
 
@@ -52,9 +46,3 @@
 - [ ] Getting-started guide doesn't exist
 - [ ] No auto-build to update WASM and `.hzo` fixtures in Demo
 - [ ] Book Maker (online GUI builder) doesn't exist
-
-## Housekeeping
-
-- [X] `honzo-io/src/extra.rs` should validate against the known-namespace registry
-- [X] HonzoStream should preserve alt_text and font_license_url on TOC entry clones
-- [X] NOTE chunks should be included in chapter iteration or exposed as a separate method

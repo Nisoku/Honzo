@@ -33,9 +33,10 @@ fn resolve_against_base(relative: &str, base_dir: &str) -> String {
     }
 }
 
-fn extract_src_attr(tag: &str) -> Option<String> {
+fn extract_attr(tag: &str, attr: &str) -> Option<String> {
     let lower = tag.to_ascii_lowercase();
-    let patterns = ["src=\"", "src='"];
+    let attr_lower = attr.to_ascii_lowercase();
+    let patterns = [format!("{}=\"", attr_lower), format!("{}='", attr_lower)];
     for pat in &patterns {
         if let Some(start) = lower.find(pat) {
             let value_start = start + pat.len();
@@ -47,7 +48,11 @@ fn extract_src_attr(tag: &str) -> Option<String> {
     None
 }
 
-fn rewrite_html_images(html: &str, chapter_path: &str, img_map: &HashMap<String, u32>) -> String {
+fn normalize_path(p: &str) -> String {
+    p.to_ascii_lowercase()
+}
+
+fn rewrite_html_to_ref(html: &str, chapter_path: &str, img_map: &HashMap<String, u32>) -> String {
     let mut result = String::with_capacity(html.len());
     let mut pos = 0;
     let bytes = html.as_bytes();
@@ -61,21 +66,20 @@ fn rewrite_html_images(html: &str, chapter_path: &str, img_map: &HashMap<String,
                 .unwrap_or(html.len());
             let tag = &html[tag_start..tag_end];
 
-            if let Some(raw_src) = extract_src_attr(tag) {
+            if let Some(raw_src) = extract_attr(tag, "src") {
                 let resolved = resolve_against_base(&raw_src, chapter_path);
-                if let Some(&chunk_id) = img_map.get(&resolved) {
-                    let quoted = format!("src=\"{}\"", raw_src);
-                    let new_attr = format!("src=\"chunk://{}\"", chunk_id);
-                    let quoted2 = format!("src='{}'", raw_src);
-                    let new_attr2 = format!("src='chunk://{}'", chunk_id);
-
-                    let mut rewritten = tag.to_string();
-                    if let Some(idx) = rewritten.find(&quoted) {
-                        rewritten.replace_range(idx..idx + quoted.len(), &new_attr);
-                    } else if let Some(idx) = rewritten.find(&quoted2) {
-                        rewritten.replace_range(idx..idx + quoted2.len(), &new_attr2);
-                    }
-                    result.push_str(&rewritten);
+                if let Some(&chunk_id) = img_map.get(&normalize_path(&resolved)) {
+                    let alt = extract_attr(tag, "alt");
+                    let ref_tag = if let Some(ref alt_text) = alt {
+                        format!(
+                            "<ref type=\"image\" chunk=\"{}\" alt=\"{}\"/>",
+                            chunk_id,
+                            alt_text.replace('"', "&quot;")
+                        )
+                    } else {
+                        format!("<ref type=\"image\" chunk=\"{}\"/>", chunk_id)
+                    };
+                    result.push_str(&ref_tag);
                     pos = tag_end;
                     continue;
                 }
@@ -225,6 +229,8 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         .await;
     }
 
+    let mut img_path_to_chunk: HashMap<String, u32> = HashMap::new();
+
     // Cover image
     if let Some(ref cid) = opf.cover_id {
         if let Some(item) = manifest.iter().find(|m| m.id == *cid) {
@@ -240,6 +246,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                     None,
                     None,
                 );
+                img_path_to_chunk.insert(normalize_path(&path), next_chunk_id);
                 next_chunk_id += 1;
                 if let Ok(covt) = generate_covt(&covr_data) {
                     builder = builder.add_chunk(
@@ -257,8 +264,6 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
             }
         }
     }
-
-    let mut img_path_to_chunk: HashMap<String, u32> = HashMap::new();
 
     for item in &manifest {
         if item.media_type.starts_with("image/")
@@ -295,7 +300,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
 
                 let alt_ref: Option<&str> = alt_text_opt.as_deref().or(Some(&path));
 
-                img_path_to_chunk.insert(path.clone(), next_chunk_id);
+                img_path_to_chunk.insert(normalize_path(&path), next_chunk_id);
                 builder = builder.add_chunk(
                     *b"IMG_",
                     &data,
@@ -383,7 +388,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
 
         let html_text = String::from_utf8_lossy(&html_bytes).to_string();
         let rewritten = if !img_path_to_chunk.is_empty() {
-            rewrite_html_images(&html_text, path, &img_path_to_chunk)
+            rewrite_html_to_ref(&html_text, path, &img_path_to_chunk)
         } else {
             html_text
         };
