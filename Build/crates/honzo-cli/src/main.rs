@@ -458,9 +458,9 @@ fn detect_format(data: &[u8]) -> &'static str {
         "epub"
     } else if data.len() > 4 && &data[..4] == b"%PDF" {
         "pdf"
-    } else if data.len() > 68 && &data[0x3C..0x40] == b"MOBI" {
-        "mobi"
-    } else if data.len() > 4 && &data[..4] == b"BOOK" {
+    } else if (data.len() > 68 && &data[0x3C..0x40] == b"MOBI")
+        || (data.len() > 4 && &data[..4] == b"BOOK")
+    {
         "mobi"
     } else {
         "mobi/azw3"
@@ -557,11 +557,11 @@ fn cmd_convert_batch(pattern: &str, out_dir: &PathBuf) {
                 let mut out_name = input.file_stem().unwrap_or_default().to_os_string();
                 out_name.push(".hzo");
                 let out_path = out_dir.join(out_name);
-                fs::write(&out_path, &hzo).unwrap_or_else(|e| {
-                    eprintln!("Error writing {}: {}", out_path.display(), e);
+                if fs::write(&out_path, &hzo).is_err() {
+                    eprintln!("Error writing {}", out_path.display());
                     errors += 1;
-                    return;
-                });
+                    continue;
+                }
                 println!(
                     "  Converted {} -> {} ({} bytes)",
                     input.display(),
@@ -653,7 +653,7 @@ fn extract_excerpt(text: &str, byte_offset: u32, context: usize) -> String {
         Some((i, _)) => start + i,
         None => start,
     };
-    let end = match text[..end].char_indices().rev().next() {
+    let end = match text[..end].char_indices().next_back() {
         Some((i, _)) => {
             let next_char = text[end..].chars().next();
             i + next_char.map(|c| c.len_utf8()).unwrap_or(0)
