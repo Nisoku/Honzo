@@ -279,12 +279,9 @@ async function loadBook(data) {
   for (const e of tocEntries) {
     if (e.chunk_type === "IMG_" || e.chunk_type === "COVR") {
       const data = reader.get_chunk(e.chunk_id);
-      const ext = (e.alt_text || "").split(".").pop().toLowerCase();
-      const mime =
-        { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", gif: "image/gif", webp: "image/webp", svg: "image/svg+xml" }[ext] ||
-        "image/jpeg";
+      const mime = guessMime(data);
       const blob = new Blob([data], { type: mime });
-      imageBlobs.set(e.chunk_id, { path: e.alt_text || null, blob, url: URL.createObjectURL(blob) });
+      imageBlobs.set(e.chunk_id, { blob, url: URL.createObjectURL(blob) });
     }
   }
 
@@ -324,6 +321,8 @@ async function loadBook(data) {
   bookTitle.set(titleVal || "Untitled");
 }
 
+// TODO: Probably build a viewless renderer so that we don't have to handle the <ref> stuff 
+// TODO: and it's cleaner and safer
 function renderCurrentChapter() {
   if (!chapters.length) return;
   if (!elements.viewer) return;
@@ -391,6 +390,22 @@ function renderCurrentChapter() {
         if (alt) img.alt = alt;
         ref.replaceWith(img);
       }
+    } else if (type === "chapter" && !isNaN(chunkId)) {
+      const chapterIndex = chapters.findIndex((ch) => ch.chunk_id === chunkId);
+      if (chapterIndex !== -1) {
+        const link = document.createElement("a");
+        link.href = "#";
+        link.className = "chapter-ref";
+        const anchor = ref.getAttribute("anchor");
+        link.textContent = anchor
+          ? `Chapter #${chunkId} (${anchor})`
+          : `Chapter #${chunkId}`;
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          goToChapter(chapterIndex);
+        });
+        ref.replaceWith(link);
+      }
     }
   }
 
@@ -450,6 +465,40 @@ function sanitizeHtml(html) {
     "main",
     "aside",
     "ref",
+    // MathML
+    "math",
+    "mi",
+    "mo",
+    "mn",
+    "msup",
+    "msub",
+    "mfrac",
+    "msqrt",
+    "mroot",
+    "mstyle",
+    "mrow",
+    "mspace",
+    "mtext",
+    "munder",
+    "mover",
+    "munderover",
+    "msubsup",
+    "mmultiscripts",
+    "mprescripts",
+    "none",
+    "mtable",
+    "mtr",
+    "mtd",
+    "mphantom",
+    "mfenced",
+    "menclose",
+    "merror",
+    "mpadded",
+    "maction",
+    "mlabeledtr",
+    "maligngroup",
+    "malignmark",
+    "msline",
   ];
   const allowedAttrs = [
     "href",
@@ -466,6 +515,16 @@ function sanitizeHtml(html) {
     "type",
     "chunk",
     "anchor",
+    "xmlns",
+    "display",
+    "alttext",
+    "rowspan",
+    "columnspan",
+    "linethickness",
+    "lspace",
+    "voffset",
+    "scriptlevel",
+    "displaystyle",
   ];
   const doc = new DOMParser().parseFromString(html, "text/html");
   const walk = (node) => {
@@ -558,6 +617,20 @@ function handleKeyEvents(e) {
   if (!hasBookLoaded()) return;
   if (e.key === "ArrowLeft") prevPage();
   if (e.key === "ArrowRight") nextPage();
+}
+
+function guessMime(bytes) {
+  if (bytes.length < 4) return "image/jpeg";
+  const b = (i) => bytes[i];
+  if (b(0) === 0x89 && b(1) === 0x50 && b(2) === 0x4e && b(3) === 0x47) return "image/png";
+  if (b(0) === 0xff && b(1) === 0xd8) return "image/jpeg";
+  if (b(0) === 0x47 && b(1) === 0x49 && b(2) === 0x46) return "image/gif";
+  if (b(0) === 0x52 && b(1) === 0x49 && b(2) === 0x46 && b(3) === 0x46) return "image/webp";
+  if (b(0) === 0x3c) {
+    const head = new TextDecoder().decode(bytes.slice(0, 512));
+    if (head.includes("<svg")) return "image/svg+xml";
+  }
+  return "image/jpeg";
 }
 
 export function toggleToc() {
