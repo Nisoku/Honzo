@@ -45,6 +45,13 @@ enum Commands {
     },
     /// Convert epub/mobi/pdf to .hzo
     Convert { input: PathBuf, out: PathBuf },
+    /// Batch-convert all matching files to .hzo
+    ConvertBatch {
+        /// Glob pattern for input files (e.g. "*.epub" or "books/**/*.epub")
+        pattern: String,
+        /// Output directory
+        out_dir: PathBuf,
+    },
     /// Parse and validate .hzo file
     Validate { file: PathBuf },
     /// Query SIDX search index
@@ -446,24 +453,30 @@ fn cmd_build(spec: &PathBuf, out: &PathBuf) {
     println!("Built {} ({} bytes)", out.display(), hzo.len());
 }
 
-fn cmd_convert(input: &PathBuf, out: &PathBuf) {
-    let data = read_file(input);
-
-    let detected = if data.len() > 4 && &data[..4] == b"PK\x03\x04" {
+fn detect_format(data: &[u8]) -> &'static str {
+    if data.len() > 4 && &data[..4] == b"PK\x03\x04" {
         "epub"
     } else if data.len() > 4 && &data[..4] == b"%PDF" {
         "pdf"
+    } else if data.len() > 68 && &data[0x3C..0x40] == b"MOBI" {
+        "mobi"
+    } else if data.len() > 4 && &data[..4] == b"BOOK" {
+        "mobi"
     } else {
         "mobi/azw3"
-    };
+    }
+}
+
+fn cmd_convert(input: &PathBuf, out: &PathBuf) {
+    let data = read_file(input);
+
+    let detected = detect_format(&data);
     eprintln!("Detected format: {}", detected);
 
-    let result = if detected == "epub" {
-        honzo_convert::from_epub(&data)
-    } else if detected == "pdf" {
-        honzo_convert::from_pdf(&data)
-    } else {
-        honzo_convert::from_mobi(&data)
+    let result = match detected {
+        "epub" => honzo_convert::from_epub(&data),
+        "pdf" => honzo_convert::from_pdf(&data),
+        _ => honzo_convert::from_mobi(&data),
     };
 
     match result {
@@ -480,9 +493,101 @@ fn cmd_convert(input: &PathBuf, out: &PathBuf) {
             );
         }
         Err(e) => {
-            eprintln!("Conversion failed: {:?}", e);
+            eprintln!("Conversion failed (detected format: {}): {:?}", detected, e);
             std::process::exit(1);
         }
+    }
+}
+
+fn cmd_convert_batch(pattern: &str, out_dir: &PathBuf) {
+    let mut count = 0u32;
+    let mut errors = 0u32;
+
+    fs::create_dir_all(out_dir).unwrap_or_else(|e| {
+        eprintln!(
+            "Error creating output directory {}: {}",
+            out_dir.display(),
+            e
+        );
+        std::process::exit(1);
+    });
+
+    for entry in glob::glob(pattern).unwrap_or_else(|e| {
+        eprintln!("Error parsing pattern '{}': {}", pattern, e);
+        std::process::exit(1);
+    }) {
+        let input = match entry {
+            Ok(path) => path,
+            Err(e) => {
+                eprintln!("Error accessing path: {}", e);
+                errors += 1;
+                continue;
+            }
+        };
+
+        if !input.is_file() {
+            continue;
+        }
+
+        let data = match fs::read(&input) {
+            Ok(d) => d,
+            Err(e) => {
+                eprintln!("Error reading {}: {}", input.display(), e);
+                errors += 1;
+                continue;
+            }
+        };
+
+        let detected = detect_format(&data);
+        eprintln!(
+            "[{}] Detected: {} ({} bytes)",
+            input.display(),
+            detected,
+            data.len()
+        );
+
+        let result = match detected {
+            "epub" => honzo_convert::from_epub(&data),
+            "pdf" => honzo_convert::from_pdf(&data),
+            _ => honzo_convert::from_mobi(&data),
+        };
+
+        match result {
+            Ok(hzo) => {
+                let mut out_name = input.file_stem().unwrap_or_default().to_os_string();
+                out_name.push(".hzo");
+                let out_path = out_dir.join(out_name);
+                fs::write(&out_path, &hzo).unwrap_or_else(|e| {
+                    eprintln!("Error writing {}: {}", out_path.display(), e);
+                    errors += 1;
+                    return;
+                });
+                println!(
+                    "  Converted {} -> {} ({} bytes)",
+                    input.display(),
+                    out_path.display(),
+                    hzo.len()
+                );
+                count += 1;
+            }
+            Err(e) => {
+                eprintln!(
+                    "  Conversion failed (detected format: {}): {:?}",
+                    detected, e
+                );
+                errors += 1;
+            }
+        }
+    }
+
+    if errors > 0 {
+        eprintln!(
+            "Batch convert finished: {} converted, {} errors",
+            count, errors
+        );
+        std::process::exit(1);
+    } else {
+        println!("Batch convert finished: {} converted", count);
     }
 }
 
@@ -533,6 +638,52 @@ fn cmd_validate(file: &PathBuf) {
     } else {
         println!("{}: VALID ({} chunks)", file.display(), count);
     }
+}
+
+fn extract_excerpt(text: &str, byte_offset: u32, context: usize) -> String {
+    let offset = byte_offset as usize;
+    if offset > text.len() {
+        return String::new();
+    }
+
+    let start = offset.saturating_sub(context);
+    let end = (offset + context).min(text.len());
+
+    let start = match text[start..].char_indices().next() {
+        Some((i, _)) => start + i,
+        None => start,
+    };
+    let end = match text[..end].char_indices().rev().next() {
+        Some((i, _)) => {
+            let next_char = text[end..].chars().next();
+            i + next_char.map(|c| c.len_utf8()).unwrap_or(0)
+        }
+        None => end,
+    };
+
+    let before = &text[start..offset];
+    let match_word = &text[offset..std::cmp::min(offset + 40, text.len())];
+    let match_end = match_word
+        .find(|c: char| c.is_ascii_punctuation() || c.is_whitespace())
+        .map(|i| offset + i)
+        .unwrap_or(std::cmp::min(offset + 40, text.len()));
+
+    let after_start = std::cmp::min(offset + 40, text.len());
+    let after = &text[offset..after_start];
+    let remaining = &text[after_start..end];
+
+    let prefix = if start > 0 { "…" } else { "" };
+    let suffix_ellipsis = if end < text.len() { "…" } else { "" };
+
+    format!(
+        "{}{}{}[MATCH]{}[\\MATCH]{}{}",
+        prefix,
+        before,
+        &text[offset..match_end],
+        after,
+        remaining,
+        suffix_ellipsis
+    )
 }
 
 fn cmd_search(file: &PathBuf, query: &str) {
@@ -600,7 +751,7 @@ fn cmd_search(file: &PathBuf, query: &str) {
                 if !seen_chunks.contains(chunk_id) {
                     seen_chunks.insert(*chunk_id);
                     let entry = hits_by_chunk.entry(*chunk_id).or_insert((0u32, Vec::new()));
-                    entry.0 += 1; // count this term once for the chunk
+                    entry.0 += 1;
                 }
             }
         } else {
@@ -610,7 +761,6 @@ fn cmd_search(file: &PathBuf, query: &str) {
         }
     }
 
-    // Only keep chunks that matched all terms
     let mut matches: Vec<(u32, u32, Vec<u32>)> = hits_by_chunk
         .into_iter()
         .filter(|(_, (score, _))| *score == terms.len() as u32)
@@ -622,16 +772,55 @@ fn cmd_search(file: &PathBuf, query: &str) {
         return;
     }
 
-    // Sort by score desc then chunk id asc
     matches.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
 
+    // Build chunk id -> tag lookup
+    let mut chunk_tags: HashMap<u32, String> = HashMap::new();
+    for (chunk_id, _, _) in &matches {
+        if !chunk_tags.contains_key(chunk_id) {
+            if let Some(entry) = p.find_chunk_by_id(*chunk_id) {
+                chunk_tags.insert(*chunk_id, entry.chunk_type_str().to_string());
+            }
+        }
+    }
+
+    // Pre-decompress all CHAP/NOTE chunks for excerpt extraction
+    let mut chunk_texts: HashMap<u32, String> = HashMap::new();
+    for (chunk_id, _, _) in &matches {
+        if !chunk_texts.contains_key(chunk_id) {
+            if let Some(entry) = p.find_chunk_by_id(*chunk_id) {
+                if !entry.is_encrypted() {
+                    if let Ok(raw) = p.chunk_bytes(&entry) {
+                        if let Ok(decompressed) = decompress(raw, entry.compression, entry.size_raw)
+                        {
+                            if let Ok(text) = String::from_utf8(decompressed) {
+                                chunk_texts.insert(*chunk_id, text);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     println!("Found '{}' in {} chunk(s):", query, matches.len());
-    for (chunk_id, score, offsets) in matches {
+    for (chunk_id, score, offsets) in &matches {
+        let tag = chunk_tags
+            .get(chunk_id)
+            .map(|s| s.as_str())
+            .unwrap_or("????");
         for offset in offsets {
+            let excerpt = chunk_texts
+                .get(chunk_id)
+                .map(|text| extract_excerpt(text, *offset, 50))
+                .unwrap_or_default();
             println!(
-                "  chunk {} at byte offset {} (score={})",
-                chunk_id, offset, score
+                "  [{}] chunk {} at byte {} (score={})",
+                tag, chunk_id, offset, score
             );
+            if !excerpt.is_empty() {
+                println!("    {}", excerpt);
+            }
         }
     }
 }
@@ -870,6 +1059,7 @@ fn main() {
         Commands::ExtractAll { file, out_dir } => cmd_extract_all(&file, &out_dir),
         Commands::Build { spec, out } => cmd_build(&spec, &out),
         Commands::Convert { input, out } => cmd_convert(&input, &out),
+        Commands::ConvertBatch { pattern, out_dir } => cmd_convert_batch(&pattern, &out_dir),
         Commands::Validate { file } => cmd_validate(&file),
         Commands::Search { file, query } => cmd_search(&file, &query),
         Commands::Tree { file } => cmd_tree(&file),

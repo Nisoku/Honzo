@@ -8,7 +8,6 @@
 
 - [ ] `honzo-chunks/src/data/css.rs`
 - [ ] `honzo-chunks/src/data/font.rs`
-- [ ] `honzo-chunks/src/data/img.rs`
 
 ## EXTRA Namespaces
 
@@ -16,17 +15,17 @@
 - [ ] No actual AES-256-CBC encrypt/decrypt anywhere
 - [ ] `org.nisoku.anno` struct is defined but no programmatic API to build/query annotations
 - [ ] `org.nisoku.sync` struct is defined with an explicit `// TODO: Finalize the schema and implement`
-- [ ] COVT auto-generation not wired into HonzoBuilder, caller must do it manually
+- [X] COVT auto-generation not wired into HonzoBuilder, caller must do it manually
 
 ## CLI
 
-- [ ] Native converter works but format detection is heuristic and error messages are poor
-- [ ] Search command shows chunk IDs but doesn't resolve excerpts (demo does this in JS)
+- [X] Native converter works but format detection is heuristic and error messages are poor
+- [X] Search command shows chunk IDs but doesn't resolve excerpts (demo does this in JS)
 
 ## WASM / TypeScript
 
 - [ ] WASM `HonzoWasm` constructor eagerly reads *all* chunks into memory (no streaming)
-- [ ] WASM API can't pass `alt_text` or `font_embedding` through `honzo_build`
+- [X] WASM API can't pass `alt_text` or `font_embedding` through `honzo_build`
 - [ ] C FFI via Diplomat is similarly limited (no alt_text, font_embedding, or extra support on builder)
 
 ## Demo
@@ -56,6 +55,6 @@
 
 ## Housekeeping
 
-- [ ] `honzo-io/src/extra.rs` should validate against the known-namespace registry
-- [ ] HonzoStream should preserve alt_text and font_license_url on TOC entry clones
-- [ ] NOTE chunks should be included in chapter iteration or exposed as a separate method
+- [X] `honzo-io/src/extra.rs` should validate against the known-namespace registry
+- [X] HonzoStream should preserve alt_text and font_license_url on TOC entry clones
+- [X] NOTE chunks should be included in chapter iteration or exposed as a separate method

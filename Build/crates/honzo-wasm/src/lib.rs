@@ -298,6 +298,10 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
         content_type_value: u8,
         #[serde(default)]
         alt_text: Option<String>,
+        #[serde(default)]
+        font_embedding: Option<u8>,
+        #[serde(default)]
+        font_license_url: Option<String>,
     }
 
     #[derive(Deserialize)]
@@ -362,6 +366,13 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
                 1 => MarkupType::Html,
                 _ => return Err(JsValue::from_str("invalid content_type_value")),
             };
+            let font_embedding = chunk.font_embedding.map(|v| match v {
+                0 => honzo_core::FontEmbedding::Allowed,
+                1 => honzo_core::FontEmbedding::PrintOnly,
+                2 => honzo_core::FontEmbedding::NoModify,
+                3 => honzo_core::FontEmbedding::NoEmbed,
+                _ => honzo_core::FontEmbedding::Allowed,
+            });
             builder = builder.add_chunk(
                 tag_arr,
                 &chunk.data,
@@ -369,8 +380,8 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
                 markup,
                 CoverType::Front,
                 chunk.alt_text.as_deref(),
-                None,
-                None,
+                font_embedding,
+                chunk.font_license_url.as_deref(),
             );
         }
     }

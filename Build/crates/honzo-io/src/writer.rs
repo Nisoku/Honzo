@@ -1,3 +1,4 @@
+use honzo_chunks::data::covr::generate_covt;
 use honzo_chunks::data::sidx::build_sidx;
 use honzo_core::{
     Compression, CoverType, FontEmbedding, HonzoError, LayoutMode, MarkupType, MathType, PmapEntry,
@@ -97,6 +98,7 @@ pub struct HonzoBuilder {
     meta: Vec<u8>,
     extra: Vec<u8>,
     auto_sidx: bool,
+    auto_covt: bool,
     language: String,
 }
 
@@ -110,8 +112,14 @@ impl HonzoBuilder {
             meta: Vec::new(),
             extra: Vec::new(),
             auto_sidx: true,
+            auto_covt: true,
             language: "en".to_string(),
         }
+    }
+
+    pub fn set_auto_covt(mut self, enable: bool) -> Self {
+        self.auto_covt = enable;
+        self
     }
 
     pub fn set_auto_sidx(mut self, enable: bool) -> Self {
@@ -227,6 +235,32 @@ impl HonzoBuilder {
                     None,
                     None,
                 );
+            }
+        }
+
+        if !final_builder.extra.is_empty() {
+            let _ = crate::validate_extra(&final_builder.extra)
+                .map_err(|e| eprintln!("Warning: extra data has unrecognised namespace: {:?}", e));
+        }
+
+        if final_builder.auto_covt {
+            let has_covr = final_builder.chunks.iter().any(|c| c.tag == *b"COVR");
+            let has_covt = final_builder.chunks.iter().any(|c| c.tag == *b"COVT");
+            if has_covr && !has_covt {
+                if let Some(covr) = final_builder.chunks.iter().find(|c| c.tag == *b"COVR") {
+                    if let Ok(covt_data) = generate_covt(&covr.raw_data) {
+                        final_builder = final_builder.add_chunk(
+                            *b"COVT",
+                            &covt_data,
+                            Compression::Lz4,
+                            MarkupType::Markdown,
+                            CoverType::Front,
+                            None,
+                            None,
+                            None,
+                        );
+                    }
+                }
             }
         }
 

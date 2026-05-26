@@ -10,6 +10,89 @@ use honzo_io::{
 mod mobi;
 mod pdf;
 
+fn resolve_against_base(relative: &str, base_dir: &str) -> String {
+    if let Some(stripped) = relative.strip_prefix('/') {
+        stripped.to_string()
+    } else {
+        let base = std::path::Path::new(base_dir);
+        let parent = base.parent().unwrap_or_else(|| std::path::Path::new(""));
+        let joined = parent.join(relative);
+        let mut components: Vec<&str> = Vec::new();
+        for c in joined.components() {
+            match c {
+                std::path::Component::Normal(p) => {
+                    components.push(p.to_str().unwrap_or_default());
+                }
+                std::path::Component::ParentDir => {
+                    components.pop();
+                }
+                _ => {}
+            }
+        }
+        components.join("/")
+    }
+}
+
+fn extract_src_attr(tag: &str) -> Option<String> {
+    let lower = tag.to_ascii_lowercase();
+    let patterns = ["src=\"", "src='"];
+    for pat in &patterns {
+        if let Some(start) = lower.find(pat) {
+            let value_start = start + pat.len();
+            let quote_char = if pat.ends_with('"') { '"' } else { '\'' };
+            let end = tag[value_start..].find(quote_char)?;
+            return Some(tag[value_start..value_start + end].to_string());
+        }
+    }
+    None
+}
+
+fn rewrite_html_images(html: &str, chapter_path: &str, img_map: &HashMap<String, u32>) -> String {
+    let mut result = String::with_capacity(html.len());
+    let mut pos = 0;
+    let bytes = html.as_bytes();
+
+    while pos < html.len() {
+        if pos + 4 <= html.len() && bytes[pos..pos + 4].eq_ignore_ascii_case(b"<img") {
+            let tag_start = pos;
+            let tag_end = html[pos..]
+                .find('>')
+                .map(|p| pos + p + 1)
+                .unwrap_or(html.len());
+            let tag = &html[tag_start..tag_end];
+
+            if let Some(raw_src) = extract_src_attr(tag) {
+                let resolved = resolve_against_base(&raw_src, chapter_path);
+                if let Some(&chunk_id) = img_map.get(&resolved) {
+                    let quoted = format!("src=\"{}\"", raw_src);
+                    let new_attr = format!("src=\"chunk://{}\"", chunk_id);
+                    let quoted2 = format!("src='{}'", raw_src);
+                    let new_attr2 = format!("src='chunk://{}'", chunk_id);
+
+                    let mut rewritten = tag.to_string();
+                    if let Some(idx) = rewritten.find(&quoted) {
+                        rewritten.replace_range(idx..idx + quoted.len(), &new_attr);
+                    } else if let Some(idx) = rewritten.find(&quoted2) {
+                        rewritten.replace_range(idx..idx + quoted2.len(), &new_attr2);
+                    }
+                    result.push_str(&rewritten);
+                    pos = tag_end;
+                    continue;
+                }
+            }
+            result.push_str(tag);
+            pos = tag_end;
+            continue;
+        }
+
+        let c = html[pos..].chars().next().unwrap_or('\0');
+        result.push(c);
+        pos += c.len_utf8();
+    }
+
+    result
+}
+
 #[derive(Debug)]
 pub enum ConvertError {
     UnsupportedFormat,
@@ -175,15 +258,15 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         }
     }
 
+    let mut img_path_to_chunk: HashMap<String, u32> = HashMap::new();
+
     for item in &manifest {
         if item.media_type.starts_with("image/")
             && Some(item.id.as_str()) != opf.cover_id.as_deref()
         {
             let path = resolve(&item.href);
             if let Ok(data) = epub.read_resource(&path).await {
-                // Determine alt text: prefer exact manifest href -> alt, then basename match, else fall back to resource path
                 let mut alt_text_opt: Option<String> = None;
-                // Prefer lookup by resolved resource path
                 if let Some(a) = img_alt_map
                     .get(&path)
                     .or_else(|| img_alt_map.get(&item.href))
@@ -193,7 +276,6 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                     }
                 }
                 if alt_text_opt.is_none() {
-                    // Try basename fallback: match filename portion of any collected keys
                     if let Some(fname) = std::path::Path::new(&path)
                         .file_name()
                         .and_then(|s| s.to_str())
@@ -213,6 +295,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
 
                 let alt_ref: Option<&str> = alt_text_opt.as_deref().or(Some(&path));
 
+                img_path_to_chunk.insert(path.clone(), next_chunk_id);
                 builder = builder.add_chunk(
                     *b"IMG_",
                     &data,
@@ -298,12 +381,19 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
             continue;
         };
 
+        let html_text = String::from_utf8_lossy(&html_bytes).to_string();
+        let rewritten = if !img_path_to_chunk.is_empty() {
+            rewrite_html_images(&html_text, path, &img_path_to_chunk)
+        } else {
+            html_text
+        };
+
         let chap_title = chap_titles.get(path).map(|s| s.as_str());
         chapter_chunk_ids.push(next_chunk_id);
 
         builder = builder.add_chunk(
             *b"CHAP",
-            &html_bytes,
+            rewritten.as_bytes(),
             Compression::None,
             MarkupType::Html,
             CoverType::Front,

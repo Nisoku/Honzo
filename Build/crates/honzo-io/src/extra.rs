@@ -58,3 +58,15 @@ pub fn parse_extra(bytes: &[u8]) -> Result<Vec<ExtraEntry>, HonzoError> {
 pub fn find_extra<'a>(entries: &'a [ExtraEntry], namespace: &str) -> Option<&'a ExtraEntry> {
     entries.iter().find(|entry| entry.namespace == namespace)
 }
+
+pub fn validate_extra(bytes: &[u8]) -> Result<(), HonzoError> {
+    let entries = parse_extra(bytes)?;
+    for entry in &entries {
+        if !entry.known {
+            return Err(HonzoError::UnknownExtraNamespace(
+                "extra namespace not in known registry",
+            ));
+        }
+    }
+    Ok(())
+}

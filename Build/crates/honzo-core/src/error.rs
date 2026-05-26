@@ -22,5 +22,6 @@ pub enum HonzoError {
     UnknownMathType(u8),
     InvalidMathML,
     UnknownFontEmbedding(u8),
+    UnknownExtraNamespace(&'static str),
     Truncated,
 }

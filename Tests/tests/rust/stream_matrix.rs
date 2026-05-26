@@ -84,5 +84,5 @@ fn generates_cover_thumbnail_and_reads_via_reader() {
 
     assert!(!covt.is_empty());
     let reader = HonzoReader::new(&data, 1).unwrap();
-    assert_eq!(reader.head().chunk_count, 6);
+    assert_eq!(reader.head().chunk_count, 7);
 }

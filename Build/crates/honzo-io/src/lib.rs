@@ -7,7 +7,7 @@ mod utils;
 mod writer;
 
 pub use compression::{decompress, verify_crc32, verify_entry_crc32};
-pub use extra::{find_extra, parse_extra, ExtraEntry};
+pub use extra::{find_extra, parse_extra, validate_extra, ExtraEntry};
 pub use meta::{
     Accessibility, Contributor, HonzoMeta, Identifier, RenderHints, Revision, SeriesMeta,
 };

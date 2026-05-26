@@ -10,7 +10,7 @@ fn ffi_parse_minimal() {
 #[test]
 fn ffi_parse_novel() {
     let handle = honzo_c::ffi::HonzoHandle::parse(&fixture("novel.hzo"), 1).unwrap();
-    assert_eq!(handle.chunk_count(), 6);
+    assert_eq!(handle.chunk_count(), 7);
     assert_eq!(handle.layout_mode(), 0);
     assert!(!handle.has_drm());
     assert!(handle.has_sidx());
@@ -19,7 +19,7 @@ fn ffi_parse_novel() {
 #[test]
 fn ffi_parse_manga() {
     let handle = honzo_c::ffi::HonzoHandle::parse(&fixture("manga.hzo"), 1).unwrap();
-    assert_eq!(handle.chunk_count(), 6);
+    assert_eq!(handle.chunk_count(), 7);
     assert_eq!(handle.layout_mode(), 2);
 }
 
