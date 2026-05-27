@@ -1,5 +1,9 @@
 # TODO
 
+## AAAAA
+
+- [ ] PAGINATION, DUH
+
 ## Format / Spec
 
 - [ ] `min_reader_version` is hardcoded to 1 everywhere, never validated meaningfully

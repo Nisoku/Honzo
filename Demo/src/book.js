@@ -285,6 +285,17 @@ async function loadBook(data) {
     }
   }
 
+  // Inject CSS_ stylesheets into the document
+  for (const e of tocEntries) {
+    if (e.chunk_type === "CSS_") {
+      const data = reader.get_chunk(e.chunk_id);
+      const css = new TextDecoder().decode(data);
+      const style = document.createElement("style");
+      style.textContent = css;
+      document.head.appendChild(style);
+    }
+  }
+
   chapters = tocEntries
     .filter(
       (e) =>
@@ -323,7 +334,7 @@ async function loadBook(data) {
 
 // TODO: Probably build a viewless renderer so that we don't have to handle the <ref> stuff 
 // TODO: and it's cleaner and safer
-function renderCurrentChapter() {
+function renderCurrentChapter(scrollToAnchor) {
   if (!chapters.length) return;
   if (!elements.viewer) return;
   const chapter = chapters[currentChapterIndex];
@@ -358,14 +369,7 @@ function renderCurrentChapter() {
     chapter.chunk_type === "CSS_" ||
     chapter.chunk_type === "FONT"
   ) {
-    container.innerHTML =
-      '<p class="meta">[' +
-      chapter.chunk_type +
-      " chunk " +
-      chapter.chunk_id +
-      " - " +
-      data.length +
-      " bytes]</p>";
+    container.innerHTML = '<p class="meta">No preview available</p>';
   } else {
     const raw = new TextDecoder().decode(data);
     const isHtml =
@@ -402,7 +406,7 @@ function renderCurrentChapter() {
           : `Chapter #${chunkId}`;
         link.addEventListener("click", (e) => {
           e.preventDefault();
-          goToChapter(chapterIndex);
+          goToChapter(chapterIndex, anchor || undefined);
         });
         ref.replaceWith(link);
       }
@@ -410,13 +414,21 @@ function renderCurrentChapter() {
   }
 
   elements.viewer.appendChild(container);
+
+  if (scrollToAnchor) {
+    const target = container.querySelector(`#${CSS.escape(scrollToAnchor)}`);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+
   currentPage.set(currentChapterIndex + 1);
 }
 
-function goToChapter(index) {
+function goToChapter(index, anchor) {
   if (!chapters.length) return;
   currentChapterIndex = clampChapterIndex(index);
-  renderCurrentChapter();
+  renderCurrentChapter(anchor);
 }
 
 function sanitizeHtml(html) {

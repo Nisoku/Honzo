@@ -1,3 +1,7 @@
+use honzo_chunks::data::css::validate_css as validate_css_impl;
+use honzo_chunks::data::font::{
+    guess_font_format as guess_font_format_impl, validate_font as validate_font_impl,
+};
 use honzo_chunks::data::math::{
     latex_to_mathml as latex_to_mathml_impl, render_math as render_math_impl,
     validate_mathml as validate_mathml_impl,
@@ -428,4 +432,19 @@ pub fn render_math(bytes: &[u8], math_type: u8) -> Result<String, JsValue> {
     let math_type =
         MathType::from_u8(math_type).map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
     render_math_impl(bytes, math_type).map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+}
+
+#[wasm_bindgen]
+pub fn validate_css(bytes: &[u8]) -> bool {
+    validate_css_impl(bytes).is_ok()
+}
+
+#[wasm_bindgen]
+pub fn validate_font(bytes: &[u8]) -> bool {
+    validate_font_impl(bytes).is_ok()
+}
+
+#[wasm_bindgen]
+pub fn guess_font_format(bytes: &[u8]) -> Option<String> {
+    guess_font_format_impl(bytes).map(|s| s.to_string())
 }

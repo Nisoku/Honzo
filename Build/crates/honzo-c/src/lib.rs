@@ -2,6 +2,8 @@ extern crate honzo_chunks;
 extern crate honzo_core;
 extern crate honzo_io;
 
+pub use honzo_chunks::data::css::validate_css_bytes;
+pub use honzo_chunks::data::font::guess_font_format;
 pub use honzo_chunks::data::math::{
     latex_to_mathml_bytes, render_math_bytes, validate_mathml_bytes,
 };
@@ -13,9 +15,10 @@ pub use honzo_io::{decompress, Compression, CoverType, HonzoBuilder, HonzoMeta, 
 #[diplomat::bridge]
 pub mod ffi {
     use crate::{
-        decompress, latex_to_mathml_bytes, normalize_search_term as normalize_search_term_impl,
-        render_math_bytes, validate_mathml_bytes, Compression, CoverType, HonzoBuilder, HonzoMeta,
-        HonzoParser, MarkupType, MathType,
+        decompress, guess_font_format as guess_font_format_impl, latex_to_mathml_bytes,
+        normalize_search_term as normalize_search_term_impl, render_math_bytes, validate_css_bytes,
+        validate_mathml_bytes, Compression, CoverType, HonzoBuilder, HonzoMeta, HonzoParser,
+        MarkupType, MathType,
     };
     use core::fmt::Write as _;
 
@@ -29,6 +32,7 @@ pub mod ffi {
         EncryptedChunk = 5,
         InvalidMathML = 6,
         Truncated = 7,
+        InvalidCss = 8,
         Unknown = 255,
     }
 
@@ -340,5 +344,22 @@ pub mod ffi {
             .write_str(&normalized)
             .map_err(|_| HonzoErrorCode::Unknown)?;
         Ok(())
+    }
+
+    pub fn validate_css(bytes: &[u8]) -> bool {
+        validate_css_bytes(bytes).is_ok()
+    }
+
+    pub fn guess_font_format(
+        bytes: &[u8],
+        write: &mut diplomat_runtime::DiplomatWrite,
+    ) -> Result<(), HonzoErrorCode> {
+        match guess_font_format_impl(bytes) {
+            Some(fmt) => {
+                write.write_str(fmt).map_err(|_| HonzoErrorCode::Unknown)?;
+                Ok(())
+            }
+            None => Err(HonzoErrorCode::Truncated),
+        }
     }
 }

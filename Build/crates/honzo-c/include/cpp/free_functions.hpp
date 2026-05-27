@@ -17,6 +17,9 @@ namespace diplomat {
 namespace capi {
     extern "C" {
 
+    typedef struct diplomat_external_guess_font_format_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} diplomat_external_guess_font_format_result;
+    diplomat_external_guess_font_format_result diplomat_external_guess_font_format(diplomat::capi::DiplomatU8View bytes, diplomat::capi::DiplomatWrite* write);
+
     typedef struct diplomat_external_latex_to_mathml_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} diplomat_external_latex_to_mathml_result;
     diplomat_external_latex_to_mathml_result diplomat_external_latex_to_mathml(diplomat::capi::DiplomatU8View bytes, diplomat::capi::DiplomatWrite* write);
 
@@ -26,6 +29,8 @@ namespace capi {
     typedef struct diplomat_external_render_math_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} diplomat_external_render_math_result;
     diplomat_external_render_math_result diplomat_external_render_math(diplomat::capi::DiplomatU8View bytes, uint8_t math_type, diplomat::capi::DiplomatWrite* write);
 
+    bool diplomat_external_validate_css(diplomat::capi::DiplomatU8View bytes);
+
     bool diplomat_external_validate_mathml(diplomat::capi::DiplomatU8View bytes);
 
     } // extern "C"
@@ -33,6 +38,20 @@ namespace capi {
 } // namespace
 
 
+inline diplomat::result<std::string, HonzoErrorCode> guess_font_format(diplomat::span<const uint8_t> bytes) {
+    std::string output;
+    diplomat::capi::DiplomatWrite write = diplomat::WriteFromString(output);
+    auto result = diplomat::capi::diplomat_external_guess_font_format({bytes.data(), bytes.size()},
+        &write);
+    return result.is_ok ? diplomat::result<std::string, HonzoErrorCode>(diplomat::Ok<std::string>(std::move(output))) : diplomat::result<std::string, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+template<typename W>
+inline diplomat::result<std::monostate, HonzoErrorCode> guess_font_format_write(diplomat::span<const uint8_t> bytes, W& writeable) {
+    diplomat::capi::DiplomatWrite write = diplomat::WriteTrait<W>::Construct(writeable);
+    auto result = diplomat::capi::diplomat_external_guess_font_format({bytes.data(), bytes.size()},
+        &write);
+    return result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
 inline diplomat::result<std::string, HonzoErrorCode> latex_to_mathml(diplomat::span<const uint8_t> bytes) {
     std::string output;
     diplomat::capi::DiplomatWrite write = diplomat::WriteFromString(output);
@@ -90,6 +109,10 @@ inline diplomat::result<std::monostate, HonzoErrorCode> render_math_write(diplom
         math_type,
         &write);
     return result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+inline bool validate_css(diplomat::span<const uint8_t> bytes) {
+    auto result = diplomat::capi::diplomat_external_validate_css({bytes.data(), bytes.size()});
+    return result;
 }
 inline bool validate_mathml(diplomat::span<const uint8_t> bytes) {
     auto result = diplomat::capi::diplomat_external_validate_mathml({bytes.data(), bytes.size()});

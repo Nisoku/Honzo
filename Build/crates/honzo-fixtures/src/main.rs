@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
+use honzo_chunks::data::css::CSS_TAG;
+use honzo_chunks::data::font::FONT_TAG;
 use honzo_chunks::data::img as img_utils;
 use honzo_chunks::extra::anno::{self, Annotation};
 use honzo_io::{
@@ -113,7 +115,7 @@ fn gen_novel() {
             None,
         )
         .add_chunk(
-            *b"CSS_",
+            CSS_TAG,
             b"body { color: black; }",
             Compression::None,
             MarkupType::Markdown,
@@ -688,7 +690,7 @@ fn gen_with_fonts() {
 
     let hzo = HonzoBuilder::new()
         .add_chunk(
-            *b"FONT",
+            FONT_TAG,
             &font_data,
             Compression::None,
             MarkupType::Markdown,

@@ -1,4 +1,6 @@
 use crate::compression::{decompress, verify_entry_crc32};
+use honzo_chunks::data::font;
+use honzo_chunks::data::is_known_chunk;
 use honzo_core::{HonzoError, HonzoHead, PmapEntry, TocEntry};
 use honzo_core::{MarkupType, MathType};
 use std::io::{Read, Seek, SeekFrom};
@@ -292,20 +294,9 @@ fn parse_toc<'a>(
         let mut font_embedding = None;
         let mut font_license_url = None;
         if &chunk_type == b"FONT" {
-            let embed = read_u8_bytes(buf, &mut cursor)?;
-            font_embedding = Some(match embed {
-                0 => honzo_core::FontEmbedding::Allowed,
-                1 => honzo_core::FontEmbedding::PrintOnly,
-                2 => honzo_core::FontEmbedding::NoModify,
-                3 => honzo_core::FontEmbedding::NoEmbed,
-                other => return Err(HonzoError::UnknownFontEmbedding(other)),
-            });
-            let url_len = read_u16_bytes(buf, &mut cursor)? as usize;
-            if url_len > 0 {
-                let slice = read_bytes(buf, &mut cursor, url_len)?;
-                font_license_url =
-                    Some(core::str::from_utf8(slice).map_err(|_| HonzoError::Truncated)?);
-            }
+            let (embed, url) = font::read_font_toc_fields(buf, &mut cursor)?;
+            font_embedding = Some(embed);
+            font_license_url = url;
         }
 
         // validate content_type depending on chunk
@@ -358,13 +349,6 @@ fn parse_toc<'a>(
     }
 
     Ok((toc, pmap))
-}
-
-fn is_known_chunk(tag: &[u8; 4]) -> bool {
-    matches!(
-        tag,
-        b"CHAP" | b"IMG_" | b"CSS_" | b"FONT" | b"COVR" | b"COVT" | b"NOTE" | b"SIDX" | b"MATH"
-    )
 }
 
 fn read_u8(reader: &mut impl Read) -> Result<u8, HonzoError> {

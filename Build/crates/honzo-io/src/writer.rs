@@ -1,4 +1,5 @@
 use honzo_chunks::data::covr::generate_covt;
+use honzo_chunks::data::font;
 use honzo_chunks::data::sidx::build_sidx;
 use honzo_core::{
     Compression, CoverType, FontEmbedding, HonzoError, LayoutMode, MarkupType, MathType, PmapEntry,
@@ -294,14 +295,11 @@ impl HonzoBuilder {
             }
 
             if chunk.tag == *b"FONT" {
-                let embedding = chunk.font_embedding.unwrap_or(FontEmbedding::Allowed) as u8;
-                toc_bytes.push(embedding);
-                if let Some(url) = &chunk.font_license_url {
-                    toc_bytes.extend_from_slice(&(url.len() as u16).to_le_bytes());
-                    toc_bytes.extend_from_slice(url.as_bytes());
-                } else {
-                    toc_bytes.extend_from_slice(&0u16.to_le_bytes());
-                }
+                font::write_font_toc_fields(
+                    &mut toc_bytes,
+                    chunk.font_embedding.unwrap_or(FontEmbedding::Allowed),
+                    chunk.font_license_url.as_deref(),
+                );
             }
 
             data_bytes.extend_from_slice(&compressed);

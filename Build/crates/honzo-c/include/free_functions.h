@@ -14,6 +14,9 @@
 
 
 
+typedef struct diplomat_external_guess_font_format_result {union { HonzoErrorCode err;}; bool is_ok;} diplomat_external_guess_font_format_result;
+diplomat_external_guess_font_format_result diplomat_external_guess_font_format(DiplomatU8View bytes, DiplomatWrite* write);
+
 typedef struct diplomat_external_latex_to_mathml_result {union { HonzoErrorCode err;}; bool is_ok;} diplomat_external_latex_to_mathml_result;
 diplomat_external_latex_to_mathml_result diplomat_external_latex_to_mathml(DiplomatU8View bytes, DiplomatWrite* write);
 
@@ -22,6 +25,8 @@ diplomat_external_normalize_search_term_result diplomat_external_normalize_searc
 
 typedef struct diplomat_external_render_math_result {union { HonzoErrorCode err;}; bool is_ok;} diplomat_external_render_math_result;
 diplomat_external_render_math_result diplomat_external_render_math(DiplomatU8View bytes, uint8_t math_type, DiplomatWrite* write);
+
+bool diplomat_external_validate_css(DiplomatU8View bytes);
 
 bool diplomat_external_validate_mathml(DiplomatU8View bytes);
 

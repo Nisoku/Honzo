@@ -23,6 +23,7 @@ namespace capi {
       HonzoErrorCode_EncryptedChunk = 5,
       HonzoErrorCode_InvalidMathML = 6,
       HonzoErrorCode_Truncated = 7,
+      HonzoErrorCode_InvalidCss = 8,
       HonzoErrorCode_Unknown = 255,
     };
 
@@ -41,6 +42,7 @@ public:
         EncryptedChunk = 5,
         InvalidMathML = 6,
         Truncated = 7,
+        InvalidCss = 8,
         Unknown = 255,
     };
 
