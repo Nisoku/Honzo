@@ -7,6 +7,7 @@ use honzo_chunks::data::math::{
     validate_mathml as validate_mathml_impl,
 };
 use honzo_chunks::data::sidx::normalize_search_term as normalize_search_term_impl;
+use honzo_chunks::extra::{anno, sync};
 use honzo_core::{Compression, CoverType, MarkupType, MathType};
 use honzo_io::*;
 use wasm_bindgen::prelude::*;
@@ -131,6 +132,37 @@ impl HonzoWasm {
         let meta: HonzoMeta = rmp_serde::from_slice(&self.meta)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
         serde_wasm_bindgen::to_value(&meta).map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+    }
+
+    pub fn get_annotations(&self) -> Result<JsValue, JsValue> {
+        let parser = honzo_core::HonzoParser::new(&self.buf, self.reader_version)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        let extra = parser
+            .extra_bytes()
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        let entries =
+            honzo_io::parse_extra(extra).map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        let entry = honzo_io::find_extra(&entries, anno::NAMESPACE)
+            .ok_or_else(|| JsValue::from_str("no annotations in extra"))?;
+        let annotations =
+            anno::parse_anno(&entry.body).map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        serde_wasm_bindgen::to_value(&annotations)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+    }
+
+    pub fn get_sync_cues(&self) -> Result<JsValue, JsValue> {
+        let parser = honzo_core::HonzoParser::new(&self.buf, self.reader_version)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        let extra = parser
+            .extra_bytes()
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        let entries =
+            honzo_io::parse_extra(extra).map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        let entry = honzo_io::find_extra(&entries, sync::NAMESPACE)
+            .ok_or_else(|| JsValue::from_str("no sync cues in extra"))?;
+        let cues =
+            sync::parse_sync(&entry.body).map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        serde_wasm_bindgen::to_value(&cues).map_err(|e| JsValue::from_str(&format!("{:?}", e)))
     }
 
     pub fn get_toc(&self) -> Result<JsValue, JsValue> {
@@ -313,6 +345,8 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
         chunks: Vec<ChunkSpec>,
         meta: Option<serde_json::Value>,
         extra: Option<Vec<u8>>,
+        annotations: Option<Vec<u8>>,
+        sync_cues: Option<Vec<u8>>,
         #[serde(default = "default_language")]
         language: String,
         #[serde(default = "default_auto_sidx")]
@@ -400,6 +434,18 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
 
     if let Some(ref extra) = spec.extra {
         builder = builder.set_extra(extra);
+    }
+
+    if let Some(ref anno_bytes) = spec.annotations {
+        let annotations: Vec<anno::Annotation> = rmp_serde::from_slice(anno_bytes)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        builder = builder.add_annotation(&annotations);
+    }
+
+    if let Some(ref sync_bytes) = spec.sync_cues {
+        let cues: Vec<sync::SyncCue> = rmp_serde::from_slice(sync_bytes)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        builder = builder.add_sync_cue(&cues);
     }
 
     builder

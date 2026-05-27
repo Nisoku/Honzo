@@ -1,6 +1,7 @@
 use crate::compression::{decompress, verify_entry_crc32};
 use honzo_chunks::data::font;
 use honzo_chunks::data::is_known_chunk;
+use honzo_chunks::extra::{anno, sync};
 use honzo_core::{HonzoError, HonzoHead, PmapEntry, TocEntry};
 use honzo_core::{MarkupType, MathType};
 use std::io::{Read, Seek, SeekFrom};
@@ -228,6 +229,20 @@ impl<R: Read + Seek> HonzoStream<R> {
             .read_exact(&mut buf)
             .map_err(|_| HonzoError::Truncated)?;
         Ok(buf)
+    }
+
+    pub fn annotations(&mut self) -> Result<Vec<anno::Annotation>, HonzoError> {
+        let extra = self.extra_bytes()?;
+        let entries = crate::parse_extra(&extra)?;
+        let entry = crate::find_extra(&entries, anno::NAMESPACE).ok_or(HonzoError::Truncated)?;
+        anno::parse_anno(&entry.body)
+    }
+
+    pub fn sync_cues(&mut self) -> Result<Vec<sync::SyncCue>, HonzoError> {
+        let extra = self.extra_bytes()?;
+        let entries = crate::parse_extra(&extra)?;
+        let entry = crate::find_extra(&entries, sync::NAMESPACE).ok_or(HonzoError::Truncated)?;
+        sync::parse_sync(&entry.body)
     }
 }
 

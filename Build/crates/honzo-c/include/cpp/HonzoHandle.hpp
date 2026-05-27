@@ -37,6 +37,12 @@ namespace capi {
     typedef struct HonzoHandle_get_meta_parsed_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} HonzoHandle_get_meta_parsed_result;
     HonzoHandle_get_meta_parsed_result HonzoHandle_get_meta_parsed(const diplomat::capi::HonzoHandle* self, diplomat::capi::DiplomatWrite* write);
 
+    typedef struct HonzoHandle_get_annotations_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} HonzoHandle_get_annotations_result;
+    HonzoHandle_get_annotations_result HonzoHandle_get_annotations(const diplomat::capi::HonzoHandle* self, diplomat::capi::DiplomatWrite* write);
+
+    typedef struct HonzoHandle_get_sync_cues_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} HonzoHandle_get_sync_cues_result;
+    HonzoHandle_get_sync_cues_result HonzoHandle_get_sync_cues(const diplomat::capi::HonzoHandle* self, diplomat::capi::DiplomatWrite* write);
+
     typedef struct HonzoHandle_get_toc_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} HonzoHandle_get_toc_result;
     HonzoHandle_get_toc_result HonzoHandle_get_toc(const diplomat::capi::HonzoHandle* self, diplomat::capi::DiplomatWrite* write);
 
@@ -94,6 +100,36 @@ template<typename W>
 inline diplomat::result<std::monostate, HonzoErrorCode> HonzoHandle::get_meta_parsed_write(W& writeable) const {
     diplomat::capi::DiplomatWrite write = diplomat::WriteTrait<W>::Construct(writeable);
     auto result = diplomat::capi::HonzoHandle_get_meta_parsed(this->AsFFI(),
+        &write);
+    return result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+
+inline diplomat::result<std::string, HonzoErrorCode> HonzoHandle::get_annotations() const {
+    std::string output;
+    diplomat::capi::DiplomatWrite write = diplomat::WriteFromString(output);
+    auto result = diplomat::capi::HonzoHandle_get_annotations(this->AsFFI(),
+        &write);
+    return result.is_ok ? diplomat::result<std::string, HonzoErrorCode>(diplomat::Ok<std::string>(std::move(output))) : diplomat::result<std::string, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+template<typename W>
+inline diplomat::result<std::monostate, HonzoErrorCode> HonzoHandle::get_annotations_write(W& writeable) const {
+    diplomat::capi::DiplomatWrite write = diplomat::WriteTrait<W>::Construct(writeable);
+    auto result = diplomat::capi::HonzoHandle_get_annotations(this->AsFFI(),
+        &write);
+    return result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+
+inline diplomat::result<std::string, HonzoErrorCode> HonzoHandle::get_sync_cues() const {
+    std::string output;
+    diplomat::capi::DiplomatWrite write = diplomat::WriteFromString(output);
+    auto result = diplomat::capi::HonzoHandle_get_sync_cues(this->AsFFI(),
+        &write);
+    return result.is_ok ? diplomat::result<std::string, HonzoErrorCode>(diplomat::Ok<std::string>(std::move(output))) : diplomat::result<std::string, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+template<typename W>
+inline diplomat::result<std::monostate, HonzoErrorCode> HonzoHandle::get_sync_cues_write(W& writeable) const {
+    diplomat::capi::DiplomatWrite write = diplomat::WriteTrait<W>::Construct(writeable);
+    auto result = diplomat::capi::HonzoHandle_get_sync_cues(this->AsFFI(),
         &write);
     return result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
 }

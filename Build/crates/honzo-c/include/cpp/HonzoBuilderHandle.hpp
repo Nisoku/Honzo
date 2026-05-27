@@ -30,6 +30,12 @@ namespace capi {
 
     bool HonzoBuilderHandle_set_meta(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View msgpack);
 
+    bool HonzoBuilderHandle_add_extra_entry(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View tag, diplomat::capi::DiplomatStringView namespace_, diplomat::capi::DiplomatU8View body);
+
+    bool HonzoBuilderHandle_add_annotation(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View body);
+
+    bool HonzoBuilderHandle_add_sync_cue(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View body);
+
     bool HonzoBuilderHandle_finalize(diplomat::capi::HonzoBuilderHandle* self);
 
     diplomat::capi::DiplomatU8View HonzoBuilderHandle_get_result(const diplomat::capi::HonzoBuilderHandle* self);
@@ -81,6 +87,29 @@ inline bool HonzoBuilderHandle::add_math_chunk(diplomat::span<const uint8_t> dat
 inline bool HonzoBuilderHandle::set_meta(diplomat::span<const uint8_t> msgpack) {
     auto result = diplomat::capi::HonzoBuilderHandle_set_meta(this->AsFFI(),
         {msgpack.data(), msgpack.size()});
+    return result;
+}
+
+inline diplomat::result<bool, diplomat::Utf8Error> HonzoBuilderHandle::add_extra_entry(diplomat::span<const uint8_t> tag, std::string_view namespace_, diplomat::span<const uint8_t> body) {
+    if (!diplomat::capi::diplomat_is_str(namespace_.data(), namespace_.size())) {
+    return diplomat::Err<diplomat::Utf8Error>();
+  }
+    auto result = diplomat::capi::HonzoBuilderHandle_add_extra_entry(this->AsFFI(),
+        {tag.data(), tag.size()},
+        {namespace_.data(), namespace_.size()},
+        {body.data(), body.size()});
+    return diplomat::Ok<bool>(result);
+}
+
+inline bool HonzoBuilderHandle::add_annotation(diplomat::span<const uint8_t> body) {
+    auto result = diplomat::capi::HonzoBuilderHandle_add_annotation(this->AsFFI(),
+        {body.data(), body.size()});
+    return result;
+}
+
+inline bool HonzoBuilderHandle::add_sync_cue(diplomat::span<const uint8_t> body) {
+    auto result = diplomat::capi::HonzoBuilderHandle_add_sync_cue(this->AsFFI(),
+        {body.data(), body.size()});
     return result;
 }
 

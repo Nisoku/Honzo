@@ -1,6 +1,7 @@
 use honzo_chunks::data::covr::generate_covt;
 use honzo_chunks::data::font;
 use honzo_chunks::data::sidx::build_sidx;
+use honzo_chunks::extra::{anno, sync};
 use honzo_core::{
     Compression, CoverType, FontEmbedding, HonzoError, LayoutMode, MarkupType, MathType, PmapEntry,
 };
@@ -98,9 +99,11 @@ pub struct HonzoBuilder {
     pmap: Vec<PmapEntry>,
     meta: Vec<u8>,
     extra: Vec<u8>,
+    extra_entries: Vec<([u8; 4], String, Vec<u8>)>,
     auto_sidx: bool,
     auto_covt: bool,
     language: String,
+    min_reader_version: u16,
 }
 
 impl HonzoBuilder {
@@ -112,9 +115,11 @@ impl HonzoBuilder {
             pmap: Vec::new(),
             meta: Vec::new(),
             extra: Vec::new(),
+            extra_entries: Vec::new(),
             auto_sidx: true,
             auto_covt: true,
             language: "en".to_string(),
+            min_reader_version: 1,
         }
     }
 
@@ -204,6 +209,28 @@ impl HonzoBuilder {
         self
     }
 
+    pub fn set_min_reader_version(mut self, version: u16) -> Self {
+        self.min_reader_version = version;
+        self
+    }
+
+    pub fn add_extra_entry(mut self, tag: [u8; 4], namespace: &str, body: &[u8]) -> Self {
+        self.extra.clear();
+        self.extra_entries
+            .push((tag, namespace.to_string(), body.to_vec()));
+        self
+    }
+
+    pub fn add_annotation(self, annotations: &[anno::Annotation]) -> Self {
+        let body = anno::build_anno(annotations).unwrap_or_default();
+        self.add_extra_entry(*b"ANNO", anno::NAMESPACE, &body)
+    }
+
+    pub fn add_sync_cue(self, cues: &[sync::SyncCue]) -> Self {
+        let body = sync::build_sync(cues).unwrap_or_default();
+        self.add_extra_entry(*b"SYNC", sync::NAMESPACE, &body)
+    }
+
     pub fn finalize(self) -> Result<Vec<u8>, HonzoError> {
         let mut final_builder = self;
         if final_builder.auto_sidx {
@@ -239,7 +266,16 @@ impl HonzoBuilder {
             }
         }
 
-        if !final_builder.extra.is_empty() {
+        if !final_builder.extra_entries.is_empty() {
+            for (_, namespace, _) in &final_builder.extra_entries {
+                if !honzo_chunks::extra::is_known_namespace(namespace) {
+                    eprintln!(
+                        "Warning: extra entry has unrecognised namespace: {:?}",
+                        namespace
+                    );
+                }
+            }
+        } else if !final_builder.extra.is_empty() {
             let _ = crate::validate_extra(&final_builder.extra)
                 .map_err(|e| eprintln!("Warning: extra data has unrecognised namespace: {:?}", e));
         }
@@ -314,7 +350,21 @@ impl HonzoBuilder {
 
         let toc_size = toc_bytes.len() as u64;
         let data_size = data_bytes.len() as u64;
-        let extra_size = final_builder.extra.len() as u64;
+        let (extra_size, extra_bytes) = if !final_builder.extra_entries.is_empty() {
+            let mut bytes = Vec::new();
+            for (tag, namespace, body) in &final_builder.extra_entries {
+                bytes.extend_from_slice(tag);
+                bytes.extend_from_slice(&(namespace.len() as u16).to_le_bytes());
+                bytes.extend_from_slice(namespace.as_bytes());
+                bytes.extend_from_slice(&(body.len() as u32).to_le_bytes());
+                bytes.extend_from_slice(body);
+            }
+            let size = bytes.len() as u64;
+            (size, bytes)
+        } else {
+            let size = final_builder.extra.len() as u64;
+            (size, final_builder.extra.clone())
+        };
         let meta_size = final_builder.meta.len() as u64;
 
         let flags = (final_builder.flags & !0x0C) | ((final_builder.layout as u32) << 2);
@@ -323,7 +373,7 @@ impl HonzoBuilder {
         out.extend_from_slice(MAGIC);
         out.push(1);
         out.push(0);
-        out.extend_from_slice(&1u16.to_le_bytes());
+        out.extend_from_slice(&final_builder.min_reader_version.to_le_bytes());
         out.extend_from_slice(&flags.to_le_bytes());
         out.extend_from_slice(&chunk_count.to_le_bytes());
         out.extend_from_slice(&toc_size.to_le_bytes());
@@ -333,7 +383,7 @@ impl HonzoBuilder {
         out.extend_from_slice(&0u32.to_le_bytes());
         out.extend_from_slice(&toc_bytes);
         out.extend_from_slice(&data_bytes);
-        out.extend_from_slice(&final_builder.extra);
+        out.extend_from_slice(&extra_bytes);
         out.extend_from_slice(&final_builder.meta);
 
         Ok(out)

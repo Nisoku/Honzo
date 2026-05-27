@@ -21,6 +21,7 @@ pub mod ffi {
         MarkupType, MathType,
     };
     use core::fmt::Write as _;
+    use honzo_chunks::extra::{anno, sync};
 
     #[repr(C)]
     pub enum HonzoErrorCode {
@@ -109,6 +110,47 @@ pub mod ffi {
             let meta: HonzoMeta =
                 rmp_serde::from_slice(&self.meta).map_err(|_| HonzoErrorCode::Truncated)?;
             let json = serde_json::to_string(&meta).map_err(|_| HonzoErrorCode::Unknown)?;
+            write
+                .write_str(&json)
+                .map_err(|_| HonzoErrorCode::Unknown)?;
+            Ok(())
+        }
+
+        pub fn get_annotations(
+            &self,
+            write: &mut diplomat_runtime::DiplomatWrite,
+        ) -> Result<(), HonzoErrorCode> {
+            let parser = HonzoParser::new(&self.buf, self.reader_version)
+                .map_err(|_| HonzoErrorCode::Unknown)?;
+            let extra = parser
+                .extra_bytes()
+                .map_err(|_| HonzoErrorCode::Truncated)?;
+            let entries = honzo_io::parse_extra(extra).map_err(|_| HonzoErrorCode::Truncated)?;
+            let entry =
+                honzo_io::find_extra(&entries, anno::NAMESPACE).ok_or(HonzoErrorCode::Truncated)?;
+            let annotations =
+                anno::parse_anno(&entry.body).map_err(|_| HonzoErrorCode::Truncated)?;
+            let json = serde_json::to_string(&annotations).map_err(|_| HonzoErrorCode::Unknown)?;
+            write
+                .write_str(&json)
+                .map_err(|_| HonzoErrorCode::Unknown)?;
+            Ok(())
+        }
+
+        pub fn get_sync_cues(
+            &self,
+            write: &mut diplomat_runtime::DiplomatWrite,
+        ) -> Result<(), HonzoErrorCode> {
+            let parser = HonzoParser::new(&self.buf, self.reader_version)
+                .map_err(|_| HonzoErrorCode::Unknown)?;
+            let extra = parser
+                .extra_bytes()
+                .map_err(|_| HonzoErrorCode::Truncated)?;
+            let entries = honzo_io::parse_extra(extra).map_err(|_| HonzoErrorCode::Truncated)?;
+            let entry =
+                honzo_io::find_extra(&entries, sync::NAMESPACE).ok_or(HonzoErrorCode::Truncated)?;
+            let cues = sync::parse_sync(&entry.body).map_err(|_| HonzoErrorCode::Truncated)?;
+            let json = serde_json::to_string(&cues).map_err(|_| HonzoErrorCode::Unknown)?;
             write
                 .write_str(&json)
                 .map_err(|_| HonzoErrorCode::Unknown)?;
@@ -268,6 +310,46 @@ pub mod ffi {
                 None => return false,
             };
             self.builder = Some(b.set_meta(msgpack));
+            true
+        }
+
+        pub fn add_extra_entry(&mut self, tag: &[u8], namespace: &str, body: &[u8]) -> bool {
+            if tag.len() != 4 {
+                return false;
+            }
+            let mut tag_arr = [0u8; 4];
+            tag_arr.copy_from_slice(tag);
+            let b = match self.builder.take() {
+                Some(b) => b,
+                None => return false,
+            };
+            self.builder = Some(b.add_extra_entry(tag_arr, namespace, body));
+            true
+        }
+
+        pub fn add_annotation(&mut self, body: &[u8]) -> bool {
+            let annotations: Vec<anno::Annotation> = match rmp_serde::from_slice(body) {
+                Ok(a) => a,
+                Err(_) => return false,
+            };
+            let b = match self.builder.take() {
+                Some(b) => b,
+                None => return false,
+            };
+            self.builder = Some(b.add_annotation(&annotations));
+            true
+        }
+
+        pub fn add_sync_cue(&mut self, body: &[u8]) -> bool {
+            let cues: Vec<sync::SyncCue> = match rmp_serde::from_slice(body) {
+                Ok(c) => c,
+                Err(_) => return false,
+            };
+            let b = match self.builder.take() {
+                Some(b) => b,
+                None => return false,
+            };
+            self.builder = Some(b.add_sync_cue(&cues));
             true
         }
 

@@ -43,6 +43,14 @@ public:
   template<typename W>
   inline diplomat::result<std::monostate, HonzoErrorCode> get_meta_parsed_write(W& writeable_output) const;
 
+  inline diplomat::result<std::string, HonzoErrorCode> get_annotations() const;
+  template<typename W>
+  inline diplomat::result<std::monostate, HonzoErrorCode> get_annotations_write(W& writeable_output) const;
+
+  inline diplomat::result<std::string, HonzoErrorCode> get_sync_cues() const;
+  template<typename W>
+  inline diplomat::result<std::monostate, HonzoErrorCode> get_sync_cues_write(W& writeable_output) const;
+
   inline diplomat::result<std::string, HonzoErrorCode> get_toc() const;
   template<typename W>
   inline diplomat::result<std::monostate, HonzoErrorCode> get_toc_write(W& writeable_output) const;

@@ -27,6 +27,12 @@ bool HonzoBuilderHandle_add_math_chunk(HonzoBuilderHandle* self, DiplomatU8View 
 
 bool HonzoBuilderHandle_set_meta(HonzoBuilderHandle* self, DiplomatU8View msgpack);
 
+bool HonzoBuilderHandle_add_extra_entry(HonzoBuilderHandle* self, DiplomatU8View tag, DiplomatStringView namespace, DiplomatU8View body);
+
+bool HonzoBuilderHandle_add_annotation(HonzoBuilderHandle* self, DiplomatU8View body);
+
+bool HonzoBuilderHandle_add_sync_cue(HonzoBuilderHandle* self, DiplomatU8View body);
+
 bool HonzoBuilderHandle_finalize(HonzoBuilderHandle* self);
 
 DiplomatU8View HonzoBuilderHandle_get_result(const HonzoBuilderHandle* self);

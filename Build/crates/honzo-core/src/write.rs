@@ -33,6 +33,8 @@ pub struct HonzoBuilder {
     pmap: Vec<PmapEntry>,
     meta: Vec<u8>,
     extra: Vec<u8>,
+    extra_entries: Vec<([u8; 4], String, Vec<u8>)>,
+    min_reader_version: u16,
 }
 
 impl HonzoBuilder {
@@ -44,6 +46,8 @@ impl HonzoBuilder {
             pmap: Vec::new(),
             meta: Vec::new(),
             extra: Vec::new(),
+            extra_entries: Vec::new(),
+            min_reader_version: 1,
         }
     }
 
@@ -118,6 +122,18 @@ impl HonzoBuilder {
         self
     }
 
+    pub fn set_min_reader_version(mut self, version: u16) -> Self {
+        self.min_reader_version = version;
+        self
+    }
+
+    pub fn add_extra_entry(mut self, tag: [u8; 4], namespace: &str, body: &[u8]) -> Self {
+        self.extra.clear();
+        self.extra_entries
+            .push((tag, String::from(namespace), Vec::from(body)));
+        self
+    }
+
     pub fn finalize(self) -> Result<Vec<u8>, HonzoError> {
         let mut compressed_chunks: Vec<Vec<u8>> = Vec::with_capacity(self.chunks.len());
         let mut toc_entries = Vec::with_capacity(self.chunks.len());
@@ -176,14 +192,26 @@ impl HonzoBuilder {
 
         let toc_bytes = build_toc(&toc_entries, &self.pmap)?;
         let data_bytes = concat_chunks(&compressed_chunks);
-        let extra_bytes = self.extra;
+        let extra_bytes = if !self.extra_entries.is_empty() {
+            let mut bytes = Vec::new();
+            for (tag, namespace, body) in &self.extra_entries {
+                bytes.extend_from_slice(tag);
+                bytes.extend_from_slice(&(namespace.len() as u16).to_le_bytes());
+                bytes.extend_from_slice(namespace.as_bytes());
+                bytes.extend_from_slice(&(body.len() as u32).to_le_bytes());
+                bytes.extend_from_slice(body);
+            }
+            bytes
+        } else {
+            self.extra.clone()
+        };
         let meta_bytes = self.meta;
 
         let flags = (self.flags & !0x0C) | ((self.layout as u32) << 2);
         let head = HonzoHeadWrite {
             version_major: 1,
             version_minor: 0,
-            min_reader_version: 1,
+            min_reader_version: self.min_reader_version,
             flags,
             chunk_count: toc_entries.len() as u32,
             toc_size: toc_bytes.len() as u64,

@@ -1,4 +1,5 @@
 use crate::compression::{decompress, verify_entry_crc32};
+use honzo_chunks::extra::{anno, sync};
 use honzo_core::{HonzoError, HonzoParser, TocEntry};
 
 pub struct HonzoReader<'a> {
@@ -42,5 +43,19 @@ impl<'a> HonzoReader<'a> {
 
     pub fn extra_bytes(&self) -> Result<&'a [u8], HonzoError> {
         self.parser.extra_bytes()
+    }
+
+    pub fn annotations(&self) -> Result<Vec<anno::Annotation>, HonzoError> {
+        let extra = self.parser.extra_bytes()?;
+        let entries = crate::parse_extra(extra)?;
+        let entry = crate::find_extra(&entries, anno::NAMESPACE).ok_or(HonzoError::Truncated)?;
+        anno::parse_anno(&entry.body)
+    }
+
+    pub fn sync_cues(&self) -> Result<Vec<sync::SyncCue>, HonzoError> {
+        let extra = self.parser.extra_bytes()?;
+        let entries = crate::parse_extra(extra)?;
+        let entry = crate::find_extra(&entries, sync::NAMESPACE).ok_or(HonzoError::Truncated)?;
+        sync::parse_sync(&entry.body)
     }
 }

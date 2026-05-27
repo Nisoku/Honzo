@@ -33,6 +33,12 @@ public:
 
   inline bool set_meta(diplomat::span<const uint8_t> msgpack);
 
+  inline diplomat::result<bool, diplomat::Utf8Error> add_extra_entry(diplomat::span<const uint8_t> tag, std::string_view namespace_, diplomat::span<const uint8_t> body);
+
+  inline bool add_annotation(diplomat::span<const uint8_t> body);
+
+  inline bool add_sync_cue(diplomat::span<const uint8_t> body);
+
   inline bool finalize();
 
   inline diplomat::span<const uint8_t> get_result() const;
