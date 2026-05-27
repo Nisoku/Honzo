@@ -65,6 +65,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, "index.html"),
         convert: resolve(__dirname, "convert.html"),
+        inspect: resolve(__dirname, "inspect.html"),
       },
     },
   },

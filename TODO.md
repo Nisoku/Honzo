@@ -8,8 +8,6 @@
 
 - [ ] DRM is envelope-only: `DrmEnvelope` struct is a placeholder (`algorithm`, `iv`, `ciphertext`), real format has `encrypted_chunks`, `key_envelope`, `license_url`, `expires_at`
 - [ ] No actual AES-256-CBC encrypt/decrypt anywhere
-- [X] `org.nisoku.anno` struct is defined but no programmatic API to build/query annotations
-- [X] `org.nisoku.sync` struct is defined with an explicit `// TODO: Finalize the schema and implement`
 
 ## WASM / TypeScript
 

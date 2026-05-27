@@ -134,6 +134,15 @@ impl HonzoWasm {
         serde_wasm_bindgen::to_value(&meta).map_err(|e| JsValue::from_str(&format!("{:?}", e)))
     }
 
+    pub fn get_extra(&self) -> Result<Vec<u8>, JsValue> {
+        let parser = honzo_core::HonzoParser::new(&self.buf, self.reader_version)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        parser
+            .extra_bytes()
+            .map(|b| b.to_vec())
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+    }
+
     pub fn get_annotations(&self) -> Result<JsValue, JsValue> {
         let parser = honzo_core::HonzoParser::new(&self.buf, self.reader_version)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
