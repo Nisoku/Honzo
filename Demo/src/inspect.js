@@ -86,48 +86,59 @@ async function ensureWasm() {
 }
 
 async function loadFile(file) {
-  if (!file || !file.name.endsWith(".hzo")) {
+  if (!file) {
+    showStatus("error", "No file selected");
+    return;
+  }
+  if (!file.name.endsWith(".hzo")) {
     showStatus("error", "Please select a .hzo file");
     return;
   }
-  await ensureWasm();
-  const buf = await file.arrayBuffer();
+
+  showStatus("loading", `Loading ${file.name}...`);
+
   try {
+    await ensureWasm();
+    const buf = await file.arrayBuffer();
     reader = new HonzoWasm(new Uint8Array(buf), 1);
+
     fileName.set(file.name);
     fileSize.set(buf.byteLength);
 
-    const view = new DataView(buf);
     const extra = reader.get_extra();
     const chunks = buildChunksData(reader);
     const meta = reader.get_meta_parsed();
 
+    // Use WASM functions to get header info
+    // Use WASM functions to get all file information
     fileInfoData.set({
-      versionMajor: view.getUint8(4),
-      versionMinor: view.getUint8(5),
-      minVer: view.getUint16(6, true),
-      flags: view.getUint32(8, true),
-      chunkCount: view.getUint32(12, true),
-      tocSize: Number(view.getBigUint64(16, true)),
-      dataSize: Number(view.getBigUint64(24, true)),
-      extraSize: Number(view.getBigUint64(32, true)),
-      metaSize: Number(view.getBigUint64(40, true)),
+      versionMajor: reader.version_major(),
+      versionMinor: reader.version_minor(),
+      minVer: reader.min_reader_version(),
+      flags: reader.flags(),
+      chunkCount: reader.chunk_count(),
+      tocSize: reader.toc_size(),
+      dataSize: reader.data_size(),
+      extraSize: reader.extra_size(),
+      metaSize: reader.meta_size(),
     });
+
     tocData.set(reader.get_toc());
     metaData.set(meta);
     originalMeta.set(JSON.parse(JSON.stringify(meta)));
     extraData.set(extra);
     chunksData.set(chunks);
-    fileLoaded.set(true);
 
     renderFileInfo();
     renderToc();
     renderMeta();
     renderExtra();
 
-    showStatus("success", `Loaded: ${file.name} (${formatSize(buf.byteLength)})`);
+    fileLoaded.set(true);
+    showStatus("success", `Successfully loaded: ${file.name} (${formatSize(buf.byteLength)})`);
   } catch (e) {
-    showStatus("error", `Failed to parse: ${e}`);
+    console.error("Error loading file:", e);
+    showStatus("error", `Failed to load file: ${e.message || String(e)}`);
   }
 }
 
@@ -149,25 +160,74 @@ function buildChunksData(r) {
 // Render helpers
 function renderFileInfo() {
   const d = fileInfoData.get();
-  if (!d) return;
-  const layout = ["Reflowable", "Fixed", "Scroll"][(d.flags >> 2) & 3] || "Unknown";
-  const comp = ["None", "Lz4"][d.flags & 3] || "Unknown";
+  if (!d || !reader) return;
+    
+    const layout = reader.layout_mode_name();
+    const comp = reader.compression_name();
   const badge = (on, label) => `<span class="flag-badge ${on ? "on" : "off"}">${on ? "Yes" : "No"}</span>`;
+   
   fileInfo.innerHTML = `
-    <div><span class="label">File Size</span><div class="value">${formatSize(fileSize.get())}</div></div>
-    <div><span class="label">Format Version</span><div class="value">${d.versionMajor}.${d.versionMinor}</div></div>
-    <div><span class="label">Min Reader Version</span><div class="value">${d.minVer}</div></div>
-    <div><span class="label">Chunks</span><div class="value">${d.chunkCount}</div></div>
-    <div><span class="label">Layout</span><div class="value">${layout}</div></div>
-    <div><span class="label">Default Compression</span><div class="value">${comp}</div></div>
-    <div><span class="label">TOC</span><div class="value">${formatSize(d.tocSize)}</div></div>
-    <div><span class="label">Data</span><div class="value">${formatSize(d.dataSize)}</div></div>
-    <div><span class="label">Extra</span><div class="value">${formatSize(d.extraSize)}</div></div>
-    <div><span class="label">Metadata</span><div class="value">${formatSize(d.metaSize)}</div></div>
-    <div><span class="label">Search Index</span><div class="value">${badge(d.flags & 0x20, "Search")}</div></div>
-    <div><span class="label">DRM</span><div class="value">${badge(d.flags & 0x10, "DRM")}</div></div>
-    <div><span class="label">Annotations</span><div class="value">${badge(d.flags & 0x40, "Anno")}</div></div>
-    <div><span class="label">Sync</span><div class="value">${badge(d.flags & 0x80, "Sync")}</div></div>
+    <div class="info-item">
+      <span class="label">File Size</span>
+      <div class="value">${formatSize(fileSize.get())}</div>
+    </div>
+    <div class="info-item">
+      <span class="label">Format Version</span>
+      <div class="value">${d.versionMajor}.${d.versionMinor}</div>
+    </div>
+    <div class="info-item">
+      <span class="label">Min Reader Version</span>
+      <div class="value">${d.minVer}</div>
+    </div>
+    <div class="info-item">
+      <span class="label">Chunks</span>
+      <div class="value">${d.chunkCount}</div>
+    </div>
+    <div class="info-item">
+      <span class="label">Layout Mode</span>
+      <div class="value">${layout}</div>
+    </div>
+    <div class="info-item">
+      <span class="label">Default Compression</span>
+      <div class="value">${comp}</div>
+    </div>
+    <div class="info-item">
+      <span class="label">TOC Size</span>
+      <div class="value">${formatSize(d.tocSize)}</div>
+    </div>
+    <div class="info-item">
+      <span class="label">Data Size</span>
+      <div class="value">${formatSize(d.dataSize)}</div>
+    </div>
+    <div class="info-item">
+      <span class="label">Extra Data Size</span>
+      <div class="value">${formatSize(d.extraSize)}</div>
+    </div>
+    <div class="info-item">
+      <span class="label">Metadata Size</span>
+      <div class="value">${formatSize(d.metaSize)}</div>
+    </div>
+    <div class="info-item">
+      <span class="label">Features</span>
+      <div class="value" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 0.85rem;">Search Index:</span>
+          ${badge(reader.has_sidx(), "Search Index")}
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 0.85rem;">DRM:</span>
+          ${badge(reader.has_drm(), "DRM")}
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 0.85rem;">Annotations:</span>
+          ${badge(reader.has_annotations(), "Annotations")}
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 0.85rem;">Sync:</span>
+          ${badge(reader.has_sync(), "Sync")}
+        </div>
+      </div>
+    </div>
   `;
 }
 
@@ -175,11 +235,21 @@ function renderToc() {
   const toc = tocData.get();
   const cc = fileInfoData.get()?.chunkCount || 0;
   chunkCount.textContent = `(${cc} total)`;
+
   tocBody.innerHTML = toc.map((e, i) => {
     const tag = typeof e.chunk_type === "string" ? e.chunk_type : new TextDecoder().decode(new Uint8Array(e.chunk_type));
-    const comp = ["None", "Lz4"][e.compression] || "?";
-    const type = ["Markdown", "Html"][e.content_type_value] || "?";
-    return `<tr><td>${i}</td><td><strong>${esc(tag)}</strong></td><td>${formatSize(Number(e.size_compressed))}</td><td>${formatSize(Number(e.size_raw))}</td><td>${comp}</td><td>${type}</td><td>0x${e.flags.toString(16)}</td></tr>`;
+    const comp = reader.compression_name_for_chunk(i);
+    const type = reader.content_type_name_for_chunk(i);
+
+    return `<tr>
+      <td>${i}</td>
+      <td><strong>${esc(tag)}</strong></td>
+      <td>${formatSize(Number(e.size_compressed))}</td>
+      <td>${formatSize(Number(e.size_raw))}</td>
+      <td>${comp}</td>
+      <td>${type}</td>
+      <td>0x${e.flags.toString(16).padStart(4, '0')}</td>
+    </tr>`;
   }).join("");
 }
 
@@ -205,11 +275,11 @@ function renderMeta() {
   const ids = meta.identifiers || [];
   html += ids.map((id, i) => `
     <div class="field" style="display:flex;gap:0.5rem;align-items:end">
-      <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="${esc(id.id_type)}" /></div>
-      <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="${esc(id.value)}" /></div>
+      <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="${esc(id.id_type || '')}" /></div>
+      <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="${esc(id.value || '')}" /></div>
       <button class="btn btn-secondary" style="padding:0.4rem 0.6rem;font-size:0.8rem" onclick="this.parentElement.remove()">×</button>
     </div>`).join("");
-  html += `</div><button class="btn btn-secondary" style="font-size:0.85rem;margin-top:0.3rem" onclick="document.getElementById('idList').insertAdjacentHTML('beforeend',\`<div class=\\"field\\" style=\\"display:flex;gap:0.5rem;align-items:end\\"><div style=\\"flex:1\\"><label>Type</label><input type=\\"text\\" class=\\"id-type\\" value=\\"\\" /></div><div style=\\"flex:2\\"><label>Value</label><input type=\\"text\\" class=\\"id-value\\" value=\\"\\" /></div><button class=\\"btn btn-secondary\\" style=\\"padding:0.4rem 0.6rem;font-size:0.8rem\\" onclick=\\"this.parentElement.remove()\\">×</button></div>\`)">+ Add Identifier</button>`;
+  html += `</div><button class="btn btn-secondary" style="font-size:0.85rem;margin-top:0.3rem" onclick="addIdentifier()">+ Add Identifier</button>`;
 
   html += `<h3>Series</h3>`;
   if (meta.series) {
@@ -219,6 +289,28 @@ function renderMeta() {
   } else {
     html += `<p style="color:#888;font-size:0.9rem">No series info</p>`;
   }
+  metaFields.innerHTML = html;
+
+  // Add helper functions to window for the onclick handlers
+  window.addTag = function (id) {
+    const input = document.getElementById(`new_${id}`);
+    const value = input.value.trim();
+    if (value) {
+      const container = document.getElementById(`tags_${id}`);
+      container.insertAdjacentHTML('beforeend', `<span class="tag"><span class="tag-text">${esc(value)}</span> <span class="remove" onclick="this.parentElement.remove()">×</span></span>`);
+      input.value = '';
+    }
+  };
+
+  window.addIdentifier = function () {
+    const container = document.getElementById('idList');
+    container.insertAdjacentHTML('beforeend', `
+      <div class="field" style="display:flex;gap:0.5rem;align-items:end">
+        <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="" /></div>
+        <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="" /></div>
+        <button class="btn btn-secondary" style="padding:0.4rem 0.6rem;font-size:0.8rem" onclick="this.parentElement.remove()">×</button>
+      </div>`);
+  };
   metaFields.innerHTML = html;
 }
 
@@ -236,9 +328,9 @@ function field(label, id, value, optional, type) {
 function tagField(label, id, values) {
   const items = Array.isArray(values) ? values : [];
   return `<div class="field"><label>${label}</label>
-    <div class="tag-list" id="tags_${id}">${items.map(t => `<span class="tag">${esc(t)} <span class="remove" onclick="this.parentElement.remove()">×</span></span>`).join("")}</div>
+    <div class="tag-list" id="tags_${id}">${items.map(t => `<span class="tag"><span class="tag-text">${esc(t)}</span> <span class="remove" onclick="this.parentElement.remove()">×</span></span>`).join("")}</div>
     <div class="tag-input"><input type="text" id="new_${id}" placeholder="Add ${label.toLowerCase()}" />
-    <button onclick="(function(){const i=document.getElementById('new_${id}'),v=i.value.trim();if(v){document.getElementById('tags_${id}').insertAdjacentHTML('beforeend','<span class=\\"tag\\">'+v.replace(/&/g,'&amp;').replace(/</g,'&lt;')+' <span class=\\"remove\\" onclick=\\"this.parentElement.remove()\\">×</span></span>');i.value=''}})()">Add</button></div>
+    <button onclick="addTag('${id}')">Add</button></div>
   </div>`;
 }
 
@@ -318,7 +410,7 @@ function collectTags(id) {
   if (!container) return undefined;
   const items = [];
   for (const span of container.querySelectorAll(".tag")) {
-    const text = span.textContent.replace("×", "").trim();
+    const text = span.querySelector(".tag-text")?.textContent?.trim() || span.textContent.replace("×", "").trim();
     if (text) items.push(text);
   }
   return items.length > 0 ? items : undefined;
@@ -326,20 +418,27 @@ function collectTags(id) {
 
 // Save / Revert
 function onSave() {
-  if (!reader) return;
-  const meta = collectMeta();
-  const chunks = chunksData.get().map(c => ({
-    tag: c.tag,
-    data: new Uint8Array(c.data),
-    compression: c.compression,
-    content_type_kind: c.content_type_kind,
-    content_type_value: c.content_type_value,
-    alt_text: c.alt_text,
-    font_embedding: c.font_embedding,
-    font_license_url: c.font_license_url,
-  }));
-  const extra = extraData.get();
+  if (!reader) {
+    showStatus("error", "No file loaded to save");
+    return;
+  }
+
+  showStatus("loading", "Saving changes...");
+
   try {
+    const meta = collectMeta();
+    const chunks = chunksData.get().map(c => ({
+      tag: c.tag,
+      data: new Uint8Array(c.data),
+      compression: c.compression,
+      content_type_kind: c.content_type_kind,
+      content_type_value: c.content_type_value,
+      alt_text: c.alt_text,
+      font_embedding: c.font_embedding,
+      font_license_url: c.font_license_url,
+    }));
+
+    const extra = extraData.get();
     const result = honzo_build({
       chunks,
       meta,
@@ -347,17 +446,25 @@ function onSave() {
       language: meta.language || "en",
       auto_sidx: true,
     });
-    download(result, fileName.get().replace(/\.hzo$/i, "_edited.hzo"));
-    showStatus("success", "File saved successfully");
+
+    const outputFilename = fileName.get().replace(/\.hzo$/i, "_edited.hzo");
+    download(result, outputFilename);
+    showStatus("success", `File saved successfully as ${outputFilename}`);
   } catch (e) {
-    showStatus("error", `Save failed: ${e}`);
+    console.error("Error saving file:", e);
+    showStatus("error", `Failed to save file: ${e.message || String(e)}`);
   }
 }
 
 function onRevert() {
   const orig = originalMeta.get();
-  if (orig) { metaData.set(JSON.parse(JSON.stringify(orig))); renderMeta(); }
-  showStatus("loading", "Reverted to original metadata");
+  if (orig) {
+    metaData.set(JSON.parse(JSON.stringify(orig)));
+    renderMeta();
+    showStatus("success", "Metadata reverted to original");
+  } else {
+    showStatus("error", "No original metadata to revert to");
+  }
 }
 
 // Utilities
@@ -365,6 +472,15 @@ function showStatus(kind, msg) {
   statusVisible.set(true);
   statusKind.set(kind);
   statusMessage.set(msg);
+
+  // Auto-hide success/loading messages after 5 seconds
+  if (kind === "success" || kind === "loading") {
+    setTimeout(() => {
+      if (statusKind.get() === kind) {
+        statusVisible.set(false);
+      }
+    }, 5000);
+  }
 }
 
 function download(bytes, filename) {
@@ -377,13 +493,16 @@ function download(bytes, filename) {
 }
 
 function formatSize(bytes) {
-  if (bytes < 1024) return bytes + " B";
-  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
-  return (bytes / 1048576).toFixed(1) + " MB";
+  // Convert to Number to handle BigInt values
+  const numBytes = Number(bytes);
+  if (numBytes < 1024) return numBytes + " B";
+  if (numBytes < 1048576) return (numBytes / 1024).toFixed(1) + " KB";
+  if (numBytes < 1073741824) return (numBytes / 1048576).toFixed(1) + " MB";
+  return (numBytes / 1073741824).toFixed(1) + " GB";
 }
 function esc(s) {
   if (!s) return "";
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 function bytesToHex(bytes) {
   const b = new Uint8Array(bytes || []);

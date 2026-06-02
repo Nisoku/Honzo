@@ -99,6 +99,50 @@ impl HonzoWasm {
         self.chunks.len() as u32
     }
 
+    pub fn version_major(&self) -> u8 {
+        self.buf.get(4).copied().unwrap_or(0)
+    }
+
+    pub fn version_minor(&self) -> u8 {
+        self.buf.get(5).copied().unwrap_or(0)
+    }
+
+    pub fn min_reader_version(&self) -> u16 {
+        let mut bytes = [0u8; 2];
+        bytes.copy_from_slice(&self.buf[6..8]);
+        u16::from_le_bytes(bytes)
+    }
+
+    pub fn flags(&self) -> u32 {
+        let mut bytes = [0u8; 4];
+        bytes.copy_from_slice(&self.buf[8..12]);
+        u32::from_le_bytes(bytes)
+    }
+
+    pub fn toc_size(&self) -> u64 {
+        let mut bytes = [0u8; 8];
+        bytes.copy_from_slice(&self.buf[16..24]);
+        u64::from_le_bytes(bytes)
+    }
+
+    pub fn data_size(&self) -> u64 {
+        let mut bytes = [0u8; 8];
+        bytes.copy_from_slice(&self.buf[24..32]);
+        u64::from_le_bytes(bytes)
+    }
+
+    pub fn extra_size(&self) -> u64 {
+        let mut bytes = [0u8; 8];
+        bytes.copy_from_slice(&self.buf[32..40]);
+        u64::from_le_bytes(bytes)
+    }
+
+    pub fn meta_size(&self) -> u64 {
+        let mut bytes = [0u8; 8];
+        bytes.copy_from_slice(&self.buf[40..48]);
+        u64::from_le_bytes(bytes)
+    }
+
     pub fn layout_mode(&self) -> u8 {
         honzo_core::HonzoParser::new(&self.buf, self.reader_version)
             .map(|p| p.head().layout_mode() as u8)
@@ -115,6 +159,66 @@ impl HonzoWasm {
         honzo_core::HonzoParser::new(&self.buf, self.reader_version)
             .map(|p| p.head().has_sidx())
             .unwrap_or(false)
+    }
+
+    pub fn has_annotations(&self) -> bool {
+        self.flags() & 0x40 != 0
+    }
+
+    pub fn has_sync(&self) -> bool {
+        self.flags() & 0x80 != 0
+    }
+
+    pub fn layout_mode_name(&self) -> String {
+        match (self.layout_mode() >> 2) & 3 {
+            0 => "Reflowable".to_string(),
+            1 => "Fixed".to_string(),
+            2 => "Scroll".to_string(),
+            _ => "Unknown".to_string(),
+        }
+    }
+
+    pub fn compression_name(&self) -> String {
+        match self.layout_mode() & 3 {
+            0 => "None".to_string(),
+            1 => "Lz4".to_string(),
+            _ => "Unknown".to_string(),
+        }
+    }
+
+    pub fn compression_name_for_chunk(&self, index: u32) -> String {
+        self.toc
+            .get(index as usize)
+            .map(|e| match e.compression {
+                Compression::None => "None".to_string(),
+                Compression::Lz4 => "Lz4".to_string(),
+            })
+            .unwrap_or_else(|| "Unknown".to_string())
+    }
+
+    pub fn content_type_name_for_chunk(&self, index: u32) -> String {
+        self.toc
+            .get(index as usize)
+            .map(|e| {
+                if e.content_type_kind == 1 {
+                    // Markup
+                    match e.content_type_value {
+                        0 => "Markdown".to_string(),
+                        1 => "Html".to_string(),
+                        _ => "Unknown".to_string(),
+                    }
+                } else if e.content_type_kind == 2 {
+                    // Math
+                    match e.content_type_value {
+                        0 => "MathML".to_string(),
+                        1 => "LaTeX".to_string(),
+                        _ => "Unknown".to_string(),
+                    }
+                } else {
+                    "Unknown".to_string()
+                }
+            })
+            .unwrap_or_else(|| "Unknown".to_string())
     }
 
     pub fn get_chunk(&self, index: u32) -> Result<Vec<u8>, JsValue> {

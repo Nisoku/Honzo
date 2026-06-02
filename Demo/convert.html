@@ -1,218 +1,53 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HonzoConvert</title>
-    <link rel="icon" href="/Honzo/demo/source.svg" type="image/svg+xml" />
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
 
-      body {
-        font-family: -apple-system, system-ui, sans-serif;
-        background: #f5f5f5;
-        color: #333;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HonzoConvert</title>
+  <link rel="icon" href="/Honzo/demo/source.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
 
-      header {
-        background: #1a1a2e;
-        color: #fff;
-        width: 100%;
-        padding: 1rem 2rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      header h1 {
-        font-size: 1.25rem;
-      }
-
-      header a {
-        color: #aaa;
-        text-decoration: none;
-        margin-left: auto;
-        font-size: 0.9rem;
-      }
-
-      header a:hover {
-        color: #fff;
-      }
-
-      .container {
-        max-width: 600px;
-        width: 100%;
-        padding: 2rem;
-        margin-top: 2rem;
-      }
-
-      .drop-zone {
-        border: 2px dashed #1a1a2e;
-        border-radius: 12px;
-        padding: 3rem 2rem;
-        text-align: center;
-        cursor: pointer;
-        transition: 0.2s;
-        background: #fff;
-      }
-
-      .drop-zone:hover,
-      .drop-zone.dragover {
-        border-color: #16213e;
-        background: #f0f0ff;
-      }
-
-      .drop-zone .icon {
-        font-size: 3rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .drop-zone p {
-        color: #666;
-        margin-top: 0.5rem;
-      }
-
-      input[type="file"] {
-        display: none;
-      }
-
-      .status {
-        margin-top: 1rem;
-        padding: 1rem;
-        border-radius: 8px;
-        display: none;
-      }
-
-      .status.active {
-        display: block;
-      }
-
-      .status.loading {
-        background: #e8f0ff;
-        color: #1a1a2e;
-      }
-
-      .status.success {
-        background: #e8ffe8;
-        color: #1a5a1a;
-      }
-
-      .status.error {
-        background: #ffe8e8;
-        color: #5a1a1a;
-      }
-
-      .progress-bar {
-        width: 100%;
-        height: 4px;
-        background: #e0e0e0;
-        border-radius: 2px;
-        margin-top: 0.5rem;
-        overflow: hidden;
-      }
-
-      .progress-bar .fill {
-        height: 100%;
-        background: #1a1a2e;
-        width: 0;
-        transition: width 0.3s;
-        border-radius: 2px;
-      }
-
-      .history {
-        margin-top: 2rem;
-      }
-
-      .history h3 {
-        margin-bottom: 0.5rem;
-        color: #555;
-      }
-
-      .history-item {
-        background: #fff;
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
-        margin-bottom: 0.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-      }
-
-      .history-item .name {
-        font-weight: 500;
-      }
-
-      .history-item .size {
-        color: #888;
-        font-size: 0.85rem;
-      }
-
-      .history-item .dl-btn {
-        background: #1a1a2e;
-        color: #fff;
-        border: none;
-        padding: 0.3rem 0.7rem;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.8rem;
-        text-decoration: none;
-      }
-    </style>
-  </head>
-
-  <body>
-    <header>
-      <h1>HonzoConvert</h1>
+<body class="page-scroll">
+  <header>
+    <h1 class="title">HonzoConvert</h1>
+    <div class="header-nav">
       <a href="/Honzo/demo/">Reader</a>
-    </header>
-    <div class="container">
-      <div class="drop-zone" id="dropZone">
-        <div class="icon">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            width="48"
-            height="48"
-          >
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-            <path
-              d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
-            />
-            <path d="M12 6v7" />
-            <path d="M9 9l3-3 3 3" />
-          </svg>
-        </div>
-        <h2>Drop an EPUB here</h2>
-        <p>or click to browse</p>
-        <input type="file" id="fileInput" accept=".epub" />
+      <a href="/Honzo/demo/inspect.html">Inspect</a>
+    </div>
+  </header>
+  <div class="container container-narrow">
+    <div class="drop-zone" id="dropZone">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" width="48" height="48">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          <path d="M12 6v7" />
+          <path d="M9 9l3-3 3 3" />
+        </svg>
       </div>
+      <h2>Drop an EPUB here</h2>
+      <p>or click to browse</p>
+      <input type="file" id="fileInput" accept=".epub" />
+    </div>
 
-      <div class="status" id="status">
-        <span id="statusText"></span>
-        <div class="progress-bar">
-          <div class="fill" id="progressFill"></div>
-        </div>
-      </div>
-
-      <div class="history" id="history">
-        <h3>Converted Files</h3>
-        <div id="historyList"></div>
+    <div class="status" id="status">
+      <span id="statusText"></span>
+      <div class="progress-bar">
+        <div class="fill" id="progressFill"></div>
       </div>
     </div>
 
-    <script type="module" src="./src/convert.js"></script>
-  </body>
+    <div class="history" id="history">
+      <h3>Converted Files</h3>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/convert.js"></script>
+</body>
+
 </html>

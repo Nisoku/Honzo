@@ -1,265 +1,139 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HonzoInspect</title>
-    <link rel="icon" href="/Honzo/demo/source.svg" type="image/svg+xml" />
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-      body {
-        font-family: -apple-system, system-ui, sans-serif;
-        background: #f5f5f5;
-        color: #333;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
-      header {
-        background: #1a1a2e;
-        color: #fff;
-        padding: 1rem 2rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-      header h1 { font-size: 1.25rem; }
-      header a {
-        color: #aaa;
-        text-decoration: none;
-        margin-left: auto;
-        font-size: 0.9rem;
-      }
-      header a:hover { color: #fff; }
-      .container { max-width: 960px; width: 100%; margin: 0 auto; padding: 2rem; }
 
-      .drop-zone {
-        border: 2px dashed #1a1a2e;
-        border-radius: 12px;
-        padding: 3rem 2rem;
-        text-align: center;
-        cursor: pointer;
-        transition: 0.2s;
-        background: #fff;
-      }
-      .drop-zone:hover, .drop-zone.dragover {
-        border-color: #16213e;
-        background: #f0f0ff;
-      }
-      .drop-zone .icon { font-size: 3rem; margin-bottom: 0.5rem; }
-      .drop-zone p { color: #666; margin-top: 0.5rem; }
-      input[type="file"] { display: none; }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HonzoInspect</title>
+  <link rel="icon" href="/Honzo/demo/source.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/style.css">
+</head>
 
-      .panel {
-        background: #fff;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-        display: none;
-      }
-      .panel.visible { display: block; }
-      .panel h2 {
-        font-size: 1.1rem;
-        color: #1a1a2e;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #e2e8f0;
-      }
-      .panel h3 {
-        font-size: 0.95rem;
-        color: #555;
-        margin: 1rem 0 0.5rem;
-      }
-
-      .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem 1.5rem;
-      }
-      .info-grid .label { color: #888; font-size: 0.85rem; }
-      .info-grid .value { font-weight: 500; }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.85rem;
-      }
-      th {
-        text-align: left;
-        padding: 0.4rem 0.5rem;
-        background: #f8f8f8;
-        font-weight: 600;
-        color: #555;
-        border-bottom: 1px solid #e2e8f0;
-      }
-      td {
-        padding: 0.4rem 0.5rem;
-        border-bottom: 1px solid #f0f0f0;
-        font-variant-numeric: tabular-nums;
-      }
-      tr:hover td { background: #fafafa; }
-
-      .flag-badge {
-        display: inline-block;
-        padding: 0.15rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 600;
-      }
-      .flag-badge.on { background: #e8ffe8; color: #1a5a1a; }
-      .flag-badge.off { background: #ffe8e8; color: #5a1a1a; }
-
-      .field {
-        margin-bottom: 0.75rem;
-      }
-      .field label {
-        display: block;
-        font-size: 0.85rem;
-        color: #888;
-        margin-bottom: 0.2rem;
-      }
-      .field input, .field textarea, .field select {
-        width: 100%;
-        padding: 0.5rem 0.75rem;
-        border: 1px solid #d0d0d0;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        font-family: inherit;
-        background: #fff;
-        transition: border-color 0.2s;
-      }
-      .field input:focus, .field textarea:focus {
-        outline: none;
-        border-color: #1a1a2e;
-      }
-      .field textarea { min-height: 80px; resize: vertical; }
-
-      .tag-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.3rem;
-      }
-      .tag {
-        background: #e2e8f0;
-        padding: 0.2rem 0.6rem;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-      }
-      .tag .remove {
-        cursor: pointer;
-        color: #888;
-        font-weight: bold;
-      }
-      .tag .remove:hover { color: #c00; }
-      .tag-input {
-        display: flex;
-        gap: 0.3rem;
-      }
-      .tag-input input { flex: 1; }
-      .tag-input button {
-        background: #1a1a2e;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 0.4rem 0.8rem;
-        cursor: pointer;
-        font-size: 0.85rem;
-      }
-      .tag-input button:hover { background: #16213e; }
-
-      .btn-row {
-        display: flex;
-        gap: 0.75rem;
-        margin-top: 1.5rem;
-      }
-      .btn {
-        padding: 0.6rem 1.2rem;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        font-family: inherit;
-        transition: 0.2s;
-      }
-      .btn-primary { background: #1a1a2e; color: #fff; }
-      .btn-primary:hover { background: #16213e; }
-      .btn-primary:disabled { background: #718096; cursor: default; }
-      .btn-secondary { background: #e2e8f0; color: #333; }
-      .btn-secondary:hover { background: #d0d8e4; }
-      .btn-success { background: #1a5a1a; color: #fff; }
-      .btn-success:hover { background: #134013; }
-
-      .status {
-        padding: 0.75rem;
-        border-radius: 6px;
-        display: none;
-        font-size: 0.9rem;
-      }
-      .status.active { display: block; }
-      .status.loading { background: #e8f0ff; color: #1a1a2e; }
-      .status.success { background: #e8ffe8; color: #1a5a1a; }
-      .status.error { background: #ffe8e8; color: #5a1a1a; }
-    </style>
-  </head>
-  <body>
-    <header>
-      <h1>HonzoInspect</h1>
+<body class="page-scroll">
+  <header>
+    <h1 class="title">HonzoInspect</h1>
+    <div class="header-nav">
       <a href="/Honzo/demo/">Reader</a>
       <a href="/Honzo/demo/convert.html">Convert</a>
-    </header>
-    <div class="container">
-      <div class="drop-zone" id="dropZone">
-        <div class="icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-            <polyline points="10 9 9 9 8 9"/>
-          </svg>
-        </div>
-        <h2>Drop a .hzo file here</h2>
-        <p>or click to browse</p>
-        <input type="file" id="fileInput" accept=".hzo" />
+    </div>
+  </header>
+  <div class="container container-grid">
+    <div class="drop-zone" id="dropZone">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" width="48" height="48">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <path d="M7 10l5 5 5-5" />
+          <path d="M12 15V3" />
+        </svg>
       </div>
+      <h2>Drop a Honzo file here</h2>
+      <p>or click to browse your device</p>
+      <input type="file" id="fileInput" accept=".hzo" />
+    </div>
 
-      <div class="status" id="status"><span id="statusText"></span></div>
+    <div class="status" id="status"><span id="statusText"></span></div>
 
-      <div class="panel" id="filePanel">
-        <h2>File Info</h2>
-        <div class="info-grid" id="fileInfo"></div>
-      </div>
+    <!-- File Info Panel -->
+    <div class="panel" id="filePanel">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <polyline points="10 9 9 9 8 9" />
+        </svg>
+        File Information
+      </h2>
+      <div class="info-grid" id="fileInfo"></div>
+    </div>
 
-      <div class="panel" id="tocPanel">
-        <h2>Chunks <span id="chunkCount" style="color:#888;font-weight:400;"></span></h2>
-        <div style="overflow-x:auto"><table><thead><tr>
-          <th>ID</th><th>Tag</th><th>Size</th><th>Raw</th><th>Comp</th><th>Type</th><th>Flags</th>
-        </tr></thead><tbody id="tocBody"></tbody></table></div>
-      </div>
-
-      <div class="panel" id="metaPanel">
-        <h2>Metadata</h2>
-        <div id="metaFields"></div>
-        <div class="btn-row">
-          <button class="btn btn-secondary" id="revertBtn" disabled>Revert</button>
-          <button class="btn btn-success" id="saveBtn" disabled>Save</button>
-        </div>
-      </div>
-
-      <div class="panel" id="extraPanel">
-        <h2>Extra Data</h2>
-        <div id="extraInfo"></div>
+    <!-- TOC Panel -->
+    <div class="panel" id="tocPanel">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+          <line x1="12" y1="11" x2="12" y2="17" />
+          <path d="M7 14l5-5 5 5" />
+        </svg>
+        Content Chunks <span id="chunkCount" style="color:var(--text-light);font-weight:400;font-size:0.9rem;"></span>
+      </h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tag</th>
+              <th>Compressed</th>
+              <th>Uncompressed</th>
+              <th>Compression</th>
+              <th>Type</th>
+              <th>Flags</th>
+            </tr>
+          </thead>
+          <tbody id="tocBody"></tbody>
+        </table>
       </div>
     </div>
 
-    <script type="module" src="./src/inspect.js"></script>
-  </body>
+    <!-- Metadata Panel -->
+    <div class="panel" id="metaPanel">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          <path d="M8 7h7" />
+          <path d="M8 12h7" />
+          <path d="M8 17h7" />
+        </svg>
+        Book Metadata
+      </h2>
+      <div id="metaFields" class="scroll-content"></div>
+      <div class="btn-row sticky-bottom">
+        <button class="btn btn-secondary" id="revertBtn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 1 18 0 9 9 0 0 1-18 0z" />
+            <path d="M12 8v4l3 3" />
+          </svg>
+          Revert
+        </button>
+        <button class="btn btn-success" id="saveBtn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          Save
+        </button>
+      </div>
+    </div>
+
+    <!-- Extra Data Panel -->
+    <div class="panel" id="extraPanel">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <polyline points="10 9 9 9 8 9" />
+          <path d="M18 12h-2v-2" />
+          <path d="M18 16h-2v-2" />
+        </svg>
+        Extra Data
+      </h2>
+      <div id="extraInfo" class="scroll-content"></div>
+    </div>
+  </div>
+  <script type="module" src="./src/inspect.js"></script>
+</body>
+
 </html>
