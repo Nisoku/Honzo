@@ -18,7 +18,6 @@ pub struct HonzoWasm {
     reader_version: u16,
     meta: Vec<u8>,
     toc: Vec<WasmTocEntry>,
-    chunks: Vec<Vec<u8>>,
 }
 
 #[allow(dead_code)]
@@ -51,20 +50,6 @@ impl HonzoWasm {
             .to_vec();
 
         let entries: Vec<_> = p.toc_entries().collect();
-        let mut chunks = Vec::with_capacity(entries.len());
-
-        for entry in &entries {
-            if entry.is_encrypted() {
-                chunks.push(Vec::new());
-                continue;
-            }
-            let raw = p
-                .chunk_bytes(entry)
-                .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
-            let decompressed = decompress(raw, entry.compression, entry.size_raw)
-                .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
-            chunks.push(decompressed);
-        }
 
         let toc = entries
             .iter()
@@ -91,12 +76,11 @@ impl HonzoWasm {
             reader_version,
             meta,
             toc,
-            chunks,
         })
     }
 
     pub fn chunk_count(&self) -> u32 {
-        self.chunks.len() as u32
+        self.toc.len() as u32
     }
 
     pub fn version_major(&self) -> u8 {
@@ -222,10 +206,22 @@ impl HonzoWasm {
     }
 
     pub fn get_chunk(&self, index: u32) -> Result<Vec<u8>, JsValue> {
-        self.chunks
-            .get(index as usize)
-            .cloned()
-            .ok_or_else(|| JsValue::from_str("chunk index out of bounds"))
+        let parser = honzo_core::HonzoParser::new(&self.buf, self.reader_version)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        
+        let toc_entry = parser.find_chunk_by_id(index)
+            .ok_or_else(|| JsValue::from_str("chunk index out of bounds"))?;
+        
+        if toc_entry.is_encrypted() {
+            return Ok(Vec::new());
+        }
+        
+        let raw = parser
+            .chunk_bytes(&toc_entry)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        
+        decompress(raw, toc_entry.compression, toc_entry.size_raw)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
     }
 
     pub fn get_meta(&self) -> Result<Vec<u8>, JsValue> {
@@ -325,8 +321,10 @@ impl HonzoWasm {
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
     }
 
-    pub fn get_chapters_text(&self) -> Vec<String> {
-        self.toc
+    pub fn get_chapters_text(&self) -> Result<Vec<String>, JsValue> {
+        let mut texts = Vec::new();
+        let chapter_entries: Vec<_> = self
+            .toc
             .iter()
             .filter(|entry| {
                 matches!(
@@ -334,12 +332,14 @@ impl HonzoWasm {
                     "CHAP" | "NOTE" | "MATH"
                 )
             })
-            .filter_map(|entry| {
-                self.chunks
-                    .get(entry.chunk_id as usize)
-                    .map(|bytes| chapter_text_for_entry(entry, bytes))
-            })
-            .collect()
+            .collect();
+
+        for entry in &chapter_entries {
+            let bytes = self.get_chunk(entry.chunk_id)?;
+            texts.push(chapter_text_for_entry(entry, &bytes));
+        }
+
+        Ok(texts)
     }
 
     pub fn get_chapter_text(&self, index: u32) -> Result<String, JsValue> {
@@ -357,11 +357,8 @@ impl HonzoWasm {
         let entry = chapter_entries
             .get(index as usize)
             .ok_or_else(|| JsValue::from_str("chapter index out of bounds"))?;
-        let bytes = self
-            .chunks
-            .get(entry.chunk_id as usize)
-            .ok_or_else(|| JsValue::from_str("chunk index out of bounds"))?;
-        Ok(chapter_text_for_entry(entry, bytes))
+        let bytes = self.get_chunk(entry.chunk_id)?;
+        Ok(chapter_text_for_entry(entry, &bytes))
     }
 }
 

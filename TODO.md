@@ -11,7 +11,7 @@
 
 ## WASM / TypeScript
 
-- [ ] WASM `HonzoWasm` constructor eagerly reads *all* chunks into memory (no streaming)
+- [X] WASM `HonzoWasm` constructor eagerly reads *all* chunks into memory (no streaming)
 - [ ] C FFI via Diplomat is similarly limited (no alt_text, font_embedding, or extra support on builder)
 
 ## Demo

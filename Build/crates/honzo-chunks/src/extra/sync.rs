@@ -10,16 +10,16 @@ pub enum SyncType {
     /// Audio synchronization (text-to-audio)
     #[default]
     Audio = 0,
-    
+
     /// Video synchronization (text-to-video)
     Video = 1,
-    
+
     /// Animation synchronization
     Animation = 2,
-    
+
     /// Page turn synchronization (for pagination)
     Page = 3,
-    
+
     /// Custom synchronization type
     Custom = 255,
 }
@@ -30,24 +30,24 @@ pub struct SyncCue {
     /// The type of synchronization
     #[serde(default)]
     pub sync_type: SyncType,
-    
+
     /// ID of the chunk this cue applies to
     pub chunk_id: u32,
-    
+
     /// Byte offset within the chunk
     pub offset: u32,
-    
+
     /// Timestamp in milliseconds (or page number for Page sync type)
     pub timestamp_ms: u64,
-    
+
     /// Optional identifier for the sync media
     #[serde(skip_serializing_if = "Option::is_none")]
     pub media_id: Option<String>,
-    
+
     /// Optional duration in milliseconds for this cue
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration_ms: Option<u64>,
-    
+
     /// Optional custom data for the cue (e.g., JSON metadata)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<SyncMetadata>,
@@ -59,16 +59,16 @@ pub struct SyncCue {
 pub enum SyncMetadata {
     /// String metadata
     String(String),
-    
+
     /// Number metadata
     Number(u64),
-    
+
     /// Boolean metadata
     Boolean(bool),
-    
+
     /// Array of values
     Array(Vec<SyncMetadata>),
-    
+
     /// Key-value pairs
     Map(Vec<(String, SyncMetadata)>),
 }
@@ -78,21 +78,21 @@ pub enum SyncMetadata {
 pub struct SyncTrack {
     /// Unique identifier for this track
     pub track_id: String,
-    
+
     /// Type of synchronization for this track
     pub track_type: SyncType,
-    
+
     /// Optional media identifier
     #[serde(skip_serializing_if = "Option::is_none")]
     pub media_id: Option<String>,
-    
+
     /// Optional media duration in milliseconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub media_duration_ms: Option<u64>,
-    
+
     /// List of synchronization cues in this track
     pub cues: Vec<SyncCue>,
-    
+
     /// Optional track metadata
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<SyncMetadata>,
@@ -103,10 +103,10 @@ pub struct SyncTrack {
 pub struct SyncDocument {
     /// Format version
     pub version: u8,
-    
+
     /// List of synchronization tracks
     pub tracks: Vec<SyncTrack>,
-    
+
     /// Global metadata
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<SyncMetadata>,
@@ -117,20 +117,19 @@ pub fn validate_cue(cue: &SyncCue) -> Result<(), HonzoError> {
     if cue.timestamp_ms == 0 {
         return Err(HonzoError::Truncated);
     }
-    
+
     if let Some(duration) = cue.duration_ms {
         if duration == 0 {
             return Err(HonzoError::Truncated);
         }
     }
-    
+
     // For page syncs, validate page number range
-    if cue.sync_type == SyncType::Page {
-        if cue.timestamp_ms > 100000 { // Arbitrary max page count (100,000 pages)
-            return Err(HonzoError::Truncated);
-        }
+    if cue.sync_type == SyncType::Page && cue.timestamp_ms > 100000 {
+        // Arbitrary max page count (100,000 pages)
+        return Err(HonzoError::Truncated);
     }
-    
+
     Ok(())
 }
 
@@ -140,17 +139,17 @@ pub fn validate_track(track: &SyncTrack) -> Result<(), HonzoError> {
     // if track.cues.is_empty() {
     //     return Err(HonzoError::Truncated);
     // }
-    
+
     // Validate all cues in the track
     for cue in &track.cues {
         // Ensure cue type matches track type
         if cue.sync_type != track.track_type && track.track_type != SyncType::Custom {
             return Err(HonzoError::Truncated);
         }
-        
+
         validate_cue(cue)?;
     }
-    
+
     Ok(())
 }
 
@@ -159,17 +158,17 @@ pub fn validate_document(doc: &SyncDocument) -> Result<(), HonzoError> {
     if doc.version != 1 {
         return Err(HonzoError::Truncated);
     }
-    
+
     // Allow empty tracks for now
     // if doc.tracks.is_empty() {
     //     return Err(HonzoError::Truncated);
     // }
-    
+
     // Validate all tracks
     for track in &doc.tracks {
         validate_track(track)?;
     }
-    
+
     Ok(())
 }
 
@@ -178,13 +177,12 @@ pub fn parse_sync(body: &[u8]) -> Result<Vec<SyncCue>, HonzoError> {
     if body.is_empty() {
         return Ok(Vec::new());
     }
-    
-    let cues: Vec<SyncCue> = rmp_serde::from_slice(body)
-        .map_err(|e| {
-            eprintln!("Failed to deserialize sync cues: {:?}", e);
-            HonzoError::Truncated
-        })?;
-    
+
+    let cues: Vec<SyncCue> = rmp_serde::from_slice(body).map_err(|e| {
+        eprintln!("Failed to deserialize sync cues: {:?}", e);
+        HonzoError::Truncated
+    })?;
+
     // Validate all cues
     for cue in &cues {
         if let Err(e) = validate_cue(cue) {
@@ -192,7 +190,7 @@ pub fn parse_sync(body: &[u8]) -> Result<Vec<SyncCue>, HonzoError> {
             return Err(e);
         }
     }
-    
+
     Ok(cues)
 }
 
@@ -205,18 +203,17 @@ pub fn parse_sync_document(body: &[u8]) -> Result<SyncDocument, HonzoError> {
             metadata: None,
         });
     }
-    
-    let doc: SyncDocument = rmp_serde::from_slice(body)
-        .map_err(|e| {
-            eprintln!("Failed to deserialize sync document: {:?}", e);
-            HonzoError::Truncated
-        })?;
-    
+
+    let doc: SyncDocument = rmp_serde::from_slice(body).map_err(|e| {
+        eprintln!("Failed to deserialize sync document: {:?}", e);
+        HonzoError::Truncated
+    })?;
+
     if let Err(e) = validate_document(&doc) {
         eprintln!("Invalid sync document: {:?}", doc);
         return Err(e);
     }
-    
+
     Ok(doc)
 }
 
@@ -225,7 +222,7 @@ pub fn build_sync(cues: &[SyncCue]) -> Result<Vec<u8>, HonzoError> {
     if cues.is_empty() {
         return Ok(Vec::new());
     }
-    
+
     // Validate all cues before building
     for cue in cues {
         if let Err(e) = validate_cue(cue) {
@@ -233,7 +230,7 @@ pub fn build_sync(cues: &[SyncCue]) -> Result<Vec<u8>, HonzoError> {
             return Err(e);
         }
     }
-    
+
     rmp_serde::to_vec(cues).map_err(|e| {
         eprintln!("Failed to serialize sync cues: {:?}", e);
         HonzoError::Truncated
@@ -246,7 +243,7 @@ pub fn build_sync_document(doc: &SyncDocument) -> Result<Vec<u8>, HonzoError> {
         eprintln!("Invalid sync document during build: {:?}", doc);
         return Err(e);
     }
-    
+
     rmp_serde::to_vec(doc).map_err(|e| {
         eprintln!("Failed to serialize sync document: {:?}", e);
         HonzoError::Truncated
@@ -299,7 +296,7 @@ pub fn new_media_segment_cue(
     offset: u32,
     timestamp_ms: u64,
     duration_ms: u64,
-    media_id: &str
+    media_id: &str,
 ) -> SyncCue {
     SyncCue {
         sync_type,
@@ -317,7 +314,7 @@ pub fn new_sync_track(
     track_id: &str,
     track_type: SyncType,
     media_id: Option<&str>,
-    media_duration_ms: Option<u64>
+    media_duration_ms: Option<u64>,
 ) -> SyncTrack {
     SyncTrack {
         track_id: track_id.to_string(),
@@ -403,13 +400,13 @@ pub fn merge_sync_cues(cues_sets: &[&[SyncCue]]) -> Vec<SyncCue> {
 /// Converts legacy sync cues to a sync document
 pub fn legacy_cues_to_document(cues: Vec<SyncCue>) -> SyncDocument {
     let mut doc = new_sync_document();
-    
+
     // Group cues by type
     let mut audio_cues = Vec::new();
     let mut video_cues = Vec::new();
     let mut page_cues = Vec::new();
     let mut custom_cues = Vec::new();
-    
+
     for cue in cues {
         match cue.sync_type {
             SyncType::Audio => audio_cues.push(cue),
@@ -418,31 +415,31 @@ pub fn legacy_cues_to_document(cues: Vec<SyncCue>) -> SyncDocument {
             SyncType::Animation | SyncType::Custom => custom_cues.push(cue),
         }
     }
-    
+
     // Create tracks for each type
     if !audio_cues.is_empty() {
         let mut track = new_sync_track("audio", SyncType::Audio, None, None);
         track.cues = audio_cues;
         doc.tracks.push(track);
     }
-    
+
     if !video_cues.is_empty() {
         let mut track = new_sync_track("video", SyncType::Video, None, None);
         track.cues = video_cues;
         doc.tracks.push(track);
     }
-    
+
     if !page_cues.is_empty() {
         let mut track = new_sync_track("pages", SyncType::Page, Some("page"), None);
         track.cues = page_cues;
         doc.tracks.push(track);
     }
-    
+
     if !custom_cues.is_empty() {
         let mut track = new_sync_track("custom", SyncType::Custom, None, None);
         track.cues = custom_cues;
         doc.tracks.push(track);
     }
-    
+
     doc
 }

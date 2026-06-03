@@ -12,7 +12,7 @@ fn test_annotation_creation() {
         note: Some("important text".to_string()),
         color: Some("#ffff00".to_string()),
     };
-    
+
     assert_eq!(annotation.chunk_id, 1);
     assert_eq!(annotation.offset, 100);
     assert_eq!(annotation.length, 20);
@@ -31,7 +31,7 @@ fn test_annotation_with_optional_fields() {
         note: None,
         color: None,
     };
-    
+
     assert_eq!(annotation.chunk_id, 1);
     assert_eq!(annotation.offset, 100);
     assert_eq!(annotation.length, 20);
