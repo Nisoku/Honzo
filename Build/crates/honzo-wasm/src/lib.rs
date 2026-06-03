@@ -208,18 +208,19 @@ impl HonzoWasm {
     pub fn get_chunk(&self, index: u32) -> Result<Vec<u8>, JsValue> {
         let parser = honzo_core::HonzoParser::new(&self.buf, self.reader_version)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
-        
-        let toc_entry = parser.find_chunk_by_id(index)
+
+        let toc_entry = parser
+            .find_chunk_by_id(index)
             .ok_or_else(|| JsValue::from_str("chunk index out of bounds"))?;
-        
+
         if toc_entry.is_encrypted() {
             return Ok(Vec::new());
         }
-        
+
         let raw = parser
             .chunk_bytes(&toc_entry)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
-        
+
         decompress(raw, toc_entry.compression, toc_entry.size_raw)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
     }
