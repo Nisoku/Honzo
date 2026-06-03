@@ -24,6 +24,7 @@ namespace capi {
       HonzoErrorCode_InvalidMathML = 6,
       HonzoErrorCode_Truncated = 7,
       HonzoErrorCode_InvalidCss = 8,
+      HonzoErrorCode_InvalidSyncCue = 9,
       HonzoErrorCode_Unknown = 255,
     };
 
@@ -43,6 +44,7 @@ public:
         InvalidMathML = 6,
         Truncated = 7,
         InvalidCss = 8,
+        InvalidSyncCue = 9,
         Unknown = 255,
     };
 

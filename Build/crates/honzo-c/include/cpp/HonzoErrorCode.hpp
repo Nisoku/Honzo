@@ -35,6 +35,7 @@ inline HonzoErrorCode HonzoErrorCode::FromFFI(diplomat::capi::HonzoErrorCode c_e
         case diplomat::capi::HonzoErrorCode_InvalidMathML:
         case diplomat::capi::HonzoErrorCode_Truncated:
         case diplomat::capi::HonzoErrorCode_InvalidCss:
+        case diplomat::capi::HonzoErrorCode_InvalidSyncCue:
         case diplomat::capi::HonzoErrorCode_Unknown:
             return static_cast<HonzoErrorCode::Value>(c_enum);
         default:

@@ -21,6 +21,7 @@ typedef enum HonzoErrorCode {
   HonzoErrorCode_InvalidMathML = 6,
   HonzoErrorCode_Truncated = 7,
   HonzoErrorCode_InvalidCss = 8,
+  HonzoErrorCode_InvalidSyncCue = 9,
   HonzoErrorCode_Unknown = 255,
 } HonzoErrorCode;
 

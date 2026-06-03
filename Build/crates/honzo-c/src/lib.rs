@@ -33,6 +33,7 @@ pub mod ffi {
         InvalidMathML = 6,
         Truncated = 7,
         InvalidCss = 8,
+        InvalidSyncCue = 9,
         Unknown = 255,
     }
 

@@ -41,12 +41,15 @@ pub struct SyncCue {
     pub timestamp_ms: u64,
 
     /// Optional identifier for the sync media
+    #[serde(default)]
     pub media_id: Option<String>,
 
     /// Optional duration in milliseconds for this cue
+    #[serde(default)]
     pub duration_ms: Option<u64>,
 
     /// Optional custom data for the cue (e.g., JSON metadata)
+    #[serde(default)]
     pub metadata: Option<SyncMetadata>,
 }
 
@@ -111,20 +114,16 @@ pub struct SyncDocument {
 
 /// Validates a sync cue
 pub fn validate_cue(cue: &SyncCue) -> Result<(), HonzoError> {
-    if cue.timestamp_ms == 0 {
-        return Err(HonzoError::Truncated);
-    }
-
     if let Some(duration) = cue.duration_ms {
         if duration == 0 {
-            return Err(HonzoError::Truncated);
+            return Err(HonzoError::InvalidSyncCue);
         }
     }
 
     // For page syncs, validate page number range
     if cue.sync_type == SyncType::Page && cue.timestamp_ms > 100000 {
         // Arbitrary max page count (100,000 pages)
-        return Err(HonzoError::Truncated);
+        return Err(HonzoError::InvalidSyncCue);
     }
 
     Ok(())
@@ -141,7 +140,7 @@ pub fn validate_track(track: &SyncTrack) -> Result<(), HonzoError> {
     for cue in &track.cues {
         // Ensure cue type matches track type
         if cue.sync_type != track.track_type && track.track_type != SyncType::Custom {
-            return Err(HonzoError::Truncated);
+            return Err(HonzoError::InvalidSyncCue);
         }
 
         validate_cue(cue)?;
@@ -153,7 +152,7 @@ pub fn validate_track(track: &SyncTrack) -> Result<(), HonzoError> {
 /// Validates a sync document
 pub fn validate_document(doc: &SyncDocument) -> Result<(), HonzoError> {
     if doc.version != 1 {
-        return Err(HonzoError::Truncated);
+        return Err(HonzoError::InvalidSyncCue);
     }
 
     // Allow empty tracks for now
@@ -228,7 +227,7 @@ pub fn build_sync(cues: &[SyncCue]) -> Result<Vec<u8>, HonzoError> {
         }
     }
 
-    rmp_serde::to_vec(cues).map_err(|e| {
+    rmp_serde::to_vec_named(cues).map_err(|e| {
         eprintln!("Failed to serialize sync cues: {:?}", e);
         HonzoError::Truncated
     })
@@ -241,7 +240,7 @@ pub fn build_sync_document(doc: &SyncDocument) -> Result<Vec<u8>, HonzoError> {
         return Err(e);
     }
 
-    rmp_serde::to_vec(doc).map_err(|e| {
+    rmp_serde::to_vec_named(doc).map_err(|e| {
         eprintln!("Failed to serialize sync document: {:?}", e);
         HonzoError::Truncated
     })
@@ -381,7 +380,7 @@ pub fn find_page_cue(cues: &[SyncCue], page_number: u32) -> Option<&SyncCue> {
 
 /// Sorts sync cues by timestamp
 pub fn sort_sync_cues(cues: &mut [SyncCue]) {
-    cues.sort_by(|a, b| a.timestamp_ms.cmp(&b.timestamp_ms));
+    cues.sort_by_key(|a| a.timestamp_ms);
 }
 
 /// Merges multiple sets of sync cues

@@ -25,4 +25,5 @@ pub enum HonzoError {
     UnknownFontEmbedding(u8),
     UnknownExtraNamespace(&'static str),
     Truncated,
+    InvalidSyncCue,
 }

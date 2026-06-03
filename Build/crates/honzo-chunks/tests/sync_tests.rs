@@ -90,10 +90,10 @@ fn test_sync_validation() {
     let valid_cue = new_audio_cue(1, 100, 5000);
     assert!(validate_cue(&valid_cue).is_ok());
 
-    // Test invalid timestamp
-    let mut invalid_cue = valid_cue.clone();
-    invalid_cue.timestamp_ms = 0;
-    assert!(validate_cue(&invalid_cue).is_err());
+    // Test timestamp 0 is valid (start of stream)
+    let mut zero_ts_cue = valid_cue.clone();
+    zero_ts_cue.timestamp_ms = 0;
+    assert!(validate_cue(&zero_ts_cue).is_ok());
 
     // Test invalid duration
     let mut invalid_cue = valid_cue.clone();

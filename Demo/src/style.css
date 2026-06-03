@@ -630,7 +630,6 @@ footer {
   border: 1px solid var(--border);
   max-height: 75vh; /* Keep panels from getting infinitely tall */
   overflow: hidden;
-  display: flex;
 }
 
 .panel.visible {
