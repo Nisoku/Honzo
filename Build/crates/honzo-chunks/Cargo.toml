@@ -16,3 +16,7 @@ pulldown-latex = "0.7"
 quick-xml = "0.40"
 rust-stemmers = "1"
 lexepub = "0.1"
+
+[dev-dependencies]
+tempfile = "3.3"
+pretty_assertions = "1.3"

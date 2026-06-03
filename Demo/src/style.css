@@ -630,6 +630,7 @@ footer {
   border: 1px solid var(--border);
   max-height: 75vh; /* Keep panels from getting infinitely tall */
   overflow: hidden;
+  display: flex;
 }
 
 .panel.visible {
@@ -692,12 +693,10 @@ footer {
 .table-container {
   border-radius: var(--radius-md);
   margin-top: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  flex: 1; /* Fill available space */
-  min-height: 0; /* Allow scrolling inside flex */
+  display: block;
+  max-height: 50vh;
+  overflow-y: auto;
   border: 1px solid var(--border);
-  overflow: hidden; /* Handle overflow at table level */
 }
 
 table {
@@ -823,9 +822,8 @@ tr:last-child td {
 }
 
 .scroll-content {
-  flex: 1;
   overflow-y: auto;
-  min-height: 0; /* Crucial for nested flex scroll */
+  max-height: 50vh;
   padding-right: 0.25rem; /* Prevent scrollbar overlap */
 }
 

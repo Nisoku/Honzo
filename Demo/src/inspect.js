@@ -235,12 +235,12 @@ function renderToc() {
   const toc = tocData.get();
   const cc = fileInfoData.get()?.chunkCount || 0;
   chunkCount.textContent = `(${cc} total)`;
-
+  
   tocBody.innerHTML = toc.map((e, i) => {
     const tag = typeof e.chunk_type === "string" ? e.chunk_type : new TextDecoder().decode(new Uint8Array(e.chunk_type));
     const comp = reader.compression_name_for_chunk(i);
     const type = reader.content_type_name_for_chunk(i);
-
+    
     return `<tr>
       <td>${i}</td>
       <td><strong>${esc(tag)}</strong></td>
