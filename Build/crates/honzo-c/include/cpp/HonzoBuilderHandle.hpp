@@ -20,15 +20,27 @@ namespace capi {
 
     diplomat::capi::HonzoBuilderHandle* HonzoBuilderHandle_new(void);
 
-    bool HonzoBuilderHandle_add_chunk(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View tag, diplomat::capi::DiplomatU8View data, uint8_t compression, uint8_t content_type_kind, uint8_t content_type_value);
+    bool HonzoBuilderHandle_add_chunk(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View tag, diplomat::capi::DiplomatU8View data, uint8_t compression, uint8_t content_type_kind, uint8_t content_type_value, uint8_t cover_type, diplomat::capi::DiplomatStringView alt_text, int32_t font_embedding, diplomat::capi::DiplomatStringView font_license_url);
 
     bool HonzoBuilderHandle_set_language(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatStringView lang);
 
     bool HonzoBuilderHandle_set_auto_sidx(diplomat::capi::HonzoBuilderHandle* self, bool enable);
 
+    bool HonzoBuilderHandle_set_auto_covt(diplomat::capi::HonzoBuilderHandle* self, bool enable);
+
+    bool HonzoBuilderHandle_set_layout(diplomat::capi::HonzoBuilderHandle* self, uint8_t layout);
+
+    bool HonzoBuilderHandle_set_flags(diplomat::capi::HonzoBuilderHandle* self, uint32_t flags);
+
+    bool HonzoBuilderHandle_set_min_reader_version(diplomat::capi::HonzoBuilderHandle* self, uint16_t version);
+
+    bool HonzoBuilderHandle_add_pmap_entry(diplomat::capi::HonzoBuilderHandle* self, uint32_t print_page, uint32_t chunk_id, uint32_t byte_offset);
+
     bool HonzoBuilderHandle_add_math_chunk(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View data, uint8_t math_type, uint8_t compression);
 
     bool HonzoBuilderHandle_set_meta(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View msgpack);
+
+    bool HonzoBuilderHandle_set_extra(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View extra);
 
     bool HonzoBuilderHandle_add_extra_entry(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View tag, diplomat::capi::DiplomatStringView namespace_, diplomat::capi::DiplomatU8View body);
 
@@ -51,14 +63,24 @@ inline std::unique_ptr<HonzoBuilderHandle> HonzoBuilderHandle::new_() {
     return std::unique_ptr<HonzoBuilderHandle>(HonzoBuilderHandle::FromFFI(result));
 }
 
-inline bool HonzoBuilderHandle::add_chunk(diplomat::span<const uint8_t> tag, diplomat::span<const uint8_t> data, uint8_t compression, uint8_t content_type_kind, uint8_t content_type_value) {
+inline diplomat::result<bool, diplomat::Utf8Error> HonzoBuilderHandle::add_chunk(diplomat::span<const uint8_t> tag, diplomat::span<const uint8_t> data, uint8_t compression, uint8_t content_type_kind, uint8_t content_type_value, uint8_t cover_type, std::string_view alt_text, int32_t font_embedding, std::string_view font_license_url) {
+    if (!diplomat::capi::diplomat_is_str(alt_text.data(), alt_text.size())) {
+    return diplomat::Err<diplomat::Utf8Error>();
+  }
+    if (!diplomat::capi::diplomat_is_str(font_license_url.data(), font_license_url.size())) {
+    return diplomat::Err<diplomat::Utf8Error>();
+  }
     auto result = diplomat::capi::HonzoBuilderHandle_add_chunk(this->AsFFI(),
         {tag.data(), tag.size()},
         {data.data(), data.size()},
         compression,
         content_type_kind,
-        content_type_value);
-    return result;
+        content_type_value,
+        cover_type,
+        {alt_text.data(), alt_text.size()},
+        font_embedding,
+        {font_license_url.data(), font_license_url.size()});
+    return diplomat::Ok<bool>(result);
 }
 
 inline diplomat::result<bool, diplomat::Utf8Error> HonzoBuilderHandle::set_language(std::string_view lang) {
@@ -76,6 +98,38 @@ inline bool HonzoBuilderHandle::set_auto_sidx(bool enable) {
     return result;
 }
 
+inline bool HonzoBuilderHandle::set_auto_covt(bool enable) {
+    auto result = diplomat::capi::HonzoBuilderHandle_set_auto_covt(this->AsFFI(),
+        enable);
+    return result;
+}
+
+inline bool HonzoBuilderHandle::set_layout(uint8_t layout) {
+    auto result = diplomat::capi::HonzoBuilderHandle_set_layout(this->AsFFI(),
+        layout);
+    return result;
+}
+
+inline bool HonzoBuilderHandle::set_flags(uint32_t flags) {
+    auto result = diplomat::capi::HonzoBuilderHandle_set_flags(this->AsFFI(),
+        flags);
+    return result;
+}
+
+inline bool HonzoBuilderHandle::set_min_reader_version(uint16_t version) {
+    auto result = diplomat::capi::HonzoBuilderHandle_set_min_reader_version(this->AsFFI(),
+        version);
+    return result;
+}
+
+inline bool HonzoBuilderHandle::add_pmap_entry(uint32_t print_page, uint32_t chunk_id, uint32_t byte_offset) {
+    auto result = diplomat::capi::HonzoBuilderHandle_add_pmap_entry(this->AsFFI(),
+        print_page,
+        chunk_id,
+        byte_offset);
+    return result;
+}
+
 inline bool HonzoBuilderHandle::add_math_chunk(diplomat::span<const uint8_t> data, uint8_t math_type, uint8_t compression) {
     auto result = diplomat::capi::HonzoBuilderHandle_add_math_chunk(this->AsFFI(),
         {data.data(), data.size()},
@@ -87,6 +141,12 @@ inline bool HonzoBuilderHandle::add_math_chunk(diplomat::span<const uint8_t> dat
 inline bool HonzoBuilderHandle::set_meta(diplomat::span<const uint8_t> msgpack) {
     auto result = diplomat::capi::HonzoBuilderHandle_set_meta(this->AsFFI(),
         {msgpack.data(), msgpack.size()});
+    return result;
+}
+
+inline bool HonzoBuilderHandle::set_extra(diplomat::span<const uint8_t> extra) {
+    auto result = diplomat::capi::HonzoBuilderHandle_set_extra(this->AsFFI(),
+        {extra.data(), extra.size()});
     return result;
 }
 

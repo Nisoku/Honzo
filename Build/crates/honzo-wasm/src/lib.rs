@@ -17,6 +17,7 @@ pub struct HonzoWasm {
     buf: Vec<u8>,
     reader_version: u16,
     meta: Vec<u8>,
+    data_start: usize,
     toc: Vec<WasmTocEntry>,
 }
 
@@ -49,10 +50,11 @@ impl HonzoWasm {
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?
             .to_vec();
 
-        let entries: Vec<_> = p.toc_entries().collect();
+        let head = p.head();
+        let data_start = (52 + head.toc_size) as usize;
 
-        let toc = entries
-            .iter()
+        let toc = p
+            .toc_entries()
             .map(|e| WasmTocEntry {
                 chunk_type: e.chunk_type,
                 chunk_id: e.chunk_id,
@@ -75,6 +77,7 @@ impl HonzoWasm {
             buf: buf.to_vec(),
             reader_version,
             meta,
+            data_start,
             toc,
         })
     }
@@ -206,22 +209,23 @@ impl HonzoWasm {
     }
 
     pub fn get_chunk(&self, index: u32) -> Result<Vec<u8>, JsValue> {
-        let parser = honzo_core::HonzoParser::new(&self.buf, self.reader_version)
-            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
-
-        let toc_entry = parser
-            .find_chunk_by_id(index)
+        let entry = self
+            .toc
+            .get(index as usize)
             .ok_or_else(|| JsValue::from_str("chunk index out of bounds"))?;
 
-        if toc_entry.is_encrypted() {
+        if entry.flags & 0x01 != 0 {
             return Ok(Vec::new());
         }
 
-        let raw = parser
-            .chunk_bytes(&toc_entry)
-            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        let start = self.data_start + entry.offset as usize;
+        let end = start + entry.size_compressed as usize;
+        if end > self.buf.len() {
+            return Err(JsValue::from_str("chunk data truncated"));
+        }
 
-        decompress(raw, toc_entry.compression, toc_entry.size_raw)
+        let compressed = &self.buf[start..end];
+        decompress(compressed, entry.compression, entry.size_raw)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
     }
 
@@ -444,6 +448,8 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
         content_type_kind: u8,
         content_type_value: u8,
         #[serde(default)]
+        cover_type: u8,
+        #[serde(default)]
         alt_text: Option<String>,
         #[serde(default)]
         font_embedding: Option<u8>,
@@ -462,6 +468,14 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
         language: String,
         #[serde(default = "default_auto_sidx")]
         auto_sidx: bool,
+        #[serde(default = "default_auto_covt")]
+        auto_covt: bool,
+        #[serde(default)]
+        layout: u8,
+        #[serde(default)]
+        flags: u32,
+        #[serde(default = "default_min_reader_version")]
+        min_reader_version: u16,
     }
 
     fn default_language() -> String {
@@ -472,12 +486,37 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
         true
     }
 
+    fn default_auto_covt() -> bool {
+        true
+    }
+
+    fn default_min_reader_version() -> u16 {
+        1
+    }
+
     let spec: BuildSpec =
         serde_wasm_bindgen::from_value(spec).map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
 
     let mut builder = HonzoBuilder::new()
         .set_language(&spec.language)
-        .set_auto_sidx(spec.auto_sidx);
+        .set_auto_sidx(spec.auto_sidx)
+        .set_auto_covt(spec.auto_covt);
+
+    if spec.flags != 0 {
+        builder = builder.set_flags(spec.flags);
+    }
+
+    if spec.min_reader_version != 1 {
+        builder = builder.set_min_reader_version(spec.min_reader_version);
+    }
+
+    let layout = match spec.layout {
+        0 => honzo_core::LayoutMode::Reflowable,
+        1 => honzo_core::LayoutMode::Fixed,
+        2 => honzo_core::LayoutMode::Scroll,
+        _ => return Err(JsValue::from_str("invalid layout mode")),
+    };
+    builder = builder.set_layout(layout);
 
     for chunk in &spec.chunks {
         if chunk.tag.len() != 4 {
@@ -510,10 +549,26 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
                     "invalid content_type_kind for markup chunk",
                 ));
             }
-            let markup = match chunk.content_type_value {
-                0 => MarkupType::Markdown,
-                1 => MarkupType::Html,
-                _ => return Err(JsValue::from_str("invalid content_type_value")),
+            let markup = match &tag_arr {
+                b"CHAP" | b"NOTE" => match chunk.content_type_value {
+                    0 => MarkupType::Markdown,
+                    1 => MarkupType::Html,
+                    _ => return Err(JsValue::from_str("invalid content_type_value")),
+                },
+                _ => {
+                    if chunk.content_type_value != 0 {
+                        return Err(JsValue::from_str(
+                            "content_type_value must be 0 for this chunk type",
+                        ));
+                    }
+                    MarkupType::Markdown
+                }
+            };
+            let cover = match chunk.cover_type {
+                0 => CoverType::Front,
+                1 => CoverType::Back,
+                2 => CoverType::FullSpread,
+                _ => CoverType::Front,
             };
             let font_embedding = chunk.font_embedding.map(|v| match v {
                 0 => honzo_core::FontEmbedding::Allowed,
@@ -527,7 +582,7 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
                 &chunk.data,
                 compression,
                 markup,
-                CoverType::Front,
+                cover,
                 chunk.alt_text.as_deref(),
                 font_embedding,
                 chunk.font_license_url.as_deref(),

@@ -8,8 +8,7 @@ pub use honzo_chunks::data::math::{
     latex_to_mathml_bytes, render_math_bytes, validate_mathml_bytes,
 };
 pub use honzo_chunks::data::sidx::normalize_search_term;
-pub use honzo_core::HonzoParser;
-pub use honzo_core::MathType;
+pub use honzo_core::{FontEmbedding, HonzoParser, LayoutMode, MathType, PmapEntry};
 pub use honzo_io::{decompress, Compression, CoverType, HonzoBuilder, HonzoMeta, MarkupType};
 
 #[diplomat::bridge]
@@ -17,8 +16,8 @@ pub mod ffi {
     use crate::{
         decompress, guess_font_format as guess_font_format_impl, latex_to_mathml_bytes,
         normalize_search_term as normalize_search_term_impl, render_math_bytes, validate_css_bytes,
-        validate_mathml_bytes, Compression, CoverType, HonzoBuilder, HonzoMeta, HonzoParser,
-        MarkupType, MathType,
+        validate_mathml_bytes, Compression, CoverType, FontEmbedding, HonzoBuilder, HonzoMeta,
+        HonzoParser, LayoutMode, MarkupType, MathType, PmapEntry,
     };
     use core::fmt::Write as _;
     use honzo_chunks::extra::{anno, sync};
@@ -37,65 +36,164 @@ pub mod ffi {
         Unknown = 255,
     }
 
-    #[diplomat::opaque]
+    #[diplomat::opaque_mut]
     pub struct HonzoHandle {
         buf: Vec<u8>,
         meta: Vec<u8>,
-        chunks: Vec<Vec<u8>>,
+        data_start: usize,
+        toc_entries: Vec<TocEntryOwned>,
+        chunk_cache: Vec<Option<Vec<u8>>>,
         reader_version: u16,
+    }
+
+    struct TocEntryOwned {
+        chunk_id: u32,
+        offset: u64,
+        size_compressed: u32,
+        size_raw: u32,
+        compression: u8,
+        ctype_kind: u8,
+        ctype_value: u8,
+        cover_type: u8,
+        flags: u8,
+        crc32: u32,
     }
 
     impl HonzoHandle {
         pub fn parse(data: &[u8], reader_version: u16) -> Option<Box<HonzoHandle>> {
             let p = HonzoParser::new(data, reader_version).ok()?;
             let meta = p.meta_bytes().ok()?.to_vec();
+            let head = p.head();
 
-            let entries: Vec<_> = p.toc_entries().collect();
-            let mut chunks = Vec::with_capacity(entries.len());
+            let data_start = (52 + head.toc_size) as usize;
 
-            for entry in &entries {
-                if entry.is_encrypted() {
-                    chunks.push(Vec::new());
-                    continue;
-                }
-                let raw = p.chunk_bytes(entry).ok()?;
-                let decompressed = decompress(raw, entry.compression, entry.size_raw).ok()?;
-                chunks.push(decompressed);
-            }
+            let toc_entries: Vec<_> = p
+                .toc_entries()
+                .map(|e| TocEntryOwned {
+                    chunk_id: e.chunk_id,
+                    offset: e.offset,
+                    size_compressed: e.size_compressed,
+                    size_raw: e.size_raw,
+                    compression: e.compression as u8,
+                    ctype_kind: e.content_type_kind,
+                    ctype_value: e.content_type_value,
+                    cover_type: e.cover_type as u8,
+                    flags: e.flags,
+                    crc32: e.crc32,
+                })
+                .collect();
+
+            let chunk_count = toc_entries.len();
+            let chunk_cache = (0..chunk_count).map(|_| None).collect();
 
             Some(Box::new(HonzoHandle {
                 buf: data.to_vec(),
                 meta,
-                chunks,
+                data_start,
+                toc_entries,
+                chunk_cache,
                 reader_version,
             }))
         }
 
         pub fn chunk_count(&self) -> u32 {
-            self.chunks.len() as u32
+            self.toc_entries.len() as u32
+        }
+
+        pub fn version_major(&self) -> u8 {
+            self.buf.get(4).copied().unwrap_or(0)
+        }
+
+        pub fn version_minor(&self) -> u8 {
+            self.buf.get(5).copied().unwrap_or(0)
+        }
+
+        pub fn min_reader_version(&self) -> u16 {
+            read_le_u16(&self.buf, 6).unwrap_or(0)
+        }
+
+        pub fn flags(&self) -> u32 {
+            read_le_u32(&self.buf, 8).unwrap_or(0)
+        }
+
+        pub fn toc_size(&self) -> u64 {
+            read_le_u64(&self.buf, 16).unwrap_or(0)
+        }
+
+        pub fn data_size(&self) -> u64 {
+            read_le_u64(&self.buf, 24).unwrap_or(0)
+        }
+
+        pub fn extra_size(&self) -> u64 {
+            read_le_u64(&self.buf, 32).unwrap_or(0)
+        }
+
+        pub fn meta_size(&self) -> u64 {
+            read_le_u64(&self.buf, 40).unwrap_or(0)
         }
 
         pub fn layout_mode(&self) -> u8 {
-            HonzoParser::new(&self.buf, self.reader_version)
-                .map(|p| p.head().layout_mode() as u8)
-                .unwrap_or(0)
+            self.flags().wrapping_shr(2) as u8 & 3
         }
 
         pub fn has_drm(&self) -> bool {
-            HonzoParser::new(&self.buf, self.reader_version)
-                .map(|p| p.head().has_drm())
-                .unwrap_or(false)
+            self.flags() & 0x10 != 0
         }
 
         pub fn has_sidx(&self) -> bool {
-            HonzoParser::new(&self.buf, self.reader_version)
-                .map(|p| p.head().has_sidx())
-                .unwrap_or(false)
+            self.flags() & 0x20 != 0
+        }
+
+        pub fn has_annotations(&self) -> bool {
+            self.flags() & 0x40 != 0
+        }
+
+        pub fn has_sync(&self) -> bool {
+            self.flags() & 0x80 != 0
         }
 
         #[allow(clippy::needless_lifetimes)]
-        pub fn get_chunk<'a>(&'a self, index: u32) -> Option<&'a [u8]> {
-            self.chunks.get(index as usize).map(|c| c.as_slice())
+        pub fn get_extra<'a>(&'a self) -> &'a [u8] {
+            let data_size = self.data_size();
+            let extra_size = self.extra_size();
+            if extra_size == 0 {
+                return &[];
+            }
+            let start = self.data_start + data_size as usize;
+            let end = start + extra_size as usize;
+            if end > self.buf.len() {
+                return &[];
+            }
+            &self.buf[start..end]
+        }
+
+        #[allow(clippy::needless_lifetimes)]
+        pub fn get_chunk<'a>(&'a mut self, index: u32) -> Option<&'a [u8]> {
+            let entry = self.toc_entries.get(index as usize)?;
+            if entry.flags & 0x01 != 0 {
+                return Some(&[]);
+            }
+            // Check cache — take the slot temporarily to drop the borrow
+            let cached = self.chunk_cache[index as usize].take();
+            if let Some(data) = cached {
+                self.chunk_cache[index as usize] = Some(data);
+                return Some(self.chunk_cache[index as usize].as_ref().unwrap());
+            }
+            // Decompress and cache
+            let start = self.data_start + entry.offset as usize;
+            let end = start + entry.size_compressed as usize;
+            if end > self.buf.len() {
+                return None;
+            }
+            let compressed = &self.buf[start..end];
+            let comp = match entry.compression {
+                0 => Compression::None,
+                1 => Compression::Lz4,
+                _ => return None,
+            };
+            let decompressed = decompress(compressed, comp, entry.size_raw).ok()?;
+            self.chunk_cache[index as usize] = Some(decompressed);
+            Some(self.chunk_cache[index as usize].as_ref().unwrap())
         }
 
         #[allow(clippy::needless_lifetimes)]
@@ -227,6 +325,7 @@ pub mod ffi {
             })
         }
 
+        #[allow(clippy::too_many_arguments)]
         pub fn add_chunk(
             &mut self,
             tag: &[u8],
@@ -234,6 +333,10 @@ pub mod ffi {
             compression: u8,
             content_type_kind: u8,
             content_type_value: u8,
+            cover_type: u8,
+            alt_text: &str,
+            font_embedding: i32,
+            font_license_url: &str,
         ) -> bool {
             if tag.len() != 4 {
                 return false;
@@ -264,20 +367,51 @@ pub mod ffi {
             if content_type_kind != 1 {
                 return false;
             }
-            let markup = match content_type_value {
-                0 => MarkupType::Markdown,
-                1 => MarkupType::Html,
-                _ => return false,
+            let markup = match &tag_arr {
+                b"CHAP" | b"NOTE" => match content_type_value {
+                    0 => MarkupType::Markdown,
+                    1 => MarkupType::Html,
+                    _ => return false,
+                },
+                _ => {
+                    if content_type_value != 0 {
+                        return false;
+                    }
+                    MarkupType::Markdown
+                }
+            };
+            let cover = match cover_type {
+                0 => CoverType::Front,
+                1 => CoverType::Back,
+                2 => CoverType::FullSpread,
+                _ => CoverType::Front,
+            };
+            let alt = if alt_text.is_empty() {
+                None
+            } else {
+                Some(alt_text)
+            };
+            let embedding = match font_embedding {
+                0 => Some(FontEmbedding::Allowed),
+                1 => Some(FontEmbedding::PrintOnly),
+                2 => Some(FontEmbedding::NoModify),
+                3 => Some(FontEmbedding::NoEmbed),
+                _ => None,
+            };
+            let license_url = if font_license_url.is_empty() {
+                None
+            } else {
+                Some(font_license_url)
             };
             self.builder = Some(builder.add_chunk(
                 tag_arr,
                 data,
                 compression,
                 markup,
-                CoverType::Front,
-                None,
-                None,
-                None,
+                cover,
+                alt,
+                embedding,
+                license_url,
             ));
             true
         }
@@ -300,8 +434,63 @@ pub mod ffi {
             true
         }
 
+        pub fn set_auto_covt(&mut self, enable: bool) -> bool {
+            let b = match self.builder.as_mut() {
+                Some(b) => std::mem::take(b),
+                None => return false,
+            };
+            self.builder = Some(b.set_auto_covt(enable));
+            true
+        }
+
+        pub fn set_layout(&mut self, layout: u8) -> bool {
+            let l = match layout {
+                0 => LayoutMode::Reflowable,
+                1 => LayoutMode::Fixed,
+                2 => LayoutMode::Scroll,
+                _ => return false,
+            };
+            let b = match self.builder.as_mut() {
+                Some(b) => std::mem::take(b),
+                None => return false,
+            };
+            self.builder = Some(b.set_layout(l));
+            true
+        }
+
+        pub fn set_flags(&mut self, flags: u32) -> bool {
+            let b = match self.builder.as_mut() {
+                Some(b) => std::mem::take(b),
+                None => return false,
+            };
+            self.builder = Some(b.set_flags(flags));
+            true
+        }
+
+        pub fn set_min_reader_version(&mut self, version: u16) -> bool {
+            let b = match self.builder.as_mut() {
+                Some(b) => std::mem::take(b),
+                None => return false,
+            };
+            self.builder = Some(b.set_min_reader_version(version));
+            true
+        }
+
+        pub fn add_pmap_entry(&mut self, print_page: u32, chunk_id: u32, byte_offset: u32) -> bool {
+            let b = match self.builder.as_mut() {
+                Some(b) => std::mem::take(b),
+                None => return false,
+            };
+            self.builder = Some(b.add_pmap_entry(PmapEntry {
+                print_page,
+                chunk_id,
+                byte_offset,
+            }));
+            true
+        }
+
         pub fn add_math_chunk(&mut self, data: &[u8], math_type: u8, compression: u8) -> bool {
-            self.add_chunk(b"MATH", data, compression, 2, math_type)
+            self.add_chunk(b"MATH", data, compression, 2, math_type, 0, "", -1, "")
         }
 
         pub fn set_meta(&mut self, msgpack: &[u8]) -> bool {
@@ -310,6 +499,15 @@ pub mod ffi {
                 None => return false,
             };
             self.builder = Some(b.set_meta(msgpack));
+            true
+        }
+
+        pub fn set_extra(&mut self, extra: &[u8]) -> bool {
+            let b = match self.builder.take() {
+                Some(b) => b,
+                None => return false,
+            };
+            self.builder = Some(b.set_extra(extra));
             true
         }
 
@@ -443,5 +641,40 @@ pub mod ffi {
             }
             None => Err(HonzoErrorCode::Truncated),
         }
+    }
+
+    fn read_le_u16(buf: &[u8], offset: usize) -> Option<u16> {
+        if offset + 2 > buf.len() {
+            return None;
+        }
+        Some(u16::from_le_bytes([buf[offset], buf[offset + 1]]))
+    }
+
+    fn read_le_u32(buf: &[u8], offset: usize) -> Option<u32> {
+        if offset + 4 > buf.len() {
+            return None;
+        }
+        Some(u32::from_le_bytes([
+            buf[offset],
+            buf[offset + 1],
+            buf[offset + 2],
+            buf[offset + 3],
+        ]))
+    }
+
+    fn read_le_u64(buf: &[u8], offset: usize) -> Option<u64> {
+        if offset + 8 > buf.len() {
+            return None;
+        }
+        Some(u64::from_le_bytes([
+            buf[offset],
+            buf[offset + 1],
+            buf[offset + 2],
+            buf[offset + 3],
+            buf[offset + 4],
+            buf[offset + 5],
+            buf[offset + 6],
+            buf[offset + 7],
+        ]))
     }
 }

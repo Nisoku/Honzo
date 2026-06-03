@@ -29,13 +29,35 @@ public:
 
   inline uint32_t chunk_count() const;
 
+  inline uint8_t version_major() const;
+
+  inline uint8_t version_minor() const;
+
+  inline uint16_t min_reader_version() const;
+
+  inline uint32_t flags() const;
+
+  inline uint64_t toc_size() const;
+
+  inline uint64_t data_size() const;
+
+  inline uint64_t extra_size() const;
+
+  inline uint64_t meta_size() const;
+
   inline uint8_t layout_mode() const;
 
   inline bool has_drm() const;
 
   inline bool has_sidx() const;
 
-  inline std::optional<diplomat::span<const uint8_t>> get_chunk(uint32_t index) const;
+  inline bool has_annotations() const;
+
+  inline bool has_sync() const;
+
+  inline diplomat::span<const uint8_t> get_extra() const;
+
+  inline std::optional<diplomat::span<const uint8_t>> get_chunk(uint32_t index);
 
   inline diplomat::span<const uint8_t> get_meta() const;
 

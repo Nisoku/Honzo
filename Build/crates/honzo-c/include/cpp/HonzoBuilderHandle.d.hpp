@@ -23,15 +23,27 @@ public:
 
   inline static std::unique_ptr<HonzoBuilderHandle> new_();
 
-  inline bool add_chunk(diplomat::span<const uint8_t> tag, diplomat::span<const uint8_t> data, uint8_t compression, uint8_t content_type_kind, uint8_t content_type_value);
+  inline diplomat::result<bool, diplomat::Utf8Error> add_chunk(diplomat::span<const uint8_t> tag, diplomat::span<const uint8_t> data, uint8_t compression, uint8_t content_type_kind, uint8_t content_type_value, uint8_t cover_type, std::string_view alt_text, int32_t font_embedding, std::string_view font_license_url);
 
   inline diplomat::result<bool, diplomat::Utf8Error> set_language(std::string_view lang);
 
   inline bool set_auto_sidx(bool enable);
 
+  inline bool set_auto_covt(bool enable);
+
+  inline bool set_layout(uint8_t layout);
+
+  inline bool set_flags(uint32_t flags);
+
+  inline bool set_min_reader_version(uint16_t version);
+
+  inline bool add_pmap_entry(uint32_t print_page, uint32_t chunk_id, uint32_t byte_offset);
+
   inline bool add_math_chunk(diplomat::span<const uint8_t> data, uint8_t math_type, uint8_t compression);
 
   inline bool set_meta(diplomat::span<const uint8_t> msgpack);
+
+  inline bool set_extra(diplomat::span<const uint8_t> extra);
 
   inline diplomat::result<bool, diplomat::Utf8Error> add_extra_entry(diplomat::span<const uint8_t> tag, std::string_view namespace_, diplomat::span<const uint8_t> body);
 
