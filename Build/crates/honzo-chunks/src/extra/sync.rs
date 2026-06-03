@@ -41,15 +41,12 @@ pub struct SyncCue {
     pub timestamp_ms: u64,
 
     /// Optional identifier for the sync media
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub media_id: Option<String>,
 
     /// Optional duration in milliseconds for this cue
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub duration_ms: Option<u64>,
 
     /// Optional custom data for the cue (e.g., JSON metadata)
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<SyncMetadata>,
 }
 

@@ -37,12 +37,7 @@ fn parse_known_routes_to_typed_payloads() {
         other => panic!("expected anno payload, got {other:?}"),
     }
 
-    let sync_body = sync::build_sync(&[sync::SyncCue {
-        chunk_id: 1,
-        offset: 2,
-        timestamp_ms: 3,
-    }])
-    .unwrap();
+    let sync_body = sync::build_sync(&[sync::new_audio_cue(1, 2, 3)]).unwrap();
 
     let sync_parsed = parse_known(sync::NAMESPACE, &sync_body)
         .expect("known namespace")
