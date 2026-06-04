@@ -331,3 +331,80 @@ fn ffi_chunk_roundtrip() {
     let chunk = handle.get_chunk(0).unwrap(); // CHAP is index 0, SIDX gets appended last
     assert_eq!(std::str::from_utf8(chunk).unwrap(), "hello world");
 }
+
+#[test]
+fn ffi_get_extra_with_content() {
+    let meta = rmp_serde::to_vec(&honzo_io::HonzoMeta::default()).unwrap();
+    let mut builder = honzo_c::ffi::HonzoBuilderHandle::new();
+    builder.add_chunk(b"CHAP", b"extra test", 0, 1, 0, 0, "", -1, "");
+    builder.add_extra_entry(b"XTRA", "com.example.test", b"hello");
+    builder.set_meta(&meta);
+    assert!(builder.finalize());
+    let output = builder.get_result();
+    let handle = honzo_c::ffi::HonzoHandle::parse(output, 1).unwrap();
+    let extra = handle.get_extra();
+    assert!(!extra.is_empty(), "extra should contain our entry");
+    let entries = honzo_io::parse_extra(extra).unwrap();
+    assert!(honzo_io::find_extra(&entries, "com.example.test").is_some());
+}
+
+#[test]
+fn ffi_get_annotations() {
+    let meta = rmp_serde::to_vec(&honzo_io::HonzoMeta::default()).unwrap();
+    let annos = vec![honzo_chunks::extra::anno::Annotation {
+        chunk_id: 0,
+        offset: 5,
+        length: 10,
+        r#type: "highlight".to_string(),
+        note: Some("test".to_string()),
+        color: None,
+    }];
+    let anno_body = honzo_chunks::extra::anno::build_anno(&annos).unwrap();
+
+    let mut builder = honzo_c::ffi::HonzoBuilderHandle::new();
+    builder.add_chunk(b"CHAP", b"anno test", 0, 1, 0, 0, "", -1, "");
+    builder.add_annotation(&anno_body);
+    builder.set_meta(&meta);
+    assert!(builder.finalize());
+    let output = builder.get_result();
+
+    let handle = honzo_c::ffi::HonzoHandle::parse(output, 1).unwrap();
+    let mut buffer = diplomat_runtime::rust_interop::RustWriteVec::with_capacity(256);
+    let result = handle.get_annotations(unsafe { buffer.borrow_mut() });
+    assert!(result.is_ok(), "get_annotations should succeed");
+    let json = std::str::from_utf8(buffer.borrow().as_bytes()).unwrap();
+    assert!(json.contains("\"chunk_id\":0"));
+    assert!(json.contains("\"type\":\"highlight\""));
+    assert!(json.contains("\"note\":\"test\""));
+}
+
+#[test]
+fn ffi_get_sync_cues() {
+    let meta = rmp_serde::to_vec(&honzo_io::HonzoMeta::default()).unwrap();
+    let cues = vec![honzo_chunks::extra::sync::SyncCue {
+        sync_type: honzo_chunks::extra::sync::SyncType::Audio,
+        chunk_id: 0,
+        offset: 100,
+        timestamp_ms: 5000,
+        media_id: None,
+        duration_ms: None,
+        metadata: None,
+    }];
+    let sync_body = honzo_chunks::extra::sync::build_sync(&cues).unwrap();
+
+    let mut builder = honzo_c::ffi::HonzoBuilderHandle::new();
+    builder.add_chunk(b"CHAP", b"sync test", 0, 1, 0, 0, "", -1, "");
+    builder.add_sync_cue(&sync_body);
+    builder.set_meta(&meta);
+    assert!(builder.finalize());
+    let output = builder.get_result();
+
+    let handle = honzo_c::ffi::HonzoHandle::parse(output, 1).unwrap();
+    let mut buffer = diplomat_runtime::rust_interop::RustWriteVec::with_capacity(256);
+    let result = handle.get_sync_cues(unsafe { buffer.borrow_mut() });
+    assert!(result.is_ok(), "get_sync_cues should succeed");
+    let json = std::str::from_utf8(buffer.borrow().as_bytes()).unwrap();
+    assert!(json.contains("\"chunk_id\":0"));
+    assert!(json.contains("\"offset\":100"));
+    assert!(json.contains("\"timestamp_ms\":5000"));
+}

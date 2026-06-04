@@ -10,9 +10,9 @@ pub struct Annotation {
     pub length: u32,
     #[serde(rename = "type")]
     pub r#type: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", default)]
     pub note: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", default)]
     pub color: Option<String>,
 }
 
@@ -21,5 +21,5 @@ pub fn parse_anno(body: &[u8]) -> Result<Vec<Annotation>, HonzoError> {
 }
 
 pub fn build_anno(annotations: &[Annotation]) -> Result<Vec<u8>, HonzoError> {
-    rmp_serde::to_vec(annotations).map_err(|_| HonzoError::Truncated)
+    rmp_serde::to_vec_named(annotations).map_err(|_| HonzoError::Truncated)
 }

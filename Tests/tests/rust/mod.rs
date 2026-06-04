@@ -9,6 +9,7 @@ mod corpus_matrix;
 mod covr;
 mod css_matrix;
 mod extra_matrix;
+mod extra_roundtrip_matrix;
 mod font_matrix;
 mod img_matrix;
 mod math_matrix;
