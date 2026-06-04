@@ -4,14 +4,26 @@
   "description": "Honzo ebook format reader and writer",
   "type": "module",
   "scripts": {
-    "lint": "node --eval \"const p=require('./package.json'); if(!p.name||!p.version){process.exit(1)}\"",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "make-pretty": "prettier --write .",
     "typecheck": "node --eval \"const p=require('./package.json'); if(!p.types||!String(p.types).endsWith('.d.ts')){process.exit(1)}\"",
-    "test": "node --eval \"const p=require('./package.json'); if(!Array.isArray(p.files)||p.files.length===0){process.exit(1)}\"",
-    "build": "node --eval \"const p=require('./package.json'); if(!p.main){process.exit(1)}\"",
-    "format": "npm run lint"
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest --no-cache",
+    "build": "node --eval \"const p=require('./package.json'); if(!p.main){process.exit(1)}\""
   },
   "main": "wasm/honzo_wasm.js",
   "types": "wasm/honzo_wasm.d.ts",
-  "files": ["wasm"],
-  "license": "Apache-2.0"
+  "files": [
+    "wasm"
+  ],
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.4.1",
+    "globals": "^17.6.0",
+    "jest": "^30.4.2",
+    "jiti": "^2.7.0",
+    "prettier": "^3.8.3",
+    "typescript-eslint": "^8.60.1"
+  }
 }
