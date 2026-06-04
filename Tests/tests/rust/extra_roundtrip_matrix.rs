@@ -259,17 +259,22 @@ fn drm_roundtrip_parse_and_build() {
 
 #[test]
 fn drm_known_namespace_is_recognized() {
-    assert!(honzo_chunks::extra::is_known_namespace(honzo_chunks::extra::DRM_NAMESPACE));
+    assert!(honzo_chunks::extra::is_known_namespace(
+        honzo_chunks::extra::DRM_NAMESPACE
+    ));
     let known = honzo_chunks::extra::parse_known(
         honzo_chunks::extra::DRM_NAMESPACE,
         &drm::build_drm(&drm::DrmEnvelope {
             algorithm: "AES-256-CBC".to_string(),
             iv: vec![0u8; 16],
             ciphertext: vec![1u8, 2, 3],
-        }).unwrap(),
-    ).unwrap().unwrap();
+        })
+        .unwrap(),
+    )
+    .unwrap()
+    .unwrap();
     match known {
-        honzo_chunks::extra::KnownExtra::Drm(_) => {},
+        honzo_chunks::extra::KnownExtra::Drm(_) => {}
         _ => panic!("expected Drm wrapped"),
     }
 }
