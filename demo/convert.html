@@ -1,54 +1,65 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HonzoConvert</title>
+    <link rel="icon" href="/Honzo/demo/source.svg" type="image/svg+xml" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="/Honzo/demo/assets/convert-BHv3DaVM.js"></script>
+    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/honzo_wasm-6MAoTcby.js">
+    <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/honzo_wasm-BNPW25fS.css">
+  <link rel="manifest" href="/Honzo/demo/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Honzo/demo/registerSW.js"></script></head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HonzoConvert</title>
-  <link rel="icon" href="/Honzo/demo/source.svg" type="image/svg+xml" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/Honzo/demo/assets/convert-DLrJxvaD.js"></script>
-  <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/honzo_wasm-DjDW3nVy.js">
-  <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/honzo_wasm-1fiFE0-C.css">
-<link rel="manifest" href="/Honzo/demo/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Honzo/demo/registerSW.js"></script></head>
-
-<body class="page-scroll">
-  <header>
-    <h1 class="title">HonzoConvert</h1>
-    <div class="header-nav">
-      <a href="/Honzo/demo/">Reader</a>
-      <a href="/Honzo/demo/inspect.html">Inspect</a>
-    </div>
-  </header>
-  <div class="container container-narrow">
-    <div class="drop-zone" id="dropZone">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-          stroke-linejoin="round" width="48" height="48">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-          <path d="M12 6v7" />
-          <path d="M9 9l3-3 3 3" />
-        </svg>
+  <body class="page-scroll">
+    <header>
+      <h1 class="title">HonzoConvert</h1>
+      <div class="header-nav">
+        <a href="/Honzo/demo/">Reader</a>
+        <a href="/Honzo/demo/inspect.html">Inspect</a>
       </div>
-      <h2>Drop an EPUB here</h2>
-      <p>or click to browse</p>
-      <input type="file" id="fileInput" accept=".epub" />
-    </div>
+    </header>
+    <div class="container container-narrow">
+      <div class="drop-zone" id="dropZone">
+        <div class="icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            width="48"
+            height="48"
+          >
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path
+              d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+            />
+            <path d="M12 6v7" />
+            <path d="M9 9l3-3 3 3" />
+          </svg>
+        </div>
+        <h2>Drop an EPUB here</h2>
+        <p>or click to browse</p>
+        <input type="file" id="fileInput" accept=".epub" />
+      </div>
 
-    <div class="status" id="status">
-      <span id="statusText"></span>
-      <div class="progress-bar">
-        <div class="fill" id="progressFill"></div>
+      <div class="status" id="status">
+        <span id="statusText"></span>
+        <div class="progress-bar">
+          <div class="fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="history" id="history">
+        <h3>Converted Files</h3>
+        <div id="historyList"></div>
       </div>
     </div>
 
-    <div class="history" id="history">
-      <h3>Converted Files</h3>
-      <div id="historyList"></div>
-    </div>
-  </div>
-
-</body>
-
+  </body>
 </html>
