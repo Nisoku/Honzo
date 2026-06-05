@@ -203,7 +203,7 @@ pub mod ffi {
         pub fn get_chunk<'a>(&'a mut self, index: u32) -> Option<&'a [u8]> {
             let entry = self.toc_entries.get(index as usize)?;
 
-            // Check cache — take the slot temporarily to drop the borrow
+            // Check cache. take the slot temporarily to drop the borrow
             let cached = self.chunk_cache[index as usize].take();
             if let Some(data) = cached {
                 self.chunk_cache[index as usize] = Some(data);

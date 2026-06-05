@@ -1,35 +1,19 @@
 import { openBookFromEntry } from "./book.js";
-import { showError, toggleLibrary } from "./ui.js";
+import { showError } from "./ui.js";
 import init, { HonzoWasm } from "./wasm/honzo_wasm.js";
 
-let elements = {
-  libraryContent: null,
-  libraryInput: null,
-};
+let elLibraryContent = null;
+let elLibraryInput = null;
 let wasmInitPromise = null;
 
 async function ensureWasmReady() {
-  if (!wasmInitPromise) {
-    wasmInitPromise = init();
-  }
+  if (!wasmInitPromise) wasmInitPromise = init();
   await wasmInitPromise;
 }
 
-function formatError(err) {
-  if (err instanceof Error && err.message) {
-    return err.message;
-  }
-  if (typeof err === "string") {
-    return err;
-  }
-  return String(err);
-}
-
-export function setLibraryElements(nextElements) {
-  elements = {
-    ...elements,
-    ...nextElements,
-  };
+export function setLibraryElements(elements) {
+  elLibraryContent = elements.libraryContent || elLibraryContent;
+  elLibraryInput = elements.libraryInput || elLibraryInput;
 }
 
 export async function openLibrary() {
@@ -43,43 +27,44 @@ export async function openLibrary() {
         }
       }
     } else {
-      elements.libraryInput?.click();
+      elLibraryInput?.click();
       return;
     }
     displayLibraryGrid(files);
-    toggleLibrary(true);
   } catch (err) {
-    showError("Failed to open library: " + formatError(err));
+    showError(
+      "Failed to open library: " +
+        (err instanceof Error ? err.message : String(err)),
+    );
   }
 }
 
 export function handleLibraryFiles(e) {
-  const files = Array.from(e.target.files);
-  displayLibraryGrid(files);
-  toggleLibrary(true);
+  displayLibraryGrid(Array.from(e.target.files));
 }
 
 async function displayLibraryGrid(fileEntries) {
-  if (!elements.libraryContent) return;
-  elements.libraryContent.innerHTML = "";
+  if (!elLibraryContent) return;
+  elLibraryContent.innerHTML = "";
   if (fileEntries.length === 0) {
-    elements.libraryContent.textContent = "No .hzo files found.";
+    elLibraryContent.textContent = "No .hzo files found.";
     return;
   }
   for (const entry of fileEntries) {
     const item = await createLibraryItem(entry);
-    elements.libraryContent.appendChild(item);
+    elLibraryContent.appendChild(item);
   }
 }
 
 async function createLibraryItem(fileEntry) {
   const item = document.createElement("div");
-  item.className = "library-item";
+  item.className = "toc-item";
+  item.style.marginBottom = "2px";
 
-  const titleDiv = document.createElement("div");
-  titleDiv.className = "library-title";
-  titleDiv.textContent = fileEntry.name;
-  item.appendChild(titleDiv);
+  const label = document.createElement("span");
+  label.className = "toc-label";
+  label.textContent = fileEntry.name;
+  item.appendChild(label);
 
   try {
     const file =
@@ -97,7 +82,7 @@ async function createLibraryItem(fileEntry) {
           : typeof v === "object"
             ? Object.values(v)[0]
             : v;
-      titleDiv.textContent = firstVal(meta?.title) || fileEntry.name;
+      label.textContent = firstVal(meta?.title) || fileEntry.name;
     }
   } catch (err) {
     console.error("Error reading metadata for", fileEntry.name, err);

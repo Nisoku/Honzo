@@ -3,22 +3,30 @@ import { marked } from "marked";
 import init, {
   HonzoWasm,
   normalize_search_term as normalizeSearchTerm,
-  render_math as renderMath,
 } from "./wasm/honzo_wasm.js";
-import {
-  showLoading,
-  hideLoading,
-  showError,
-  toggleLibrary,
-  toggleToc as setTocOpen,
-} from "./ui.js";
+import { showLoading, hideLoading, showError } from "./ui.js";
 import {
   bookTitle,
-  currentPage,
+  chapterLabel,
+  closeSidebar,
+  currentChapter,
+  currentChunkId,
+  currentDirection,
   hasBook,
   resetReaderState,
-  totalPages,
+  textAlign,
+  totalChapters,
+  setCurrentBookId,
+  setProgress,
+  getProgress,
+  getCurrentBookId,
+  getBookmarks,
+  addBookmark,
+  removeBookmark,
+  toggleSidebar,
 } from "./state.js";
+import { renderBookmarks } from "./bookmarks.js";
+import { renderMath } from "./math.js";
 
 let reader = null;
 let meta = null;
@@ -35,25 +43,24 @@ let elements = {
   searchStatus: null,
   tocContent: null,
   viewer: null,
+  chapterLabel: null,
+  progressFill: null,
+  footer: null,
+  header: null,
+  bookmarksContent: null,
+  metaContent: null,
 };
 
 export function setBookElements(nextElements) {
-  elements = {
-    ...elements,
-    ...nextElements,
-  };
+  elements = { ...elements, ...nextElements };
 }
 
-function setSearchStatus(message) {
-  if (elements.searchStatus) {
-    elements.searchStatus.textContent = message;
-  }
+function setSearchStatus(msg) {
+  if (elements.searchStatus) elements.searchStatus.textContent = msg;
 }
 
 function clearSearchResults() {
-  if (elements.searchResults) {
-    elements.searchResults.innerHTML = "";
-  }
+  if (elements.searchResults) elements.searchResults.innerHTML = "";
 }
 
 function setSearchResults(results) {
@@ -77,12 +84,13 @@ function setSearchResults(results) {
     item.type = "button";
     item.className = "search-result";
     const chapterLabel = `${result.chapter.chunk_type} #${result.chapter.chunk_id}`;
-    const summary = `${chapterLabel} • ${result.score} match${result.score === 1 ? "" : "es"}`;
-    const excerpt = result.excerpt ? `<span>${esc(result.excerpt)}</span>` : "";
-    item.innerHTML = `<strong>${esc(summary)}</strong>${excerpt}`;
+    const excerpt = result.excerpt
+      ? `<span class="search-excerpt">${esc(result.excerpt)}</span>`
+      : "";
+    item.innerHTML = `<span class="search-result-title">${esc(chapterLabel)}</span>${excerpt}`;
     item.addEventListener("click", () => {
       goToChapter(result.chapter.index);
-      setTocOpen(false);
+      toggleSidebar(null);
     });
     elements.searchResults.appendChild(item);
   }
@@ -119,22 +127,11 @@ function searchChapters(query) {
   const hitsByChunk = new Map();
   for (const term of terms) {
     const bucket = getIndexBucket(term);
-    if (!bucket) {
-      return [];
-    }
-    const seenOffsets = new Set();
-    const seenChunks = new Set();
+    if (!bucket) return [];
     for (const [chunkId, offset] of bucket) {
       const key = `${chunkId}:${offset}`;
-      if (!seenOffsets.has(key)) {
-        seenOffsets.add(key);
-        const entry = hitsByChunk.get(chunkId) || { score: 0, offsets: [] };
-        entry.offsets.push(offset);
-        hitsByChunk.set(chunkId, entry);
-      }
-      if (!seenChunks.has(chunkId)) {
-        seenChunks.add(chunkId);
-        const entry = hitsByChunk.get(chunkId) || { score: 0, offsets: [] };
+      if (!hitsByChunk.has(key)) {
+        const entry = hitsByChunk.get(chunkId) || { score: 0 };
         entry.score += 1;
         hitsByChunk.set(chunkId, entry);
       }
@@ -144,23 +141,30 @@ function searchChapters(query) {
   const matches = [];
   for (const [chunkId, entry] of hitsByChunk.entries()) {
     if (entry.score !== terms.length) continue;
-    const chapter = chapters.find((item) => item.chunk_id === chunkId);
-    if (!chapter) continue;
-    const chapterText = reader.get_chapter_text(chapter.index) || "";
+    const ch = chapters.find((item) => item.chunk_id === chunkId);
+    if (!ch) continue;
+    const chapterText = reader.get_chapter_text(ch.index) || "";
     const encodedText = new TextEncoder().encode(chapterText);
-    const firstOffset = entry.offsets[0] || 0;
+    const offsets = [];
+    for (const term of terms) {
+      const bucket = getIndexBucket(term);
+      if (!bucket) continue;
+      for (const [cid, offset] of bucket) {
+        if (cid === chunkId && !offsets.includes(offset)) offsets.push(offset);
+      }
+    }
+    const firstOffset = offsets[0] || 0;
     const start = Math.max(0, firstOffset - 24);
     const end = Math.min(encodedText.length, firstOffset + 72);
     const excerpt = new TextDecoder()
       .decode(encodedText.slice(start, end))
       .replace(/\s+/g, " ")
       .trim();
-    matches.push({ chapter, score: entry.score, excerpt });
+    matches.push({ chapter: ch, score: entry.score, excerpt });
   }
 
   matches.sort(
-    (left, right) =>
-      right.score - left.score || left.chapter.index - right.chapter.index,
+    (a, b) => b.score - a.score || a.chapter.index - b.chapter.index,
   );
   return matches.slice(0, 25);
 }
@@ -189,19 +193,13 @@ function getMetaStr(obj, field) {
 }
 
 function formatError(err) {
-  if (err instanceof Error && err.message) {
-    return err.message;
-  }
-  if (typeof err === "string") {
-    return err;
-  }
+  if (err instanceof Error && err.message) return err.message;
+  if (typeof err === "string") return err;
   return String(err);
 }
 
 async function ensureWasmReady() {
-  if (!wasmInitPromise) {
-    wasmInitPromise = init();
-  }
+  if (!wasmInitPromise) wasmInitPromise = init();
   await wasmInitPromise;
 }
 
@@ -211,7 +209,7 @@ export async function openBook(e) {
   showLoading();
   try {
     const data = await file.arrayBuffer();
-    await loadBook(new Uint8Array(data));
+    await loadBook(new Uint8Array(data), file.name);
   } catch (err) {
     showError("Error loading book: " + formatError(err));
   } finally {
@@ -226,7 +224,8 @@ export async function openBuiltinBook(bookPath) {
     const resp = await fetch(bookPath);
     if (!resp.ok) throw new Error("HTTP " + resp.status);
     const data = await resp.arrayBuffer();
-    await loadBook(new Uint8Array(data));
+    const name = bookPath.split("/").pop() || "book.hzo";
+    await loadBook(new Uint8Array(data), name);
   } catch (err) {
     showError("Error loading demo: " + formatError(err));
   } finally {
@@ -235,22 +234,21 @@ export async function openBuiltinBook(bookPath) {
 }
 
 export async function openBookFromEntry(entry) {
-  toggleLibrary(false);
+  toggleSidebar(null);
   showLoading();
   try {
     const file =
       typeof entry.getFile === "function" ? await entry.getFile() : entry;
     const data = await file.arrayBuffer();
-    await loadBook(new Uint8Array(data));
+    await loadBook(new Uint8Array(data), file.name);
   } catch (err) {
-    toggleLibrary(true);
     showError("Error opening book: " + formatError(err));
   } finally {
     hideLoading();
   }
 }
 
-async function loadBook(data) {
+async function loadBook(data, fileName) {
   await ensureWasmReady();
   if (!elements.viewer || !elements.tocContent) {
     throw new Error("Reader UI is not ready.");
@@ -262,6 +260,8 @@ async function loadBook(data) {
   if (elements.searchInput) elements.searchInput.value = "";
   clearSearchResults();
   setSearchStatus("Type a word to search.");
+  if (elements.footer) elements.footer.hidden = false;
+
   reader = new HonzoWasm(data, 1);
   meta = reader.get_meta_parsed();
   tocEntries = reader.get_toc();
@@ -285,11 +285,10 @@ async function loadBook(data) {
     }
   }
 
-  // Inject CSS_ stylesheets into the document
+  // Inject CSS_ stylesheets
   for (const e of tocEntries) {
     if (e.chunk_type === "CSS_") {
-      const data = reader.get_chunk(e.chunk_id);
-      const css = new TextDecoder().decode(data);
+      const css = new TextDecoder().decode(reader.get_chunk(e.chunk_id));
       const style = document.createElement("style");
       style.textContent = css;
       document.head.appendChild(style);
@@ -313,27 +312,47 @@ async function loadBook(data) {
     }));
   }
 
-  if (chapters.length === 0) {
+  if (chapters.length === 0)
     throw new Error("This file has no readable content.");
-  }
+
+  // Book ID for persistence
+  const titleVal = getMetaStr(meta, "title") || "Untitled";
+  const bookId = `${titleVal}_${data.length}`;
+  setCurrentBookId(bookId);
 
   currentChapterIndex = 0;
   renderCurrentChapter();
   generateToc();
+  renderMetaInfo();
 
-  totalPages.set(chapters.length);
-  currentPage.set(1);
+  totalChapters.set(chapters.length);
   hasBook.set(true);
 
   window.removeEventListener("keyup", handleKeyEvents);
   window.addEventListener("keyup", handleKeyEvents);
 
-  const titleVal = getMetaStr(meta, "title");
-  bookTitle.set(titleVal || "Untitled");
+  bookTitle.set(titleVal);
+
+  // Detect text direction from book metadata
+  const direction = meta?.direction || "ltr";
+  currentDirection.set(direction);
+  if (direction === "rtl") {
+    textAlign.set("rtl");
+  }
+
+  // Restore progress
+  const progress = getProgress(bookId);
+  if (progress && progress.chapter >= 0 && progress.chapter < chapters.length) {
+    goToChapter(progress.chapter);
+  }
+
+  // Render bookmarks sidebar
+  if (elements.bookmarksContent) {
+    renderBookmarks(elements.bookmarksContent, bookId, chapters);
+  }
 }
 
-// TODO: Probably build a viewless renderer so that we don't have to handle the <ref> stuff 
-// TODO: and it's cleaner and safer
+// Chapter rendering with decorations
 function renderCurrentChapter(scrollToAnchor) {
   if (!chapters.length) return;
   if (!elements.viewer) return;
@@ -357,13 +376,7 @@ function renderCurrentChapter(scrollToAnchor) {
     img.src = url;
     container.appendChild(img);
   } else if (isMath) {
-    const raw = new TextDecoder().decode(data);
-    try {
-      const rendered = renderMath(data, chapter.content_type_value);
-      container.innerHTML = '<div class="math-block">' + rendered + "</div>";
-    } catch {
-      container.innerHTML = '<pre class="math-latex">' + esc(raw) + "</pre>";
-    }
+    renderMath(container, data, chapter.content_type_value, reader);
   } else if (
     chapter.chunk_type === "SIDX" ||
     chapter.chunk_type === "CSS_" ||
@@ -375,13 +388,18 @@ function renderCurrentChapter(scrollToAnchor) {
     const isHtml =
       chapter.content_type_kind === 1 && chapter.content_type_value === 1;
 
+    let content;
     if (isHtml) {
-      container.innerHTML = sanitizeHtml(raw);
+      content = sanitizeHtml(raw);
     } else {
-      container.innerHTML = renderMarkdown(raw);
+      content = renderMarkdown(raw);
     }
+
+    // Wrap in decorated container
+    container.innerHTML = `<div class="chapter-body">${content}</div>`;
   }
 
+  // Resolve <ref> tags
   for (const ref of container.querySelectorAll("ref")) {
     const type = ref.getAttribute("type");
     const chunkId = parseInt(ref.getAttribute("chunk"), 10);
@@ -417,15 +435,35 @@ function renderCurrentChapter(scrollToAnchor) {
 
   if (scrollToAnchor) {
     const target = container.querySelector(`#${CSS.escape(scrollToAnchor)}`);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    if (target) target.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  currentPage.set(currentChapterIndex + 1);
+  // Scroll to top when navigating chapters
+  if (!scrollToAnchor) {
+    elements.viewer.scrollTop = 0;
+  }
+
+  currentChapter.set(currentChapterIndex);
+  currentChunkId.set(chapter.chunk_id);
+
+  // Update chapter label
+  const label = `${chapter.chunk_type} ${chapter.chunk_id}${chapter.size_raw ? ` (${(chapter.size_raw / 1024).toFixed(0)} KB)` : ""}`;
+  chapterLabel.set(label);
+
+  // Update progress bar
+  if (elements.progressFill) {
+    const t = chapters.length;
+    elements.progressFill.style.width = `${t > 1 ? ((currentChapterIndex + 1) / t) * 100 : 0}%`;
+  }
+
+  // Persist reading progress
+  const bookId = getCurrentBookId();
+  if (bookId) {
+    setProgress(bookId, currentChapterIndex, chapter.chunk_id);
+  }
 }
 
-function goToChapter(index, anchor) {
+export function goToChapter(index, anchor) {
   if (!chapters.length) return;
   currentChapterIndex = clampChapterIndex(index);
   renderCurrentChapter(anchor);
@@ -477,7 +515,6 @@ function sanitizeHtml(html) {
     "main",
     "aside",
     "ref",
-    // MathML
     "math",
     "mi",
     "mo",
@@ -582,18 +619,101 @@ function generateToc() {
   if (!chapters.length || !elements.tocContent) return;
   elements.tocContent.innerHTML = "";
   chapters.forEach((ch, i) => {
+    const isCurrent = i === currentChapterIndex;
     const item = document.createElement("div");
-    item.className = "toc-item";
+    item.className = `toc-item${isCurrent ? " active" : ""}`;
     const label =
-      ch.chunk_type + " #" + ch.chunk_id + " (" + ch.size_raw + " bytes)";
-    item.textContent = label;
+      ch.chunk_type === "CHAP"
+        ? `Chapter ${ch.chunk_id}`
+        : `${ch.chunk_type} ${ch.chunk_id}`;
+    const sizeInfo = ch.size_raw ? `${(ch.size_raw / 1024).toFixed(0)} KB` : "";
+    item.innerHTML = `<span class="toc-label">${esc(label)}</span>${sizeInfo ? `<span class="toc-size">${esc(sizeInfo)}</span>` : ""}`;
     item.addEventListener("click", () => {
-      currentChapterIndex = i;
-      renderCurrentChapter();
-      closeToc();
+      goToChapter(i);
+      toggleSidebar(null);
     });
     elements.tocContent.appendChild(item);
   });
+}
+
+function renderMetaInfo() {
+  if (!elements.metaContent) return;
+  const m = meta;
+  if (!m || typeof m !== "object") {
+    elements.metaContent.innerHTML =
+      "<p class='meta-empty'>No metadata available</p>";
+    return;
+  }
+
+  const title = getMetaStr(m, "title") || "Untitled";
+  const author =
+    getMetaStr(m, "authors") || getMetaStr(m, "author") || "Unknown";
+  const publisher = getMetaStr(m, "publisher");
+  const description = getMetaStr(m, "description");
+  const language = getMetaStr(m, "language");
+  const wordCount = m.word_count;
+  const readingTime = m.reading_time_mins;
+  const edition = getMetaStr(m, "edition");
+  const source = getMetaStr(m, "source_url");
+  const license = getMetaStr(m, "license");
+  const genres = Array.isArray(m.genres) ? m.genres : [];
+  const tags = Array.isArray(m.tags) ? m.tags : [];
+
+  const series = m.series;
+  const identifiers = Array.isArray(m.identifiers) ? m.identifiers : [];
+
+  let html = `
+    <div class="meta-section">
+      <h3 class="meta-title">${esc(title)}</h3>
+      <p class="meta-author">${esc(author)}</p>
+      ${publisher ? `<p class="meta-publisher">${esc(publisher)}</p>` : ""}
+    </div>
+  `;
+
+  if (description) {
+    html += `<div class="meta-section"><p class="meta-description">${esc(description)}</p></div>`;
+  }
+
+  html += `<div class="meta-grid">`;
+  if (language) html += metaGridItem("Language", language);
+  if (wordCount !== null && wordCount !== undefined)
+    html += metaGridItem("Words", Number(wordCount).toLocaleString());
+  if (readingTime !== null && readingTime !== undefined)
+    html += metaGridItem("Reading Time", `${readingTime} min`);
+  if (edition) html += metaGridItem("Edition", edition);
+  if (source)
+    html += metaGridItem(
+      "Source",
+      `<a href="${esc(source)}" target="_blank" rel="noopener">${esc(new URL(source).hostname)}</a>`,
+    );
+  if (license) html += metaGridItem("License", license);
+  html += metaGridItem("Chapters", String(chapters.length));
+  html += metaGridItem("File Type", ".hzo");
+  html += `</div>`;
+
+  if (series) {
+    html += `<div class="meta-section"><h4>Series</h4>`;
+    html += `<p>${esc(series.title || "")}${series.position ? ` · ${esc(series.position)}` : ""}${series.arc ? ` · ${esc(series.arc)}` : ""}</p>`;
+    html += `</div>`;
+  }
+
+  if (genres.length) {
+    html += `<div class="meta-section"><h4>Genres</h4><div class="meta-tags">${genres.map((g) => `<span class="meta-tag">${esc(g)}</span>`).join("")}</div></div>`;
+  }
+
+  if (tags.length) {
+    html += `<div class="meta-section"><h4>Tags</h4><div class="meta-tags">${tags.map((t) => `<span class="meta-tag">${esc(t)}</span>`).join("")}</div></div>`;
+  }
+
+  if (identifiers.length) {
+    html += `<div class="meta-section"><h4>Identifiers</h4><div class="meta-ids">${identifiers.map((id) => `<div class="meta-id"><span class="meta-id-type">${esc(id.id_type)}</span><span class="meta-id-value">${esc(id.value)}</span></div>`).join("")}</div></div>`;
+  }
+
+  elements.metaContent.innerHTML = html;
+}
+
+function metaGridItem(label, value) {
+  return `<div class="meta-grid-item"><span class="meta-grid-label">${label}</span><span class="meta-grid-value">${value}</span></div>`;
 }
 
 function hasBookLoaded() {
@@ -603,11 +723,6 @@ function hasBookLoaded() {
 function clampChapterIndex(index) {
   if (!chapters.length) return 0;
   return Math.max(0, Math.min(index, chapters.length - 1));
-}
-
-function normalizedPageNumber() {
-  const p = parseInt(elements.currentPageInput?.value ?? "", 10);
-  return Number.isNaN(p) ? currentChapterIndex + 1 : p;
 }
 
 export function prevPage() {
@@ -620,24 +735,64 @@ export function nextPage() {
   goToChapter(currentChapterIndex + 1);
 }
 
-export function goToPage() {
-  if (!hasBookLoaded()) return;
-  goToChapter(normalizedPageNumber() - 1);
+export function addBookmarkCurrent() {
+  const bookId = getCurrentBookId();
+  if (!bookId || !hasBookLoaded()) return;
+  const ch = chapters[currentChapterIndex];
+  const marks = addBookmark(bookId, currentChapterIndex, ch.chunk_id, "");
+  if (elements.bookmarksContent) {
+    renderBookmarks(elements.bookmarksContent, bookId, chapters);
+  }
+}
+
+export function removeBookmarkCurrent() {
+  const bookId = getCurrentBookId();
+  if (!bookId || !hasBookLoaded()) return;
+  const marks = getBookmarks(bookId);
+  const idx = marks.findIndex((m) => m.chapter === currentChapterIndex);
+  if (idx >= 0) {
+    removeBookmark(bookId, idx);
+    if (elements.bookmarksContent) {
+      renderBookmarks(elements.bookmarksContent, bookId, chapters);
+    }
+  }
+}
+
+export function isCurrentChapterBookmarked() {
+  const bookId = getCurrentBookId();
+  if (!bookId) return false;
+  return getBookmarks(bookId).some((m) => m.chapter === currentChapterIndex);
 }
 
 function handleKeyEvents(e) {
   if (!hasBookLoaded()) return;
   if (e.key === "ArrowLeft") prevPage();
   if (e.key === "ArrowRight") nextPage();
+  if (e.key === "b" && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    if (isCurrentChapterBookmarked()) {
+      removeBookmarkCurrent();
+    } else {
+      addBookmarkCurrent();
+    }
+  }
+  if (e.key === "f" && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    toggleSidebar("search");
+    if (elements.searchInput)
+      setTimeout(() => elements.searchInput.focus(), 100);
+  }
 }
 
 function guessMime(bytes) {
   if (bytes.length < 4) return "image/jpeg";
   const b = (i) => bytes[i];
-  if (b(0) === 0x89 && b(1) === 0x50 && b(2) === 0x4e && b(3) === 0x47) return "image/png";
+  if (b(0) === 0x89 && b(1) === 0x50 && b(2) === 0x4e && b(3) === 0x47)
+    return "image/png";
   if (b(0) === 0xff && b(1) === 0xd8) return "image/jpeg";
   if (b(0) === 0x47 && b(1) === 0x49 && b(2) === 0x46) return "image/gif";
-  if (b(0) === 0x52 && b(1) === 0x49 && b(2) === 0x46 && b(3) === 0x46) return "image/webp";
+  if (b(0) === 0x52 && b(1) === 0x49 && b(2) === 0x46 && b(3) === 0x46)
+    return "image/webp";
   if (b(0) === 0x3c) {
     const head = new TextDecoder().decode(bytes.slice(0, 512));
     if (head.includes("<svg")) return "image/svg+xml";
@@ -646,11 +801,11 @@ function guessMime(bytes) {
 }
 
 export function toggleToc() {
-  setTocOpen();
+  toggleSidebar("toc");
 }
 
 export function closeToc() {
-  setTocOpen(false);
+  toggleSidebar(null);
 }
 
 export function focusSearch() {

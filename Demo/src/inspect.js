@@ -20,22 +20,37 @@ const statusVisible = signal(path("inspect", "statusVisible"), false);
 const statusKind = signal(path("inspect", "statusKind"), "");
 const statusMessage = signal(path("inspect", "statusMessage"), "");
 
-const statusClass = derived(path("inspect", "statusClass"), () =>
-  `status${statusVisible.get() ? ` active ${statusKind.get()}` : ""}`);
+const statusClass = derived(
+  path("inspect", "statusClass"),
+  () => `status${statusVisible.get() ? ` active ${statusKind.get()}` : ""}`,
+);
 
-const filePanelClass = derived(path("inspect", "filePanelClass"), () =>
-  `panel${fileLoaded.get() ? " visible" : ""}`);
-const tocPanelClass = derived(path("inspect", "tocPanelClass"), () =>
-  `panel${fileLoaded.get() ? " visible" : ""}`);
-const metaPanelClass = derived(path("inspect", "metaPanelClass"), () =>
-  `panel${fileLoaded.get() ? " visible" : ""}`);
-const extraPanelClass = derived(path("inspect", "extraPanelClass"), () =>
-  `panel${fileLoaded.get() && extraData.get()?.length > 0 ? " visible" : ""}`);
+const filePanelClass = derived(
+  path("inspect", "filePanelClass"),
+  () => `panel${fileLoaded.get() ? " visible" : ""}`,
+);
+const tocPanelClass = derived(
+  path("inspect", "tocPanelClass"),
+  () => `panel${fileLoaded.get() ? " visible" : ""}`,
+);
+const metaPanelClass = derived(
+  path("inspect", "metaPanelClass"),
+  () => `panel${fileLoaded.get() ? " visible" : ""}`,
+);
+const extraPanelClass = derived(
+  path("inspect", "extraPanelClass"),
+  () =>
+    `panel${fileLoaded.get() && extraData.get()?.length > 0 ? " visible" : ""}`,
+);
 
-const saveDisabled = derived(path("inspect", "saveDisabled"), () =>
-  !fileLoaded.get());
-const revertDisabled = derived(path("inspect", "revertDisabled"), () =>
-  !fileLoaded.get());
+const saveDisabled = derived(
+  path("inspect", "saveDisabled"),
+  () => !fileLoaded.get(),
+);
+const revertDisabled = derived(
+  path("inspect", "revertDisabled"),
+  () => !fileLoaded.get(),
+);
 
 // DOM refs
 const dropZone = document.getElementById("dropZone");
@@ -63,7 +78,7 @@ bindClass(metaPanel, metaPanelClass);
 bindClass(extraPanel, extraPanelClass);
 
 const origBindDisabled = (el, signal) => {
-  const update = () => el.disabled = signal.get();
+  const update = () => (el.disabled = signal.get());
   update();
   signal.subscribe?.(update) ?? (signal._onSet = update);
 };
@@ -73,16 +88,28 @@ origBindDisabled(revertBtn, revertDisabled);
 
 // Events
 bindEvent(dropZone, "click", () => fileInput.click());
-bindEvent(dropZone, "dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
+bindEvent(dropZone, "dragover", (e) => {
+  e.preventDefault();
+  dropZone.classList.add("dragover");
+});
 bindEvent(dropZone, "dragleave", () => dropZone.classList.remove("dragover"));
-bindEvent(dropZone, "drop", (e) => { e.preventDefault(); dropZone.classList.remove("dragover"); loadFile(e.dataTransfer?.files?.[0]); });
-bindEvent(fileInput, "change", (e) => { if (e.target.files?.[0]) loadFile(e.target.files[0]); });
+bindEvent(dropZone, "drop", (e) => {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+  loadFile(e.dataTransfer?.files?.[0]);
+});
+bindEvent(fileInput, "change", (e) => {
+  if (e.target.files?.[0]) loadFile(e.target.files[0]);
+});
 bindEvent(saveBtn, "click", onSave);
 bindEvent(revertBtn, "click", onRevert);
 
 // File loading
 async function ensureWasm() {
-  if (!wasmReady) { await init(); wasmReady = true; }
+  if (!wasmReady) {
+    await init();
+    wasmReady = true;
+  }
 }
 
 async function loadFile(file) {
@@ -135,7 +162,10 @@ async function loadFile(file) {
     renderExtra();
 
     fileLoaded.set(true);
-    showStatus("success", `Successfully loaded: ${file.name} (${formatSize(buf.byteLength)})`);
+    showStatus(
+      "success",
+      `Successfully loaded: ${file.name} (${formatSize(buf.byteLength)})`,
+    );
   } catch (e) {
     console.error("Error loading file:", e);
     showStatus("error", `Failed to load file: ${e.message || String(e)}`);
@@ -161,11 +191,12 @@ function buildChunksData(r) {
 function renderFileInfo() {
   const d = fileInfoData.get();
   if (!d || !reader) return;
-    
-    const layout = reader.layout_mode_name();
-    const comp = reader.compression_name();
-  const badge = (on, label) => `<span class="flag-badge ${on ? "on" : "off"}">${on ? "Yes" : "No"}</span>`;
-   
+
+  const layout = reader.layout_mode_name();
+  const comp = reader.compression_name();
+  const badge = (on, label) =>
+    `<span class="flag-badge ${on ? "on" : "off"}">${on ? "Yes" : "No"}</span>`;
+
   fileInfo.innerHTML = `
     <div class="info-item">
       <span class="label">File Size</span>
@@ -235,56 +266,92 @@ function renderToc() {
   const toc = tocData.get();
   const cc = fileInfoData.get()?.chunkCount || 0;
   chunkCount.textContent = `(${cc} total)`;
-  
-  tocBody.innerHTML = toc.map((e, i) => {
-    const tag = typeof e.chunk_type === "string" ? e.chunk_type : new TextDecoder().decode(new Uint8Array(e.chunk_type));
-    const comp = reader.compression_name_for_chunk(i);
-    const type = reader.content_type_name_for_chunk(i);
-    
-    return `<tr>
+
+  tocBody.innerHTML = toc
+    .map((e, i) => {
+      const tag =
+        typeof e.chunk_type === "string"
+          ? e.chunk_type
+          : new TextDecoder().decode(new Uint8Array(e.chunk_type));
+      const comp = reader.compression_name_for_chunk(i);
+      const type = reader.content_type_name_for_chunk(i);
+
+      return `<tr>
       <td>${i}</td>
       <td><strong>${esc(tag)}</strong></td>
       <td>${formatSize(Number(e.size_compressed))}</td>
       <td>${formatSize(Number(e.size_raw))}</td>
       <td>${comp}</td>
       <td>${type}</td>
-      <td>0x${e.flags.toString(16).padStart(4, '0')}</td>
+      <td>0x${e.flags.toString(16).padStart(4, "0")}</td>
     </tr>`;
-  }).join("");
+    })
+    .join("");
 }
 
 function renderMeta() {
   const meta = metaData.get();
-  if (!meta || typeof meta !== "object") { metaFields.innerHTML = "<p style='color:#888'>No metadata</p>"; return; }
+  if (!meta || typeof meta !== "object") {
+    metaFields.innerHTML = "<p style='color:#888'>No metadata</p>";
+    return;
+  }
   let html = "";
   html += field("Title", "title", meta.title, true, "text");
   html += field("Subtitle", "subtitle", meta.subtitle, true, "text");
   html += field("Authors", "authors", meta.authors, false, "csv");
   html += field("Language", "language", meta.language, false, "text");
   html += field("Publisher", "publisher", meta.publisher, true, "text");
-  html += field("Description", "description", meta.description, true, "textarea");
+  html += field(
+    "Description",
+    "description",
+    meta.description,
+    true,
+    "textarea",
+  );
   html += field("Source URL", "source_url", meta.source_url, true, "text");
   html += field("License", "license", meta.license, true, "text");
   html += field("Edition", "edition", meta.edition, true, "text");
   html += field("Word Count", "word_count", meta.word_count, true, "number");
-  html += field("Reading Time (min)", "reading_time_mins", meta.reading_time_mins, true, "number");
+  html += field(
+    "Reading Time (min)",
+    "reading_time_mins",
+    meta.reading_time_mins,
+    true,
+    "number",
+  );
   html += tagField("Genres", "genres", meta.genres);
   html += tagField("Tags", "tags", meta.tags);
 
   html += `<h3>Identifiers</h3><div id="idList">`;
   const ids = meta.identifiers || [];
-  html += ids.map((id, i) => `
+  html += ids
+    .map(
+      (id, i) => `
     <div class="field" style="display:flex;gap:0.5rem;align-items:end">
-      <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="${esc(id.id_type || '')}" /></div>
-      <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="${esc(id.value || '')}" /></div>
+      <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="${esc(id.id_type || "")}" /></div>
+      <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="${esc(id.value || "")}" /></div>
       <button class="btn btn-secondary" style="padding:0.4rem 0.6rem;font-size:0.8rem" onclick="this.parentElement.remove()">×</button>
-    </div>`).join("");
+    </div>`,
+    )
+    .join("");
   html += `</div><button class="btn btn-secondary" style="font-size:0.85rem;margin-top:0.3rem" onclick="addIdentifier()">+ Add Identifier</button>`;
 
   html += `<h3>Series</h3>`;
   if (meta.series) {
-    html += field("Series Title", "series_title", meta.series.title, true, "text");
-    html += field("Series Position", "series_pos", meta.series.position, true, "text");
+    html += field(
+      "Series Title",
+      "series_title",
+      meta.series.title,
+      true,
+      "text",
+    );
+    html += field(
+      "Series Position",
+      "series_pos",
+      meta.series.position,
+      true,
+      "text",
+    );
     html += field("Series Arc", "series_arc", meta.series.arc, true, "text");
   } else {
     html += `<p style="color:#888;font-size:0.9rem">No series info</p>`;
@@ -297,38 +364,46 @@ function renderMeta() {
     const value = input.value.trim();
     if (value) {
       const container = document.getElementById(`tags_${id}`);
-      container.insertAdjacentHTML('beforeend', `<span class="tag"><span class="tag-text">${esc(value)}</span> <span class="remove" onclick="this.parentElement.remove()">×</span></span>`);
-      input.value = '';
+      container.insertAdjacentHTML(
+        "beforeend",
+        `<span class="tag"><span class="tag-text">${esc(value)}</span> <span class="remove" onclick="this.parentElement.remove()">×</span></span>`,
+      );
+      input.value = "";
     }
   };
 
   window.addIdentifier = function () {
-    const container = document.getElementById('idList');
-    container.insertAdjacentHTML('beforeend', `
+    const container = document.getElementById("idList");
+    container.insertAdjacentHTML(
+      "beforeend",
+      `
       <div class="field" style="display:flex;gap:0.5rem;align-items:end">
         <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="" /></div>
         <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="" /></div>
         <button class="btn btn-secondary" style="padding:0.4rem 0.6rem;font-size:0.8rem" onclick="this.parentElement.remove()">×</button>
-      </div>`);
+      </div>`,
+    );
   };
   metaFields.innerHTML = html;
 }
 
 function field(label, id, value, optional, type) {
   const v = value !== null && value !== undefined ? value : "";
-  const displayVal = typeof v === "object" && v !== null ? Object.values(v)[0] || "" : String(v);
-  const input = type === "textarea"
-    ? `<textarea id="mf_${id}">${esc(displayVal)}</textarea>`
-    : type === "csv"
-      ? `<input type="text" id="mf_${id}" value="${esc(Array.isArray(v) ? v.join(", ") : displayVal)}" />`
-      : `<input type="${type}" id="mf_${id}" value="${esc(displayVal)}" />`;
+  const displayVal =
+    typeof v === "object" && v !== null ? Object.values(v)[0] || "" : String(v);
+  const input =
+    type === "textarea"
+      ? `<textarea id="mf_${id}">${esc(displayVal)}</textarea>`
+      : type === "csv"
+        ? `<input type="text" id="mf_${id}" value="${esc(Array.isArray(v) ? v.join(", ") : displayVal)}" />`
+        : `<input type="${type}" id="mf_${id}" value="${esc(displayVal)}" />`;
   return `<div class="field"><label for="mf_${id}">${label}${optional ? "" : " *"}</label>${input}</div>`;
 }
 
 function tagField(label, id, values) {
   const items = Array.isArray(values) ? values : [];
   return `<div class="field"><label>${label}</label>
-    <div class="tag-list" id="tags_${id}">${items.map(t => `<span class="tag"><span class="tag-text">${esc(t)}</span> <span class="remove" onclick="this.parentElement.remove()">×</span></span>`).join("")}</div>
+    <div class="tag-list" id="tags_${id}">${items.map((t) => `<span class="tag"><span class="tag-text">${esc(t)}</span> <span class="remove" onclick="this.parentElement.remove()">×</span></span>`).join("")}</div>
     <div class="tag-input"><input type="text" id="new_${id}" placeholder="Add ${label.toLowerCase()}" />
     <button onclick="addTag('${id}')">Add</button></div>
   </div>`;
@@ -336,7 +411,10 @@ function tagField(label, id, values) {
 
 function renderExtra() {
   const extra = extraData.get();
-  if (!extra || extra.length === 0) { extraInfo.innerHTML = "<p style='color:#888'>No extra data</p>"; return; }
+  if (!extra || extra.length === 0) {
+    extraInfo.innerHTML = "<p style='color:#888'>No extra data</p>";
+    return;
+  }
   extraInfo.innerHTML = `<div class="info-grid">
     <div><span class="label">Extra Size</span><div class="value">${formatSize(extra.length)}</div></div>
     <div><span class="label">Entries</span><div class="value">? (binary)</div></div>
@@ -352,7 +430,10 @@ function collectMeta() {
   setStr(meta, "title", document.getElementById("mf_title")?.value);
   setStr(meta, "subtitle", document.getElementById("mf_subtitle")?.value);
   const authors = document.getElementById("mf_authors")?.value || "";
-  meta.authors = authors.split(",").map(s => s.trim()).filter(Boolean);
+  meta.authors = authors
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
   meta.language = document.getElementById("mf_language")?.value || "en";
   setStr(meta, "publisher", document.getElementById("mf_publisher")?.value);
   setStr(meta, "description", document.getElementById("mf_description")?.value);
@@ -360,7 +441,11 @@ function collectMeta() {
   setStr(meta, "license", document.getElementById("mf_license")?.value);
   setStr(meta, "edition", document.getElementById("mf_edition")?.value);
   setNum(meta, "word_count", document.getElementById("mf_word_count")?.value);
-  setNum(meta, "reading_time_mins", document.getElementById("mf_reading_time_mins")?.value);
+  setNum(
+    meta,
+    "reading_time_mins",
+    document.getElementById("mf_reading_time_mins")?.value,
+  );
   meta.genres = collectTags("genres");
   meta.tags = collectTags("tags");
 
@@ -377,7 +462,8 @@ function collectMeta() {
   if (st) {
     meta.series = {
       title: st,
-      position: document.getElementById("mf_series_pos")?.value?.trim() || undefined,
+      position:
+        document.getElementById("mf_series_pos")?.value?.trim() || undefined,
       arc: document.getElementById("mf_series_arc")?.value?.trim() || undefined,
     };
   } else {
@@ -387,9 +473,16 @@ function collectMeta() {
 }
 
 function setStr(obj, field, val) {
-  if (!val || !val.trim()) { delete obj[field]; return; }
+  if (!val || !val.trim()) {
+    delete obj[field];
+    return;
+  }
   const v = val.trim();
-  if (obj[field] && typeof obj[field] === "object" && !Array.isArray(obj[field])) {
+  if (
+    obj[field] &&
+    typeof obj[field] === "object" &&
+    !Array.isArray(obj[field])
+  ) {
     obj[field] = { ...obj[field] };
     const keys = Object.keys(obj[field]);
     if (keys.length > 0) obj[field][keys[0]] = v;
@@ -401,7 +494,10 @@ function setStr(obj, field, val) {
 
 function setNum(obj, field, val) {
   const n = parseInt(val, 10);
-  if (isNaN(n)) { delete obj[field]; return; }
+  if (isNaN(n)) {
+    delete obj[field];
+    return;
+  }
   obj[field] = n;
 }
 
@@ -410,7 +506,9 @@ function collectTags(id) {
   if (!container) return undefined;
   const items = [];
   for (const span of container.querySelectorAll(".tag")) {
-    const text = span.querySelector(".tag-text")?.textContent?.trim() || span.textContent.replace("×", "").trim();
+    const text =
+      span.querySelector(".tag-text")?.textContent?.trim() ||
+      span.textContent.replace("×", "").trim();
     if (text) items.push(text);
   }
   return items.length > 0 ? items : undefined;
@@ -427,7 +525,7 @@ function onSave() {
 
   try {
     const meta = collectMeta();
-    const chunks = chunksData.get().map(c => ({
+    const chunks = chunksData.get().map((c) => ({
       tag: c.tag,
       data: new Uint8Array(c.data),
       compression: c.compression,
@@ -487,7 +585,8 @@ function download(bytes, filename) {
   const blob = new Blob([bytes], { type: "application/octet-stream" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = filename;
+  a.href = url;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -502,7 +601,12 @@ function formatSize(bytes) {
 }
 function esc(s) {
   if (!s) return "";
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 function bytesToHex(bytes) {
   const b = new Uint8Array(bytes || []);
