@@ -67,19 +67,19 @@ pub mod ffi {
             Self::parse_inner(data, reader_version, &[])
         }
 
-        /// Parse with a DER-encoded RSA private key for DRM decryption.
+        /// Parse with an X25519 private key (32 bytes) for DRM decryption.
         pub fn parse_with_private_key(
             data: &[u8],
             reader_version: u16,
-            private_key_der: &[u8],
+            private_key: &[u8],
         ) -> Option<Box<HonzoHandle>> {
-            Self::parse_inner(data, reader_version, private_key_der)
+            Self::parse_inner(data, reader_version, private_key)
         }
 
         fn parse_inner(
             data: &[u8],
             reader_version: u16,
-            private_key_der: &[u8],
+            private_key: &[u8],
         ) -> Option<Box<HonzoHandle>> {
             let p = HonzoParser::new(data, reader_version).ok()?;
             let meta = p.meta_bytes().ok()?.to_vec();
@@ -107,12 +107,12 @@ pub mod ffi {
             let chunk_cache = (0..chunk_count).map(|_| None).collect();
 
             // Parse DRM envelope if DRM flag is set and a private key was provided
-            let cek = if head.has_drm() && !private_key_der.is_empty() {
+            let cek = if head.has_drm() && !private_key.is_empty() {
                 let extra = p.extra_bytes().ok()?;
                 let entries = honzo_io::parse_extra(extra).ok()?;
                 let entry = honzo_io::find_extra(&entries, honzo_chunks::extra::drm::NAMESPACE)?;
                 let envelope = honzo_chunks::extra::drm::parse_drm(&entry.body).ok()?;
-                honzo_io::crypto::unwrap_cek(&envelope.key_envelope, private_key_der).ok()
+                honzo_io::crypto::unwrap_cek(&envelope.key_envelope, private_key).ok()
             } else {
                 None
             };
@@ -584,7 +584,7 @@ pub mod ffi {
         pub fn set_drm_config(
             &mut self,
             encrypt_chunk_ids: &[u32],
-            public_key_der: &[u8],
+            recipient_public_key: &[u8],
             license_url: &str,
             expires_at: u64,
         ) -> bool {
@@ -594,7 +594,7 @@ pub mod ffi {
             };
             let config = DrmConfig {
                 encrypt_chunk_ids: encrypt_chunk_ids.to_vec(),
-                public_key_der: public_key_der.to_vec(),
+                recipient_public_key: recipient_public_key.to_vec(),
                 license_url: if license_url.is_empty() {
                     None
                 } else {

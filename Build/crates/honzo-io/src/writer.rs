@@ -12,8 +12,8 @@ use std::vec::Vec;
 pub struct DrmConfig {
     /// IDs of chunks to encrypt
     pub encrypt_chunk_ids: Vec<u32>,
-    /// DER-encoded RSA public key (PKCS#8 SubjectPublicKeyInfo)
-    pub public_key_der: Vec<u8>,
+    /// X25519 public key (32 bytes)
+    pub recipient_public_key: Vec<u8>,
     /// Optional license URL
     pub license_url: Option<String>,
     /// Optional expiry timestamp (Unix epoch seconds)
@@ -396,9 +396,9 @@ impl HonzoBuilder {
         // Build DRM envelope if configured
         if let Some((ref cek, ref ids)) = drm_state {
             let cfg = final_builder.drm_config.as_ref().unwrap();
-            let key_envelope = crate::crypto::wrap_cek(cek, &cfg.public_key_der)?;
+            let key_envelope = crate::crypto::wrap_cek(cek, &cfg.recipient_public_key)?;
             let envelope = drm::DrmEnvelope {
-                scheme: "AES-256-CBC+RSA-OAEP".to_string(),
+                scheme: "AES-256-GCM+X25519".to_string(),
                 encrypted_chunks: ids.clone(),
                 key_envelope,
                 license_url: cfg.license_url.clone(),

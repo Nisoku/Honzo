@@ -79,7 +79,7 @@ seq:
     if: head.extra_size > 0
     doc: |
       Optional namespaced extensions under org.nisoku.*
-      Each entry: [tag: 4 bytes][length: 4 bytes][body: length bytes]
+      Each entry: [tag: 4 bytes][namespace_len: 2 bytes][namespace: namespace_len bytes][body_len: 4 bytes][body: body_len bytes]
 
   - id: meta
     size: head.meta_size
@@ -403,8 +403,10 @@ types:
   data_chunk:
     seq:
       - id: raw
-        size-eos: true
+        size: _parent.data_size
         doc: |
+          Must be exactly head.data_size bytes (use TOC entries to seek within)
+          
           Raw concatenated chunk payloads.
           Use TOC entries to seek to individual chunks by offset + size.
           DATA itself is intentionally dumb - all structure is in TOC.
@@ -489,11 +491,11 @@ types:
           org.nisoku.drm:
             MessagePack object:
             {
-              scheme: "aes256-cbc",
+              scheme: "AES-256-GCM+X25519",
               encrypted_chunks: [chunk_id, ...],
-              key_envelope: bytes,    // symmetric key encrypted with platform key
+              key_envelope: bytes,    // RSA-OAEP-wrapped AES-256 CEK
               license_url: string?,
-              expires_at: string?     // ISO 8601
+              expires_at: uint?       // Unix epoch seconds
             }
             Encrypted chunks have is_encrypted=true in their TOC entry.
           

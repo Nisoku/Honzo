@@ -248,7 +248,7 @@ fn stream_yields_same_annotations_as_parser() {
 #[test]
 fn drm_roundtrip_parse_and_build() {
     let envelope = drm::DrmEnvelope {
-        scheme: "AES-256-CBC+RSA-OAEP".to_string(),
+        scheme: "AES-256-GCM+X25519".to_string(),
         encrypted_chunks: vec![0, 1],
         key_envelope: vec![10u8; 256],
         license_url: None,
@@ -267,7 +267,7 @@ fn drm_known_namespace_is_recognized() {
     let known = honzo_chunks::extra::parse_known(
         honzo_chunks::extra::DRM_NAMESPACE,
         &drm::build_drm(&drm::DrmEnvelope {
-            scheme: "AES-256-CBC+RSA-OAEP".to_string(),
+            scheme: "AES-256-GCM+X25519".to_string(),
             encrypted_chunks: vec![0],
             key_envelope: vec![1u8, 2, 3],
             license_url: None,

@@ -10,7 +10,7 @@ pub const NAMESPACE: &str = super::DRM_NAMESPACE;
 /// field names, consistent with ANNO/SYNC conventions.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DrmEnvelope {
-    /// Encryption scheme identifier (e.g. "AES-256-CBC+ RSA-OAEP")
+    /// Encryption scheme identifier (e.g. "AES-256-GCM+X25519")
     pub scheme: String,
     /// IDs of chunks that are encrypted
     pub encrypted_chunks: Vec<u32>,

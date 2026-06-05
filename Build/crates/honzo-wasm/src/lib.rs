@@ -13,29 +13,29 @@ use honzo_io::*;
 use wasm_bindgen::prelude::*;
 
 /// A DRM key pair for building/reading encrypted Honzo files.
-/// Generated externally (e.g., `openssl genpkey -algorithm RSA -out private.pem`).
+/// Generated externally (X25519 keys, 32 bytes each).
 #[wasm_bindgen]
 pub struct DrmKeyPair {
-    public_key_der: Vec<u8>,
-    private_key_der: Vec<u8>,
+    recipient_public_key: Vec<u8>,
+    private_key: Vec<u8>,
 }
 
 #[wasm_bindgen]
 impl DrmKeyPair {
     #[wasm_bindgen(constructor)]
-    pub fn new(public_key_der: Vec<u8>, private_key_der: Vec<u8>) -> Self {
+    pub fn new(recipient_public_key: Vec<u8>, private_key: Vec<u8>) -> Self {
         Self {
-            public_key_der,
-            private_key_der,
+            recipient_public_key,
+            private_key,
         }
     }
 
-    pub fn public_key_der(&self) -> Vec<u8> {
-        self.public_key_der.clone()
+    pub fn recipient_public_key(&self) -> Vec<u8> {
+        self.recipient_public_key.clone()
     }
 
-    pub fn private_key_der(&self) -> Vec<u8> {
-        self.private_key_der.clone()
+    pub fn private_key(&self) -> Vec<u8> {
+        self.private_key.clone()
     }
 }
 
@@ -74,20 +74,20 @@ impl HonzoWasm {
         Self::new_inner(buf, reader_version, None)
     }
 
-    /// Create a reader with a DER-encoded RSA private key for DRM decryption.
+    /// Create a reader with an X25519 private key (32 bytes) for DRM decryption.
     #[wasm_bindgen]
     pub fn with_private_key(
         buf: &[u8],
         reader_version: u16,
-        private_key_der: &[u8],
+        private_key: &[u8],
     ) -> Result<HonzoWasm, JsValue> {
-        Self::new_inner(buf, reader_version, Some(private_key_der))
+        Self::new_inner(buf, reader_version, Some(private_key))
     }
 
     fn new_inner(
         buf: &[u8],
         reader_version: u16,
-        private_key_der: Option<&[u8]>,
+        private_key: Option<&[u8]>,
     ) -> Result<HonzoWasm, JsValue> {
         let p = honzo_core::HonzoParser::new(buf, reader_version)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
@@ -121,7 +121,7 @@ impl HonzoWasm {
 
         // Parse DRM envelope and unwrap CEK if private key is provided
         let cek = if head.has_drm() {
-            if let Some(pk_der) = private_key_der {
+            if let Some(pk) = private_key {
                 let extra = p
                     .extra_bytes()
                     .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
@@ -131,7 +131,7 @@ impl HonzoWasm {
                     .ok_or_else(|| JsValue::from_str("DRM flag set but no DRM extra entry"))?;
                 let envelope = honzo_chunks::extra::drm::parse_drm(&entry.body)
                     .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
-                let cek = honzo_io::crypto::unwrap_cek(&envelope.key_envelope, pk_der)
+                let cek = honzo_io::crypto::unwrap_cek(&envelope.key_envelope, pk)
                     .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
                 Some(cek)
             } else {
@@ -560,8 +560,9 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
     struct DrmBuildSpec {
         /// Chunk IDs to encrypt
         encrypt_chunk_ids: Vec<u32>,
-        /// DER-encoded RSA public key
-        public_key_der: Vec<u8>,
+        /// X25519 public key (32 bytes)
+        #[serde(alias = "public_key_der")]
+        recipient_public_key: Vec<u8>,
         /// Optional license URL
         #[serde(default)]
         license_url: Option<String>,
@@ -709,7 +710,7 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
     if let Some(ref drm_spec) = spec.drm {
         let config = DrmConfig {
             encrypt_chunk_ids: drm_spec.encrypt_chunk_ids.clone(),
-            public_key_der: drm_spec.public_key_der.clone(),
+            recipient_public_key: drm_spec.recipient_public_key.clone(),
             license_url: drm_spec.license_url.clone(),
             expires_at: drm_spec.expires_at,
         };

@@ -20,19 +20,19 @@ impl<R: Read + Seek> HonzoStream<R> {
         Self::open_inner(reader, reader_version, None)
     }
 
-    /// Open a stream with a DER-encoded RSA private key for DRM decryption.
+    /// Open a stream with an X25519 private key (32 bytes) for DRM decryption.
     pub fn open_with_private_key(
         reader: R,
         reader_version: u16,
-        private_key_der: &[u8],
+        private_key: &[u8],
     ) -> Result<Self, HonzoError> {
-        Self::open_inner(reader, reader_version, Some(private_key_der))
+        Self::open_inner(reader, reader_version, Some(private_key))
     }
 
     fn open_inner(
         mut reader: R,
         reader_version: u16,
-        private_key_der: Option<&[u8]>,
+        private_key: Option<&[u8]>,
     ) -> Result<Self, HonzoError> {
         let mut magic = [0u8; 4];
         reader
@@ -81,7 +81,7 @@ impl<R: Read + Seek> HonzoStream<R> {
 
         // Parse DRM envelope if DRM flag is set and a private key was provided
         let cek = if head.has_drm() {
-            if let Some(pk_der) = private_key_der {
+            if let Some(pk) = private_key {
                 // Seek to extra section to read DRM envelope
                 let extra_offset = data_start + data_size;
                 reader
@@ -96,7 +96,7 @@ impl<R: Read + Seek> HonzoStream<R> {
                     HonzoError::CryptoError("DRM flag set but no DRM extra entry found"),
                 )?;
                 let envelope = drm::parse_drm(&entry.body)?;
-                let cek = crate::crypto::unwrap_cek(&envelope.key_envelope, pk_der)?;
+                let cek = crate::crypto::unwrap_cek(&envelope.key_envelope, pk)?;
                 Some(cek)
             } else {
                 None

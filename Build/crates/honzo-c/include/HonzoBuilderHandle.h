@@ -43,7 +43,7 @@ bool HonzoBuilderHandle_add_extra_entry(HonzoBuilderHandle* self, DiplomatU8View
 
 bool HonzoBuilderHandle_add_annotation(HonzoBuilderHandle* self, DiplomatU8View body);
 
-bool HonzoBuilderHandle_set_drm_config(HonzoBuilderHandle* self, DiplomatU32View encrypt_chunk_ids, DiplomatU8View public_key_der, DiplomatStringView license_url, uint64_t expires_at);
+bool HonzoBuilderHandle_set_drm_config(HonzoBuilderHandle* self, DiplomatU32View encrypt_chunk_ids, DiplomatU8View recipient_public_key, DiplomatStringView license_url, uint64_t expires_at);
 
 bool HonzoBuilderHandle_add_sync_cue(HonzoBuilderHandle* self, DiplomatU8View body);
 

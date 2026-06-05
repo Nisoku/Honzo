@@ -1,24 +1,16 @@
 use honzo_chunks::extra::drm::{self, build_drm, parse_drm, DrmEnvelope};
 use honzo_core::{Compression, CoverType, HonzoError, HonzoParser, MarkupType};
 use honzo_io::{DrmConfig, HonzoBuilder, HonzoReader, HonzoStream};
-use rsa::pkcs8::{DecodePrivateKey, DecodePublicKey, EncodePrivateKey, EncodePublicKey};
-use rsa::Oaep;
-use rsa::RsaPrivateKey;
-use rsa::RsaPublicKey;
-use sha2::Sha256;
+use x25519_dalek::{PublicKey, StaticSecret};
 
-/// Generate a test RSA-2048 key pair. Returns (public_key_der, private_key_der).
-fn generate_test_keypair() -> (Vec<u8>, Vec<u8>) {
-    let mut rng = rand::rngs::OsRng;
-    let private_key = RsaPrivateKey::new(&mut rng, 2048).expect("failed to generate RSA key");
-    let public_key = RsaPublicKey::from(&private_key);
-    (
-        public_key.to_public_key_der().unwrap().as_bytes().to_vec(),
-        private_key.to_pkcs8_der().unwrap().as_bytes().to_vec(),
-    )
+/// Generate a test X25519 key pair. Returns (public_key, private_key).
+fn generate_test_keypair() -> ([u8; 32], [u8; 32]) {
+    let secret = StaticSecret::random();
+    let public = PublicKey::from(&secret);
+    (public.to_bytes(), secret.to_bytes())
 }
 
-fn build_drm_file(encrypt_ids: &[u32]) -> (Vec<u8>, Vec<u8>) {
+fn build_drm_file(encrypt_ids: &[u32]) -> (Vec<u8>, [u8; 32]) {
     let (pub_key, priv_key) = generate_test_keypair();
 
     let meta = rmp_serde::to_vec(&honzo_io::HonzoMeta::default()).unwrap();
@@ -26,7 +18,7 @@ fn build_drm_file(encrypt_ids: &[u32]) -> (Vec<u8>, Vec<u8>) {
         .set_meta(&meta)
         .set_drm_config(DrmConfig {
             encrypt_chunk_ids: encrypt_ids.to_vec(),
-            public_key_der: pub_key,
+            recipient_public_key: pub_key.to_vec(),
             license_url: Some("https://example.com/license".to_string()),
             expires_at: Some(1893456000),
         })
@@ -70,7 +62,7 @@ fn drm_envelope_is_in_extra() {
     let entries = honzo_io::parse_extra(extra).unwrap();
     let entry = honzo_io::find_extra(&entries, drm::NAMESPACE).unwrap();
     let envelope = drm::parse_drm(&entry.body).unwrap();
-    assert_eq!(envelope.scheme, "AES-256-CBC+RSA-OAEP");
+    assert_eq!(envelope.scheme, "AES-256-GCM+X25519");
     assert_eq!(envelope.encrypted_chunks, vec![0]);
     assert!(envelope.license_url.is_some());
     assert!(envelope.expires_at.is_some());
@@ -147,7 +139,7 @@ fn drm_encrypts_multiple_chunks() {
         .set_meta(&meta)
         .set_drm_config(DrmConfig {
             encrypt_chunk_ids: vec![0, 1],
-            public_key_der: pub_key,
+            recipient_public_key: pub_key.to_vec(),
             license_url: None,
             expires_at: None,
         })
@@ -211,8 +203,7 @@ fn drm_encrypts_multiple_chunks() {
 #[test]
 fn drm_wrong_key_fails() {
     let (data, _) = build_drm_file(&[0]);
-    let (wrong_pub, wrong_priv) = generate_test_keypair();
-    let _ = wrong_pub; // unused
+    let (_, wrong_priv) = generate_test_keypair();
 
     match HonzoReader::with_private_key(&data, 1, &wrong_priv) {
         Err(HonzoError::CryptoError(_)) => {}
@@ -222,32 +213,25 @@ fn drm_wrong_key_fails() {
 
 #[test]
 fn create_test_keypair_roundtrip() {
-    let (pub_key_der, priv_key_der) = generate_test_keypair();
+    let (pub_key, priv_key) = generate_test_keypair();
 
-    // Verify keys can be parsed
-    let pub_key = RsaPublicKey::from_public_key_der(&pub_key_der).unwrap();
-    let priv_key = RsaPrivateKey::from_pkcs8_der(&priv_key_der).unwrap();
-
-    // Verify encrypt/decrypt roundtrip
-    let data = b"Hello RSA!";
-    let encrypted = pub_key
-        .encrypt(&mut rand::rngs::OsRng, Oaep::new::<Sha256>(), data)
-        .unwrap();
-    let decrypted = priv_key.decrypt(Oaep::new::<Sha256>(), &encrypted).unwrap();
-    assert_eq!(&decrypted, data);
+    // Verify keys can be parsed by reconstructing
+    let secret = StaticSecret::from(priv_key);
+    let public = PublicKey::from(&secret);
+    assert_eq!(public.to_bytes(), pub_key);
 }
 
 #[test]
 fn test_drm_envelope_creation() {
     let envelope = DrmEnvelope {
-        scheme: "AES-256-CBC+RSA-OAEP".to_string(),
+        scheme: "AES-256-GCM+X25519".to_string(),
         encrypted_chunks: vec![0, 1, 2],
         key_envelope: vec![10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
         license_url: Some("https://example.com/license".to_string()),
         expires_at: Some(1893456000),
     };
 
-    assert_eq!(envelope.scheme, "AES-256-CBC+RSA-OAEP");
+    assert_eq!(envelope.scheme, "AES-256-GCM+X25519");
     assert_eq!(envelope.encrypted_chunks, vec![0, 1, 2]);
     assert!(!envelope.key_envelope.is_empty());
     assert_eq!(
@@ -260,7 +244,7 @@ fn test_drm_envelope_creation() {
 #[test]
 fn test_drm_envelope_optional_fields() {
     let envelope = DrmEnvelope {
-        scheme: "AES-256-CBC+RSA-OAEP".to_string(),
+        scheme: "AES-256-GCM+X25519".to_string(),
         encrypted_chunks: vec![],
         key_envelope: vec![1, 2, 3],
         license_url: None,
@@ -274,7 +258,7 @@ fn test_drm_envelope_optional_fields() {
 #[test]
 fn test_drm_serialization_roundtrip() {
     let envelope = DrmEnvelope {
-        scheme: "AES-256-CBC+RSA-OAEP".to_string(),
+        scheme: "AES-256-GCM+X25519".to_string(),
         encrypted_chunks: vec![0, 2, 4],
         key_envelope: vec![100; 256],
         license_url: Some("https://example.com/license".to_string()),
@@ -284,7 +268,7 @@ fn test_drm_serialization_roundtrip() {
     let data = build_drm(&envelope).unwrap();
     let loaded = parse_drm(&data).unwrap();
 
-    assert_eq!(loaded.scheme, "AES-256-CBC+RSA-OAEP");
+    assert_eq!(loaded.scheme, "AES-256-GCM+X25519");
     assert_eq!(loaded.encrypted_chunks, vec![0, 2, 4]);
     assert_eq!(loaded.key_envelope, vec![100; 256]);
     assert_eq!(

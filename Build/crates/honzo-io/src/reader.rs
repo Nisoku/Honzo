@@ -15,12 +15,12 @@ impl<'a> HonzoReader<'a> {
         })
     }
 
-    /// Create a reader with a DER-encoded RSA private key for DRM decryption.
+    /// Create a reader with an X25519 private key (32 bytes) for DRM decryption.
     /// Parses the DRM envelope from the extra section and unwraps the CEK.
     pub fn with_private_key(
         buf: &'a [u8],
         reader_version: u16,
-        private_key_der: &[u8],
+        private_key: &[u8],
     ) -> Result<Self, HonzoError> {
         let parser = HonzoParser::new(buf, reader_version)?;
         let cek = if parser.head().has_drm() {
@@ -30,7 +30,7 @@ impl<'a> HonzoReader<'a> {
                 HonzoError::CryptoError("DRM flag set but no DRM extra entry found"),
             )?;
             let envelope = drm::parse_drm(&entry.body)?;
-            let cek = crate::crypto::unwrap_cek(&envelope.key_envelope, private_key_der)?;
+            let cek = crate::crypto::unwrap_cek(&envelope.key_envelope, private_key)?;
             Some(cek)
         } else {
             None

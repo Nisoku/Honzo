@@ -9,7 +9,7 @@ import {
   buildExtraEntry,
   buildDrmEnvelope,
 } from './helpers.mjs';
-import { TEST_PRIV_KEY_DER, TEST_PUB_KEY_DER } from './keys.js';
+import { TEST_PRIV_KEY, TEST_PUB_KEY } from './keys.js';
 
 beforeAll(async () => {
   let honzo;
@@ -80,7 +80,7 @@ describe('DRM extra namespace', () => {
       chunks: [{ tag: 'CHAP', data: [72, 105], content_type_kind: 1, content_type_value: 0 }],
       drm: {
         encrypt_chunk_ids: [0],
-        public_key_der: Array.from(TEST_PUB_KEY_DER),
+        public_key_der: Array.from(TEST_PUB_KEY),
         license_url: 'https://example.com/license',
         expires_at: 1893456000,
       },
@@ -94,7 +94,7 @@ describe('DRM extra namespace', () => {
       chunks: [{ tag: 'CHAP', data: [72, 105], content_type_kind: 1, content_type_value: 0 }],
       drm: {
         encrypt_chunk_ids: [0],
-        public_key_der: Array.from(TEST_PUB_KEY_DER),
+        public_key_der: Array.from(TEST_PUB_KEY),
       },
     });
     const reader = open(file);
@@ -108,7 +108,7 @@ describe('DRM extra namespace', () => {
       chunks: [{ tag: 'CHAP', data: [72, 105], content_type_kind: 1, content_type_value: 0 }],
       drm: {
         encrypt_chunk_ids: [0],
-        public_key_der: Array.from(TEST_PUB_KEY_DER),
+        public_key_der: Array.from(TEST_PUB_KEY),
       },
     });
     const reader = open(file);
@@ -120,10 +120,10 @@ describe('DRM extra namespace', () => {
       chunks: [{ tag: 'CHAP', data: [72, 105], content_type_kind: 1, content_type_value: 0 }],
       drm: {
         encrypt_chunk_ids: [0],
-        public_key_der: Array.from(TEST_PUB_KEY_DER),
+        public_key_der: Array.from(TEST_PUB_KEY),
       },
     });
-    const reader = openWithPrivateKey(file, TEST_PRIV_KEY_DER);
+    const reader = openWithPrivateKey(file, TEST_PRIV_KEY);
     const chunk = reader.get_chunk(0);
     const decoded = new TextDecoder().decode(chunk);
     expect(decoded).toBe('Hi');

@@ -44,3 +44,4 @@ __pycache__/
 site/
 .DS_Store
 Demo/src/wasm/
+Build/adapters/typescript/pkg/*
