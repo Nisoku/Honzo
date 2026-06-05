@@ -6,13 +6,7 @@
 
 ## Demo
 
-- [x] MathML and LaTeX rendering via `math.js` module
-- [X] Search UI is kinda bad
-- [X] META inspector panel doesn't exist
-- [X] Reading progress / bookmarks have no demo or API
-- [X] No settings panel (theme, font size, layout mode)
-- [X] No reading progress persistence (localStorage/IndexedDB)
-- [X] No styling/decoration system for chapters
+- [ ] Pagination in Demo
 
 ## Docs / CI
 

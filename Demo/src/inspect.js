@@ -198,64 +198,66 @@ function renderFileInfo() {
     `<span class="flag-badge ${on ? "on" : "off"}">${on ? "Yes" : "No"}</span>`;
 
   fileInfo.innerHTML = `
-    <div class="info-item">
-      <span class="label">File Size</span>
-      <div class="value">${formatSize(fileSize.get())}</div>
-    </div>
-    <div class="info-item">
-      <span class="label">Format Version</span>
-      <div class="value">${d.versionMajor}.${d.versionMinor}</div>
-    </div>
-    <div class="info-item">
-      <span class="label">Min Reader Version</span>
-      <div class="value">${d.minVer}</div>
-    </div>
-    <div class="info-item">
-      <span class="label">Chunks</span>
-      <div class="value">${d.chunkCount}</div>
-    </div>
-    <div class="info-item">
-      <span class="label">Layout Mode</span>
-      <div class="value">${layout}</div>
-    </div>
-    <div class="info-item">
-      <span class="label">Default Compression</span>
-      <div class="value">${comp}</div>
-    </div>
-    <div class="info-item">
-      <span class="label">TOC Size</span>
-      <div class="value">${formatSize(d.tocSize)}</div>
-    </div>
-    <div class="info-item">
-      <span class="label">Data Size</span>
-      <div class="value">${formatSize(d.dataSize)}</div>
-    </div>
-    <div class="info-item">
-      <span class="label">Extra Data Size</span>
-      <div class="value">${formatSize(d.extraSize)}</div>
-    </div>
-    <div class="info-item">
-      <span class="label">Metadata Size</span>
-      <div class="value">${formatSize(d.metaSize)}</div>
-    </div>
-    <div class="info-item">
-      <span class="label">Features</span>
-      <div class="value" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <span style="font-size: 0.85rem;">Search Index:</span>
-          ${badge(reader.has_sidx(), "Search Index")}
-        </div>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <span style="font-size: 0.85rem;">DRM:</span>
-          ${badge(reader.has_drm(), "DRM")}
-        </div>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <span style="font-size: 0.85rem;">Annotations:</span>
-          ${badge(reader.has_annotations(), "Annotations")}
-        </div>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <span style="font-size: 0.85rem;">Sync:</span>
-          ${badge(reader.has_sync(), "Sync")}
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="label">File Size</span>
+        <div class="value">${formatSize(fileSize.get())}</div>
+      </div>
+      <div class="info-item">
+        <span class="label">Format Version</span>
+        <div class="value">${d.versionMajor}.${d.versionMinor}</div>
+      </div>
+      <div class="info-item">
+        <span class="label">Min Reader Version</span>
+        <div class="value">${d.minVer}</div>
+      </div>
+      <div class="info-item">
+        <span class="label">Chunks</span>
+        <div class="value">${d.chunkCount}</div>
+      </div>
+      <div class="info-item">
+        <span class="label">Layout Mode</span>
+        <div class="value">${layout}</div>
+      </div>
+      <div class="info-item">
+        <span class="label">Default Compression</span>
+        <div class="value">${comp}</div>
+      </div>
+      <div class="info-item">
+        <span class="label">TOC Size</span>
+        <div class="value">${formatSize(d.tocSize)}</div>
+      </div>
+      <div class="info-item">
+        <span class="label">Data Size</span>
+        <div class="value">${formatSize(d.dataSize)}</div>
+      </div>
+      <div class="info-item">
+        <span class="label">Extra Data Size</span>
+        <div class="value">${formatSize(d.extraSize)}</div>
+      </div>
+      <div class="info-item">
+        <span class="label">Metadata Size</span>
+        <div class="value">${formatSize(d.metaSize)}</div>
+      </div>
+      <div class="info-item" style="grid-column: 1 / -1">
+        <span class="label">Features</span>
+        <div class="value features-grid">
+          <div>
+            <span>Search Index:</span>
+            ${badge(reader.has_sidx(), "Search Index")}
+          </div>
+          <div>
+            <span>DRM:</span>
+            ${badge(reader.has_drm(), "DRM")}
+          </div>
+          <div>
+            <span>Annotations:</span>
+            ${badge(reader.has_annotations(), "Annotations")}
+          </div>
+          <div>
+            <span>Sync:</span>
+            ${badge(reader.has_sync(), "Sync")}
+          </div>
         </div>
       </div>
     </div>
