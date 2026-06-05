@@ -11,10 +11,13 @@ honzo-core = { path = "../Build/crates/honzo-core" }
 honzo-convert = { path = "../Build/crates/honzo-convert" }
 honzo-chunks = { path = "../Build/crates/honzo-chunks" }
 honzo-io = { path = "../Build/crates/honzo-io" }
-rmp-serde = "1"
-serde = { version = "1", features = ["derive"] }
-lopdf = "0.40.0"
-image = { version = "0.25", default-features = false, features = ["jpeg"] }
-diplomat-runtime = "0.15"
+rmp-serde = "1.3.1"
+serde = { version = "1.0.228", features = ["derive"] }
+lopdf = "0.41.0"
+image = { version = "0.25.10", default-features = false, features = ["jpeg"] }
+diplomat-runtime = "0.15.1"
 zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
 quick-xml = "0.40.1"
+rsa = "0.9.10"
+sha2 = "0.10.8"
+rand = "0.8.6"

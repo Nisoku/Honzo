@@ -46,6 +46,8 @@ namespace capi {
 
     bool HonzoBuilderHandle_add_annotation(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View body);
 
+    bool HonzoBuilderHandle_set_drm_config(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU32View encrypt_chunk_ids, diplomat::capi::DiplomatU8View public_key_der, diplomat::capi::DiplomatStringView license_url, uint64_t expires_at);
+
     bool HonzoBuilderHandle_add_sync_cue(diplomat::capi::HonzoBuilderHandle* self, diplomat::capi::DiplomatU8View body);
 
     bool HonzoBuilderHandle_finalize(diplomat::capi::HonzoBuilderHandle* self);
@@ -165,6 +167,18 @@ inline bool HonzoBuilderHandle::add_annotation(diplomat::span<const uint8_t> bod
     auto result = diplomat::capi::HonzoBuilderHandle_add_annotation(this->AsFFI(),
         {body.data(), body.size()});
     return result;
+}
+
+inline diplomat::result<bool, diplomat::Utf8Error> HonzoBuilderHandle::set_drm_config(diplomat::span<const uint32_t> encrypt_chunk_ids, diplomat::span<const uint8_t> public_key_der, std::string_view license_url, uint64_t expires_at) {
+    if (!diplomat::capi::diplomat_is_str(license_url.data(), license_url.size())) {
+    return diplomat::Err<diplomat::Utf8Error>();
+  }
+    auto result = diplomat::capi::HonzoBuilderHandle_set_drm_config(this->AsFFI(),
+        {encrypt_chunk_ids.data(), encrypt_chunk_ids.size()},
+        {public_key_der.data(), public_key_der.size()},
+        {license_url.data(), license_url.size()},
+        expires_at);
+    return diplomat::Ok<bool>(result);
 }
 
 inline bool HonzoBuilderHandle::add_sync_cue(diplomat::span<const uint8_t> body) {

@@ -112,7 +112,9 @@ describe('HonzoWasm section sizes', () => {
   });
 
   it('toc_size is > 0 when chunks present', () => {
-    const file = buildHonzo({ chunks: [{ tag: 'CHAP', data: [72, 105], content_type_kind: 1, content_type_value: 0 }] });
+    const file = buildHonzo({
+      chunks: [{ tag: 'CHAP', data: [72, 105], content_type_kind: 1, content_type_value: 0 }],
+    });
     const reader = open(file);
 
     expect(reader.toc_size()).toBeGreaterThan(0n);

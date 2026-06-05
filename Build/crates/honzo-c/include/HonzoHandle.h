@@ -18,6 +18,8 @@
 
 HonzoHandle* HonzoHandle_parse(DiplomatU8View data, uint16_t reader_version);
 
+HonzoHandle* HonzoHandle_parse_with_private_key(DiplomatU8View data, uint16_t reader_version, DiplomatU8View private_key_der);
+
 uint32_t HonzoHandle_chunk_count(const HonzoHandle* self);
 
 uint8_t HonzoHandle_version_major(const HonzoHandle* self);

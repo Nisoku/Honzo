@@ -9,6 +9,7 @@ pub use honzo_chunks::data::math::{
 };
 pub use honzo_chunks::data::sidx::normalize_search_term;
 pub use honzo_core::{FontEmbedding, HonzoParser, LayoutMode, MathType, PmapEntry};
+pub use honzo_io::DrmConfig;
 pub use honzo_io::{decompress, Compression, CoverType, HonzoBuilder, HonzoMeta, MarkupType};
 
 #[diplomat::bridge]
@@ -16,8 +17,8 @@ pub mod ffi {
     use crate::{
         decompress, guess_font_format as guess_font_format_impl, latex_to_mathml_bytes,
         normalize_search_term as normalize_search_term_impl, render_math_bytes, validate_css_bytes,
-        validate_mathml_bytes, Compression, CoverType, FontEmbedding, HonzoBuilder, HonzoMeta,
-        HonzoParser, LayoutMode, MarkupType, MathType, PmapEntry,
+        validate_mathml_bytes, Compression, CoverType, DrmConfig, FontEmbedding, HonzoBuilder,
+        HonzoMeta, HonzoParser, LayoutMode, MarkupType, MathType, PmapEntry,
     };
     use core::fmt::Write as _;
     use honzo_chunks::extra::{anno, sync};
@@ -45,6 +46,7 @@ pub mod ffi {
         toc_entries: Vec<TocEntryOwned>,
         chunk_cache: Vec<Option<Vec<u8>>>,
         reader_version: u16,
+        cek: Option<[u8; 32]>,
     }
 
     struct TocEntryOwned {
@@ -62,6 +64,23 @@ pub mod ffi {
 
     impl HonzoHandle {
         pub fn parse(data: &[u8], reader_version: u16) -> Option<Box<HonzoHandle>> {
+            Self::parse_inner(data, reader_version, &[])
+        }
+
+        /// Parse with a DER-encoded RSA private key for DRM decryption.
+        pub fn parse_with_private_key(
+            data: &[u8],
+            reader_version: u16,
+            private_key_der: &[u8],
+        ) -> Option<Box<HonzoHandle>> {
+            Self::parse_inner(data, reader_version, private_key_der)
+        }
+
+        fn parse_inner(
+            data: &[u8],
+            reader_version: u16,
+            private_key_der: &[u8],
+        ) -> Option<Box<HonzoHandle>> {
             let p = HonzoParser::new(data, reader_version).ok()?;
             let meta = p.meta_bytes().ok()?.to_vec();
             let head = p.head();
@@ -87,6 +106,17 @@ pub mod ffi {
             let chunk_count = toc_entries.len();
             let chunk_cache = (0..chunk_count).map(|_| None).collect();
 
+            // Parse DRM envelope if DRM flag is set and a private key was provided
+            let cek = if head.has_drm() && !private_key_der.is_empty() {
+                let extra = p.extra_bytes().ok()?;
+                let entries = honzo_io::parse_extra(extra).ok()?;
+                let entry = honzo_io::find_extra(&entries, honzo_chunks::extra::drm::NAMESPACE)?;
+                let envelope = honzo_chunks::extra::drm::parse_drm(&entry.body).ok()?;
+                honzo_io::crypto::unwrap_cek(&envelope.key_envelope, private_key_der).ok()
+            } else {
+                None
+            };
+
             Some(Box::new(HonzoHandle {
                 buf: data.to_vec(),
                 meta,
@@ -94,6 +124,7 @@ pub mod ffi {
                 toc_entries,
                 chunk_cache,
                 reader_version,
+                cek,
             }))
         }
 
@@ -171,28 +202,39 @@ pub mod ffi {
         #[allow(clippy::needless_lifetimes)]
         pub fn get_chunk<'a>(&'a mut self, index: u32) -> Option<&'a [u8]> {
             let entry = self.toc_entries.get(index as usize)?;
-            if entry.flags & 0x01 != 0 {
-                return Some(&[]);
-            }
+
             // Check cache — take the slot temporarily to drop the borrow
             let cached = self.chunk_cache[index as usize].take();
             if let Some(data) = cached {
                 self.chunk_cache[index as usize] = Some(data);
                 return Some(self.chunk_cache[index as usize].as_ref().unwrap());
             }
-            // Decompress and cache
+
+            // Read raw bytes from buffer
             let start = self.data_start + entry.offset as usize;
             let end = start + entry.size_compressed as usize;
             if end > self.buf.len() {
                 return None;
             }
-            let compressed = &self.buf[start..end];
+            let raw = &self.buf[start..end];
+
             let comp = match entry.compression {
                 0 => Compression::None,
                 1 => Compression::Lz4,
                 _ => return None,
             };
-            let decompressed = decompress(compressed, comp, entry.size_raw).ok()?;
+
+            let decompressed = if entry.flags & 0x01 != 0 {
+                if let Some(ref cek) = self.cek {
+                    let compressed = honzo_io::crypto::decrypt_chunk(raw, cek).ok()?;
+                    decompress(&compressed, comp, entry.size_raw).ok()?
+                } else {
+                    return None;
+                }
+            } else {
+                decompress(raw, comp, entry.size_raw).ok()?
+            };
+
             self.chunk_cache[index as usize] = Some(decompressed);
             Some(self.chunk_cache[index as usize].as_ref().unwrap())
         }
@@ -536,6 +578,35 @@ pub mod ffi {
                 None => return false,
             };
             self.builder = Some(b.add_annotation(&annotations));
+            true
+        }
+
+        pub fn set_drm_config(
+            &mut self,
+            encrypt_chunk_ids: &[u32],
+            public_key_der: &[u8],
+            license_url: &str,
+            expires_at: u64,
+        ) -> bool {
+            let b = match self.builder.take() {
+                Some(b) => b,
+                None => return false,
+            };
+            let config = DrmConfig {
+                encrypt_chunk_ids: encrypt_chunk_ids.to_vec(),
+                public_key_der: public_key_der.to_vec(),
+                license_url: if license_url.is_empty() {
+                    None
+                } else {
+                    Some(license_url.to_string())
+                },
+                expires_at: if expires_at == 0 {
+                    None
+                } else {
+                    Some(expires_at)
+                },
+            };
+            self.builder = Some(b.set_drm_config(config));
             true
         }
 

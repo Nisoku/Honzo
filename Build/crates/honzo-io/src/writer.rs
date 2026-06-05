@@ -1,11 +1,24 @@
 use honzo_chunks::data::covr::generate_covt;
 use honzo_chunks::data::font;
 use honzo_chunks::data::sidx::build_sidx;
-use honzo_chunks::extra::{anno, sync};
+use honzo_chunks::extra::{self, anno, drm, sync};
 use honzo_core::{
     Compression, CoverType, FontEmbedding, HonzoError, LayoutMode, MarkupType, MathType, PmapEntry,
 };
 use std::vec::Vec;
+
+/// DRM configuration for building an encrypted Honzo file.
+#[derive(Clone)]
+pub struct DrmConfig {
+    /// IDs of chunks to encrypt
+    pub encrypt_chunk_ids: Vec<u32>,
+    /// DER-encoded RSA public key (PKCS#8 SubjectPublicKeyInfo)
+    pub public_key_der: Vec<u8>,
+    /// Optional license URL
+    pub license_url: Option<String>,
+    /// Optional expiry timestamp (Unix epoch seconds)
+    pub expires_at: Option<u64>,
+}
 
 fn strip_html_tags(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
@@ -104,6 +117,7 @@ pub struct HonzoBuilder {
     auto_covt: bool,
     language: String,
     min_reader_version: u16,
+    drm_config: Option<DrmConfig>,
 }
 
 impl HonzoBuilder {
@@ -120,7 +134,13 @@ impl HonzoBuilder {
             auto_covt: true,
             language: "en".to_string(),
             min_reader_version: 1,
+            drm_config: None,
         }
+    }
+
+    pub fn set_drm_config(mut self, config: DrmConfig) -> Self {
+        self.drm_config = Some(config);
+        self
     }
 
     pub fn set_auto_covt(mut self, enable: bool) -> Self {
@@ -301,6 +321,20 @@ impl HonzoBuilder {
             }
         }
 
+        // DRM setup: generate CEK and determine which chunks to encrypt
+        let drm_state = if let Some(ref cfg) = final_builder.drm_config {
+            let cek = crate::crypto::generate_cek()?;
+            let valid_ids: Vec<u32> = cfg
+                .encrypt_chunk_ids
+                .iter()
+                .filter(|id| **id < final_builder.chunks.len() as u32)
+                .copied()
+                .collect();
+            Some((cek, valid_ids))
+        } else {
+            None
+        };
+
         let chunk_count = final_builder.chunks.len() as u32;
         let mut toc_bytes = Vec::new();
         let mut data_bytes = Vec::new();
@@ -308,7 +342,18 @@ impl HonzoBuilder {
         toc_bytes.extend_from_slice(&chunk_count.to_le_bytes());
 
         for (chunk_id, chunk) in final_builder.chunks.iter().enumerate() {
-            let (compressed, size_compressed, size_raw, crc32) = prepare_chunk(chunk)?;
+            let (mut compressed, mut size_compressed, size_raw, crc32) = prepare_chunk(chunk)?;
+            let mut chunk_flags: u8 = 0;
+
+            // Encrypt if this chunk is in the DRM set
+            if let Some((ref cek, ref ids)) = drm_state {
+                if ids.contains(&(chunk_id as u32)) {
+                    let encrypted = crate::crypto::encrypt_chunk(&compressed, cek)?;
+                    size_compressed = encrypted.len() as u32;
+                    compressed = encrypted;
+                    chunk_flags |= 0x01;
+                }
+            }
 
             toc_bytes.extend_from_slice(&chunk.tag);
             toc_bytes.extend_from_slice(&(chunk_id as u32).to_le_bytes());
@@ -320,7 +365,7 @@ impl HonzoBuilder {
             toc_bytes.push(chunk.content_type_kind);
             toc_bytes.push(chunk.content_type_value);
             toc_bytes.push(chunk.cover_type as u8);
-            toc_bytes.push(0);
+            toc_bytes.push(chunk_flags);
             toc_bytes.extend_from_slice(&crc32.to_le_bytes());
 
             if let Some(text) = &chunk.alt_text {
@@ -346,6 +391,26 @@ impl HonzoBuilder {
             toc_bytes.extend_from_slice(&entry.print_page.to_le_bytes());
             toc_bytes.extend_from_slice(&entry.chunk_id.to_le_bytes());
             toc_bytes.extend_from_slice(&entry.byte_offset.to_le_bytes());
+        }
+
+        // Build DRM envelope if configured
+        if let Some((ref cek, ref ids)) = drm_state {
+            let cfg = final_builder.drm_config.as_ref().unwrap();
+            let key_envelope = crate::crypto::wrap_cek(cek, &cfg.public_key_der)?;
+            let envelope = drm::DrmEnvelope {
+                scheme: "AES-256-CBC+RSA-OAEP".to_string(),
+                encrypted_chunks: ids.clone(),
+                key_envelope,
+                license_url: cfg.license_url.clone(),
+                expires_at: cfg.expires_at,
+            };
+            let drm_body = drm::build_drm(&envelope)?;
+            final_builder.flags |= 0x10;
+            final_builder.extra_entries.push((
+                *b"DRM_",
+                extra::DRM_NAMESPACE.to_string(),
+                drm_body,
+            ));
         }
 
         let toc_size = toc_bytes.len() as u64;

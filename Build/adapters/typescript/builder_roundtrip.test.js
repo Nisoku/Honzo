@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeAll } from '@jest/globals';
-import { initHonzo, getHonzo, buildHonzo, open } from './helpers.mjs';
+import { initHonzo, buildHonzo, open } from './helpers.mjs';
 
 beforeAll(async () => {
   await initHonzo();
@@ -83,10 +83,15 @@ describe('Chunk round-trip', () => {
   it('builds chunks with LZ4 compression', () => {
     const data = txt('Some compressible data '.repeat(10));
     const file = buildHonzo({
-      chunks: [{
-        tag: 'CHAP', data, compression: 1,
-        content_type_kind: 1, content_type_value: 0,
-      }],
+      chunks: [
+        {
+          tag: 'CHAP',
+          data,
+          compression: 1,
+          content_type_kind: 1,
+          content_type_value: 0,
+        },
+      ],
     });
     const reader = open(file);
 
@@ -162,10 +167,15 @@ describe('compression_name_for_chunk', () => {
   it('returns Lz4 for compressed chunks', () => {
     const data = txt('Compressible '.repeat(20));
     const file = buildHonzo({
-      chunks: [{
-        tag: 'CHAP', data, compression: 1,
-        content_type_kind: 1, content_type_value: 0,
-      }],
+      chunks: [
+        {
+          tag: 'CHAP',
+          data,
+          compression: 1,
+          content_type_kind: 1,
+          content_type_value: 0,
+        },
+      ],
     });
     const reader = open(file);
 
@@ -247,7 +257,13 @@ describe('get_chapter_text', () => {
     const file = buildHonzo({
       chunks: [
         { tag: 'CHAP', data: txt('Chapter 1'), content_type_kind: 1, content_type_value: 0 },
-        { tag: 'IMG_', data: [1, 2, 3], content_type_kind: 1, content_type_value: 0, cover_type: 1 },
+        {
+          tag: 'IMG_',
+          data: [1, 2, 3],
+          content_type_kind: 1,
+          content_type_value: 0,
+          cover_type: 1,
+        },
       ],
     });
     const reader = open(file);

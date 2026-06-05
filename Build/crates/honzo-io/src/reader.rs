@@ -1,16 +1,41 @@
 use crate::compression::{decompress, verify_entry_crc32};
-use honzo_chunks::extra::{anno, sync};
+use honzo_chunks::extra::{anno, drm, sync};
 use honzo_core::{HonzoError, HonzoParser, TocEntry};
 
 pub struct HonzoReader<'a> {
     parser: HonzoParser<'a>,
+    cek: Option<[u8; 32]>,
 }
 
 impl<'a> HonzoReader<'a> {
     pub fn new(buf: &'a [u8], reader_version: u16) -> Result<Self, HonzoError> {
         Ok(Self {
             parser: HonzoParser::new(buf, reader_version)?,
+            cek: None,
         })
+    }
+
+    /// Create a reader with a DER-encoded RSA private key for DRM decryption.
+    /// Parses the DRM envelope from the extra section and unwraps the CEK.
+    pub fn with_private_key(
+        buf: &'a [u8],
+        reader_version: u16,
+        private_key_der: &[u8],
+    ) -> Result<Self, HonzoError> {
+        let parser = HonzoParser::new(buf, reader_version)?;
+        let cek = if parser.head().has_drm() {
+            let extra = parser.extra_bytes()?;
+            let entries = crate::parse_extra(extra)?;
+            let entry = crate::find_extra(&entries, drm::NAMESPACE).ok_or(
+                HonzoError::CryptoError("DRM flag set but no DRM extra entry found"),
+            )?;
+            let envelope = drm::parse_drm(&entry.body)?;
+            let cek = crate::crypto::unwrap_cek(&envelope.key_envelope, private_key_der)?;
+            Some(cek)
+        } else {
+            None
+        };
+        Ok(Self { parser, cek })
     }
 
     pub fn head(&self) -> &honzo_core::HonzoHead {
@@ -27,6 +52,13 @@ impl<'a> HonzoReader<'a> {
 
     pub fn chunk_bytes(&self, entry: &TocEntry) -> Result<Vec<u8>, HonzoError> {
         if entry.is_encrypted() {
+            if let Some(ref cek) = self.cek {
+                let raw = self.parser.chunk_bytes_unchecked(entry)?;
+                let compressed = crate::crypto::decrypt_chunk(raw, cek)?;
+                let data = decompress(&compressed, entry.compression, entry.size_raw)?;
+                verify_entry_crc32(entry, &data)?;
+                return Ok(data);
+            }
             return Err(HonzoError::EncryptedChunk {
                 chunk_id: entry.chunk_id,
             });

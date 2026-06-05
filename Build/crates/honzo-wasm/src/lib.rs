@@ -12,6 +12,33 @@ use honzo_core::{Compression, CoverType, MarkupType, MathType};
 use honzo_io::*;
 use wasm_bindgen::prelude::*;
 
+/// A DRM key pair for building/reading encrypted Honzo files.
+/// Generated externally (e.g., `openssl genpkey -algorithm RSA -out private.pem`).
+#[wasm_bindgen]
+pub struct DrmKeyPair {
+    public_key_der: Vec<u8>,
+    private_key_der: Vec<u8>,
+}
+
+#[wasm_bindgen]
+impl DrmKeyPair {
+    #[wasm_bindgen(constructor)]
+    pub fn new(public_key_der: Vec<u8>, private_key_der: Vec<u8>) -> Self {
+        Self {
+            public_key_der,
+            private_key_der,
+        }
+    }
+
+    pub fn public_key_der(&self) -> Vec<u8> {
+        self.public_key_der.clone()
+    }
+
+    pub fn private_key_der(&self) -> Vec<u8> {
+        self.private_key_der.clone()
+    }
+}
+
 #[wasm_bindgen]
 pub struct HonzoWasm {
     buf: Vec<u8>,
@@ -19,6 +46,7 @@ pub struct HonzoWasm {
     meta: Vec<u8>,
     data_start: usize,
     toc: Vec<WasmTocEntry>,
+    cek: Option<[u8; 32]>,
 }
 
 #[allow(dead_code)]
@@ -43,6 +71,24 @@ struct WasmTocEntry {
 impl HonzoWasm {
     #[wasm_bindgen(constructor)]
     pub fn new(buf: &[u8], reader_version: u16) -> Result<HonzoWasm, JsValue> {
+        Self::new_inner(buf, reader_version, None)
+    }
+
+    /// Create a reader with a DER-encoded RSA private key for DRM decryption.
+    #[wasm_bindgen]
+    pub fn with_private_key(
+        buf: &[u8],
+        reader_version: u16,
+        private_key_der: &[u8],
+    ) -> Result<HonzoWasm, JsValue> {
+        Self::new_inner(buf, reader_version, Some(private_key_der))
+    }
+
+    fn new_inner(
+        buf: &[u8],
+        reader_version: u16,
+        private_key_der: Option<&[u8]>,
+    ) -> Result<HonzoWasm, JsValue> {
         let p = honzo_core::HonzoParser::new(buf, reader_version)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
         let meta = p
@@ -73,12 +119,35 @@ impl HonzoWasm {
             })
             .collect();
 
+        // Parse DRM envelope and unwrap CEK if private key is provided
+        let cek = if head.has_drm() {
+            if let Some(pk_der) = private_key_der {
+                let extra = p
+                    .extra_bytes()
+                    .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+                let entries = honzo_io::parse_extra(extra)
+                    .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+                let entry = honzo_io::find_extra(&entries, honzo_chunks::extra::drm::NAMESPACE)
+                    .ok_or_else(|| JsValue::from_str("DRM flag set but no DRM extra entry"))?;
+                let envelope = honzo_chunks::extra::drm::parse_drm(&entry.body)
+                    .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+                let cek = honzo_io::crypto::unwrap_cek(&envelope.key_envelope, pk_der)
+                    .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+                Some(cek)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
         Ok(HonzoWasm {
             buf: buf.to_vec(),
             reader_version,
             meta,
             data_start,
             toc,
+            cek,
         })
     }
 
@@ -214,18 +283,25 @@ impl HonzoWasm {
             .get(index as usize)
             .ok_or_else(|| JsValue::from_str("chunk index out of bounds"))?;
 
-        if entry.flags & 0x01 != 0 {
-            return Ok(Vec::new());
-        }
-
         let start = self.data_start + entry.offset as usize;
         let end = start + entry.size_compressed as usize;
         if end > self.buf.len() {
             return Err(JsValue::from_str("chunk data truncated"));
         }
 
-        let compressed = &self.buf[start..end];
-        decompress(compressed, entry.compression, entry.size_raw)
+        let raw = &self.buf[start..end];
+
+        if entry.flags & 0x01 != 0 {
+            if let Some(ref cek) = self.cek {
+                let compressed = honzo_io::crypto::decrypt_chunk(raw, cek)
+                    .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+                return decompress(&compressed, entry.compression, entry.size_raw)
+                    .map_err(|e| JsValue::from_str(&format!("{:?}", e)));
+            }
+            return Err(JsValue::from_str("chunk is encrypted"));
+        }
+
+        decompress(raw, entry.compression, entry.size_raw)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
     }
 
@@ -476,6 +552,22 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
         flags: u32,
         #[serde(default = "default_min_reader_version")]
         min_reader_version: u16,
+        #[serde(default)]
+        drm: Option<DrmBuildSpec>,
+    }
+
+    #[derive(Deserialize)]
+    struct DrmBuildSpec {
+        /// Chunk IDs to encrypt
+        encrypt_chunk_ids: Vec<u32>,
+        /// DER-encoded RSA public key
+        public_key_der: Vec<u8>,
+        /// Optional license URL
+        #[serde(default)]
+        license_url: Option<String>,
+        /// Optional expiry timestamp
+        #[serde(default)]
+        expires_at: Option<u64>,
     }
 
     fn default_language() -> String {
@@ -612,6 +704,16 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
         let cues: Vec<sync::SyncCue> = rmp_serde::from_slice(sync_bytes)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
         builder = builder.add_sync_cue(&cues);
+    }
+
+    if let Some(ref drm_spec) = spec.drm {
+        let config = DrmConfig {
+            encrypt_chunk_ids: drm_spec.encrypt_chunk_ids.clone(),
+            public_key_der: drm_spec.public_key_der.clone(),
+            license_url: drm_spec.license_url.clone(),
+            expires_at: drm_spec.expires_at,
+        };
+        builder = builder.set_drm_config(config);
     }
 
     builder

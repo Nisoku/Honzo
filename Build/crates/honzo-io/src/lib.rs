@@ -1,4 +1,5 @@
 mod compression;
+pub mod crypto;
 mod extra;
 mod meta;
 mod reader;
@@ -14,6 +15,7 @@ pub use meta::{
 pub use reader::HonzoReader;
 pub use stream::{ChapterIter, HonzoStream};
 pub use utils::{compute_reading_time, new_uuid};
+pub use writer::DrmConfig;
 pub use writer::HonzoBuilder;
 
 pub use honzo_core::{

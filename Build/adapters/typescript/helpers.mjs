@@ -19,7 +19,7 @@ export function getHonzo() {
   return _honzo;
 }
 
-// --- MsgPack helpers ---
+// MsgPack helpers
 
 function concat(arrays) {
   const totalLen = arrays.reduce((s, a) => s + a.length, 0);
@@ -84,7 +84,7 @@ export function u8toArray(u8) {
   return Array.from(u8);
 }
 
-// --- Build helpers ---
+// Build helpers
 
 export function buildAnnotations(annos) {
   return u8toArray(
@@ -124,14 +124,19 @@ export function buildSyncCues(cues) {
   );
 }
 
-export function buildDrmEnvelope(algorithm, iv, ciphertext) {
-  return u8toArray(
-    encodeMap([
-      ['algorithm', encodeStr(algorithm)],
-      ['iv', u8toArray(encodeArray(iv.map((b) => encodeUint(b))))],
-      ['ciphertext', u8toArray(encodeArray(ciphertext.map((b) => encodeUint(b))))],
-    ]),
-  );
+export function buildDrmEnvelope(scheme, encryptedChunks, keyEnvelope, licenseUrl, expiresAt) {
+  const entries = [
+    ['scheme', encodeStr(scheme)],
+    ['encrypted_chunks', encodeArray((encryptedChunks || []).map((id) => encodeUint(id)))],
+    ['key_envelope', encodeArray((keyEnvelope || []).map((b) => encodeUint(b)))],
+  ];
+  if (licenseUrl !== undefined && licenseUrl !== null) {
+    entries.push(['license_url', encodeStr(licenseUrl)]);
+  }
+  if (expiresAt !== undefined && expiresAt !== null) {
+    entries.push(['expires_at', encodeUint(expiresAt)]);
+  }
+  return u8toArray(encodeMap(entries));
 }
 
 export function buildExtraEntry(namespace, body) {
@@ -141,7 +146,7 @@ export function buildExtraEntry(namespace, body) {
   return u8toArray(concat([nsBytes, lenBuf, new Uint8Array(body)]));
 }
 
-export function buildHonzo({ meta, chunks, annotations, syncCues, extra, flags, layout }) {
+export function buildHonzo({ meta, chunks, annotations, syncCues, extra, flags, layout, drm }) {
   const honzo = getHonzo();
   return honzo.honzo_build({
     chunks: chunks || [],
@@ -154,9 +159,14 @@ export function buildHonzo({ meta, chunks, annotations, syncCues, extra, flags, 
     auto_sidx: false,
     auto_covt: false,
     layout: layout ?? 0,
+    drm: drm || null,
   });
 }
 
 export function open(file) {
   return new (getHonzo().HonzoWasm)(file, 1);
+}
+
+export function openWithPrivateKey(file, privateKeyDer) {
+  return getHonzo().HonzoWasm.with_private_key(file, 1, privateKeyDer);
 }

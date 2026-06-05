@@ -106,6 +106,12 @@ impl<'buf> HonzoParser<'buf> {
                 chunk_id: entry.chunk_id,
             });
         }
+        self.chunk_bytes_unchecked(entry)
+    }
+
+    /// Read raw chunk bytes regardless of the encrypted flag.
+    /// Upper layers (honzo-io) handle decryption when a key is provided.
+    pub fn chunk_bytes_unchecked(&self, entry: &TocEntry) -> Result<&'buf [u8], HonzoError> {
         let start = self.data_offset + entry.offset as usize;
         let end = start + entry.size_compressed as usize;
         if end > self.data_offset + self.head.data_size as usize {

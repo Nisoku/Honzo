@@ -3,14 +3,18 @@ import {
   initHonzo,
   buildAnnotations,
   buildSyncCues,
-  buildDrmEnvelope,
-  buildExtraEntry,
   buildHonzo,
   open,
+  openWithPrivateKey,
+  buildExtraEntry,
+  buildDrmEnvelope,
 } from './helpers.mjs';
+import { TEST_PRIV_KEY_DER, TEST_PUB_KEY_DER } from './keys.js';
 
 beforeAll(async () => {
-  await initHonzo();
+  let honzo;
+  // eslint-disable-next-line no-unused-vars
+  honzo = await initHonzo();
 });
 
 describe('ANNO + SYNC combined', () => {
@@ -40,12 +44,14 @@ describe('ANNO + SYNC combined', () => {
 describe('DRM extra namespace', () => {
   it('recognizes DRM namespace via get_extra', () => {
     const drmBody = buildDrmEnvelope(
-      'AES-256-CBC',
-      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+      'AES-256-CBC+RSA-OAEP',
+      [0, 1],
       [100, 101, 102, 103, 104],
+      'https://example.com/license',
+      1893456000,
     );
     const extraData = buildExtraEntry('DRM_', drmBody);
-    const file = buildHonzo({ extra: extraData });
+    const file = buildHonzo({ extra: extraData, flags: 0x10 });
     const reader = open(file);
 
     const extra = reader.get_extra();
@@ -54,14 +60,73 @@ describe('DRM extra namespace', () => {
   });
 
   it('has_drm returns true when DRM flag is set', () => {
-    const drmBody = buildDrmEnvelope('AES-256-CBC', [], [1, 2, 3]);
+    const drmBody = buildDrmEnvelope('AES-256-CBC+RSA-OAEP', [0], [1, 2, 3]);
     const extraData = buildExtraEntry('DRM_', drmBody);
-    const file = buildHonzo({ extra: extraData, flags: 0x100 });
-    // DRM flag is bit 8 (0x100) - looking at the spec, but the current
-    // implementation checks the DRM bit differently
+    const file = buildHonzo({ extra: extraData, flags: 0x10 });
     const reader = open(file);
-    // has_drm uses parser head, which checks the buffer directly, not flags
-    expect(typeof reader.has_drm()).toBe('boolean');
+
+    expect(reader.has_drm()).toBe(true);
+  });
+
+  it('has_drm returns false when DRM flag is not set', () => {
+    const file = buildHonzo({});
+    const reader = open(file);
+
+    expect(reader.has_drm()).toBe(false);
+  });
+
+  it('honzo_build accepts drm config and sets the DRM flag', () => {
+    const file = buildHonzo({
+      chunks: [{ tag: 'CHAP', data: [72, 105], content_type_kind: 1, content_type_value: 0 }],
+      drm: {
+        encrypt_chunk_ids: [0],
+        public_key_der: Array.from(TEST_PUB_KEY_DER),
+        license_url: 'https://example.com/license',
+        expires_at: 1893456000,
+      },
+    });
+    const reader = open(file);
+    expect(reader.flags() & 0x10).toBe(0x10);
+  });
+
+  it('DRM extra entry is present when drm config is used', () => {
+    const file = buildHonzo({
+      chunks: [{ tag: 'CHAP', data: [72, 105], content_type_kind: 1, content_type_value: 0 }],
+      drm: {
+        encrypt_chunk_ids: [0],
+        public_key_der: Array.from(TEST_PUB_KEY_DER),
+      },
+    });
+    const reader = open(file);
+    const extra = reader.get_extra();
+    const header = new TextDecoder().decode(extra.slice(0, 4));
+    expect(header).toBe('DRM_');
+  });
+
+  it('encrypted chunk cannot be read without a key', () => {
+    const file = buildHonzo({
+      chunks: [{ tag: 'CHAP', data: [72, 105], content_type_kind: 1, content_type_value: 0 }],
+      drm: {
+        encrypt_chunk_ids: [0],
+        public_key_der: Array.from(TEST_PUB_KEY_DER),
+      },
+    });
+    const reader = open(file);
+    expect(() => reader.get_chunk(0)).toThrow();
+  });
+
+  it('encrypted chunk can be read with the private key', () => {
+    const file = buildHonzo({
+      chunks: [{ tag: 'CHAP', data: [72, 105], content_type_kind: 1, content_type_value: 0 }],
+      drm: {
+        encrypt_chunk_ids: [0],
+        public_key_der: Array.from(TEST_PUB_KEY_DER),
+      },
+    });
+    const reader = openWithPrivateKey(file, TEST_PRIV_KEY_DER);
+    const chunk = reader.get_chunk(0);
+    const decoded = new TextDecoder().decode(chunk);
+    expect(decoded).toBe('Hi');
   });
 });
 
@@ -210,7 +275,8 @@ describe('Metadata round-trip', () => {
   it('get_meta_parsed returns series info', () => {
     const file = buildHonzo({
       meta: {
-        title: { en: 'T' }, authors: ['A'],
+        title: { en: 'T' },
+        authors: ['A'],
         series: { title: 'Trilogy', position: '1' },
         language: 'en',
       },

@@ -1,7 +1,7 @@
 use crate::compression::{decompress, verify_entry_crc32};
 use honzo_chunks::data::font;
 use honzo_chunks::data::is_known_chunk;
-use honzo_chunks::extra::{anno, sync};
+use honzo_chunks::extra::{anno, drm, sync};
 use honzo_core::{HonzoError, HonzoHead, PmapEntry, TocEntry};
 use honzo_core::{MarkupType, MathType};
 use std::io::{Read, Seek, SeekFrom};
@@ -12,10 +12,28 @@ pub struct HonzoStream<R: Read + Seek> {
     toc_buf: Vec<u8>,
     pmap: Vec<PmapEntry>,
     data_start: u64,
+    cek: Option<[u8; 32]>,
 }
 
 impl<R: Read + Seek> HonzoStream<R> {
-    pub fn open(mut reader: R, reader_version: u16) -> Result<Self, HonzoError> {
+    pub fn open(reader: R, reader_version: u16) -> Result<Self, HonzoError> {
+        Self::open_inner(reader, reader_version, None)
+    }
+
+    /// Open a stream with a DER-encoded RSA private key for DRM decryption.
+    pub fn open_with_private_key(
+        reader: R,
+        reader_version: u16,
+        private_key_der: &[u8],
+    ) -> Result<Self, HonzoError> {
+        Self::open_inner(reader, reader_version, Some(private_key_der))
+    }
+
+    fn open_inner(
+        mut reader: R,
+        reader_version: u16,
+        private_key_der: Option<&[u8]>,
+    ) -> Result<Self, HonzoError> {
         let mut magic = [0u8; 4];
         reader
             .read_exact(&mut magic)
@@ -61,12 +79,44 @@ impl<R: Read + Seek> HonzoStream<R> {
 
         let data_start = 4 + 48 + toc_size;
 
+        // Parse DRM envelope if DRM flag is set and a private key was provided
+        let cek = if head.has_drm() {
+            if let Some(pk_der) = private_key_der {
+                // Seek to extra section to read DRM envelope
+                let extra_offset = data_start + data_size;
+                reader
+                    .seek(SeekFrom::Start(extra_offset))
+                    .map_err(|_| HonzoError::Truncated)?;
+                let mut extra_buf = vec![0u8; extra_size as usize];
+                reader
+                    .read_exact(&mut extra_buf)
+                    .map_err(|_| HonzoError::Truncated)?;
+                let entries = crate::parse_extra(&extra_buf)?;
+                let entry = crate::find_extra(&entries, drm::NAMESPACE).ok_or(
+                    HonzoError::CryptoError("DRM flag set but no DRM extra entry found"),
+                )?;
+                let envelope = drm::parse_drm(&entry.body)?;
+                let cek = crate::crypto::unwrap_cek(&envelope.key_envelope, pk_der)?;
+                Some(cek)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        // Reset reader position to start of data section
+        reader
+            .seek(SeekFrom::Start(data_start))
+            .map_err(|_| HonzoError::Truncated)?;
+
         Ok(Self {
             reader,
             head,
             toc_buf,
             pmap,
             data_start,
+            cek,
         })
     }
 
@@ -115,22 +165,30 @@ impl<R: Read + Seek> HonzoStream<R> {
     }
 
     pub fn read_chunk(&mut self, entry: &TocEntry) -> Result<Vec<u8>, HonzoError> {
-        if entry.is_encrypted() {
-            return Err(HonzoError::EncryptedChunk {
-                chunk_id: entry.chunk_id,
-            });
-        }
         let start = self.data_start + entry.offset;
         self.reader
             .seek(SeekFrom::Start(start))
             .map_err(|_| HonzoError::Truncated)?;
-        let mut buf = vec![0u8; entry.size_compressed as usize];
+        let mut raw = vec![0u8; entry.size_compressed as usize];
         self.reader
-            .read_exact(&mut buf)
+            .read_exact(&mut raw)
             .map_err(|_| HonzoError::Truncated)?;
-        let decompressed = decompress(&buf, entry.compression, entry.size_raw)?;
-        verify_entry_crc32(entry, &decompressed)?;
-        Ok(decompressed)
+
+        if entry.is_encrypted() {
+            if let Some(ref cek) = self.cek {
+                let compressed = crate::crypto::decrypt_chunk(&raw, cek)?;
+                let data = decompress(&compressed, entry.compression, entry.size_raw)?;
+                verify_entry_crc32(entry, &data)?;
+                return Ok(data);
+            }
+            return Err(HonzoError::EncryptedChunk {
+                chunk_id: entry.chunk_id,
+            });
+        }
+
+        let data = decompress(&raw, entry.compression, entry.size_raw)?;
+        verify_entry_crc32(entry, &data)?;
+        Ok(data)
     }
 
     pub fn notes(&mut self) -> ChapterIter<'_, R> {
@@ -260,11 +318,6 @@ impl<'a, R: Read + Seek> Iterator for ChapterIter<'a, R> {
             let entry = self.toc[self.index];
             self.index += 1;
             if entry.chunk_type == *b"CHAP" || entry.chunk_type == *b"NOTE" {
-                if entry.is_encrypted() {
-                    return Some(Err(HonzoError::EncryptedChunk {
-                        chunk_id: entry.chunk_id,
-                    }));
-                }
                 return Some(self.stream.read_chunk(&entry));
             }
         }

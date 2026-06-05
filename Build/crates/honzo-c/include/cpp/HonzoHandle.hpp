@@ -21,6 +21,8 @@ namespace capi {
 
     diplomat::capi::HonzoHandle* HonzoHandle_parse(diplomat::capi::DiplomatU8View data, uint16_t reader_version);
 
+    diplomat::capi::HonzoHandle* HonzoHandle_parse_with_private_key(diplomat::capi::DiplomatU8View data, uint16_t reader_version, diplomat::capi::DiplomatU8View private_key_der);
+
     uint32_t HonzoHandle_chunk_count(const diplomat::capi::HonzoHandle* self);
 
     uint8_t HonzoHandle_version_major(const diplomat::capi::HonzoHandle* self);
@@ -77,6 +79,13 @@ namespace capi {
 inline std::unique_ptr<HonzoHandle> HonzoHandle::parse(diplomat::span<const uint8_t> data, uint16_t reader_version) {
     auto result = diplomat::capi::HonzoHandle_parse({data.data(), data.size()},
         reader_version);
+    return std::unique_ptr<HonzoHandle>(HonzoHandle::FromFFI(result));
+}
+
+inline std::unique_ptr<HonzoHandle> HonzoHandle::parse_with_private_key(diplomat::span<const uint8_t> data, uint16_t reader_version, diplomat::span<const uint8_t> private_key_der) {
+    auto result = diplomat::capi::HonzoHandle_parse_with_private_key({data.data(), data.size()},
+        reader_version,
+        {private_key_der.data(), private_key_der.size()});
     return std::unique_ptr<HonzoHandle>(HonzoHandle::FromFFI(result));
 }
 

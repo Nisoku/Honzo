@@ -24,6 +24,7 @@ pub enum HonzoError {
     InvalidCss,
     UnknownFontEmbedding(u8),
     UnknownExtraNamespace(&'static str),
+    CryptoError(&'static str),
     Truncated,
     InvalidSyncCue,
 }

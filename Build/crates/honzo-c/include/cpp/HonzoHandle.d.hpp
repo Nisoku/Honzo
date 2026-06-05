@@ -27,6 +27,11 @@ public:
 
   inline static std::unique_ptr<HonzoHandle> parse(diplomat::span<const uint8_t> data, uint16_t reader_version);
 
+  /**
+   * Parse with a DER-encoded RSA private key for DRM decryption.
+   */
+  inline static std::unique_ptr<HonzoHandle> parse_with_private_key(diplomat::span<const uint8_t> data, uint16_t reader_version, diplomat::span<const uint8_t> private_key_der);
+
   inline uint32_t chunk_count() const;
 
   inline uint8_t version_major() const;

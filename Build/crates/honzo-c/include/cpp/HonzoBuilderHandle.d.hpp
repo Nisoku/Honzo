@@ -49,6 +49,8 @@ public:
 
   inline bool add_annotation(diplomat::span<const uint8_t> body);
 
+  inline diplomat::result<bool, diplomat::Utf8Error> set_drm_config(diplomat::span<const uint32_t> encrypt_chunk_ids, diplomat::span<const uint8_t> public_key_der, std::string_view license_url, uint64_t expires_at);
+
   inline bool add_sync_cue(diplomat::span<const uint8_t> body);
 
   inline bool finalize();

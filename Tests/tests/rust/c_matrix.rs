@@ -82,8 +82,7 @@ fn ffi_version_too_new() {
 #[test]
 fn ffi_encrypted_chunk_skipped() {
     let mut handle = honzo_c::ffi::HonzoHandle::parse(&corpus("encrypted_chunk.hzo"), 1).unwrap();
-    let chunk = handle.get_chunk(0).unwrap();
-    assert!(chunk.is_empty());
+    assert!(handle.get_chunk(0).is_none());
 }
 
 #[test]
