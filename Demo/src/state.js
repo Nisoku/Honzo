@@ -16,6 +16,7 @@ export const totalChapters = signal(path("reader", "totalChapters"), 0);
 export const hasBook = signal(path("reader", "hasBook"), false);
 export const currentChunkId = signal(path("reader", "currentChunkId"), 0);
 export const chapterLabel = signal(path("reader", "chapterLabel"), "");
+export const referencePage = signal(path("reader", "referencePage"), "");
 export const currentDirection = signal(
   path("reader", "currentDirection"),
   "ltr",
@@ -210,5 +211,6 @@ export function resetReaderState() {
   hasBook.set(false);
   currentChunkId.set(0);
   chapterLabel.set("");
+  referencePage.set("");
   activeSidebar.set(null);
 }

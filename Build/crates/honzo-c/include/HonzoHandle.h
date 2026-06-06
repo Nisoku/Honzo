@@ -64,6 +64,9 @@ HonzoHandle_get_annotations_result HonzoHandle_get_annotations(const HonzoHandle
 typedef struct HonzoHandle_get_sync_cues_result {union { HonzoErrorCode err;}; bool is_ok;} HonzoHandle_get_sync_cues_result;
 HonzoHandle_get_sync_cues_result HonzoHandle_get_sync_cues(const HonzoHandle* self, DiplomatWrite* write);
 
+typedef struct HonzoHandle_get_pmap_result {union { HonzoErrorCode err;}; bool is_ok;} HonzoHandle_get_pmap_result;
+HonzoHandle_get_pmap_result HonzoHandle_get_pmap(const HonzoHandle* self, DiplomatWrite* write);
+
 typedef struct HonzoHandle_get_toc_result {union { HonzoErrorCode err;}; bool is_ok;} HonzoHandle_get_toc_result;
 HonzoHandle_get_toc_result HonzoHandle_get_toc(const HonzoHandle* self, DiplomatWrite* write);
 

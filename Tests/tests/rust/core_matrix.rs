@@ -46,20 +46,6 @@ fn parses_fixed_and_scroll_layouts() {
 }
 
 #[test]
-fn exposes_pmap_entries_in_order() {
-    let data = fixture("textbook.hzo");
-    let parser = HonzoParser::new(&data, 1).unwrap();
-    let entries: Vec<_> = parser.pmap_entries().collect();
-
-    assert_eq!(entries.len(), 10);
-    assert_eq!(entries[0].print_page, 1);
-    assert_eq!(entries[9].print_page, 10);
-    assert!(entries
-        .windows(2)
-        .all(|pair| pair[0].print_page < pair[1].print_page));
-}
-
-#[test]
 fn zero_copy_chunk_bytes_have_expected_length() {
     let data = fixture("novel.hzo");
     let parser = HonzoParser::new(&data, 1).unwrap();

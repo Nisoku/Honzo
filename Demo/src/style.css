@@ -519,6 +519,13 @@ body[data-text-align="justify"] .chapter-body {
   margin-left: 4px;
 }
 
+.ref-page {
+  color: var(--accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 2em;
+}
+
 /* Sidebar */
 .sidebar {
   position: fixed;

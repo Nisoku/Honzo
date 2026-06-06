@@ -9,6 +9,7 @@ import {
   hasBook,
   nextDisabled,
   prevDisabled,
+  referencePage,
   textAlign,
   totalPagesText,
   toggleSidebar,
@@ -56,6 +57,7 @@ const settingsSidebar = document.getElementById("settings-sidebar");
 const settingsContent = document.getElementById("settings-content");
 const errorTextNode = document.getElementById("error-text");
 const chapterLabelSpan = document.getElementById("chapter-label");
+const refPageSpan = document.getElementById("ref-page");
 const progressFill = document.getElementById("progress-fill");
 const footer = document.getElementById("app-footer");
 
@@ -144,6 +146,7 @@ bindText(totalPagesSpan, totalPagesText);
 bindText(currentPageSpan, currentPageText);
 bindText(errorTextNode, errorText);
 bindText(chapterLabelSpan, chapterLabel);
+bindText(refPageSpan, referencePage);
 
 // Disabled bindings for prev/next
 bindDisabled(prevButton, prevDisabled);

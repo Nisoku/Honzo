@@ -16,6 +16,7 @@ mod font_matrix;
 mod img_matrix;
 mod math_matrix;
 mod metadata_matrix;
+mod pmap_matrix;
 mod sidx_matrix;
 mod stream_matrix;
 mod sync_matrix;

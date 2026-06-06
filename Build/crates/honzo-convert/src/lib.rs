@@ -6,12 +6,14 @@ use lexepub::LexEpub;
 use honzo_io::data::{css::CSS_TAG, font::FONT_TAG};
 use honzo_io::{
     build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
-    HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType,
+    HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType, PmapEntry,
 };
 mod mobi;
+mod pagebreaks;
 mod pdf;
 mod refs;
 
+pub use pagebreaks::{detect_pagebreaks, estimate_pagebreaks};
 use refs::{normalize_path, rewrite_html_to_ref, rewrite_links_to_ref};
 
 #[derive(Debug)]
@@ -265,6 +267,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
 
     let mut chapter_texts: Vec<String> = Vec::new();
     let mut chapter_chunk_ids: Vec<u32> = Vec::new();
+    let mut all_pmap_entries: Vec<(u32, u32, u32)> = Vec::new(); // (page_num, chunk_id, byte_offset)
 
     // Build spine path -> chunk ID map for cross-chapter link rewriting
     let mut spine_path_to_chunk: HashMap<String, u32> = HashMap::new();
@@ -317,6 +320,12 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         let chap_title = chap_titles.get(path).map(|s| s.as_str());
         chapter_chunk_ids.push(next_chunk_id);
 
+        // Detect explicit pagebreaks in the rewritten HTML
+        let chapter_pages = detect_pagebreaks(&rewritten);
+        for (page_num, byte_offset) in chapter_pages {
+            all_pmap_entries.push((page_num, next_chunk_id, byte_offset));
+        }
+
         builder = builder.add_chunk(
             *b"CHAP",
             rewritten.as_bytes(),
@@ -336,6 +345,27 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
             chapter_texts.len(),
             chapter_chunk_ids.len()
         )));
+    }
+
+    // Add PMAP entries to builder
+    if !all_pmap_entries.is_empty() {
+        for &(page_num, chunk_id, byte_offset) in &all_pmap_entries {
+            builder = builder.add_pmap_entry(PmapEntry {
+                print_page: page_num,
+                chunk_id,
+                byte_offset,
+            });
+        }
+    } else if !chapter_chunk_ids.is_empty() {
+        // Fallback: estimate page breaks for books without explicit markers
+        let estimated = estimate_pagebreaks(&chapter_texts, &chapter_chunk_ids, 2400);
+        for &(page_num, chunk_id, byte_offset) in &estimated {
+            builder = builder.add_pmap_entry(PmapEntry {
+                print_page: page_num,
+                chunk_id,
+                byte_offset,
+            });
+        }
     }
 
     let sidx_refs: Vec<(u32, &str)> = chapter_chunk_ids

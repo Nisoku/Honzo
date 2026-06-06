@@ -13,6 +13,7 @@ import {
   currentChunkId,
   currentDirection,
   hasBook,
+  referencePage,
   resetReaderState,
   textAlign,
   totalChapters,
@@ -35,6 +36,7 @@ let tocEntries = [];
 let searchIndex = null;
 let imageBlobs = [];
 let currentChapterIndex = 0;
+let pmapEntries = [];
 let wasmInitPromise = null;
 let elements = {
   currentPageInput: null,
@@ -184,6 +186,22 @@ export function runSearch(query) {
   setSearchResults(searchChapters(query));
 }
 
+function updateReferencePage(chapter) {
+  if (!pmapEntries || pmapEntries.length === 0) {
+    referencePage.set("");
+    return;
+  }
+  // Show the first PMAP entry for this chunk (page where this chapter starts)
+  let refPage = "";
+  for (const entry of pmapEntries) {
+    if (entry.chunkId === chapter.chunk_id) {
+      refPage = `p. ${entry.printPage}`;
+      break;
+    }
+  }
+  referencePage.set(refPage);
+}
+
 function getMetaStr(obj, field) {
   if (!obj) return null;
   const v = obj[field];
@@ -265,6 +283,7 @@ async function loadBook(data, fileName) {
   reader = new HonzoWasm(data, 1);
   meta = reader.get_meta_parsed();
   tocEntries = reader.get_toc();
+  pmapEntries = reader.get_pmap() || [];
   const sidxEntry = tocEntries.find((entry) => entry.chunk_type === "SIDX");
   searchIndex = null;
   if (sidxEntry) {
@@ -445,6 +464,9 @@ function renderCurrentChapter(scrollToAnchor) {
 
   currentChapter.set(currentChapterIndex);
   currentChunkId.set(chapter.chunk_id);
+
+  // Resolve reference page from PMAP
+  updateReferencePage(chapter);
 
   // Update chapter label
   const label = `${chapter.chunk_type} ${chapter.chunk_id}${chapter.size_raw ? ` (${(chapter.size_raw / 1024).toFixed(0)} KB)` : ""}`;

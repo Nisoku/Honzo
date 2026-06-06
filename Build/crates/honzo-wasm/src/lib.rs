@@ -355,6 +355,27 @@ impl HonzoWasm {
         serde_wasm_bindgen::to_value(&cues).map_err(|e| JsValue::from_str(&format!("{:?}", e)))
     }
 
+    pub fn get_pmap(&self) -> Result<JsValue, JsValue> {
+        #[derive(serde::Serialize)]
+        #[serde(rename_all = "camelCase")]
+        struct PmapOut {
+            print_page: u32,
+            chunk_id: u32,
+            byte_offset: u32,
+        }
+        let parser = honzo_core::HonzoParser::new(&self.buf, self.reader_version)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        let entries: Vec<PmapOut> = parser
+            .pmap_entries()
+            .map(|e| PmapOut {
+                print_page: e.print_page,
+                chunk_id: e.chunk_id,
+                byte_offset: e.byte_offset,
+            })
+            .collect();
+        serde_wasm_bindgen::to_value(&entries).map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+    }
+
     pub fn get_toc(&self) -> Result<JsValue, JsValue> {
         #[derive(serde::Serialize)]
         struct TocOut {
@@ -534,12 +555,21 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
     }
 
     #[derive(Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    struct PmapEntrySpec {
+        print_page: u32,
+        chunk_id: u32,
+        byte_offset: u32,
+    }
+
+    #[derive(Deserialize)]
     struct BuildSpec {
         chunks: Vec<ChunkSpec>,
         meta: Option<serde_json::Value>,
         extra: Option<Vec<u8>>,
         annotations: Option<Vec<u8>>,
         sync_cues: Option<Vec<u8>>,
+        pmap_entries: Option<Vec<PmapEntrySpec>>,
         #[serde(default = "default_language")]
         language: String,
         #[serde(default = "default_auto_sidx")]
@@ -705,6 +735,16 @@ pub fn honzo_build(spec: JsValue) -> Result<Vec<u8>, JsValue> {
         let cues: Vec<sync::SyncCue> = rmp_serde::from_slice(sync_bytes)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
         builder = builder.add_sync_cue(&cues);
+    }
+
+    if let Some(ref pmap) = spec.pmap_entries {
+        for entry in pmap {
+            builder = builder.add_pmap_entry(honzo_core::PmapEntry {
+                print_page: entry.print_page,
+                chunk_id: entry.chunk_id,
+                byte_offset: entry.byte_offset,
+            });
+        }
     }
 
     if let Some(ref drm_spec) = spec.drm {

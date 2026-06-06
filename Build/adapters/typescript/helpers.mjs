@@ -146,13 +146,14 @@ export function buildExtraEntry(namespace, body) {
   return u8toArray(concat([nsBytes, lenBuf, new Uint8Array(body)]));
 }
 
-export function buildHonzo({ meta, chunks, annotations, syncCues, extra, flags, layout, drm }) {
+export function buildHonzo({ meta, chunks, annotations, syncCues, extra, flags, layout, drm, pmapEntries }) {
   const honzo = getHonzo();
   return honzo.honzo_build({
     chunks: chunks || [],
     meta: meta || { title: { en: 'Test' }, authors: ['Tester'], language: 'en' },
     annotations: annotations || null,
     sync_cues: syncCues || null,
+    pmap_entries: pmapEntries || null,
     extra: extra || null,
     flags: flags || 0,
     language: 'en',

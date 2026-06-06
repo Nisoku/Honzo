@@ -298,6 +298,33 @@ pub mod ffi {
             Ok(())
         }
 
+        pub fn get_pmap(
+            &self,
+            write: &mut diplomat_runtime::DiplomatWrite,
+        ) -> Result<(), HonzoErrorCode> {
+            #[derive(serde::Serialize)]
+            struct PmapOut {
+                print_page: u32,
+                chunk_id: u32,
+                byte_offset: u32,
+            }
+            let parser = HonzoParser::new(&self.buf, self.reader_version)
+                .map_err(|_| HonzoErrorCode::Unknown)?;
+            let entries: Vec<PmapOut> = parser
+                .pmap_entries()
+                .map(|e| PmapOut {
+                    print_page: e.print_page,
+                    chunk_id: e.chunk_id,
+                    byte_offset: e.byte_offset,
+                })
+                .collect();
+            let json = serde_json::to_string(&entries).map_err(|_| HonzoErrorCode::Unknown)?;
+            write
+                .write_str(&json)
+                .map_err(|_| HonzoErrorCode::Unknown)?;
+            Ok(())
+        }
+
         pub fn get_toc(
             &self,
             write: &mut diplomat_runtime::DiplomatWrite,

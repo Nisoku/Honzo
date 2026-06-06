@@ -1104,6 +1104,95 @@ fn gen_large_alt_text() {
     fs::write(corpus_dir().join("large_alt_text.hzo"), &hzo).unwrap();
 }
 
+fn gen_with_pmap() {
+    let mut title = HashMap::new();
+    title.insert("en".to_string(), "With PMAP".to_string());
+    let meta = HonzoMeta {
+        title: Some(title),
+        authors: vec!["Author".to_string()],
+        language: "en".to_string(),
+        ..Default::default()
+    };
+    let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
+
+    let hzo = HonzoBuilder::new()
+        .set_layout(LayoutMode::Fixed)
+        .add_chunk(
+            *b"CHAP",
+            b"Chapter one content that starts at page 1.",
+            Compression::None,
+            MarkupType::Markdown,
+            CoverType::Front,
+            None,
+            None,
+            None,
+        )
+        .add_chunk(
+            *b"CHAP",
+            b"Chapter two content that starts at page 3.",
+            Compression::None,
+            MarkupType::Markdown,
+            CoverType::Front,
+            None,
+            None,
+            None,
+        )
+        .add_chunk(
+            *b"CHAP",
+            b"Longer chapter with multiple page breaks. ",
+            Compression::None,
+            MarkupType::Markdown,
+            CoverType::Front,
+            None,
+            None,
+            None,
+        )
+        .add_chunk(
+            *b"CHAP",
+            b"Final chapter with large offset.",
+            Compression::None,
+            MarkupType::Markdown,
+            CoverType::Front,
+            None,
+            None,
+            None,
+        )
+        .add_pmap_entry(PmapEntry {
+            print_page: 1,
+            chunk_id: 0,
+            byte_offset: 0,
+        })
+        .add_pmap_entry(PmapEntry {
+            print_page: 3,
+            chunk_id: 1,
+            byte_offset: 0,
+        })
+        .add_pmap_entry(PmapEntry {
+            print_page: 5,
+            chunk_id: 2,
+            byte_offset: 0,
+        })
+        .add_pmap_entry(PmapEntry {
+            print_page: 10,
+            chunk_id: 2,
+            byte_offset: 7,
+        })
+        .add_pmap_entry(PmapEntry {
+            print_page: 15,
+            chunk_id: 3,
+            byte_offset: 0,
+        })
+        .add_pmap_entry(PmapEntry {
+            print_page: 20,
+            chunk_id: 3,
+            byte_offset: 12,
+        })
+        .set_meta(&meta_bytes)
+        .finalize()
+        .unwrap();
+    fs::write(fixtures_dir().join("with_pmap.hzo"), &hzo).unwrap();
+}
+
 pub fn generate_all() {
     let dirs = [fixtures_dir(), corpus_dir()];
     for d in &dirs {
@@ -1151,6 +1240,9 @@ pub fn generate_all() {
 
     gen_compressed("compressed_lz4.hzo", Compression::Lz4);
     println!("Generated compressed_lz4.hzo");
+
+    gen_with_pmap();
+    println!("Generated with_pmap.hzo");
 
     gen_bad_magic();
     println!("Generated bad_magic.hzo");
