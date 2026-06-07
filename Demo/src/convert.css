@@ -1,0 +1,65 @@
+/* History (convert page) */
+.history {
+  margin-top: 24px;
+}
+
+.history h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 6px;
+  transition: var(--transition);
+}
+
+.history-item:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.history-item .name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.history-item .size {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+.history-item .dl-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  background: var(--accent);
+  color: white;
+  transition: var(--transition);
+}
+
+.history-item .dl-btn:hover {
+  background: var(--accent-hover);
+}
+
+.history-empty {
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: 24px;
+}

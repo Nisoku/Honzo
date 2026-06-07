@@ -53,7 +53,8 @@ pub struct HonzoMeta {
 #[derive(Serialize, Deserialize)]
 pub struct Contributor {
     pub name: String,
-    pub role: String,
+    #[serde(default)]
+    pub role: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]

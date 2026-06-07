@@ -96,6 +96,18 @@ export const layoutMode = signal(
 );
 layoutMode.subscribe(() => saveSetting("layoutMode", layoutMode.get()));
 
+export const gapless = signal(
+  path("settings", "gapless"),
+  loadSetting("gapless", false),
+);
+gapless.subscribe(() => saveSetting("gapless", gapless.get()));
+
+export const pageZoom = signal(
+  path("settings", "pageZoom"),
+  loadSetting("pageZoom", 1),
+);
+pageZoom.subscribe(() => saveSetting("pageZoom", pageZoom.get()));
+
 export const textAlign = signal(
   path("settings", "textAlign"),
   loadSetting("textAlign", "ltr"),

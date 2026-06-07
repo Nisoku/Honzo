@@ -12,7 +12,10 @@ import {
   currentChapter,
   currentChunkId,
   currentDirection,
+  gapless,
   hasBook,
+  layoutMode,
+  pageZoom,
   referencePage,
   resetReaderState,
   textAlign,
@@ -26,6 +29,7 @@ import {
   removeBookmark,
   toggleSidebar,
 } from "./state.js";
+import "./satori.js";
 import { renderBookmarks } from "./bookmarks.js";
 import { renderMath } from "./math.js";
 
@@ -37,6 +41,7 @@ let searchIndex = null;
 let imageBlobs = [];
 let currentChapterIndex = 0;
 let pmapEntries = [];
+let mangaPages = [];
 let wasmInitPromise = null;
 let elements = {
   currentPageInput: null,
@@ -284,6 +289,7 @@ async function loadBook(data, fileName) {
   meta = reader.get_meta_parsed();
   tocEntries = reader.get_toc();
   pmapEntries = reader.get_pmap() || [];
+  mangaPages = tocEntries.filter((e) => e.chunk_type !== "SIDX");
   const sidxEntry = tocEntries.find((entry) => entry.chunk_type === "SIDX");
   searchIndex = null;
   if (sidxEntry) {
@@ -340,11 +346,16 @@ async function loadBook(data, fileName) {
   setCurrentBookId(bookId);
 
   currentChapterIndex = 0;
-  renderCurrentChapter();
-  generateToc();
+  if (layoutMode.get() === "manga") {
+    renderManga();
+    generateMangaToc();
+  } else {
+    renderCurrentChapter();
+    generateToc();
+    totalChapters.set(chapters.length);
+  }
   renderMetaInfo();
 
-  totalChapters.set(chapters.length);
   hasBook.set(true);
 
   window.removeEventListener("keyup", handleKeyEvents);
@@ -369,10 +380,201 @@ async function loadBook(data, fileName) {
   if (elements.bookmarksContent) {
     renderBookmarks(elements.bookmarksContent, bookId, chapters);
   }
+
+  // Re-render on layout mode or gapless change
+  if (window._layoutSub) window._layoutSub();
+  window._layoutSub = layoutMode.subscribe(() => {
+    if (layoutMode.get() === "manga") {
+      renderManga();
+      generateMangaToc();
+    } else {
+      renderCurrentChapter();
+      generateToc();
+    }
+  });
+  if (window._gaplessSub) window._gaplessSub();
+  window._gaplessSub = gapless.subscribe(() => {
+    const v = gapless.get();
+    if (elements.viewer) {
+      elements.viewer.classList.toggle("gapless", v);
+    }
+  });
+  if (window._zoomSub) window._zoomSub();
+  window._zoomSub = pageZoom.subscribe(() => {
+    const v = pageZoom.get();
+    if (layoutMode.get() === "manga") setMangaZoom(v);
+  });
+}
+
+// Teardown on unload
+export function unloadBook() {
+  if (window._layoutSub) { window._layoutSub(); window._layoutSub = null; }
+  if (window._gaplessSub) { window._gaplessSub(); window._gaplessSub = null; }
+  if (window._zoomSub) { window._zoomSub(); window._zoomSub = null; }
+  if (window._mangaScrollHandler && elements.viewer) {
+    elements.viewer.removeEventListener("scroll", window._mangaScrollHandler);
+    window._mangaScrollHandler = null;
+  }
+  mangaPages = [];
+  currentChapterIndex = 0;
+  closeSidebar(null);
+  resetReaderState();
+}
+
+// Manga mode 
+function renderManga() {
+  if (!mangaPages.length || !elements.viewer) return;
+  elements.viewer.innerHTML = "";
+  elements.viewer.classList.add("manga-mode");
+
+  const container = document.createElement("div");
+  container.className = "manga-container";
+
+  for (const entry of mangaPages) {
+    const page = document.createElement("div");
+    page.className = "manga-page";
+    page.dataset.chunkId = entry.chunk_id;
+    page.dataset.chunkIndex = mangaPages.indexOf(entry);
+
+    const chunkType = entry.chunk_type;
+    const data = reader.get_chunk(entry.chunk_id);
+
+    if (chunkType === "IMG_" || chunkType === "COVR" || chunkType === "COVT") {
+      const mime = guessMime(data);
+      const blob = new Blob([data], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const img = document.createElement("img");
+      img.src = url;
+      img.alt = `Page ${entry.chunk_id}`;
+      page.appendChild(img);
+    } else if (chunkType === "CHAP" || chunkType === "NOTE") {
+      const raw = new TextDecoder().decode(data);
+      const isHtml = entry.content_type_kind === 1 && entry.content_type_value === 1;
+      const content = isHtml ? sanitizeHtml(raw) : renderMarkdown(raw);
+      const body = document.createElement("div");
+      body.className = "manga-text chapter-body";
+      body.innerHTML = content;
+      page.appendChild(body);
+    } else if (chunkType === "MATH") {
+      const mathDiv = document.createElement("div");
+      mathDiv.className = "manga-math";
+      renderMath(mathDiv, data, entry.content_type_value, reader);
+      page.appendChild(mathDiv);
+    } else {
+      const label = document.createElement("p");
+      label.className = "manga-placeholder";
+      label.textContent = `${chunkType} #${entry.chunk_id}`;
+      page.appendChild(label);
+    }
+
+    container.appendChild(page);
+  }
+
+  elements.viewer.appendChild(container);
+
+  if (gapless.get()) {
+    elements.viewer.classList.add("gapless");
+  }
+
+  // Add scroll tracking
+  if (window._mangaScrollHandler) {
+    elements.viewer.removeEventListener("scroll", window._mangaScrollHandler);
+  }
+  window._mangaScrollHandler = () => {
+    updateMangaPageInfo();
+  };
+  elements.viewer.addEventListener("scroll", window._mangaScrollHandler, { passive: true });
+
+  setMangaZoom(pageZoom.get());
+  updateMangaPageInfo();
+}
+
+function scrollToMangaPage(index) {
+  if (!elements.viewer || !mangaPages.length) return;
+  const clamped = Math.max(0, Math.min(index, mangaPages.length - 1));
+  const page = elements.viewer.querySelector(`.manga-page[data-chunk-index="${clamped}"]`);
+  if (page) {
+    page.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  updateMangaPageInfo();
+}
+
+function updateMangaPageInfo() {
+  if (!mangaPages.length || !elements.viewer) return;
+  const idx = getMangaCurrentPage();
+  const entry = mangaPages[idx];
+  if (!entry) return;
+
+  currentChapter.set(idx);
+  currentChunkId.set(entry.chunk_id);
+
+  totalChapters.set(mangaPages.length);
+  hasBook.set(true);
+
+  const label = `${entry.chunk_type} ${entry.chunk_id}${entry.size_raw ? ` (${(entry.size_raw / 1024).toFixed(0)} KB)` : ""}`;
+  chapterLabel.set(label);
+
+  updateReferencePage(entry);
+
+  // Persist progress
+  const bookId = getCurrentBookId();
+  if (bookId) setProgress(bookId, idx, entry.chunk_id);
+
+  // Update progress bar
+  if (elements.progressFill) {
+    elements.progressFill.style.width = `${((idx + 1) / mangaPages.length) * 100}%`;
+  }
+
+  // Update TOC active state
+  if (elements.tocContent) {
+    elements.tocContent.querySelectorAll(".toc-item").forEach((item, i) => {
+      item.classList.toggle("active", i === idx);
+    });
+  }
+}
+
+function getMangaCurrentPage() {
+  if (!elements.viewer || !mangaPages.length) return 0;
+  const pages = elements.viewer.querySelectorAll(".manga-page");
+  const viewCenter = elements.viewer.scrollTop + elements.viewer.clientHeight / 2;
+  let closest = 0;
+  let closestDist = Infinity;
+  pages.forEach((p, i) => {
+    const rect = p.getBoundingClientRect();
+    const pageCenter = rect.top + rect.height / 2;
+    const dist = Math.abs(pageCenter - elements.viewer.clientHeight / 2);
+    if (dist < closestDist) {
+      closestDist = dist;
+      closest = i;
+    }
+  });
+  return closest;
+}
+
+function generateMangaToc() {
+  if (!mangaPages.length || !elements.tocContent) return;
+  elements.tocContent.innerHTML = "";
+  mangaPages.forEach((entry, i) => {
+    const isCurrent = i === getMangaCurrentPage();
+    const item = document.createElement("div");
+    item.className = `toc-item${isCurrent ? " active" : ""}`;
+    const label = `${entry.chunk_type} #${entry.chunk_id}${entry.chunk_type === "CHAP" || entry.chunk_type === "IMG_" ? "" : ""}`;
+    const sizeInfo = entry.size_raw ? `${(entry.size_raw / 1024).toFixed(0)} KB` : "";
+    item.innerHTML = `<span class="toc-label">${esc(label)}</span>${sizeInfo ? `<span class="toc-size">${esc(sizeInfo)}</span>` : ""}`;
+    item.addEventListener("click", () => {
+      scrollToMangaPage(i);
+      toggleSidebar(null);
+    });
+    elements.tocContent.appendChild(item);
+  });
 }
 
 // Chapter rendering with decorations
 function renderCurrentChapter(scrollToAnchor) {
+  if (layoutMode.get() === "manga") {
+    renderManga();
+    return;
+  }
   if (!chapters.length) return;
   if (!elements.viewer) return;
   const chapter = chapters[currentChapterIndex];
@@ -487,6 +689,10 @@ function renderCurrentChapter(scrollToAnchor) {
 
 export function goToChapter(index, anchor) {
   if (!chapters.length) return;
+  if (layoutMode.get() === "manga") {
+    scrollToMangaPage(index);
+    return;
+  }
   currentChapterIndex = clampChapterIndex(index);
   renderCurrentChapter(anchor);
 }
@@ -748,12 +954,24 @@ function clampChapterIndex(index) {
 }
 
 export function prevPage() {
-  if (!hasBookLoaded() || currentChapterIndex <= 0) return;
+  if (!hasBookLoaded()) return;
+  if (layoutMode.get() === "manga") {
+    if (!elements.viewer) return;
+    elements.viewer.scrollBy({ top: -elements.viewer.clientHeight, behavior: "smooth" });
+    return;
+  }
+  if (currentChapterIndex <= 0) return;
   goToChapter(currentChapterIndex - 1);
 }
 
 export function nextPage() {
-  if (!hasBookLoaded() || currentChapterIndex >= chapters.length - 1) return;
+  if (!hasBookLoaded()) return;
+  if (layoutMode.get() === "manga") {
+    if (!elements.viewer) return;
+    elements.viewer.scrollBy({ top: elements.viewer.clientHeight, behavior: "smooth" });
+    return;
+  }
+  if (currentChapterIndex >= chapters.length - 1) return;
   goToChapter(currentChapterIndex + 1);
 }
 
@@ -804,6 +1022,25 @@ function handleKeyEvents(e) {
     if (elements.searchInput)
       setTimeout(() => elements.searchInput.focus(), 100);
   }
+  if (layoutMode.get() === "manga") {
+    if (e.key === "=" || e.key === "+") {
+      e.preventDefault();
+      const v = Math.min(2.5, +(pageZoom.get() + 0.1).toFixed(1));
+      pageZoom.set(v);
+      setMangaZoom(v);
+    }
+    if (e.key === "-" || e.key === "_") {
+      e.preventDefault();
+      const v = Math.max(0.5, +(pageZoom.get() - 0.1).toFixed(1));
+      pageZoom.set(v);
+      setMangaZoom(v);
+    }
+    if (e.key === "0" && !e.metaKey && !e.ctrlKey) {
+      e.preventDefault();
+      pageZoom.set(1);
+      setMangaZoom(1);
+    }
+  }
 }
 
 function guessMime(bytes) {
@@ -820,6 +1057,13 @@ function guessMime(bytes) {
     if (head.includes("<svg")) return "image/svg+xml";
   }
   return "image/jpeg";
+}
+
+export function setMangaZoom(zoom) {
+  if (!elements.viewer) return;
+  elements.viewer.querySelectorAll(".manga-page img").forEach((img) => {
+    img.style.width = (zoom * 100) + "%";
+  });
 }
 
 export function toggleToc() {

@@ -1,4 +1,6 @@
-import { fontFamily, fontSize, layoutMode, textAlign, theme } from "./state.js";
+import { icon } from "./icons.js";
+import { fontFamily, fontSize, gapless, layoutMode, pageZoom, textAlign, theme } from "./state.js";
+import { setMangaZoom } from "./book.js";
 
 // Theme engine
 const THEMES = {
@@ -117,15 +119,15 @@ export function renderSettings(container) {
       <label class="settings-label">Theme</label>
       <div class="settings-options" data-setting="theme">
         <button class="setting-option${theme.get() === "light" ? " active" : ""}" data-value="light">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          ${icon("Sun", 18)}
           Light
         </button>
         <button class="setting-option${theme.get() === "sepia" ? " active" : ""}" data-value="sepia">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/></svg>
+          ${icon("Contrast", 18)}
           Sepia
         </button>
         <button class="setting-option${theme.get() === "dark" ? " active" : ""}" data-value="dark">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          ${icon("Moon", 18)}
           Dark
         </button>
       </div>
@@ -162,10 +164,38 @@ export function renderSettings(container) {
       <label class="settings-label">Layout</label>
       <div class="settings-options" data-setting="layoutMode">
         <button class="setting-option${layoutMode.get() === "scroll" ? " active" : ""}" data-value="scroll">Scroll</button>
+        <button class="setting-option${layoutMode.get() === "manga" ? " active" : ""}" data-value="manga">Manga</button>
         <button class="setting-option${layoutMode.get() === "paginated" ? " active" : ""}" data-value="paginated" disabled>Paginated</button>
       </div>
     </div>
+
+    <div class="settings-group" id="gaplessGroup" style="display:${layoutMode.get() === "manga" ? "block" : "none"}">
+      <label class="settings-label">
+        <label class="maker-check" style="display:inline-flex;align-items:center;gap:6px;font-size:0.85rem;font-weight:500;color:var(--text-secondary);cursor:pointer">
+          <input type="checkbox" id="gaplessToggle" ${gapless.get() ? "checked" : ""} />
+          Webtoon / Gapless
+        </label>
+      </label>
+    </div>
+
+    <div class="settings-group" id="zoomGroup" style="display:${layoutMode.get() === "manga" ? "block" : "none"}">
+      <label class="settings-label">Page Zoom</label>
+      <div class="settings-options" data-setting="pageZoom">
+        <button class="setting-option" data-action="zoomOut">−</button>
+        <span class="setting-option" style="cursor:default;flex:none;padding:8px 16px;min-width:3em" id="zoomValue">${Math.round(pageZoom.get() * 100)}%</span>
+        <button class="setting-option" data-action="zoomIn">+</button>
+        <button class="setting-option" data-action="zoomReset">Reset</button>
+      </div>
+    </div>
   `;
+
+  const gaplessToggle = document.getElementById("gaplessToggle");
+  if (gaplessToggle) {
+    gaplessToggle.addEventListener("change", () => {
+      const on = gaplessToggle.checked;
+      gapless.set(on);
+    });
+  }
 
   container.querySelectorAll(".settings-options").forEach((group) => {
     group.addEventListener("click", (e) => {
@@ -193,6 +223,10 @@ export function renderSettings(container) {
           break;
         case "layoutMode":
           layoutMode.set(value);
+          const gg = document.getElementById("gaplessGroup");
+          if (gg) gg.style.display = value === "manga" ? "block" : "none";
+          const zg = document.getElementById("zoomGroup");
+          if (zg) zg.style.display = value === "manga" ? "block" : "none";
           break;
         case "textAlign":
           textAlign.set(value);
@@ -200,4 +234,37 @@ export function renderSettings(container) {
       }
     });
   });
+
+  // Zoom controls
+  const zoomIn = container.querySelector('[data-action="zoomIn"]');
+  const zoomOut = container.querySelector('[data-action="zoomOut"]');
+  const zoomReset = container.querySelector('[data-action="zoomReset"]');
+  const zoomValue = document.getElementById("zoomValue");
+  function updateZoomDisplay() {
+    if (zoomValue) zoomValue.textContent = `${Math.round(pageZoom.get() * 100)}%`;
+  }
+  if (zoomIn) {
+    zoomIn.addEventListener("click", () => {
+      const v = Math.min(2.5, +(pageZoom.get() + 0.1).toFixed(1));
+      pageZoom.set(v);
+      setMangaZoom(v);
+      updateZoomDisplay();
+    });
+  }
+  if (zoomOut) {
+    zoomOut.addEventListener("click", () => {
+      const v = Math.max(0.5, +(pageZoom.get() - 0.1).toFixed(1));
+      pageZoom.set(v);
+      setMangaZoom(v);
+      updateZoomDisplay();
+    });
+  }
+  if (zoomReset) {
+    zoomReset.addEventListener("click", () => {
+      pageZoom.set(1);
+      setMangaZoom(1);
+      updateZoomDisplay();
+    });
+  }
+  pageZoom.subscribe(updateZoomDisplay);
 }

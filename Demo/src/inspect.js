@@ -1,4 +1,6 @@
 import init, { HonzoWasm, honzo_build } from "./wasm/honzo_wasm.js";
+import { createIcons } from "lucide";
+import { icons } from "./icons.js";
 import { bindClass, bindEvent, bindText } from "@nisoku/sairin";
 import { derived, path, signal } from "@nisoku/sairin";
 
@@ -103,6 +105,42 @@ bindEvent(fileInput, "change", (e) => {
 });
 bindEvent(saveBtn, "click", onSave);
 bindEvent(revertBtn, "click", onRevert);
+
+createIcons({ icons });
+
+// Delegated events for meta panel (identifiers, tags)
+bindEvent(metaPanel, "click", (e) => {
+  const addId = e.target.closest("[data-add-id]");
+  if (addId) {
+    const container = document.getElementById("idList");
+    if (container) {
+      container.insertAdjacentHTML("beforeend", `
+      <div class="field" style="display:flex;gap:0.5rem;align-items:end">
+        <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="" /></div>
+        <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="" /></div>
+        <button class="btn btn-secondary" data-remove="inspect-id" style="padding:0.4rem 0.6rem;font-size:0.8rem">×</button>
+      </div>`);
+    }
+  }
+  const rem = e.target.closest("[data-remove]");
+  if (rem) rem.closest(".field")?.remove();
+  const tagBtn = e.target.closest("[data-tag-add]");
+  if (tagBtn) {
+    const id = tagBtn.dataset.tagAdd;
+    const input = document.getElementById(`new_${id}`);
+    const value = input?.value?.trim();
+    if (value) {
+      const container = document.getElementById(`tags_${id}`);
+      if (container) {
+        container.insertAdjacentHTML("beforeend",
+          `<span class="tag"><span class="tag-text">${esc(value)}</span> <span class="tag-remove" data-tag-id="${id}">×</span></span>`);
+      }
+      input.value = "";
+    }
+  }
+  const tagRem = e.target.closest(".tag-remove");
+  if (tagRem) tagRem.parentElement.remove();
+});
 
 // File loading
 async function ensureWasm() {
@@ -332,11 +370,11 @@ function renderMeta() {
     <div class="field" style="display:flex;gap:0.5rem;align-items:end">
       <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="${esc(id.id_type || "")}" /></div>
       <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="${esc(id.value || "")}" /></div>
-      <button class="btn btn-secondary" style="padding:0.4rem 0.6rem;font-size:0.8rem" onclick="this.parentElement.remove()">×</button>
+      <button class="btn btn-secondary" data-remove="inspect-id" style="padding:0.4rem 0.6rem;font-size:0.8rem">×</button>
     </div>`,
     )
     .join("");
-  html += `</div><button class="btn btn-secondary" style="font-size:0.85rem;margin-top:0.3rem" onclick="addIdentifier()">+ Add Identifier</button>`;
+  html += `</div><button class="btn btn-secondary" data-add-id="1" style="font-size:0.85rem;margin-top:0.3rem">+ Add Identifier</button>`;
 
   html += `<h3>Series</h3>`;
   if (meta.series) {
@@ -360,32 +398,6 @@ function renderMeta() {
   }
   metaFields.innerHTML = html;
 
-  // Add helper functions to window for the onclick handlers
-  window.addTag = function (id) {
-    const input = document.getElementById(`new_${id}`);
-    const value = input.value.trim();
-    if (value) {
-      const container = document.getElementById(`tags_${id}`);
-      container.insertAdjacentHTML(
-        "beforeend",
-        `<span class="tag"><span class="tag-text">${esc(value)}</span> <span class="remove" onclick="this.parentElement.remove()">×</span></span>`,
-      );
-      input.value = "";
-    }
-  };
-
-  window.addIdentifier = function () {
-    const container = document.getElementById("idList");
-    container.insertAdjacentHTML(
-      "beforeend",
-      `
-      <div class="field" style="display:flex;gap:0.5rem;align-items:end">
-        <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="" /></div>
-        <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="" /></div>
-        <button class="btn btn-secondary" style="padding:0.4rem 0.6rem;font-size:0.8rem" onclick="this.parentElement.remove()">×</button>
-      </div>`,
-    );
-  };
   metaFields.innerHTML = html;
 }
 
@@ -405,9 +417,9 @@ function field(label, id, value, optional, type) {
 function tagField(label, id, values) {
   const items = Array.isArray(values) ? values : [];
   return `<div class="field"><label>${label}</label>
-    <div class="tag-list" id="tags_${id}">${items.map((t) => `<span class="tag"><span class="tag-text">${esc(t)}</span> <span class="remove" onclick="this.parentElement.remove()">×</span></span>`).join("")}</div>
+    <div class="tag-list" id="tags_${id}">${items.map((t) => `<span class="tag"><span class="tag-text">${esc(t)}</span> <span class="tag-remove" data-tag-id="${id}">×</span></span>`).join("")}</div>
     <div class="tag-input"><input type="text" id="new_${id}" placeholder="Add ${label.toLowerCase()}" />
-    <button onclick="addTag('${id}')">Add</button></div>
+    <button data-tag-add="${id}">Add</button></div>
   </div>`;
 }
 

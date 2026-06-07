@@ -1,4 +1,6 @@
 import { bindDisabled, bindEvent, bindText } from "@nisoku/sairin";
+import { createIcons } from "lucide";
+import { icons } from "./icons.js";
 import {
   activeSidebar,
   bookTitle,
@@ -171,6 +173,9 @@ hasBook.subscribe(() => updateSidebar(hasBook.get()));
 textAlign.subscribe(() => {
   document.body.setAttribute("data-text-align", textAlign.get());
 });
+
+// Lucide icons
+createIcons({ icons });
 
 // Initial render
 renderSettings(settingsContent);

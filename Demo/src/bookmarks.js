@@ -1,3 +1,4 @@
+import { icon } from "./icons.js";
 import { getBookmarks, removeBookmark } from "./state.js";
 import { goToChapter } from "./book.js";
 import { toggleSidebar } from "./state.js";
@@ -8,7 +9,7 @@ export function renderBookmarks(container, bookId, chapters) {
 
   if (!marks.length) {
     container.innerHTML = `<div class="bookmarks-empty">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.3"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      <div style="opacity:0.3">${icon("Bookmark", 32, 1.5)}</div>
       <p>No bookmarks yet</p>
       <p class="bookmarks-hint">Use <kbd>⌘B</kbd> to bookmark the current chapter</p>
     </div>`;
@@ -35,7 +36,7 @@ export function renderBookmarks(container, bookId, chapters) {
         <div class="bookmark-date">${date}</div>
       </div>
       <button class="icon-btn bookmark-remove" data-index="${i}" aria-label="Remove bookmark">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        ${icon("X", 14)}
       </button>
     `;
 
