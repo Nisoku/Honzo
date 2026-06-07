@@ -122,7 +122,7 @@ npm run dev
 
 ```bash
 cargo build --workspace --release
-./target/release/honzo --version
+./target/release/honzo-cli --version
 ```
 
 ## Test

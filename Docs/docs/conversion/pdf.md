@@ -84,7 +84,7 @@ Title, author preserved in `META`.
 ## Example
 
 ```bash
-honzo convert book.pdf book.hzo
+honzo-cli convert book.pdf book.hzo
 ```
 
 ## Next Steps

@@ -61,7 +61,7 @@ Or build from source:
 git clone https://github.com/Nisoku/Honzo
 cd Honzo
 cargo build -p honzo-cli --release
-./target/release/honzo --help
+./target/release/honzo-cli --help
 ```
 
 ### Developer setup
@@ -79,7 +79,7 @@ just check     # verify everything works
 ## Verify
 
 ```bash
-honzo --version
+honzo-cli --version
 ```
 
 If you see a version number, everything is ready.

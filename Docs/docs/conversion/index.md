@@ -33,13 +33,13 @@ Text extraction only. No reflow preservation.
 
 ```bash
 # EPUB to Honzo
-honzo convert book.epub book.hzo
+honzo-cli convert book.epub book.hzo
 
 # MOBI to Honzo
-honzo convert book.mobi book.hzo
+honzo-cli convert book.mobi book.hzo
 
 # PDF to Honzo
-honzo convert book.pdf book.hzo
+honzo-cli convert book.pdf book.hzo
 ```
 
 == tab "Rust API"
@@ -112,7 +112,7 @@ Explicit EPUB pagebreak patterns are also detected:
 Override metadata during conversion:
 
 ```bash
-honzo convert book.epub book.hzo \
+honzo-cli convert book.epub book.hzo \
   --title "Custom Title" \
   --author "Custom Author" \
   --language "fr"

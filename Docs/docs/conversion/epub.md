@@ -97,17 +97,17 @@ Honzo TOC + META toc array.
 
 ```bash
 # Basic conversion
-honzo convert book.epub book.hzo
+honzo-cli convert book.epub book.hzo
 
 # Override title and author
-honzo convert book.epub book.hzo \
+honzo-cli convert book.epub book.hzo \
   --title "My Edition" \
   --author "My Name" \
   --language "en"
 
 # Inspect the result
-honzo info book.hzo
-honzo info --json book.hzo
+honzo-cli info book.hzo
+honzo-cli info --json book.hzo
 ```
 
 ## Next Steps

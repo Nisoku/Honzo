@@ -52,7 +52,7 @@ let sidx_data = index.encode().unwrap();
 Or from the CLI:
 
 ```bash
-honzo make book.hzo --chapters ch1.md ch2.md \
+honzo-cli make book.hzo --chapters ch1.md ch2.md \
   --build-index
 ```
 

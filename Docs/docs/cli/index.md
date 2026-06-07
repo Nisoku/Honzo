@@ -8,7 +8,7 @@ The `honzo` CLI provides commands for creating, inspecting, converting, and mana
 ## Global usage
 
 ```bash
-honzo <command> [options]
+honzo-cli <command> [options]
 ```
 
 | Flag        | Description  |
@@ -18,11 +18,11 @@ honzo <command> [options]
 
 ## Commands
 
-::: card "**honzo make**" icon:wrench
+::: card "**honzo-cli make**" icon:wrench
 Create a Honzo file from markdown source files.
 
 ```bash
-honzo make <output.hzo> \
+honzo-cli make <output.hzo> \
   --title "Book Title" \
   --author "Author Name" \
   --language "en" \
@@ -42,11 +42,11 @@ honzo make <output.hzo> \
 
 :::
 
-::: card "**honzo info**" icon:info
+::: card "**honzo-cli info**" icon:info
 Display metadata and structure of a Honzo file.
 
 ```bash
-honzo info <file.hzo>
+honzo-cli info <file.hzo>
 ```
 
 Example output:
@@ -78,21 +78,21 @@ Chunks:
 
 :::
 
-::: card "**honzo inspect**" icon:search
+::: card "**honzo-cli inspect**" icon:search
 Low-level dump of the file structure.
 
 ```bash
-honzo inspect <file.hzo>
+honzo-cli inspect <file.hzo>
 ```
 
 Shows HEAD fields, TOC entries (hex + decoded), and section offsets.
 :::
 
-::: card "**honzo convert**" icon:git-merge
+::: card "**honzo-cli convert**" icon:git-merge
 Convert an existing ebook format to Honzo.
 
 ```bash
-honzo convert <input> <output.hzo>
+honzo-cli convert <input> <output.hzo>
 ```
 
 Supported input formats:
@@ -111,11 +111,11 @@ Supported input formats:
 
 :::
 
-::: card "**honzo validate**" icon:check-circle
+::: card "**honzo-cli validate**" icon:check-circle
 Validate a Honzo file's structure and integrity.
 
 ```bash
-honzo validate <file.hzo>
+honzo-cli validate <file.hzo>
 ```
 
 Checks:

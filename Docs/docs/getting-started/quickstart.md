@@ -36,7 +36,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "CLI"
 
    ```bash
-   honzo make my_book.hzo \
+   honzo-cli make my_book.hzo \
      --title "My First Book" \
      --author "Author Name" \
      --chapters chapter1.md chapter2.md chapter3.md
@@ -71,7 +71,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "CLI"
 
    ```bash
-   honzo info my_book.hzo
+   honzo-cli info my_book.hzo
    ```
 
    Example output:
@@ -151,7 +151,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
 4. **Convert from EPUB**
 
    ```bash
-   honzo convert book.epub book.hzo
+   honzo-cli convert book.epub book.hzo
    ```
 
    Or with Rust:

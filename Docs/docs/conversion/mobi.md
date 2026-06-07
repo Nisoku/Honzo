@@ -96,7 +96,7 @@ Bold and italic preserved as HTML.
 ## Example
 
 ```bash
-honzo convert book.mobi book.hzo
+honzo-cli convert book.mobi book.hzo
 ```
 
 ## Next Steps
