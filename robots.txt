@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://nellowtcs.me/libhonzo/docs/sitemap.xml
+Sitemap: https://nisoku.github.io/Honzo/sitemap.xml

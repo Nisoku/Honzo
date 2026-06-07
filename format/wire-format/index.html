@@ -1,0 +1,2143 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.5.x">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
+    var theme = localValue ? localValue : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      var siteRoot = "../../";
+      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
+      if (siteRoot === '') siteRoot = './';
+      window.DOCMD_SITE_ROOT = siteRoot;
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
+    <title>
+      Wire Format : Honzo
+    </title>
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq38xvyb">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq38xvyb" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq38xvyb" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="The binary layout of HEAD, TOC, DATA, EXTRA, and META">
+<link rel="canonical" href="https://nisoku.github.io/Honzo/format/wire-format/">
+<meta property="og:title" content="Wire Format - Honzo">
+<meta property="og:description" content="The binary layout of HEAD, TOC, DATA, EXTRA, and META">
+<meta property="og:url" content="https://nisoku.github.io/Honzo/format/wire-format/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Wire Format - Honzo">
+<meta name="twitter:description" content="The binary layout of HEAD, TOC, DATA, EXTRA, and META">
+
+
+
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq38xvyb" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq38xvyb" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq38xvyb" >
+
+    
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq38xvyb">
+    
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
+    var theme = localValue ? localValue : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/format/wire-format.md">
+
+    <a href="#main-content" class="skip-link">skipToContent</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+            <h1><a href="../../">
+                Honzo
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="mainNavigation">
+  <ul>
+    
+      <li class="" >
+      
+        <a href="../../" class=" "
+          >
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Home
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="expanded nav-group" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-rocket " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-rocket"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09" />
+  <path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z" />
+  <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Getting Started
+          </span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../getting-started/quickstart/" class=" "
+          >
+           
+<svg class="lucide-icon icon-play " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-play"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Quick Start
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../getting-started/installation/" class=" "
+          >
+           
+<svg class="lucide-icon icon-download " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-download"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 15V3" />
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+  <path d="m7 10 5 5 5-5" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Installation
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../getting-started/concepts/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Core Concepts
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent expanded nav-group" >
+      
+        <a href="../../format/" class=" nav-group"
+          >
+           
+<svg class="lucide-icon icon-file-text " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-file-text"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+  <path d="M10 9H8" />
+  <path d="M16 13H8" />
+  <path d="M16 17H8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Format Specification
+            </span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="active" >
+      
+        <a href="../../format/wire-format/" class="active "
+          >
+           
+<svg class="lucide-icon icon-binary " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-binary"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect x="14" y="14" width="4" height="6" rx="2" />
+  <rect x="6" y="4" width="4" height="6" rx="2" />
+  <path d="M6 20h4" />
+  <path d="M14 10h4" />
+  <path d="M6 14h2v6" />
+  <path d="M14 4h2v6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Wire Format
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../format/chunk-types/" class=" "
+          >
+           
+<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Chunk Types
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../format/compression/" class=" "
+          >
+           
+<svg class="lucide-icon icon-zap " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-zap"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Compression
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../format/drm/" class=" "
+          >
+           
+<svg class="lucide-icon icon-lock " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-lock"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            DRM &amp; Encryption
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../format/layout/" class=" "
+          >
+           
+<svg class="lucide-icon icon-columns " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-columns-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="18" x="3" y="3" rx="2" />
+  <path d="M12 3v18" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Layout Modes
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="expanded nav-group" >
+      
+        <a href="../../api/" class=" nav-group"
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            API Reference
+            </span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../api/rust/" class=" "
+          >
+           
+<svg class="lucide-icon icon-box " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-box"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+  <path d="m3.3 7 8.7 5 8.7-5" />
+  <path d="M12 22V12" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Rust
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/wasm/" class=" "
+          >
+           
+<svg class="lucide-icon icon-cpu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cpu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v2" />
+  <path d="M12 2v2" />
+  <path d="M17 20v2" />
+  <path d="M17 2v2" />
+  <path d="M2 12h2" />
+  <path d="M2 17h2" />
+  <path d="M2 7h2" />
+  <path d="M20 12h2" />
+  <path d="M20 17h2" />
+  <path d="M20 7h2" />
+  <path d="M7 20v2" />
+  <path d="M7 2v2" />
+  <rect x="4" y="4" width="16" height="16" rx="2" />
+  <rect x="8" y="8" width="8" height="8" rx="1" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            WASM / TypeScript
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/c/" class=" "
+          >
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            C
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../cli/" class=" "
+          >
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            CLI Reference
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="expanded nav-group" >
+      
+        <a href="../../features/" class=" nav-group"
+          >
+           
+<svg class="lucide-icon icon-star " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-star"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Features
+            </span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../features/annotations/" class=" "
+          >
+           
+<svg class="lucide-icon icon-pen-tool " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-pen-tool"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15.707 21.293a1 1 0 0 1-1.414 0l-1.586-1.586a1 1 0 0 1 0-1.414l5.586-5.586a1 1 0 0 1 1.414 0l1.586 1.586a1 1 0 0 1 0 1.414z" />
+  <path d="m18 13-1.375-6.874a1 1 0 0 0-.746-.776L3.235 2.028a1 1 0 0 0-1.207 1.207L5.35 15.879a1 1 0 0 0 .776.746L13 18" />
+  <path d="m2.3 2.3 7.286 7.286" />
+  <circle cx="11" cy="11" r="2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Annotations
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../features/search/" class=" "
+          >
+           
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Search Index
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../features/sync/" class=" "
+          >
+           
+<svg class="lucide-icon icon-clock " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-clock"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 6v6l4 2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Sync Tracks
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../features/streaming/" class=" "
+          >
+           
+<svg class="lucide-icon icon-wind " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-wind"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.8 19.6A2 2 0 1 0 14 16H2" />
+  <path d="M17.5 8a2.5 2.5 0 1 1 2 4H2" />
+  <path d="M9.8 4.4A2 2 0 1 1 11 8H2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Streaming
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="expanded nav-group" >
+      
+        <a href="../../conversion/" class=" nav-group"
+          >
+           
+<svg class="lucide-icon icon-git-merge " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-git-merge"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="18" cy="18" r="3" />
+  <circle cx="6" cy="6" r="3" />
+  <path d="M6 21V9a9 9 0 0 0 9 9" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Conversion
+            </span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../conversion/epub/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            EPUB
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../conversion/mobi/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book-open " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book-open"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 7v14" />
+  <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            MOBI
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../conversion/pdf/" class=" "
+          >
+           
+<svg class="lucide-icon icon-file-text " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-file-text"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+  <path d="M10 9H8" />
+  <path d="M16 13H8" />
+  <path d="M16 17H8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            PDF
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../demo/" class=" "
+          >
+           
+<svg class="lucide-icon icon-eye " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-eye"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+  <circle cx="12" cy="12" r="3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Demo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="expanded nav-group" >
+      
+        <a href="../../contributing/" class=" nav-group"
+          >
+           
+<svg class="lucide-icon icon-heart " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-heart"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Contributing
+            </span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../contributing/building/" class=" "
+          >
+           
+<svg class="lucide-icon icon-network " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-network"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect x="16" y="16" width="6" height="6" rx="1" />
+  <rect x="2" y="16" width="6" height="6" rx="1" />
+  <rect x="9" y="2" width="6" height="6" rx="1" />
+  <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
+  <path d="M12 12V8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Building
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../contributing/architecture/" class=" "
+          >
+           
+<svg class="lucide-icon icon-git-commit " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-git-commit-horizontal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="3" />
+  <line x1="3" x2="9" y1="12" y2="12" />
+  <line x1="15" x2="21" y1="12" y2="12" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Architecture
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="https://github.com/Nisoku/Honzo" class=" "
+          target=&quot;_blank&quot; rel=&quot;noopener&quot;>
+           
+<svg class="lucide-icon icon-github " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-github"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+  <path d="M9 18c-4.51 2-5-2-7-2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            GitHub
+            </span>
+          
+           
+<svg class="lucide-icon icon-external-link nav-external-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-external-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 3h6v6" />
+  <path d="M10 14 21 3" />
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+</svg>
+
+          
+        </a>
+        
+
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="toggleSidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  Wire Format
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+                
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+
+    
+    <button class="theme-toggle-button" aria-label="toggleTheme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Wire%20Format%22%0Adescription%3A%20%22The%20binary%20layout%20of%20HEAD%2C%20TOC%2C%20DATA%2C%20EXTRA%2C%20and%20META%22%0A---%0A%0A%23%23%20HEAD%20(48%20bytes)%0A%0AThe%20first%204%20bytes%20of%20HEAD%20are%20always%20the%20ASCII%20bytes%20%60HONO%60%20(%600x484F4F4E%60).%20Any%20file%20that%20does%20not%20start%20with%20these%20bytes%20is%20not%20a%20Honzo%20file.%0A%0AOffset%20%7C%20Size%20%7C%20Field%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%0A-------%7C------%7C--------------------%7C------------------------------------------------------------%0A0%20%20%20%20%20%20%7C%204%20%20%20%20%7C%20magic%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%22HONO%22%60%20magic%20bytes%0A4%20%20%20%20%20%20%7C%204%20%20%20%20%7C%20format_version%20%20%20%20%20%7C%20Format%20version%2C%20currently%20%601%60%0A8%20%20%20%20%20%20%7C%202%20%20%20%20%7C%20chunk_count%20%20%20%20%20%20%20%20%7C%20Number%20of%20TOC%20entries%0A10%20%20%20%20%20%7C%201%20%20%20%20%7C%20layout_mode%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20reflowable%2C%20%601%60%20for%20fixed%2C%20%602%60%20for%20scroll%0A11%20%20%20%20%20%7C%201%20%20%20%20%7C%20flags%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Bit%20flags%20where%20bit%200%20indicates%20has_extra%0A12%20%20%20%20%20%7C%208%20%20%20%20%7C%20data_offset%20%20%20%20%20%20%20%20%7C%20Byte%20offset%20from%20file%20start%20to%20DATA%20section%0A20%20%20%20%20%20%7C%208%20%20%20%20%7C%20extra_offset%20%20%20%20%20%20%20%7C%20Byte%20offset%20from%20file%20start%20to%20EXTRA%20section.%20Zero%20if%20none.%0A28%20%20%20%20%20%7C%208%20%20%20%20%7C%20meta_offset%20%20%20%20%20%20%20%20%7C%20Byte%20offset%20from%20file%20start%20to%20META%20section%0A36%20%20%20%20%20%7C%204%20%20%20%20%7C%20meta_size%20%20%20%20%20%20%20%20%20%20%7C%20Size%20of%20META%20section%20in%20bytes%0A40%20%20%20%20%20%7C%204%20%20%20%20%7C%20chunk_table_offset%20%7C%20Byte%20offset%20of%20TOC%20within%20the%20file%2C%20relative%20to%20DATA%20start%0A44%20%20%20%20%20%7C%204%20%20%20%20%7C%20reserved%20%20%20%20%20%20%20%20%20%20%20%7C%20Reserved%20for%20future%20use%2C%20zero%20padded%0A%0AAll%20offsets%20are%20absolute%20from%20the%20start%20of%20the%20file.%0A%0A%23%23%20TOC%20(32%20bytes%20x%20chunk_count)%0A%0AEach%20TOC%20entry%20is%20exactly%2032%20bytes%3A%0A%0AOffset%20%7C%20Size%20%7C%20Field%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%0A-------%7C------%7C----------------------%7C-----------------------------------------------------------------------------------%0A0%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B0%5D%20%20%20%20%20%20%20%20%20%20%7C%20First%20byte%20of%20the%204-byte%20chunk%20type%20tag%0A1%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B1%5D%20%20%20%20%20%20%20%20%20%20%7C%20Second%20byte%0A2%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B2%5D%20%20%20%20%20%20%20%20%20%20%7C%20Third%20byte%0A3%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B3%5D%20%20%20%20%20%20%20%20%20%20%7C%20Fourth%20byte%2C%20for%20example%20%60CHAP%60%20or%20%60IMG_%60%0A4%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20content_type%20%20%20%20%20%20%20%20%20%7C%20Content%20type%20kind%0A5%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20compression%20%20%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20none%2C%20%601%60%20for%20lz4%0A6%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20markup_type%20%20%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20markdown%2C%20%601%60%20for%20html%2C%20applies%20to%20CHAP%20chunks%0A7%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20cover_type%20%20%20%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20none%2C%20%601%60%20for%20front%2C%20%602%60%20for%20back%2C%20applies%20to%20COVR%20or%20COVT%0A8%20%20%20%20%20%20%7C%202%20%20%20%20%7C%20language%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20BCP%2047%20language%20tag%20index%0A10%20%20%20%20%20%7C%202%20%20%20%20%7C%20font_embedding%20%20%20%20%20%20%20%7C%20Font%20embedding%20mode%2C%20applies%20to%20FONT%20chunks%0A12%20%20%20%20%20%7C%202%20%20%20%20%7C%20font_license_url_len%20%7C%20Length%20of%20font%20license%20URL%2C%20zero%20if%20none%0A14%20%20%20%20%20%7C%202%20%20%20%20%7C%20reserved%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Reserved%2C%20zero%20padded%0A16%20%20%20%20%20%7C%208%20%20%20%20%7C%20offset%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Byte%20offset%20within%20DATA%20section%0A24%20%20%20%20%20%7C%204%20%20%20%20%7C%20size%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Size%20of%20chunk%20data%20in%20bytes.%20Represents%20compressed%20size%20if%20compression%20is%20nonzero.%0A28%20%20%20%20%20%7C%204%20%20%20%20%7C%20orig_size%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Original%20uncompressed%20size.%20Zero%20if%20same%20as%20size.%0A%0A%23%23%23%20Offset%20and%20Size%20Rules%0A%0A%60offset%60%20is%20relative%20to%20%60data_offset%60%20from%20HEAD.%20The%20absolute%20file%20position%20of%20a%20chunk%20is%20%60data_offset%20%2B%20entry.offset%60.%0A%0AIf%20%60compression%60%20is%200%2C%20%60size%60%20equals%20%60orig_size%60.%20Alternatively%20%60orig_size%60%20is%200.%0A%0AIf%20%60compression%60%20is%201%2C%20%60size%60%20represents%20the%20compressed%20length.%20%60orig_size%60%20represents%20the%20decompressed%20length.%0A%0A%23%23%20DATA%20Section%0A%0AThe%20DATA%20section%20starts%20at%20%60data_offset%60.%20It%20is%20a%20flat%20array%20of%20chunk%20payloads.%20Each%20chunk&#039;s%20position%20and%20size%20are%20defined%20by%20its%20TOC%20entry.%20No%20separator%20or%20framing%20exists%20between%20chunks.%20The%20TOC%20serves%20as%20the%20authoritative%20index.%0A%0A%60%60%60txt%0Adata_offset%20%2B%200%3A%20%20%20%20%20chunk%200%20data%20(entry%5B0%5D.size%20bytes)%0Adata_offset%20%2B%20off1%3A%20%20chunk%201%20data%20(entry%5B1%5D.size%20bytes)%0Adata_offset%20%2B%20off2%3A%20%20chunk%202%20data%20(entry%5B2%5D.size%20bytes)%0A...%0A%60%60%60%0A%0A%3A%3A%3A%20collapsible%20%22EXTRA%20Section%20(optional)%22%0A%0AThe%20EXTRA%20section%20is%20variable%20length%20and%20optional.%20If%20%60flags%20%26%201%60%20equals%200%2C%20there%20is%20no%20EXTRA%20section%20and%20%60extra_offset%60%20is%200.%0A%0A%60%60%60txt%0AOffset%20%20Size%20%20Field%0A0%20%20%20%20%20%20%204%20%20%20%20%20extra_count%3A%20u32%0A4%20%20%20%20%20%20%20variable%20%20Array%20of%20ExtraEntry%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%202%20bytes%3A%20namespace%20length%20(u16)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%20N%20bytes%3A%20namespace%20(UTF-8)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%208%20bytes%3A%20offset%20(u64%2C%20relative%20to%20extra_offset)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%204%20bytes%3A%20size%20(u32)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20(entry%20repeats%20extra_count%20times)%0A%60%60%60%0A%0AAfter%20the%20entry%20array%2C%20each%20entry&#039;s%20data%20resides%20at%20%60extra_offset%20%2B%20entry.offset%60.%0A%0A%23%23%23%20Standard%20Namespaces%0A%0A%3C!--%20markdownlint-disable%20MD055%20--%3E%0A%7C%20Namespace%20%20%20%20%20%20%20%20%20%7C%20Purpose%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------------%7C-----------------------------------------------%7C%0A%7C%20%60org.nisoku.anno%60%20%7C%20Annotations%20stored%20as%20MessagePack%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60org.nisoku.drm%60%20%20%7C%20DRM%20envelope%20stored%20as%20MessagePack%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60org.nisoku.sync%60%20%7C%20Audio%2Fvideo%20sync%20tracks%20stored%20as%20MessagePack%20%7C%0A%0A%3A%3A%3A%0A%0A%23%23%20META%20Section%0A%0AThe%20META%20section%20is%20a%20MessagePack%20map.%20It%20starts%20at%20%60meta_offset%60%20and%20spans%20%60meta_size%60%20bytes.%20Only%20%60title%60%20and%20%60language%60%20are%20required.%20Everything%20else%20is%20optional.%0A%0A%3A%3A%3A%20collapsible%20%22Example%20META%20payload%22%0A%0A%60%60%60text%0A%7B%0A%20%20%22honzo%22%3A%20%7B%0A%20%20%20%20%22version%22%3A%201%2C%0A%20%20%20%20%22converter%22%3A%20%22honzo-convert%200.1.0%22%2C%0A%20%20%20%20%22created%22%3A%20%222025-01-15T10%3A30%3A00Z%22%2C%0A%20%20%20%20%22modified%22%3A%20%222025-01-15T10%3A30%3A00Z%22%0A%20%20%7D%2C%0A%20%20%22title%22%3A%20%7B%0A%20%20%20%20%22en%22%3A%20%22The%20Example%20Book%22%2C%0A%20%20%20%20%22fr%22%3A%20%22Le%20Livre%20Exemple%22%0A%20%20%7D%2C%0A%20%20%22creator%22%3A%20%7B%0A%20%20%20%20%22en%22%3A%20%22Author%20Name%22%0A%20%20%7D%2C%0A%20%20%22language%22%3A%20%22en%22%2C%0A%20%20%22description%22%3A%20%7B%0A%20%20%20%20%22en%22%3A%20%22A%20short%20description%20of%20the%20book.%22%0A%20%20%7D%2C%0A%20%20%22publisher%22%3A%20%22Publisher%20Name%22%2C%0A%20%20%22published%22%3A%20%222024-01-01%22%2C%0A%20%20%22rights%22%3A%20%22Copyright%202024%22%2C%0A%20%20%22identifiers%22%3A%20%7B%0A%20%20%20%20%22isbn%22%3A%20%22978-0-00-000000-0%22%2C%0A%20%20%20%20%22doi%22%3A%20%2210.0000%2Fexample%22%0A%20%20%7D%2C%0A%20%20%22subject%22%3A%20%5B%22Fiction%22%2C%20%22Adventure%22%5D%2C%0A%20%20%22series%22%3A%20%22Series%20Name%22%2C%0A%20%20%22series_position%22%3A%201%2C%0A%20%20%22edition%22%3A%201%2C%0A%20%20%22page_progression_direction%22%3A%20%22ltr%22%2C%0A%20%20%22toc%22%3A%20%5B%0A%20%20%20%20%7B%22title%22%3A%20%22Chapter%201%22%2C%20%22src%22%3A%200%7D%2C%0A%20%20%20%20%7B%22title%22%3A%20%22Chapter%202%22%2C%20%22src%22%3A%201%7D%0A%20%20%5D%0A%7D%0A%60%60%60%0A%0A%3A%3A%3A%0A%0AAll%20field%20names%20use%20lowercase%20with%20underscores.%20All%20text%20values%20are%20maps%20keyed%20by%20BCP%2047%20language%20tags.%20This%20enables%20multi%20language%20support.%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Chunk%20Types%22%20.%2Fchunk-types.md%20icon%3Apackage%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Compression%22%20.%2Fcompression.md%20icon%3Azap%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22DRM%20%26%20Encryption%22%20.%2Fdrm.md%20icon%3Alock%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <a href="../../format/">Format Specification</a>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>Wire Format</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">copyContext</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h2 id="head-48-bytes" class="docmd-heading"><a href="#head-48-bytes" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HEAD (48 bytes)</h2>
+<p>The first 4 bytes of HEAD are always the ASCII bytes <code>HONO</code> (<code>0x484F4F4E</code>). Any file that does not start with these bytes is not a Honzo file.</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Offset</th>
+<th>Size</th>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>4</td>
+<td>magic</td>
+<td><code>&quot;HONO&quot;</code> magic bytes</td>
+</tr>
+<tr>
+<td>4</td>
+<td>4</td>
+<td>format_version</td>
+<td>Format version, currently <code>1</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>2</td>
+<td>chunk_count</td>
+<td>Number of TOC entries</td>
+</tr>
+<tr>
+<td>10</td>
+<td>1</td>
+<td>layout_mode</td>
+<td><code>0</code> for reflowable, <code>1</code> for fixed, <code>2</code> for scroll</td>
+</tr>
+<tr>
+<td>11</td>
+<td>1</td>
+<td>flags</td>
+<td>Bit flags where bit 0 indicates has_extra</td>
+</tr>
+<tr>
+<td>12</td>
+<td>8</td>
+<td>data_offset</td>
+<td>Byte offset from file start to DATA section</td>
+</tr>
+<tr>
+<td>20</td>
+<td>8</td>
+<td>extra_offset</td>
+<td>Byte offset from file start to EXTRA section. Zero if none.</td>
+</tr>
+<tr>
+<td>28</td>
+<td>8</td>
+<td>meta_offset</td>
+<td>Byte offset from file start to META section</td>
+</tr>
+<tr>
+<td>36</td>
+<td>4</td>
+<td>meta_size</td>
+<td>Size of META section in bytes</td>
+</tr>
+<tr>
+<td>40</td>
+<td>4</td>
+<td>chunk_table_offset</td>
+<td>Byte offset of TOC within the file, relative to DATA start</td>
+</tr>
+<tr>
+<td>44</td>
+<td>4</td>
+<td>reserved</td>
+<td>Reserved for future use, zero padded</td>
+</tr>
+</tbody>
+</table>
+</div><p>All offsets are absolute from the start of the file.</p>
+<h2 id="toc-32-bytes-x-chunkcount" class="docmd-heading"><a href="#toc-32-bytes-x-chunkcount" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>TOC (32 bytes x chunk_count)</h2>
+<p>Each TOC entry is exactly 32 bytes:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Offset</th>
+<th>Size</th>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>chunk_id[0]</td>
+<td>First byte of the 4-byte chunk type tag</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>chunk_id[1]</td>
+<td>Second byte</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1</td>
+<td>chunk_id[2]</td>
+<td>Third byte</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1</td>
+<td>chunk_id[3]</td>
+<td>Fourth byte, for example <code>CHAP</code> or <code>IMG_</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>1</td>
+<td>content_type</td>
+<td>Content type kind</td>
+</tr>
+<tr>
+<td>5</td>
+<td>1</td>
+<td>compression</td>
+<td><code>0</code> for none, <code>1</code> for lz4</td>
+</tr>
+<tr>
+<td>6</td>
+<td>1</td>
+<td>markup_type</td>
+<td><code>0</code> for markdown, <code>1</code> for html, applies to CHAP chunks</td>
+</tr>
+<tr>
+<td>7</td>
+<td>1</td>
+<td>cover_type</td>
+<td><code>0</code> for none, <code>1</code> for front, <code>2</code> for back, applies to COVR or COVT</td>
+</tr>
+<tr>
+<td>8</td>
+<td>2</td>
+<td>language</td>
+<td>BCP 47 language tag index</td>
+</tr>
+<tr>
+<td>10</td>
+<td>2</td>
+<td>font_embedding</td>
+<td>Font embedding mode, applies to FONT chunks</td>
+</tr>
+<tr>
+<td>12</td>
+<td>2</td>
+<td>font_license_url_len</td>
+<td>Length of font license URL, zero if none</td>
+</tr>
+<tr>
+<td>14</td>
+<td>2</td>
+<td>reserved</td>
+<td>Reserved, zero padded</td>
+</tr>
+<tr>
+<td>16</td>
+<td>8</td>
+<td>offset</td>
+<td>Byte offset within DATA section</td>
+</tr>
+<tr>
+<td>24</td>
+<td>4</td>
+<td>size</td>
+<td>Size of chunk data in bytes. Represents compressed size if compression is nonzero.</td>
+</tr>
+<tr>
+<td>28</td>
+<td>4</td>
+<td>orig_size</td>
+<td>Original uncompressed size. Zero if same as size.</td>
+</tr>
+</tbody>
+</table>
+</div><h3 id="toc-32-bytes-x-chunkcount-offset-and-size-rules" class="docmd-heading"><a href="#toc-32-bytes-x-chunkcount-offset-and-size-rules" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Offset and Size Rules</h3>
+<p><code>offset</code> is relative to <code>data_offset</code> from HEAD. The absolute file position of a chunk is <code>data_offset + entry.offset</code>.</p>
+<p>If <code>compression</code> is 0, <code>size</code> equals <code>orig_size</code>. Alternatively <code>orig_size</code> is 0.</p>
+<p>If <code>compression</code> is 1, <code>size</code> represents the compressed length. <code>orig_size</code> represents the decompressed length.</p>
+<h2 id="data-section" class="docmd-heading"><a href="#data-section" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>DATA Section</h2>
+<p>The DATA section starts at <code>data_offset</code>. It is a flat array of chunk payloads. Each chunk’s position and size are defined by its TOC entry. No separator or framing exists between chunks. The TOC serves as the authoritative index.</p>
+<pre class="hljs"><code>data_offset <span class="hljs-punctuation">+</span> <span class="hljs-number">0</span><span class="hljs-punctuation">:</span>     chunk <span class="hljs-number">0</span> <span class="hljs-title function_">data</span> (entry[<span class="hljs-number">0</span>].<span class="hljs-attr">size</span> bytes)
+data_offset <span class="hljs-punctuation">+</span> off1<span class="hljs-punctuation">:</span>  chunk <span class="hljs-number">1</span> <span class="hljs-title function_">data</span> (entry[<span class="hljs-number">1</span>].<span class="hljs-attr">size</span> bytes)
+data_offset <span class="hljs-punctuation">+</span> off2<span class="hljs-punctuation">:</span>  chunk <span class="hljs-number">2</span> <span class="hljs-title function_">data</span> (entry[<span class="hljs-number">2</span>].<span class="hljs-attr">size</span> bytes)
+...
+</code></pre>
+<details class="docmd-container collapsible">
+        <summary class="collapsible-summary">
+            <span class="collapsible-title">EXTRA Section (optional)</span>
+            <span class="collapsible-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+        </summary>
+        <div class="collapsible-content">
+<p>The EXTRA section is variable length and optional. If <code>flags &amp; 1</code> equals 0, there is no EXTRA section and <code>extra_offset</code> is 0.</p>
+<pre class="hljs"><code>Offset  Size  Field
+<span class="hljs-number">0</span>       <span class="hljs-number">4</span>     extra_count<span class="hljs-punctuation">:</span> u32
+<span class="hljs-number">4</span>       variable  Array <span class="hljs-keyword">of</span> ExtraEntry<span class="hljs-punctuation">:</span>
+                  <span class="hljs-punctuation">-</span> <span class="hljs-number">2</span> bytes<span class="hljs-punctuation">:</span> <span class="hljs-keyword">namespace</span> <span class="hljs-title function_">length</span> (u16)
+                  <span class="hljs-punctuation">-</span> N bytes<span class="hljs-punctuation">:</span> <span class="hljs-keyword">namespace</span> (UTF<span class="hljs-punctuation">-</span><span class="hljs-number">8</span>)
+                  <span class="hljs-punctuation">-</span> <span class="hljs-number">8</span> bytes<span class="hljs-punctuation">:</span> <span class="hljs-title function_">offset</span> (u64, relative to extra_offset)
+                  <span class="hljs-punctuation">-</span> <span class="hljs-number">4</span> bytes<span class="hljs-punctuation">:</span> <span class="hljs-title function_">size</span> (u32)
+                  (entry repeats extra_count times)
+</code></pre>
+<p>After the entry array, each entry’s data resides at <code>extra_offset + entry.offset</code>.</p>
+<h3>Standard Namespaces</h3>
+<!-- markdownlint-disable MD055 -->
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Namespace</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>org.nisoku.anno</code></td>
+<td>Annotations stored as MessagePack</td>
+</tr>
+<tr>
+<td><code>org.nisoku.drm</code></td>
+<td>DRM envelope stored as MessagePack</td>
+</tr>
+<tr>
+<td><code>org.nisoku.sync</code></td>
+<td>Audio/video sync tracks stored as MessagePack</td>
+</tr>
+</tbody>
+</table>
+</div></div></details>
+<h2 id="meta-section" class="docmd-heading"><a href="#meta-section" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>META Section</h2>
+<p>The META section is a MessagePack map. It starts at <code>meta_offset</code> and spans <code>meta_size</code> bytes. Only <code>title</code> and <code>language</code> are required. Everything else is optional.</p>
+<details class="docmd-container collapsible">
+        <summary class="collapsible-summary">
+            <span class="collapsible-title">Example META payload</span>
+            <span class="collapsible-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+        </summary>
+        <div class="collapsible-content">
+<pre class="hljs"><code>{
+  <span class="hljs-string">&quot;honzo&quot;</span><span class="hljs-punctuation">:</span> {
+    <span class="hljs-string">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>,
+    <span class="hljs-string">&quot;converter&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;honzo-convert 0.1.0&quot;</span>,
+    <span class="hljs-string">&quot;created&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-01-15T10:30:00Z&quot;</span>,
+    <span class="hljs-string">&quot;modified&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-01-15T10:30:00Z&quot;</span>
+  },
+  <span class="hljs-string">&quot;title&quot;</span><span class="hljs-punctuation">:</span> {
+    <span class="hljs-string">&quot;en&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;The Example Book&quot;</span>,
+    <span class="hljs-string">&quot;fr&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Le Livre Exemple&quot;</span>
+  },
+  <span class="hljs-string">&quot;creator&quot;</span><span class="hljs-punctuation">:</span> {
+    <span class="hljs-string">&quot;en&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Author Name&quot;</span>
+  },
+  <span class="hljs-string">&quot;language&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;en&quot;</span>,
+  <span class="hljs-string">&quot;description&quot;</span><span class="hljs-punctuation">:</span> {
+    <span class="hljs-string">&quot;en&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;A short description of the book.&quot;</span>
+  },
+  <span class="hljs-string">&quot;publisher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Publisher Name&quot;</span>,
+  <span class="hljs-string">&quot;published&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2024-01-01&quot;</span>,
+  <span class="hljs-string">&quot;rights&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Copyright 2024&quot;</span>,
+  <span class="hljs-string">&quot;identifiers&quot;</span><span class="hljs-punctuation">:</span> {
+    <span class="hljs-string">&quot;isbn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;978-0-00-000000-0&quot;</span>,
+    <span class="hljs-string">&quot;doi&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;10.0000/example&quot;</span>
+  },
+  <span class="hljs-string">&quot;subject&quot;</span><span class="hljs-punctuation">:</span> [<span class="hljs-string">&quot;Fiction&quot;</span>, <span class="hljs-string">&quot;Adventure&quot;</span>],
+  <span class="hljs-string">&quot;series&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Series Name&quot;</span>,
+  <span class="hljs-string">&quot;series_position&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>,
+  <span class="hljs-string">&quot;edition&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>,
+  <span class="hljs-string">&quot;page_progression_direction&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ltr&quot;</span>,
+  <span class="hljs-string">&quot;toc&quot;</span><span class="hljs-punctuation">:</span> [
+    {<span class="hljs-string">&quot;title&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Chapter 1&quot;</span>, <span class="hljs-string">&quot;src&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span>},
+    {<span class="hljs-string">&quot;title&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Chapter 2&quot;</span>, <span class="hljs-string">&quot;src&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>}
+  ]
+}
+</code></pre>
+</div></details>
+<p>All field names use lowercase with underscores. All text values are maps keyed by BCP 47 language tags. This enables multi language support.</p>
+<h2 id="next-steps" class="docmd-heading"><a href="#next-steps" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Next Steps</h2>
+<div class="docmd-container grids">
+<div class="docmd-container grid-item">
+<a href="../chunk-types/" class="docmd-button">
+<svg class="lucide-icon icon-package button-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+Chunk Types</a></div>
+<div class="docmd-container grid-item">
+<a href="../compression/" class="docmd-button">
+<svg class="lucide-icon icon-zap button-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-zap"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
+</svg>
+Compression</a></div>
+<div class="docmd-container grid-item">
+<a href="../drm/" class="docmd-button">
+<svg class="lucide-icon icon-lock button-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-lock"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+</svg>
+DRM &amp; Encryption</a></div>
+</div>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../../format/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>previous</small><strong>
+                            Format Specification
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../../format/chunk-types/" class="next-page">
+                        <span><small>next</small>
+                          <strong>
+                            Chunk Types
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-2">
+          <a href="#head-48-bytes" class="toc-link">HEAD (48 bytes)</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#toc-32-bytes-x-chunkcount" class="toc-link">TOC (32 bytes x chunk_count)</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#toc-32-bytes-x-chunkcount-offset-and-size-rules" class="toc-link">Offset and Size Rules</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#data-section" class="toc-link">DATA Section</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#meta-section" class="toc-link">META Section</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#next-steps" class="toc-link">Next Steps</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+            </div>
+            <div class="page-footer-actions">
+              
+              
+                <span class="git-last-updated" data-timestamp="1780804020000">
+                  <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span class="git-label">Last updated:</span>
+                  <span class="git-time" data-timestamp="1780804020000"></span>
+                  
+                  <div class="git-commit-tooltip" role="tooltip">
+                    <div class="git-tooltip-title">Recent commits</div>
+                    <ul class="git-commit-list">
+                      
+                        <li class="git-commit-item">
+                          <div class="git-commit-avatar" title="NellowTCS">
+                            
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
+                            
+                          </div>
+                          <div class="git-commit-details">
+                            <div class="git-commit-message" title="DOCS AAAA">DOCS AAAA</div>
+                            <div class="git-commit-meta">
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1780804020000"></span>
+                            </div>
+                          </div>
+                        </li>
+                      
+                    </ul>
+                  </div>
+                  
+                </span>
+              
+              <span class="git-spacer"></span>
+              
+                <a href="https://github.com/Nisoku/Honzo/edit/main/Docs/docs/Docs/docs/format/wire-format.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                  
+<svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-pencil"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+  <path d="m15 5 4 4" />
+</svg>
+
+                  Edit this page
+                </a>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="footer-complete">
+  <div class="footer-complete-top">
+      <div class="footer-brand">
+          
+            <span class="footer-title">Honzo</span>
+          
+          
+            <p class="footer-desc">A binary ebook format for simplicity, performance, and portability.</p>
+          
+        </div>
+        
+          <div class="footer-columns">
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Resources</span>
+                <ul>
+                  
+                    <li><a href="../../getting-started/quickstart/" >Getting Started</a></li>
+                  
+                    <li><a href="../../format/" >Format Spec</a></li>
+                  
+                    <li><a href="../../cli/" >CLI Commands</a></li>
+                  
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Community</span>
+                <ul>
+                  
+                    <li><a href="https://github.com/Nisoku/Honzo" >GitHub</a></li>
+                  
+                    <li><a href="https://github.com/Nisoku/Honzo/issues" >Issues</a></li>
+                  
+                    <li><a href="https://github.com/Nisoku/Honzo/discussions" >Discussions</a></li>
+                  
+                </ul>
+              </div>
+            
+          </div>
+        
+      </div>
+      <div class="footer-complete-bottom">
+        <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/Nisoku/Honzo">View on GitHub</a>.</div>
+        
+          <div class="branding-footer">
+            builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+          </div>
+        
+      </div>
+  </footer>
+
+        </div>
+      </div>
+      
+      <script src="../../assets/js/docmd-main.js?v=mq38xvyb"></script>
+      
+      <script src="../../assets/js/docmd-git.js?v=mq38xvyb"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mq38xvyb" ></script>
+<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
+<script src="../../assets/js/docmd-search.js?v=mq38xvyb" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mq38xvyb" type="module"></script>
+<script src="../../assets/js/docmd-git.js?v=mq38xvyb" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":"https://github.com/Nisoku/Honzo/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+  </body>
+</html>
