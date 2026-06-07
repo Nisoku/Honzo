@@ -4,7 +4,7 @@
 
 ---
 
-## [C API Reference](https://nisoku.github.io/Honzo/api/c/)
+## [C API Reference](https://nisoku.org/Honzo/api/c/)
 
 ---
 title: "C API Reference"
@@ -129,7 +129,7 @@ cc -o reader reader.c -L./target/release -lhonzo_c -lpthread -ldl -lm
 
 ---
 
-## [API Reference](https://nisoku.github.io/Honzo/api/)
+## [API Reference](https://nisoku.org/Honzo/api/)
 
 ---
 title: "API Reference"
@@ -195,7 +195,7 @@ All APIs are built on the same Rust workspace:
 
 ---
 
-## [Rust API Reference](https://nisoku.github.io/Honzo/api/rust/)
+## [Rust API Reference](https://nisoku.org/Honzo/api/rust/)
 
 ---
 title: "Rust API Reference"
@@ -318,7 +318,7 @@ All fallible operations return `Result<T, HonzoError>`. Error variants include:
 
 ---
 
-## [WASM / TypeScript API Reference](https://nisoku.github.io/Honzo/api/wasm/)
+## [WASM / TypeScript API Reference](https://nisoku.org/Honzo/api/wasm/)
 
 ---
 title: "WASM / TypeScript API Reference"
@@ -478,7 +478,7 @@ const hzo = await buildHonzo({
 
 ---
 
-## [CLI Reference](https://nisoku.github.io/Honzo/cli/)
+## [CLI Reference](https://nisoku.org/Honzo/cli/)
 
 ---
 title: "CLI Reference"
@@ -623,7 +623,7 @@ Returns exit code ::: tag "0" color:#22c55e if valid, ::: tag "1" color:#ef4444 
 
 ---
 
-## [Architecture](https://nisoku.github.io/Honzo/contributing/architecture/)
+## [Architecture](https://nisoku.org/Honzo/contributing/architecture/)
 
 ---
 title: "Architecture"
@@ -781,7 +781,7 @@ The `no_unsafe` directive is enforced in honzo-chunks with `#![forbid(unsafe_cod
 
 ---
 
-## [Building](https://nisoku.github.io/Honzo/contributing/building/)
+## [Building](https://nisoku.org/Honzo/contributing/building/)
 
 ---
 title: "Building"
@@ -938,7 +938,7 @@ python3 Build/scripts/docs.py build
 
 ---
 
-## [Contributing](https://nisoku.github.io/Honzo/contributing/)
+## [Contributing](https://nisoku.org/Honzo/contributing/)
 
 ---
 title: "Contributing"
@@ -1006,7 +1006,7 @@ Update CHANGELOG.md with notable changes before submitting.
 
 ---
 
-## [EPUB Conversion](https://nisoku.github.io/Honzo/conversion/epub/)
+## [EPUB Conversion](https://nisoku.org/Honzo/conversion/epub/)
 
 ---
 title: "EPUB Conversion"
@@ -1134,7 +1134,7 @@ honzo info --json book.hzo
 
 ---
 
-## [Conversion](https://nisoku.github.io/Honzo/conversion/)
+## [Conversion](https://nisoku.org/Honzo/conversion/)
 
 ---
 title: "Conversion"
@@ -1298,7 +1298,7 @@ Basic text extraction. No reflow or layout preservation.
 
 ---
 
-## [MOBI Conversion](https://nisoku.github.io/Honzo/conversion/mobi/)
+## [MOBI Conversion](https://nisoku.org/Honzo/conversion/mobi/)
 
 ---
 title: "MOBI Conversion"
@@ -1415,7 +1415,7 @@ honzo convert book.mobi book.hzo
 
 ---
 
-## [PDF Conversion](https://nisoku.github.io/Honzo/conversion/pdf/)
+## [PDF Conversion](https://nisoku.org/Honzo/conversion/pdf/)
 
 ---
 title: "PDF Conversion"
@@ -1520,7 +1520,7 @@ honzo convert book.pdf book.hzo
 
 ---
 
-## [Demo Apps](https://nisoku.github.io/Honzo/demo/)
+## [Demo Apps](https://nisoku.org/Honzo/demo-docs/)
 
 ---
 title: "Demo Apps"
@@ -1544,6 +1544,8 @@ Full-featured ebook reader with chapter navigation, cover rendering, and layout 
 - Page turn animations
 
 Built with [Sairin](https://nisoku.org/Sairin/) (reactive UI) and [Satori](https://nisoku.org/Satori/docs/) (observability/logging).
+
+::: button "Open Reader" ../demo/ icon:external-link
 :::
 :::
 ::: grid
@@ -1556,6 +1558,8 @@ Online GUI for building Honzo files interactively.
 - Per-chapter compression control
 - Drag-and-drop chapter reordering
 - Download the resulting `.hzo` file
+
+::: button "Open Maker" ../demo/maker.html icon:external-link
 :::
 :::
 ::: grid
@@ -1568,6 +1572,8 @@ Low-level Honzo file inspector for debugging and learning the format.
 - EXTRA section browser
 - META section JSON viewer
 - Chunk data hex dump
+
+::: button "Open Inspect" ../demo/inspect.html icon:external-link
 :::
 :::
 ::: grid
@@ -1579,6 +1585,8 @@ Browser-based EPUB to Honzo converter.
 - Metadata preview before conversion
 - Download the resulting `.hzo` file
 - All processing is client-side (no server upload)
+
+::: button "Open Convert" ../demo/convert.html icon:external-link
 :::
 :::
 :::
@@ -1614,7 +1622,7 @@ The demos are separate pages under the same Vite project. Navigate between them 
 
 ---
 
-## [Annotations](https://nisoku.github.io/Honzo/features/annotations/)
+## [Annotations](https://nisoku.org/Honzo/features/annotations/)
 
 ---
 title: "Annotations"
@@ -1713,7 +1721,7 @@ Applications should preserve unknown annotation types rather than dropping them.
 
 ---
 
-## [Features](https://nisoku.github.io/Honzo/features/)
+## [Features](https://nisoku.org/Honzo/features/)
 
 ---
 title: "Features"
@@ -1780,7 +1788,7 @@ Custom namespaces are preserved on round-trip.
 
 ---
 
-## [Search Index](https://nisoku.github.io/Honzo/features/search/)
+## [Search Index](https://nisoku.org/Honzo/features/search/)
 
 ---
 title: "Search Index"
@@ -1872,7 +1880,7 @@ Multiple languages are supported via UTF-8 byte offsets. Word segmentation is an
 
 ---
 
-## [Streaming](https://nisoku.github.io/Honzo/features/streaming/)
+## [Streaming](https://nisoku.org/Honzo/features/streaming/)
 
 ---
 title: "Streaming"
@@ -1954,7 +1962,7 @@ flowchart LR
 
 ---
 
-## [Sync Tracks](https://nisoku.github.io/Honzo/features/sync/)
+## [Sync Tracks](https://nisoku.org/Honzo/features/sync/)
 
 ---
 title: "Sync Tracks"
@@ -2072,7 +2080,7 @@ Timestamps in milliseconds give approximately 1ms precision. This suffices for a
 
 ---
 
-## [Chunk Types](https://nisoku.github.io/Honzo/format/chunk-types/)
+## [Chunk Types](https://nisoku.org/Honzo/format/chunk-types/)
 
 ---
 title: "Chunk Types"
@@ -2265,7 +2273,7 @@ Equations are rendered at read time by the consuming application, for example wi
 
 ---
 
-## [Compression](https://nisoku.github.io/Honzo/format/compression/)
+## [Compression](https://nisoku.org/Honzo/format/compression/)
 
 ---
 title: "Compression"
@@ -2359,7 +2367,7 @@ for entry in p.toc_entries() {
 
 ---
 
-## [DRM & Encryption](https://nisoku.github.io/Honzo/format/drm/)
+## [DRM & Encryption](https://nisoku.org/Honzo/format/drm/)
 
 ---
 title: "DRM & Encryption"
@@ -2490,7 +2498,7 @@ let hzo = Builder::new()
 
 ---
 
-## [Format Specification](https://nisoku.github.io/Honzo/format/)
+## [Format Specification](https://nisoku.org/Honzo/format/)
 
 ---
 title: "Format Specification"
@@ -2565,7 +2573,7 @@ All multi byte integers are little endian. This matches x86, ARM, and WASM.
 
 ---
 
-## [Layout Modes](https://nisoku.github.io/Honzo/format/layout/)
+## [Layout Modes](https://nisoku.org/Honzo/format/layout/)
 
 ---
 title: "Layout Modes"
@@ -2645,7 +2653,7 @@ const reader = await createReader(buf);
 
 ---
 
-## [Wire Format](https://nisoku.github.io/Honzo/format/wire-format/)
+## [Wire Format](https://nisoku.org/Honzo/format/wire-format/)
 
 ---
 title: "Wire Format"
@@ -2806,7 +2814,7 @@ All field names use lowercase with underscores. All text values are maps keyed b
 
 ---
 
-## [Core Concepts](https://nisoku.github.io/Honzo/getting-started/concepts/)
+## [Core Concepts](https://nisoku.org/Honzo/getting-started/concepts/)
 
 ---
 title: "Core Concepts"
@@ -2957,7 +2965,7 @@ Anyone can define a custom namespace. Unrecognized entries are preserved during 
 
 ---
 
-## [Installation](https://nisoku.github.io/Honzo/getting-started/installation/)
+## [Installation](https://nisoku.org/Honzo/getting-started/installation/)
 
 ---
 title: "Installation"
@@ -3062,7 +3070,7 @@ If you see a version number, everything is ready.
 
 ---
 
-## [Quick Start](https://nisoku.github.io/Honzo/getting-started/quickstart/)
+## [Quick Start](https://nisoku.org/Honzo/getting-started/quickstart/)
 
 ---
 title: "Quick Start"
@@ -3251,7 +3259,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
 
 ---
 
-## [Honzo](https://nisoku.github.io/Honzo/)
+## [Honzo](https://nisoku.org/Honzo/)
 
 ---
 title: "Honzo"

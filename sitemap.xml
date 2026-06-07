@@ -1,142 +1,142 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://nisoku.github.io/Honzo/api/c/</loc>
+    <loc>https://nisoku.org/Honzo/api/c/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/api/</loc>
+    <loc>https://nisoku.org/Honzo/api/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/api/rust/</loc>
+    <loc>https://nisoku.org/Honzo/api/rust/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/api/wasm/</loc>
+    <loc>https://nisoku.org/Honzo/api/wasm/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/cli/</loc>
+    <loc>https://nisoku.org/Honzo/cli/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/contributing/architecture/</loc>
+    <loc>https://nisoku.org/Honzo/contributing/architecture/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/contributing/building/</loc>
+    <loc>https://nisoku.org/Honzo/contributing/building/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/contributing/</loc>
+    <loc>https://nisoku.org/Honzo/contributing/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/conversion/epub/</loc>
+    <loc>https://nisoku.org/Honzo/conversion/epub/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/conversion/</loc>
+    <loc>https://nisoku.org/Honzo/conversion/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/conversion/mobi/</loc>
+    <loc>https://nisoku.org/Honzo/conversion/mobi/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/conversion/pdf/</loc>
+    <loc>https://nisoku.org/Honzo/conversion/pdf/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/demo/</loc>
+    <loc>https://nisoku.org/Honzo/demo-docs/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/features/annotations/</loc>
+    <loc>https://nisoku.org/Honzo/features/annotations/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/features/</loc>
+    <loc>https://nisoku.org/Honzo/features/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/features/search/</loc>
+    <loc>https://nisoku.org/Honzo/features/search/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/features/streaming/</loc>
+    <loc>https://nisoku.org/Honzo/features/streaming/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/features/sync/</loc>
+    <loc>https://nisoku.org/Honzo/features/sync/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/format/chunk-types/</loc>
+    <loc>https://nisoku.org/Honzo/format/chunk-types/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/format/compression/</loc>
+    <loc>https://nisoku.org/Honzo/format/compression/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/format/drm/</loc>
+    <loc>https://nisoku.org/Honzo/format/drm/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/format/</loc>
+    <loc>https://nisoku.org/Honzo/format/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/format/layout/</loc>
+    <loc>https://nisoku.org/Honzo/format/layout/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/format/wire-format/</loc>
+    <loc>https://nisoku.org/Honzo/format/wire-format/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/getting-started/concepts/</loc>
+    <loc>https://nisoku.org/Honzo/getting-started/concepts/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/getting-started/installation/</loc>
+    <loc>https://nisoku.org/Honzo/getting-started/installation/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/getting-started/quickstart/</loc>
+    <loc>https://nisoku.org/Honzo/getting-started/quickstart/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nisoku.github.io/Honzo/</loc>
+    <loc>https://nisoku.org/Honzo/</loc>
     <changefreq>weekly</changefreq>
     <priority>1</priority>
   </url>
