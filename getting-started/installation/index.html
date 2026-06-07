@@ -87,10 +87,10 @@
       Installation : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq38xvyb">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq39fpx6">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq38xvyb" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq38xvyb" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq39fpx6" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq39fpx6" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Install Honzo on your platform">
@@ -105,12 +105,12 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq38xvyb" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq38xvyb" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq38xvyb" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq39fpx6" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq39fpx6" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq39fpx6" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq38xvyb">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq39fpx6">
     
     <script>/**
  * --------------------------------------------------------------------
@@ -1401,7 +1401,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Installation%22%0Adescription%3A%20%22Install%20Honzo%20on%20your%20platform%22%0A---%0A%0A%23%23%20Rust%0A%0AAdd%20%60honzo-std%60%20to%20your%20%60Cargo.toml%60%3A%0A%0A%60%60%60toml%0A%5Bdependencies%5D%0Ahonzo-std%20%3D%20%220.1%22%0A%60%60%60%0A%0AThe%20%60honzo-std%60%20crate%20includes%20the%20parser%2C%20builder%2C%20streaming%20reader%2C%20and%20compression.%20It%20requires%20%60std%60.%0A%0AFor%20embedded%20targets%2C%20use%20%60honzo-core%60%20with%20no_std%20support%3A%0A%0A%60%60%60toml%0A%5Bdependencies%5D%0Ahonzo-core%20%3D%20%220.1%22%0A%60%60%60%0A%0AThis%20provides%20the%20wire%20format%20parser%20without%20allocation%20or%20compression.%0A%0A%23%23%20TypeScript%20%2F%20WASM%0A%0AInstall%20the%20npm%20package%3A%0A%0A%60%60%60bash%0Anpm%20install%20%40nisoku%2Fhonzo%0A%60%60%60%0A%0AThe%20package%20bundles%20the%20Honzo%20WASM%20binary.%20It%20provides%20%60createReader%60%2C%20%60buildHonzo%60%2C%20and%20related%20types%20for%20browsers%20and%20Node.js.%0A%0A%23%23%20C%0A%0AThe%20C%20binding%20ships%20as%20a%20single%20header%20library%20plus%20a%20static%20archive%3A%0A%0A%60%60%60c%0A%23include%20%22honzo.h%22%0A%2F%2F%20link%20against%20libhonzo_c.a%0A%60%60%60%0A%0ABuild%20from%20source%3A%0A%0A%60%60%60bash%0Acargo%20build%20-p%20honzo-c%20--release%0A%23%20produces%20target%2Frelease%2Flibhonzo_c.a%0A%60%60%60%0A%0A%23%23%20CLI%0A%0A%60%60%60bash%0Acargo%20install%20honzo-cli%0A%60%60%60%0A%0AOr%20build%20from%20source%3A%0A%0A%60%60%60bash%0Agit%20clone%20https%3A%2F%2Fgithub.com%2FNisoku%2FHonzo%0Acd%20Honzo%0Acargo%20build%20-p%20honzo-cli%20--release%0A.%2Ftarget%2Frelease%2Fhonzo%20--help%0A%60%60%60%0A%0A%23%23%23%20Developer%20setup%0A%0AIf%20you%20plan%20to%20contribute%20or%20build%20all%20surfaces%2C%20install%20%5Bjust%5D(https%3A%2F%2Fjust.systems%2F)%20first%3A%0A%0A%60%60%60bash%0Agit%20clone%20https%3A%2F%2Fgithub.com%2FNisoku%2FHonzo%0Acd%20Honzo%0Acargo%20install%20just%0Ajust%20setup%20%20%20%20%20%23%20install%20Rust%20targets%2C%20npm%20packages%2C%20wasm-pack%2C%20diplomat-tool%0Ajust%20check%20%20%20%20%20%23%20verify%20everything%20works%0A%60%60%60%0A%0A%23%23%20Verify%0A%0A%60%60%60bash%0Ahonzo%20--version%0A%60%60%60%0A%0AIf%20you%20see%20a%20version%20number%2C%20everything%20is%20ready.%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Quick%20Start%22%20.%2Fquickstart.md%20icon%3Aplay%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Core%20Concepts%22%20.%2Fconcepts.md%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22CLI%20Reference%22%20..%2Fcli%2F%20icon%3Aterminal%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Installation%22%0Adescription%3A%20%22Install%20Honzo%20on%20your%20platform%22%0A---%0A%0A%23%23%20Rust%0A%0AAdd%20%60honzo-io%60%20to%20your%20%60Cargo.toml%60%3A%0A%0A%60%60%60toml%0A%5Bdependencies%5D%0Ahonzo-io%20%3D%20%220.1%22%0A%60%60%60%0A%0AThe%20%60honzo-io%60%20crate%20includes%20the%20parser%2C%20builder%2C%20streaming%20reader%2C%20and%20compression.%20It%20requires%20%60std%60.%0A%0AFor%20embedded%20targets%2C%20use%20%60honzo-core%60%20with%20no_std%20support%3A%0A%0A%60%60%60toml%0A%5Bdependencies%5D%0Ahonzo-core%20%3D%20%220.1%22%0A%60%60%60%0A%0AThis%20provides%20the%20wire%20format%20parser%20without%20allocation%20or%20compression.%0A%0A%23%23%20TypeScript%20%2F%20WASM%0A%0AInstall%20the%20npm%20package%3A%0A%0A%60%60%60bash%0Anpm%20install%20%40nisoku%2Fhonzo%0A%60%60%60%0A%0AThe%20package%20bundles%20the%20Honzo%20WASM%20binary.%20It%20provides%20%60createReader%60%2C%20%60buildHonzo%60%2C%20and%20related%20types%20for%20browsers%20and%20Node.js.%0A%0A%23%23%20C%0A%0AThe%20C%20binding%20ships%20as%20a%20single%20header%20library%20plus%20a%20static%20archive%3A%0A%0A%60%60%60c%0A%23include%20%22honzo.h%22%0A%2F%2F%20link%20against%20libhonzo_c.a%0A%60%60%60%0A%0ABuild%20from%20source%3A%0A%0A%60%60%60bash%0Acargo%20build%20-p%20honzo-c%20--release%0A%23%20produces%20target%2Frelease%2Flibhonzo_c.a%0A%60%60%60%0A%0A%23%23%20CLI%0A%0A%60%60%60bash%0Acargo%20install%20honzo-cli%0A%60%60%60%0A%0AOr%20build%20from%20source%3A%0A%0A%60%60%60bash%0Agit%20clone%20https%3A%2F%2Fgithub.com%2FNisoku%2FHonzo%0Acd%20Honzo%0Acargo%20build%20-p%20honzo-cli%20--release%0A.%2Ftarget%2Frelease%2Fhonzo%20--help%0A%60%60%60%0A%0A%23%23%23%20Developer%20setup%0A%0AIf%20you%20plan%20to%20contribute%20or%20build%20all%20surfaces%2C%20install%20%5Bjust%5D(https%3A%2F%2Fjust.systems%2F)%20first%3A%0A%0A%60%60%60bash%0Agit%20clone%20https%3A%2F%2Fgithub.com%2FNisoku%2FHonzo%0Acd%20Honzo%0Acargo%20install%20just%0Ajust%20setup%20%20%20%20%20%23%20install%20Rust%20targets%2C%20npm%20packages%2C%20wasm-pack%2C%20diplomat-tool%0Ajust%20check%20%20%20%20%20%23%20verify%20everything%20works%0A%60%60%60%0A%0A%23%23%20Verify%0A%0A%60%60%60bash%0Ahonzo%20--version%0A%60%60%60%0A%0AIf%20you%20see%20a%20version%20number%2C%20everything%20is%20ready.%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Quick%20Start%22%20.%2Fquickstart.md%20icon%3Aplay%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Core%20Concepts%22%20.%2Fconcepts.md%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22CLI%20Reference%22%20..%2Fcli%2F%20icon%3Aterminal%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1491,11 +1491,11 @@
                 </div>
                 
                 <h2 id="rust" class="docmd-heading"><a href="#rust" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Rust</h2>
-<p>Add <code>honzo-std</code> to your <code>Cargo.toml</code>:</p>
+<p>Add <code>honzo-io</code> to your <code>Cargo.toml</code>:</p>
 <pre class="hljs"><code>[dependencies]
-honzo<span class="hljs-punctuation">-</span>std <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;0.1&quot;</span>
+honzo<span class="hljs-punctuation">-</span>io <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;0.1&quot;</span>
 </code></pre>
-<p>The <code>honzo-std</code> crate includes the parser, builder, streaming reader, and compression. It requires <code>std</code>.</p>
+<p>The <code>honzo-io</code> crate includes the parser, builder, streaming reader, and compression. It requires <code>std</code>.</p>
 <p>For embedded targets, use <code>honzo-core</code> with no_std support:</p>
 <pre class="hljs"><code>[dependencies]
 honzo<span class="hljs-punctuation">-</span>core <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;0.1&quot;</span>
@@ -1705,13 +1705,13 @@ CLI Reference</a></div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1780804020000">
+                <span class="git-last-updated" data-timestamp="1780804859000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1780804020000"></span>
+                  <span class="git-time" data-timestamp="1780804859000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1724,10 +1724,10 @@ CLI Reference</a></div>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="DOCS AAAA">DOCS AAAA</div>
+                            <div class="git-commit-message" title="Some cleanup and getting ready for publishing">Some cleanup and getting ready for pu...</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1780804020000"></span>
+                              <span class="git-commit-date" data-timestamp="1780804859000"></span>
                             </div>
                           </div>
                         </li>
@@ -1820,14 +1820,14 @@ CLI Reference</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mq38xvyb"></script>
+      <script src="../../assets/js/docmd-main.js?v=mq39fpx6"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mq38xvyb"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mq38xvyb" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mq39fpx6"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mq39fpx6" ></script>
 <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=mq38xvyb" ></script>
-<script src="../../assets/js/init-mermaid.js?v=mq38xvyb" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=mq38xvyb" type="module"></script>
+<script src="../../assets/js/docmd-search.js?v=mq39fpx6" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mq39fpx6" type="module"></script>
+<script src="../../assets/js/docmd-git.js?v=mq39fpx6" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
