@@ -26,9 +26,11 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=Merriweather:wght@300;400;700&family=IBM+Plex+Serif:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <script type="module" crossorigin src="/Honzo/demo/assets/main-D5KtTwKi.js"></script>
-    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/honzo_wasm-CB9uJJDj.js">
-    <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/honzo_wasm-CLL4j9jM.css">
+    <script type="module" crossorigin src="/Honzo/demo/assets/main-kLay6NLm.js"></script>
+    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/honzo_wasm-BnLbK6IE.js">
+    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/satori-CgGrHH2b.js">
+    <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/honzo_wasm-ByFcPX5k.css">
+    <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/main-BC_m8i3U.css">
   <link rel="manifest" href="/Honzo/demo/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Honzo/demo/registerSW.js"></script></head>
   <body>
     <!-- Header -->
@@ -40,20 +42,7 @@
           disabled
           aria-label="Table of Contents"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
+          <i data-lucide="menu" width="20" height="20"></i>
         </button>
         <button
           id="bookmarks-button"
@@ -61,18 +50,7 @@
           disabled
           aria-label="Bookmarks"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-          </svg>
+          <i data-lucide="bookmark" width="20" height="20"></i>
         </button>
       </div>
       <div class="header-center">
@@ -84,6 +62,7 @@
         <nav class="header-nav">
           <a href="/Honzo/demo/convert.html">Convert</a>
           <a href="/Honzo/demo/inspect.html">Inspect</a>
+          <a href="/Honzo/demo/maker.html">Maker</a>
         </nav>
         <button
           id="search-button"
@@ -91,19 +70,7 @@
           disabled
           aria-label="Search"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
+          <i data-lucide="search" width="20" height="20"></i>
         </button>
         <button
           id="meta-button"
@@ -111,20 +78,7 @@
           disabled
           aria-label="Book Info"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="16" x2="12" y2="12" />
-            <line x1="12" y1="8" x2="12.01" y2="8" />
-          </svg>
+          <i data-lucide="info" width="20" height="20"></i>
         </button>
         <button
           id="settings-button"
@@ -132,21 +86,7 @@
           disabled
           aria-label="Settings"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="3" />
-            <path
-              d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
-            />
-          </svg>
+          <i data-lucide="settings" width="20" height="20"></i>
         </button>
         <div class="header-divider"></div>
         <select
@@ -189,18 +129,7 @@
           disabled
           aria-label="Previous Chapter"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          <i data-lucide="chevron-left" width="20" height="20"></i>
           <span class="btn-label">Prev</span>
         </button>
       </div>
@@ -227,18 +156,7 @@
           aria-label="Next Chapter"
         >
           <span class="btn-label">Next</span>
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
+          <i data-lucide="chevron-right" width="20" height="20"></i>
         </button>
       </div>
     </footer>
@@ -248,19 +166,7 @@
       <div class="sidebar-header">
         <h2>Table of Contents</h2>
         <button id="close-toc" class="icon-btn" aria-label="Close TOC">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
+          <i data-lucide="x" width="20" height="20"></i>
         </button>
       </div>
       <div class="sidebar-content" id="toc-content"></div>
@@ -275,19 +181,7 @@
           class="icon-btn"
           aria-label="Close Bookmarks"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
+          <i data-lucide="x" width="20" height="20"></i>
         </button>
       </div>
       <div class="sidebar-content" id="bookmarks-content"></div>
@@ -298,36 +192,12 @@
       <div class="sidebar-header">
         <h2>Search</h2>
         <button id="close-search" class="icon-btn" aria-label="Close Search">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
+          <i data-lucide="x" width="20" height="20"></i>
         </button>
       </div>
       <div class="sidebar-content">
         <div class="search-field">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
+          <i data-lucide="search" width="16" height="16"></i>
           <input
             id="search-input"
             type="search"
@@ -347,19 +217,7 @@
       <div class="sidebar-header">
         <h2>Book Info</h2>
         <button id="close-meta" class="icon-btn" aria-label="Close Book Info">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
+          <i data-lucide="x" width="20" height="20"></i>
         </button>
       </div>
       <div class="sidebar-content" id="meta-content"></div>
@@ -374,19 +232,7 @@
           class="icon-btn"
           aria-label="Close Settings"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
+          <i data-lucide="x" width="20" height="20"></i>
         </button>
       </div>
       <div class="sidebar-content" id="settings-content"></div>

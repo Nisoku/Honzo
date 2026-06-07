@@ -26,9 +26,10 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=Merriweather:wght@300;400;700&family=IBM+Plex+Serif:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <script type="module" crossorigin src="/Honzo/demo/assets/inspect-C9cdqJOa.js"></script>
-    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/honzo_wasm-CB9uJJDj.js">
-    <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/honzo_wasm-CLL4j9jM.css">
+    <script type="module" crossorigin src="/Honzo/demo/assets/inspect-C7ZcT-t0.js"></script>
+    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/honzo_wasm-BnLbK6IE.js">
+    <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/honzo_wasm-ByFcPX5k.css">
+    <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/inspect-KtfHNo33.css">
   <link rel="manifest" href="/Honzo/demo/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Honzo/demo/registerSW.js"></script></head>
 
   <body class="page-scroll">
@@ -44,6 +45,7 @@
         <nav class="header-nav">
           <a href="/Honzo/demo/">Reader</a>
           <a href="/Honzo/demo/convert.html">Convert</a>
+          <a href="/Honzo/demo/maker.html">Maker</a>
         </nav>
       </div>
     </header>
@@ -51,20 +53,7 @@
     <div class="container inspect-layout">
       <div class="drop-zone" id="dropZone">
         <div class="icon">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            width="48"
-            height="48"
-          >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <path d="M7 10l5 5 5-5" />
-            <path d="M12 15V3" />
-          </svg>
+          <i data-lucide="download" width="48" height="48" stroke-width="1.5"></i>
         </div>
         <h2>Drop a Honzo file here</h2>
         <p>or click to browse your device</p>
@@ -77,61 +66,17 @@
         <div class="inspect-main">
           <div class="panel inspect-meta" id="metaPanel">
             <h2>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                <path
-                  d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
-                />
-                <path d="M8 7h7" />
-                <path d="M8 12h7" />
-                <path d="M8 17h7" />
-              </svg>
+              <i data-lucide="file-text" width="20" height="20"></i>
               Book Metadata
             </h2>
             <div class="scroll-content meta-scroll" id="metaFields"></div>
             <div class="btn-row sticky-bottom">
               <button class="btn btn-secondary" id="revertBtn" disabled>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M3 12a9 9 0 1 1 18 0 9 9 0 0 1-18 0z" />
-                  <path d="M12 8v4l3 3" />
-                </svg>
+                <i data-lucide="rotate-ccw" width="16" height="16"></i>
                 Revert
               </button>
               <button class="btn btn-success" id="saveBtn" disabled>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
-                  />
-                  <polyline points="17 21 17 13 7 13 7 21" />
-                  <polyline points="7 3 7 8 15 8" />
-                </svg>
+                <i data-lucide="save" width="16" height="16"></i>
                 Save
               </button>
             </div>
@@ -142,24 +87,7 @@
           <!-- File Info -->
           <div class="panel" id="filePanel">
             <h2>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-              </svg>
+              <i data-lucide="file-text" width="20" height="20"></i>
               File Information
             </h2>
             <div class="scroll-content">
@@ -170,22 +98,7 @@
           <!-- Content Chunks -->
           <div class="panel inspect-chunks" id="tocPanel">
             <h2>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
-                />
-                <line x1="12" y1="11" x2="12" y2="17" />
-                <path d="M7 14l5-5 5 5" />
-              </svg>
+              <i data-lucide="file-up" width="20" height="20"></i>
               Content Chunks
               <span id="chunkCount"></span>
             </h2>
@@ -210,26 +123,7 @@
           <!-- Extra Data -->
           <div class="panel" id="extraPanel">
             <h2>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-                <path d="M18 12h-2v-2" />
-                <path d="M18 16h-2v-2" />
-              </svg>
+              <i data-lucide="file-plus" width="20" height="20"></i>
               Extra Data
             </h2>
             <div class="scroll-content" id="extraInfo"></div>
