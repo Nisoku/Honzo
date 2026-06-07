@@ -87,10 +87,10 @@
       MOBI Conversion : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cekj9">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cgwc2">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cekj9" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cekj9" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cgwc2" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cgwc2" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Converting MOBI (Amazon Kindle) files to Honzo format">
@@ -105,12 +105,12 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cekj9" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cekj9" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cekj9" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cgwc2" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cgwc2" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cgwc2" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cekj9">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cgwc2">
     
     <script>/**
  * --------------------------------------------------------------------
@@ -1608,7 +1608,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22MOBI%20Conversion%22%0Adescription%3A%20%22Converting%20MOBI%20(Amazon%20Kindle)%20files%20to%20Honzo%20format%22%0A---%0A%0AMOBI%20conversion%20provides%20partial%20import%20of%20Amazon%20Kindle%20format%20books.%20Text%2C%20metadata%2C%20and%20basic%20formatting%20carry%20over%2C%20but%20MOBI&#039;s%20proprietary%20features%20like%20Amazon&#039;s%20DRM%20and%20Kindle-specific%20markup%20are%20stripped.%0A%0A%23%23%20How%20it%20works%0A%0A%3A%3A%3A%20steps%0A%0A1.%20**Parse%20MOBI%20header.**%20The%20Palm%20Database%20(PDB)%20header%20and%20MOBI%20header%20identify%20the%20encoding%2C%20compression%2C%20and%20metadata.%0A%0A2.%20**Extract%20text.**%20The%20MOBI%20text%20is%20stored%20in%20PalmDoc%20format%20with%20LZ77%20compression.%20The%20converter%20decompresses%20and%20re-encodes%20it%20as%20UTF-8%20HTML.%0A%0A3.%20**Parse%20metadata.**%20Title%2C%20author%2C%20and%20language%20come%20from%20the%20MOBI%20header%20and%20EXTH%20records.%0A%0A4.%20**Split%20chapters.**%20MOBI%20chapter%20positions%20(from%20%60srcs%60%20%2F%20%60srcc%60%20records)%20divide%20the%20text%20into%20Honzo%20CHAP%20entries.%0A%0A5.%20**Embed%20images.**%20MOBI%20images%20are%20extracted%20from%20the%20PDB%20records%20and%20embedded%20as%20%60IMG_%60%20chunks.%0A%0A6.%20**Build.**%20All%20chunks%20are%20assembled%20into%20the%20final%20Honzo%20file%20with%20per-chapter%20LZ4%20compression.%0A%0A%3A%3A%3A%0A%0A%23%23%20Metadata%20mapping%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22title%22%20icon%3Abook%0AMaps%20to%20Honzo%20%60title%60%20in%20%60META%60%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22author%22%20icon%3Auser%0AMaps%20to%20Honzo%20%60creator%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22language%22%20icon%3Aglobe%0AMaps%20to%20Honzo%20%60language%60%20(BCP%2047).%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22isbn%22%20icon%3Ahash%0AMaps%20to%20%60identifiers.isbn%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22publisher%22%20icon%3Abuilding%0AMaps%20to%20Honzo%20%60publisher%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22publishingdate%22%20icon%3Acalendar%0AMaps%20to%20Honzo%20%60published%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Preserved%20features%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Chapter%20structure%22%20icon%3Abook%0A%60CHAP%60%20chunks%20via%20chapter%20break%20detection.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Inline%20images%22%20icon%3Aimage%0A%60IMG_%60%20chunks%20from%20PDB%20image%20records.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Metadata%22%20icon%3Ainfo%0ATitle%2C%20author%2C%20language%20in%20%60META%60%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Text%20formatting%22%20icon%3Abold%0ABold%20and%20italic%20preserved%20as%20HTML.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20warning%20%22Limitations%22%0A%0A-%20Amazon%20DRM%20is%20not%20supported.%20Only%20DRM-free%20MOBI%20files%20can%20be%20converted.%0A-%20Kindle%20Format%208%20(KF8)%20markup%20is%20partially%20preserved%3B%20some%20CSS-based%20formatting%20may%20be%20lost.%0A-%20Margin%20notes%20and%20highlights%20specific%20to%20the%20Kindle%20ecosystem%20are%20not%20carried%20over.%0A-%20Embedded%20fonts%20from%20AZW3%2FKF8%20are%20not%20extracted.%0A-%20Page%20break%20data%20is%20inferred%20from%20MOBI%20chapter%20positions.%0A%0A%3A%3A%3A%0A%0A%23%23%20Example%0A%0A%60%60%60bash%0Ahonzo%20convert%20book.mobi%20book.hzo%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22EPUB%20Conversion%22%20.%2Fepub.md%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22PDF%20Conversion%22%20.%2Fpdf.md%20icon%3Afile-text%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22MOBI%20Conversion%22%0Adescription%3A%20%22Converting%20MOBI%20(Amazon%20Kindle)%20files%20to%20Honzo%20format%22%0A---%0A%0AMOBI%20conversion%20provides%20partial%20import%20of%20Amazon%20Kindle%20format%20books.%20Text%2C%20metadata%2C%20and%20basic%20formatting%20carry%20over%2C%20but%20MOBI&#039;s%20proprietary%20features%20like%20Amazon&#039;s%20DRM%20and%20Kindle-specific%20markup%20are%20stripped.%0A%0A%23%23%20How%20it%20works%0A%0A%3A%3A%3A%20steps%0A%0A1.%20**Parse%20MOBI%20header.**%20The%20Palm%20Database%20(PDB)%20header%20and%20MOBI%20header%20identify%20the%20encoding%2C%20compression%2C%20and%20metadata.%0A%0A2.%20**Extract%20text.**%20The%20MOBI%20text%20is%20stored%20in%20PalmDoc%20format%20with%20LZ77%20compression.%20The%20converter%20decompresses%20and%20re-encodes%20it%20as%20UTF-8%20HTML.%0A%0A3.%20**Parse%20metadata.**%20Title%2C%20author%2C%20and%20language%20come%20from%20the%20MOBI%20header%20and%20EXTH%20records.%0A%0A4.%20**Split%20chapters.**%20MOBI%20chapter%20positions%20(from%20%60srcs%60%20%2F%20%60srcc%60%20records)%20divide%20the%20text%20into%20Honzo%20CHAP%20entries.%0A%0A5.%20**Embed%20images.**%20MOBI%20images%20are%20extracted%20from%20the%20PDB%20records%20and%20embedded%20as%20%60IMG_%60%20chunks.%0A%0A6.%20**Build.**%20All%20chunks%20are%20assembled%20into%20the%20final%20Honzo%20file%20with%20per-chapter%20LZ4%20compression.%0A%0A%3A%3A%3A%0A%0A%23%23%20Metadata%20mapping%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22title%22%20icon%3Abook%0AMaps%20to%20Honzo%20%60title%60%20in%20%60META%60%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22author%22%20icon%3Auser%0AMaps%20to%20Honzo%20%60creator%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22language%22%20icon%3Aglobe%0AMaps%20to%20Honzo%20%60language%60%20(BCP%2047).%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22isbn%22%20icon%3Ahash%0AMaps%20to%20%60identifiers.isbn%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22publisher%22%20icon%3Abuilding%0AMaps%20to%20Honzo%20%60publisher%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22publishingdate%22%20icon%3Acalendar%0AMaps%20to%20Honzo%20%60published%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Preserved%20features%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Chapter%20structure%22%20icon%3Abook%0A%60CHAP%60%20chunks%20via%20chapter%20break%20detection.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Inline%20images%22%20icon%3Aimage%0A%60IMG_%60%20chunks%20from%20PDB%20image%20records.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Metadata%22%20icon%3Ainfo%0ATitle%2C%20author%2C%20language%20in%20%60META%60%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Text%20formatting%22%20icon%3Abold%0ABold%20and%20italic%20preserved%20as%20HTML.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20warning%20%22Limitations%22%0A%0A-%20Amazon%20DRM%20is%20not%20supported.%20Only%20DRM-free%20MOBI%20files%20can%20be%20converted.%0A-%20Kindle%20Format%208%20(KF8)%20markup%20is%20partially%20preserved%3B%20some%20CSS-based%20formatting%20may%20be%20lost.%0A-%20Margin%20notes%20and%20highlights%20specific%20to%20the%20Kindle%20ecosystem%20are%20not%20carried%20over.%0A-%20Embedded%20fonts%20from%20AZW3%2FKF8%20are%20not%20extracted.%0A-%20Page%20break%20data%20is%20inferred%20from%20MOBI%20chapter%20positions.%0A%0A%3A%3A%3A%0A%0A%23%23%20Example%0A%0A%60%60%60bash%0Ahonzo-cli%20convert%20book.mobi%20book.hzo%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22EPUB%20Conversion%22%20.%2Fepub.md%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22PDF%20Conversion%22%20.%2Fpdf.md%20icon%3Afile-text%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1951,7 +1951,7 @@ Text formatting</div><div class="card-content">
 </ul>
 </div></div>
 <h2 id="example" class="docmd-heading"><a href="#example" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Example</h2>
-<pre class="hljs"><code>honzo convert book.<span class="hljs-attr">mobi</span> book.<span class="hljs-attr">hzo</span>
+<pre class="hljs"><code>honzo<span class="hljs-punctuation">-</span>cli convert book.<span class="hljs-attr">mobi</span> book.<span class="hljs-attr">hzo</span>
 </code></pre>
 <h2 id="next-steps" class="docmd-heading"><a href="#next-steps" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Next Steps</h2>
 <div class="docmd-container grids">
@@ -2100,13 +2100,13 @@ PDF Conversion</a></div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1780809817000">
+                <span class="git-last-updated" data-timestamp="1780809944000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1780809817000"></span>
+                  <span class="git-time" data-timestamp="1780809944000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -2119,10 +2119,10 @@ PDF Conversion</a></div>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="More fixes">More fixes</div>
+                            <div class="git-commit-message" title="And I commited too fast">And I commited too fast</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1780809817000"></span>
+                              <span class="git-commit-date" data-timestamp="1780809944000"></span>
                             </div>
                           </div>
                         </li>
@@ -2215,14 +2215,14 @@ PDF Conversion</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mq3cekj9"></script>
+      <script src="../../assets/js/docmd-main.js?v=mq3cgwc2"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mq3cekj9"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cekj9" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mq3cgwc2"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cgwc2" ></script>
 <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=mq3cekj9" ></script>
-<script src="../../assets/js/init-mermaid.js?v=mq3cekj9" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=mq3cekj9" type="module"></script>
+<script src="../../assets/js/docmd-search.js?v=mq3cgwc2" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mq3cgwc2" type="module"></script>
+<script src="../../assets/js/docmd-git.js?v=mq3cgwc2" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"

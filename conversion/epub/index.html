@@ -87,10 +87,10 @@
       EPUB Conversion : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cekj9">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cgwc2">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cekj9" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cekj9" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cgwc2" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cgwc2" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Converting EPUB 2/3 files to Honzo format">
@@ -105,12 +105,12 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cekj9" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cekj9" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cekj9" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cgwc2" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cgwc2" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cgwc2" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cekj9">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cgwc2">
     
     <script>/**
  * --------------------------------------------------------------------
@@ -1608,7 +1608,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22EPUB%20Conversion%22%0Adescription%3A%20%22Converting%20EPUB%202%2F3%20files%20to%20Honzo%20format%22%0A---%0A%0AEPUB%20conversion%20is%20the%20most%20complete%20conversion%20path%20in%20Honzo.%20It%20handles%20EPUB%202%20and%203%2C%20including%20the%20navigation%20document%2C%20metadata%2C%20embedded%20resources%2C%20and%20page%20breaks.%0A%0A%23%23%20How%20it%20works%0A%0A%3A%3A%3A%20steps%0A%0A1.%20**Unpack.**%20EPUB%20is%20a%20ZIP%20container.%20The%20converter%20extracts%20the%20OPF%20manifest%20and%20NCX%20or%20nav%20document.%0A%0A2.%20**Parse%20metadata.**%20Title%2C%20creator%2C%20language%2C%20identifiers%2C%20subjects%2C%20and%20series%20info%20come%20from%20the%20OPF.%0A%0A3.%20**Build%20spine.**%20The%20EPUB%20spine%2C%20which%20defines%20reading%20order%2C%20becomes%20the%20Honzo%20TOC%20and%20CHAP%20entries.%0A%0A4.%20**Embed%20resources.**%20Images%2C%20CSS%2C%20and%20fonts%20referenced%20by%20the%20XHTML%20are%20embedded%20as%20IMG_%2C%20CSS_%2C%20and%20FONT%20chunks.%0A%0A5.%20**Detect%20page%20breaks.**%20EPUB%20pagebreak%20markers%20and%20character%20count%20heuristics%20produce%20page%20map%20data.%0A%0A6.%20**Build.**%20All%20chunks%20are%20assembled%20into%20the%20final%20Honzo%20file%20with%20per-chapter%20LZ4%20compression.%0A%0A%3A%3A%3A%0A%0A%23%23%20Metadata%20mapping%0A%0A%7C%20EPUB%20field%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Honzo%20META%20field%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-----------------------------------%7C--------------------------------------------%7C%0A%7C%20%60dc%3Atitle%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60title%60%20(multi-language%20if%20multiple)%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Acreator%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60creator%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Alanguage%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60language%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Aidentifier%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60identifiers.isbn%60%20(or%20%60identifiers.uuid%60)%20%7C%0A%7C%20%60dc%3Asubject%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60subject%5B%5D%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Apublisher%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60publisher%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Adate%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60published%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Arights%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60rights%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60meta%20property%3D%22series%22%60%20%20%20%20%20%20%20%20%20%20%7C%20%60series%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60meta%20property%3D%22series_position%22%60%20%7C%20%60series_position%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60meta%20property%3D%22edition%22%60%20%20%20%20%20%20%20%20%20%7C%20%60edition%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60page-progression-direction%60%20%20%20%20%20%20%7C%20%60page_progression_direction%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20Preserved%20features%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Inline%20images%22%20icon%3Aimage%0A%60IMG_%60%20chunks%20from%20embedded%20XHTML%20images.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Stylesheets%22%20icon%3Afile-text%0A%60CSS_%60%20chunks%20preserve%20EPUB%20styling.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Embedded%20fonts%22%20icon%3Atype%0A%60FONT%60%20chunks%20carry%20over%20WOFF2%2FTTF%2FOTF.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Cover%22%20icon%3Aimage%0A%60COVR%60%20%2B%20%60COVT%60%20chunks%20for%20full%20cover%20and%20thumbnail.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Page%20breaks%22%20icon%3Abook-open%0ADetected%20and%20preserved%20in%20%60EXTRA%60%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22MathML%22%20icon%3Asigma%0AConverted%20to%20%60MATH%60%20chunks.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Multi-language%20metadata%22%20icon%3Aglobe%0APreserved%20per%20BCP%2047%20language%20tags.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Table%20of%20contents%22%20icon%3Alist%0AHonzo%20TOC%20%2B%20META%20toc%20array.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20warning%20%22Limitations%22%0A%0A-%20EPUB%20scripting%20in%20JavaScript%20is%20not%20carried%20over.%0A-%20EPUB%20media%20overlays%20using%20SMIL%20are%20not%20converted%3B%20use%20%60org.nisoku.sync%60%20instead.%0A-%20Fixed%20layout%20EPUBs%20are%20converted%20as%20reflowable%2C%20though%20the%20layout%20mode%20can%20be%20overridden.%0A%0A%3A%3A%3A%0A%0A%23%23%20Example%0A%0A%60%60%60bash%0A%23%20Basic%20conversion%0Ahonzo%20convert%20book.epub%20book.hzo%0A%0A%23%20Override%20title%20and%20author%0Ahonzo%20convert%20book.epub%20book.hzo%20%5C%0A%20%20--title%20%22My%20Edition%22%20%5C%0A%20%20--author%20%22My%20Name%22%20%5C%0A%20%20--language%20%22en%22%0A%0A%23%20Inspect%20the%20result%0Ahonzo%20info%20book.hzo%0Ahonzo%20info%20--json%20book.hzo%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22MOBI%20Conversion%22%20.%2Fmobi.md%20icon%3Abook-open%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22PDF%20Conversion%22%20.%2Fpdf.md%20icon%3Afile-text%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22EPUB%20Conversion%22%0Adescription%3A%20%22Converting%20EPUB%202%2F3%20files%20to%20Honzo%20format%22%0A---%0A%0AEPUB%20conversion%20is%20the%20most%20complete%20conversion%20path%20in%20Honzo.%20It%20handles%20EPUB%202%20and%203%2C%20including%20the%20navigation%20document%2C%20metadata%2C%20embedded%20resources%2C%20and%20page%20breaks.%0A%0A%23%23%20How%20it%20works%0A%0A%3A%3A%3A%20steps%0A%0A1.%20**Unpack.**%20EPUB%20is%20a%20ZIP%20container.%20The%20converter%20extracts%20the%20OPF%20manifest%20and%20NCX%20or%20nav%20document.%0A%0A2.%20**Parse%20metadata.**%20Title%2C%20creator%2C%20language%2C%20identifiers%2C%20subjects%2C%20and%20series%20info%20come%20from%20the%20OPF.%0A%0A3.%20**Build%20spine.**%20The%20EPUB%20spine%2C%20which%20defines%20reading%20order%2C%20becomes%20the%20Honzo%20TOC%20and%20CHAP%20entries.%0A%0A4.%20**Embed%20resources.**%20Images%2C%20CSS%2C%20and%20fonts%20referenced%20by%20the%20XHTML%20are%20embedded%20as%20IMG_%2C%20CSS_%2C%20and%20FONT%20chunks.%0A%0A5.%20**Detect%20page%20breaks.**%20EPUB%20pagebreak%20markers%20and%20character%20count%20heuristics%20produce%20page%20map%20data.%0A%0A6.%20**Build.**%20All%20chunks%20are%20assembled%20into%20the%20final%20Honzo%20file%20with%20per-chapter%20LZ4%20compression.%0A%0A%3A%3A%3A%0A%0A%23%23%20Metadata%20mapping%0A%0A%7C%20EPUB%20field%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Honzo%20META%20field%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-----------------------------------%7C--------------------------------------------%7C%0A%7C%20%60dc%3Atitle%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60title%60%20(multi-language%20if%20multiple)%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Acreator%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60creator%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Alanguage%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60language%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Aidentifier%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60identifiers.isbn%60%20(or%20%60identifiers.uuid%60)%20%7C%0A%7C%20%60dc%3Asubject%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60subject%5B%5D%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Apublisher%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60publisher%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Adate%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60published%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60dc%3Arights%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60rights%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60meta%20property%3D%22series%22%60%20%20%20%20%20%20%20%20%20%20%7C%20%60series%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60meta%20property%3D%22series_position%22%60%20%7C%20%60series_position%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60meta%20property%3D%22edition%22%60%20%20%20%20%20%20%20%20%20%7C%20%60edition%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60page-progression-direction%60%20%20%20%20%20%20%7C%20%60page_progression_direction%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20Preserved%20features%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Inline%20images%22%20icon%3Aimage%0A%60IMG_%60%20chunks%20from%20embedded%20XHTML%20images.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Stylesheets%22%20icon%3Afile-text%0A%60CSS_%60%20chunks%20preserve%20EPUB%20styling.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Embedded%20fonts%22%20icon%3Atype%0A%60FONT%60%20chunks%20carry%20over%20WOFF2%2FTTF%2FOTF.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Cover%22%20icon%3Aimage%0A%60COVR%60%20%2B%20%60COVT%60%20chunks%20for%20full%20cover%20and%20thumbnail.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Page%20breaks%22%20icon%3Abook-open%0ADetected%20and%20preserved%20in%20%60EXTRA%60%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22MathML%22%20icon%3Asigma%0AConverted%20to%20%60MATH%60%20chunks.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Multi-language%20metadata%22%20icon%3Aglobe%0APreserved%20per%20BCP%2047%20language%20tags.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Table%20of%20contents%22%20icon%3Alist%0AHonzo%20TOC%20%2B%20META%20toc%20array.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20warning%20%22Limitations%22%0A%0A-%20EPUB%20scripting%20in%20JavaScript%20is%20not%20carried%20over.%0A-%20EPUB%20media%20overlays%20using%20SMIL%20are%20not%20converted%3B%20use%20%60org.nisoku.sync%60%20instead.%0A-%20Fixed%20layout%20EPUBs%20are%20converted%20as%20reflowable%2C%20though%20the%20layout%20mode%20can%20be%20overridden.%0A%0A%3A%3A%3A%0A%0A%23%23%20Example%0A%0A%60%60%60bash%0A%23%20Basic%20conversion%0Ahonzo-cli%20convert%20book.epub%20book.hzo%0A%0A%23%20Override%20title%20and%20author%0Ahonzo-cli%20convert%20book.epub%20book.hzo%20%5C%0A%20%20--title%20%22My%20Edition%22%20%5C%0A%20%20--author%20%22My%20Name%22%20%5C%0A%20%20--language%20%22en%22%0A%0A%23%20Inspect%20the%20result%0Ahonzo-cli%20info%20book.hzo%0Ahonzo-cli%20info%20--json%20book.hzo%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22MOBI%20Conversion%22%20.%2Fmobi.md%20icon%3Abook-open%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22PDF%20Conversion%22%20.%2Fpdf.md%20icon%3Afile-text%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1961,17 +1961,17 @@ Table of contents</div><div class="card-content">
 </div></div>
 <h2 id="example" class="docmd-heading"><a href="#example" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Example</h2>
 <pre class="hljs"><code><span class="hljs-comment"># Basic conversion</span>
-honzo convert book.<span class="hljs-attr">epub</span> book.<span class="hljs-attr">hzo</span>
+honzo<span class="hljs-punctuation">-</span>cli convert book.<span class="hljs-attr">epub</span> book.<span class="hljs-attr">hzo</span>
 
 <span class="hljs-comment"># Override title and author</span>
-honzo convert book.<span class="hljs-attr">epub</span> book.<span class="hljs-attr">hzo</span> \
+honzo<span class="hljs-punctuation">-</span>cli convert book.<span class="hljs-attr">epub</span> book.<span class="hljs-attr">hzo</span> \
   <span class="hljs-punctuation">--</span>title <span class="hljs-string">&quot;My Edition&quot;</span> \
   <span class="hljs-punctuation">--</span>author <span class="hljs-string">&quot;My Name&quot;</span> \
   <span class="hljs-punctuation">--</span>language <span class="hljs-string">&quot;en&quot;</span>
 
 <span class="hljs-comment"># Inspect the result</span>
-honzo info book.<span class="hljs-attr">hzo</span>
-honzo info <span class="hljs-punctuation">--</span>json book.<span class="hljs-attr">hzo</span>
+honzo<span class="hljs-punctuation">-</span>cli info book.<span class="hljs-attr">hzo</span>
+honzo<span class="hljs-punctuation">-</span>cli info <span class="hljs-punctuation">--</span>json book.<span class="hljs-attr">hzo</span>
 </code></pre>
 <h2 id="next-steps" class="docmd-heading"><a href="#next-steps" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Next Steps</h2>
 <div class="docmd-container grids">
@@ -2121,13 +2121,13 @@ PDF Conversion</a></div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1780809817000">
+                <span class="git-last-updated" data-timestamp="1780809944000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1780809817000"></span>
+                  <span class="git-time" data-timestamp="1780809944000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -2140,10 +2140,10 @@ PDF Conversion</a></div>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="More fixes">More fixes</div>
+                            <div class="git-commit-message" title="And I commited too fast">And I commited too fast</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1780809817000"></span>
+                              <span class="git-commit-date" data-timestamp="1780809944000"></span>
                             </div>
                           </div>
                         </li>
@@ -2236,14 +2236,14 @@ PDF Conversion</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mq3cekj9"></script>
+      <script src="../../assets/js/docmd-main.js?v=mq3cgwc2"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mq3cekj9"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cekj9" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mq3cgwc2"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cgwc2" ></script>
 <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=mq3cekj9" ></script>
-<script src="../../assets/js/init-mermaid.js?v=mq3cekj9" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=mq3cekj9" type="module"></script>
+<script src="../../assets/js/docmd-search.js?v=mq3cgwc2" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mq3cgwc2" type="module"></script>
+<script src="../../assets/js/docmd-git.js?v=mq3cgwc2" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"

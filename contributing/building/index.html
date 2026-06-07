@@ -87,10 +87,10 @@
       Building : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cekj9">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cgwc2">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cekj9" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cekj9" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cgwc2" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cgwc2" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Building Honzo from source for all targets">
@@ -105,12 +105,12 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cekj9" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cekj9" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cekj9" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cgwc2" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cgwc2" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cgwc2" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cekj9">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cgwc2">
     
     <script>/**
  * --------------------------------------------------------------------
@@ -1608,7 +1608,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Building%22%0Adescription%3A%20%22Building%20Honzo%20from%20source%20for%20all%20targets%22%0A---%0A%0A%3A%3A%3A%20callout%20tip%20%22Prerequisites%22%0A%0A-%20Rust%201.75%2B%20(install%20via%20%5Brustup%5D(https%3A%2F%2Frustup.rs))%0A-%20Node.js%2018%2B%20(for%20WASM%2Fdemo%20build)%0A-%20%5Bjust%5D(https%3A%2F%2Fjust.systems%2F)%20(command%20runner)%0A-%20wasm-pack%20(for%20WASM%20target)%0A%0A%60%60%60bash%0Ajust%20setup%0A%60%60%60%0A%0AThis%20installs%20all%20toolchain%20dependencies%3A%20Rust%20targets%2C%20wasm-pack%2C%20npm%20packages%2C%20and%20diplomat-tool.%0A%0A%3A%3A%3A%0A%0A%23%23%20The%20just%20system%0A%0AHonzo%20uses%20%60just%60%20as%20its%20primary%20command%20runner.%20Each%20surface%20(Rust%2C%20TypeScript%2C%20Demo%2C%20Docs)%20has%20its%20own%20script%20under%20%60Build%2Fscripts%2F%60%2C%20invoked%20through%20%60just%60.%0A%0A%60%60%60bash%0Ajust%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20list%20all%20available%20commands%0Ajust%20setup%20%20%20%20%20%20%20%20%23%20install%20all%20dependencies%0Ajust%20check%20%20%20%20%20%20%20%20%23%20run%20all%20surface%20checks%0Ajust%20test%20%20%20%20%20%20%20%20%20%23%20run%20all%20tests%0Ajust%20format%20%20%20%20%20%20%20%23%20check%20Rust%20formatting%0A%60%60%60%0A%0ASurface%20commands%3A%0A%0A%60%60%60bash%0Ajust%20rust%20check%20%20%20%20%20%20%20%20%23%20fmt%20%2B%20lint%20%2B%20test%20%2B%20wasm%20%2B%20no_std%0Ajust%20rust%20test%20%20%20%20%20%20%20%20%20%23%20cargo%20test%20--workspace%0Ajust%20rust%20lint%20%20%20%20%20%20%20%20%20%23%20cargo%20clippy%20--workspace%0Ajust%20rust%20fmt%20%20%20%20%20%20%20%20%20%20%23%20cargo%20fmt%20--all%0A%0Ajust%20typescript%20check%20%20%23%20lint%20%2B%20typecheck%20%2B%20test%20%2B%20build%0Ajust%20typescript%20build%20%20%23%20npm%20run%20build%20(TypeScript%20adapter)%0Ajust%20typescript%20wasm%20%20%20%23%20wasm-pack%20build%0A%0Ajust%20demo%20check%20%20%20%20%20%20%20%20%23%20wasm%20%2B%20test%20%2B%20build%0Ajust%20demo%20build%20%20%20%20%20%20%20%20%23%20wasm%20%2B%20vite%20build%0A%0Ajust%20docs%20check%20%20%20%20%20%20%20%20%23%20test%20%2B%20build%20(docmd)%0Ajust%20docs%20build%20%20%20%20%20%20%20%20%23%20docmd%20build%0A%60%60%60%0A%0A%23%23%20Build%20individual%20crates%0A%0A%60%60%60bash%0Acargo%20build%20-p%20honzo-core%20%20%20%20%20%20%20%23%20no_std%20parser%20(no%20alloc)%0Acargo%20build%20-p%20honzo-chunks%20%20%20%20%20%23%20Chunk%20semantics%0Acargo%20build%20-p%20honzo-io%20%20%20%20%20%20%20%20%20%23%20Builder%2C%20reader%2C%20stream%0Acargo%20build%20-p%20honzo-cli%20%20%20%20%20%20%20%20%23%20CLI%20binary%0Acargo%20build%20-p%20honzo-convert%20%20%20%20%23%20Format%20conversion%0Acargo%20build%20-p%20honzo-c%20%20%20%20%20%20%20%20%20%20%23%20C%20FFI%20(requires%20diplomat)%0A%60%60%60%0A%0A%23%23%20WASM%20build%0A%0A%60%60%60bash%0Ajust%20typescript%20wasm%0A%60%60%60%0A%0AOutput%20goes%20to%20%60Build%2Fadapters%2Ftypescript%2Fwasm%2F%60%20and%20is%20automatically%20synced%20to%20%60Demo%2Fsrc%2Fwasm%2F%60.%0A%0ATo%20run%20wasm-pack%20directly%3A%0A%0A%60%60%60bash%0Acd%20Build%2Fcrates%2Fhonzo-wasm%0Awasm-pack%20build%20--target%20web%20--out-dir%20..%2F..%2Fadapters%2Ftypescript%2Fwasm%0A%60%60%60%0A%0A%23%23%20TypeScript%20adapter%0A%0A%60%60%60bash%0Ajust%20typescript%20build%0A%60%60%60%0A%0AOr%20directly%3A%0A%0A%60%60%60bash%0Acd%20Build%2Fadapters%2Ftypescript%0Anpm%20install%0Anpm%20run%20build%0A%60%60%60%0A%0A%23%23%20Demo%0A%0A%60%60%60bash%0Ajust%20demo%20build%20%20%20%20%20%20%23%20production%20build%0A%60%60%60%0A%0AFor%20development%3A%0A%0A%60%60%60bash%0Acd%20Demo%0Anpm%20install%0Anpm%20run%20dev%0A%60%60%60%0A%0A%23%23%20Documentation%0A%0A%60%60%60bash%0Ajust%20docs%20build%0A%23%20Output%20in%20Docs%2Fsite%2F%0A%60%60%60%0A%0AFor%20development%3A%0A%0A%60%60%60bash%0Acd%20Docs%0Anpm%20install%0Anpm%20run%20dev%0A%60%60%60%0A%0A%23%23%20Release%20build%0A%0A%60%60%60bash%0Acargo%20build%20--workspace%20--release%0A.%2Ftarget%2Frelease%2Fhonzo%20--version%0A%60%60%60%0A%0A%23%23%20Test%0A%0A%60%60%60bash%0Ajust%20test%0A%60%60%60%0A%0AOr%20directly%3A%0A%0A%60%60%60bash%0Acargo%20test%20--workspace%0A%60%60%60%0A%0AIntegration%20tests%20are%20in%20%60Tests%2Ftests%2F%60.%20Test%20fixtures%20are%20in%20%60Tests%2Ffixtures%2F%60.%0A%0A%23%23%20Using%20the%20build%20scripts%20directly%0A%0AEach%20surface%20script%20can%20also%20be%20invoked%20directly%20without%20%60just%60%3A%0A%0A%60%60%60bash%0Apython3%20Build%2Fscripts%2Frust.py%20check%0Apython3%20Build%2Fscripts%2Ftypescript.py%20setup%0Apython3%20Build%2Fscripts%2Fdemo.py%20build%0Apython3%20Build%2Fscripts%2Fdocs.py%20build%0A%60%60%60%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Building%22%0Adescription%3A%20%22Building%20Honzo%20from%20source%20for%20all%20targets%22%0A---%0A%0A%3A%3A%3A%20callout%20tip%20%22Prerequisites%22%0A%0A-%20Rust%201.75%2B%20(install%20via%20%5Brustup%5D(https%3A%2F%2Frustup.rs))%0A-%20Node.js%2018%2B%20(for%20WASM%2Fdemo%20build)%0A-%20%5Bjust%5D(https%3A%2F%2Fjust.systems%2F)%20(command%20runner)%0A-%20wasm-pack%20(for%20WASM%20target)%0A%0A%60%60%60bash%0Ajust%20setup%0A%60%60%60%0A%0AThis%20installs%20all%20toolchain%20dependencies%3A%20Rust%20targets%2C%20wasm-pack%2C%20npm%20packages%2C%20and%20diplomat-tool.%0A%0A%3A%3A%3A%0A%0A%23%23%20The%20just%20system%0A%0AHonzo%20uses%20%60just%60%20as%20its%20primary%20command%20runner.%20Each%20surface%20(Rust%2C%20TypeScript%2C%20Demo%2C%20Docs)%20has%20its%20own%20script%20under%20%60Build%2Fscripts%2F%60%2C%20invoked%20through%20%60just%60.%0A%0A%60%60%60bash%0Ajust%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20list%20all%20available%20commands%0Ajust%20setup%20%20%20%20%20%20%20%20%23%20install%20all%20dependencies%0Ajust%20check%20%20%20%20%20%20%20%20%23%20run%20all%20surface%20checks%0Ajust%20test%20%20%20%20%20%20%20%20%20%23%20run%20all%20tests%0Ajust%20format%20%20%20%20%20%20%20%23%20check%20Rust%20formatting%0A%60%60%60%0A%0ASurface%20commands%3A%0A%0A%60%60%60bash%0Ajust%20rust%20check%20%20%20%20%20%20%20%20%23%20fmt%20%2B%20lint%20%2B%20test%20%2B%20wasm%20%2B%20no_std%0Ajust%20rust%20test%20%20%20%20%20%20%20%20%20%23%20cargo%20test%20--workspace%0Ajust%20rust%20lint%20%20%20%20%20%20%20%20%20%23%20cargo%20clippy%20--workspace%0Ajust%20rust%20fmt%20%20%20%20%20%20%20%20%20%20%23%20cargo%20fmt%20--all%0A%0Ajust%20typescript%20check%20%20%23%20lint%20%2B%20typecheck%20%2B%20test%20%2B%20build%0Ajust%20typescript%20build%20%20%23%20npm%20run%20build%20(TypeScript%20adapter)%0Ajust%20typescript%20wasm%20%20%20%23%20wasm-pack%20build%0A%0Ajust%20demo%20check%20%20%20%20%20%20%20%20%23%20wasm%20%2B%20test%20%2B%20build%0Ajust%20demo%20build%20%20%20%20%20%20%20%20%23%20wasm%20%2B%20vite%20build%0A%0Ajust%20docs%20check%20%20%20%20%20%20%20%20%23%20test%20%2B%20build%20(docmd)%0Ajust%20docs%20build%20%20%20%20%20%20%20%20%23%20docmd%20build%0A%60%60%60%0A%0A%23%23%20Build%20individual%20crates%0A%0A%60%60%60bash%0Acargo%20build%20-p%20honzo-core%20%20%20%20%20%20%20%23%20no_std%20parser%20(no%20alloc)%0Acargo%20build%20-p%20honzo-chunks%20%20%20%20%20%23%20Chunk%20semantics%0Acargo%20build%20-p%20honzo-io%20%20%20%20%20%20%20%20%20%23%20Builder%2C%20reader%2C%20stream%0Acargo%20build%20-p%20honzo-cli%20%20%20%20%20%20%20%20%23%20CLI%20binary%0Acargo%20build%20-p%20honzo-convert%20%20%20%20%23%20Format%20conversion%0Acargo%20build%20-p%20honzo-c%20%20%20%20%20%20%20%20%20%20%23%20C%20FFI%20(requires%20diplomat)%0A%60%60%60%0A%0A%23%23%20WASM%20build%0A%0A%60%60%60bash%0Ajust%20typescript%20wasm%0A%60%60%60%0A%0AOutput%20goes%20to%20%60Build%2Fadapters%2Ftypescript%2Fwasm%2F%60%20and%20is%20automatically%20synced%20to%20%60Demo%2Fsrc%2Fwasm%2F%60.%0A%0ATo%20run%20wasm-pack%20directly%3A%0A%0A%60%60%60bash%0Acd%20Build%2Fcrates%2Fhonzo-wasm%0Awasm-pack%20build%20--target%20web%20--out-dir%20..%2F..%2Fadapters%2Ftypescript%2Fwasm%0A%60%60%60%0A%0A%23%23%20TypeScript%20adapter%0A%0A%60%60%60bash%0Ajust%20typescript%20build%0A%60%60%60%0A%0AOr%20directly%3A%0A%0A%60%60%60bash%0Acd%20Build%2Fadapters%2Ftypescript%0Anpm%20install%0Anpm%20run%20build%0A%60%60%60%0A%0A%23%23%20Demo%0A%0A%60%60%60bash%0Ajust%20demo%20build%20%20%20%20%20%20%23%20production%20build%0A%60%60%60%0A%0AFor%20development%3A%0A%0A%60%60%60bash%0Acd%20Demo%0Anpm%20install%0Anpm%20run%20dev%0A%60%60%60%0A%0A%23%23%20Documentation%0A%0A%60%60%60bash%0Ajust%20docs%20build%0A%23%20Output%20in%20Docs%2Fsite%2F%0A%60%60%60%0A%0AFor%20development%3A%0A%0A%60%60%60bash%0Acd%20Docs%0Anpm%20install%0Anpm%20run%20dev%0A%60%60%60%0A%0A%23%23%20Release%20build%0A%0A%60%60%60bash%0Acargo%20build%20--workspace%20--release%0A.%2Ftarget%2Frelease%2Fhonzo-cli%20--version%0A%60%60%60%0A%0A%23%23%20Test%0A%0A%60%60%60bash%0Ajust%20test%0A%60%60%60%0A%0AOr%20directly%3A%0A%0A%60%60%60bash%0Acargo%20test%20--workspace%0A%60%60%60%0A%0AIntegration%20tests%20are%20in%20%60Tests%2Ftests%2F%60.%20Test%20fixtures%20are%20in%20%60Tests%2Ffixtures%2F%60.%0A%0A%23%23%20Using%20the%20build%20scripts%20directly%0A%0AEach%20surface%20script%20can%20also%20be%20invoked%20directly%20without%20%60just%60%3A%0A%0A%60%60%60bash%0Apython3%20Build%2Fscripts%2Frust.py%20check%0Apython3%20Build%2Fscripts%2Ftypescript.py%20setup%0Apython3%20Build%2Fscripts%2Fdemo.py%20build%0Apython3%20Build%2Fscripts%2Fdocs.py%20build%0A%60%60%60%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1775,7 +1775,7 @@ wasm<span class="hljs-punctuation">-</span>pack build <span class="hljs-punctuat
 </code></pre>
 <h2 id="release-build" class="docmd-heading"><a href="#release-build" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Release build</h2>
 <pre class="hljs"><code><span class="hljs-keyword">cargo</span> build <span class="hljs-punctuation">--</span>workspace <span class="hljs-punctuation">--</span>release
-.<span class="hljs-punctuation">/</span>target<span class="hljs-punctuation">/</span>release<span class="hljs-punctuation">/</span>honzo <span class="hljs-punctuation">--</span>version
+.<span class="hljs-punctuation">/</span>target<span class="hljs-punctuation">/</span>release<span class="hljs-punctuation">/</span>honzo<span class="hljs-punctuation">-</span>cli <span class="hljs-punctuation">--</span>version
 </code></pre>
 <h2 id="test" class="docmd-heading"><a href="#test" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Test</h2>
 <pre class="hljs"><code>just test
@@ -1913,13 +1913,13 @@ python3 Build<span class="hljs-punctuation">/</span>scripts<span class="hljs-pun
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1780809817000">
+                <span class="git-last-updated" data-timestamp="1780809944000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1780809817000"></span>
+                  <span class="git-time" data-timestamp="1780809944000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1932,10 +1932,10 @@ python3 Build<span class="hljs-punctuation">/</span>scripts<span class="hljs-pun
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="More fixes">More fixes</div>
+                            <div class="git-commit-message" title="And I commited too fast">And I commited too fast</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1780809817000"></span>
+                              <span class="git-commit-date" data-timestamp="1780809944000"></span>
                             </div>
                           </div>
                         </li>
@@ -2028,14 +2028,14 @@ python3 Build<span class="hljs-punctuation">/</span>scripts<span class="hljs-pun
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mq3cekj9"></script>
+      <script src="../../assets/js/docmd-main.js?v=mq3cgwc2"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mq3cekj9"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cekj9" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mq3cgwc2"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cgwc2" ></script>
 <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=mq3cekj9" ></script>
-<script src="../../assets/js/init-mermaid.js?v=mq3cekj9" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=mq3cekj9" type="module"></script>
+<script src="../../assets/js/docmd-search.js?v=mq3cgwc2" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mq3cgwc2" type="module"></script>
+<script src="../../assets/js/docmd-git.js?v=mq3cgwc2" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"

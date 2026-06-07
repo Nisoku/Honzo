@@ -490,7 +490,7 @@ The `honzo` CLI provides commands for creating, inspecting, converting, and mana
 ## Global usage
 
 ```bash
-honzo <command> [options]
+honzo-cli <command> [options]
 ```
 
 | Flag        | Description  |
@@ -500,11 +500,11 @@ honzo <command> [options]
 
 ## Commands
 
-::: card "**honzo make**" icon:wrench
+::: card "**honzo-cli make**" icon:wrench
 Create a Honzo file from markdown source files.
 
 ```bash
-honzo make <output.hzo> \
+honzo-cli make <output.hzo> \
   --title "Book Title" \
   --author "Author Name" \
   --language "en" \
@@ -524,11 +524,11 @@ honzo make <output.hzo> \
 
 :::
 
-::: card "**honzo info**" icon:info
+::: card "**honzo-cli info**" icon:info
 Display metadata and structure of a Honzo file.
 
 ```bash
-honzo info <file.hzo>
+honzo-cli info <file.hzo>
 ```
 
 Example output:
@@ -560,21 +560,21 @@ Chunks:
 
 :::
 
-::: card "**honzo inspect**" icon:search
+::: card "**honzo-cli inspect**" icon:search
 Low-level dump of the file structure.
 
 ```bash
-honzo inspect <file.hzo>
+honzo-cli inspect <file.hzo>
 ```
 
 Shows HEAD fields, TOC entries (hex + decoded), and section offsets.
 :::
 
-::: card "**honzo convert**" icon:git-merge
+::: card "**honzo-cli convert**" icon:git-merge
 Convert an existing ebook format to Honzo.
 
 ```bash
-honzo convert <input> <output.hzo>
+honzo-cli convert <input> <output.hzo>
 ```
 
 Supported input formats:
@@ -593,11 +593,11 @@ Supported input formats:
 
 :::
 
-::: card "**honzo validate**" icon:check-circle
+::: card "**honzo-cli validate**" icon:check-circle
 Validate a Honzo file's structure and integrity.
 
 ```bash
-honzo validate <file.hzo>
+honzo-cli validate <file.hzo>
 ```
 
 Checks:
@@ -907,7 +907,7 @@ npm run dev
 
 ```bash
 cargo build --workspace --release
-./target/release/honzo --version
+./target/release/honzo-cli --version
 ```
 
 ## Test
@@ -1107,17 +1107,17 @@ Honzo TOC + META toc array.
 
 ```bash
 # Basic conversion
-honzo convert book.epub book.hzo
+honzo-cli convert book.epub book.hzo
 
 # Override title and author
-honzo convert book.epub book.hzo \
+honzo-cli convert book.epub book.hzo \
   --title "My Edition" \
   --author "My Name" \
   --language "en"
 
 # Inspect the result
-honzo info book.hzo
-honzo info --json book.hzo
+honzo-cli info book.hzo
+honzo-cli info --json book.hzo
 ```
 
 ## Next Steps
@@ -1171,13 +1171,13 @@ Text extraction only. No reflow preservation.
 
 ```bash
 # EPUB to Honzo
-honzo convert book.epub book.hzo
+honzo-cli convert book.epub book.hzo
 
 # MOBI to Honzo
-honzo convert book.mobi book.hzo
+honzo-cli convert book.mobi book.hzo
 
 # PDF to Honzo
-honzo convert book.pdf book.hzo
+honzo-cli convert book.pdf book.hzo
 ```
 
 == tab "Rust API"
@@ -1250,7 +1250,7 @@ Explicit EPUB pagebreak patterns are also detected:
 Override metadata during conversion:
 
 ```bash
-honzo convert book.epub book.hzo \
+honzo-cli convert book.epub book.hzo \
   --title "Custom Title" \
   --author "Custom Author" \
   --language "fr"
@@ -1398,7 +1398,7 @@ Bold and italic preserved as HTML.
 ## Example
 
 ```bash
-honzo convert book.mobi book.hzo
+honzo-cli convert book.mobi book.hzo
 ```
 
 ## Next Steps
@@ -1503,7 +1503,7 @@ Title, author preserved in `META`.
 ## Example
 
 ```bash
-honzo convert book.pdf book.hzo
+honzo-cli convert book.pdf book.hzo
 ```
 
 ## Next Steps
@@ -1844,7 +1844,7 @@ let sidx_data = index.encode().unwrap();
 Or from the CLI:
 
 ```bash
-honzo make book.hzo --chapters ch1.md ch2.md \
+honzo-cli make book.hzo --chapters ch1.md ch2.md \
   --build-index
 ```
 
@@ -3030,7 +3030,7 @@ Or build from source:
 git clone https://github.com/Nisoku/Honzo
 cd Honzo
 cargo build -p honzo-cli --release
-./target/release/honzo --help
+./target/release/honzo-cli --help
 ```
 
 ### Developer setup
@@ -3048,7 +3048,7 @@ just check     # verify everything works
 ## Verify
 
 ```bash
-honzo --version
+honzo-cli --version
 ```
 
 If you see a version number, everything is ready.
@@ -3110,7 +3110,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "CLI"
 
    ```bash
-   honzo make my_book.hzo \
+   honzo-cli make my_book.hzo \
      --title "My First Book" \
      --author "Author Name" \
      --chapters chapter1.md chapter2.md chapter3.md
@@ -3145,7 +3145,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "CLI"
 
    ```bash
-   honzo info my_book.hzo
+   honzo-cli info my_book.hzo
    ```
 
    Example output:
@@ -3225,7 +3225,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
 4. **Convert from EPUB**
 
    ```bash
-   honzo convert book.epub book.hzo
+   honzo-cli convert book.epub book.hzo
    ```
 
    Or with Rust:

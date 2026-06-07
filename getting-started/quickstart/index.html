@@ -87,10 +87,10 @@
       Quick Start : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cekj9">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cgwc2">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cekj9" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cekj9" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cgwc2" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cgwc2" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Create, read, and inspect a Honzo file in 5 minutes">
@@ -105,12 +105,12 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cekj9" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cekj9" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cekj9" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cgwc2" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cgwc2" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cgwc2" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cekj9">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cgwc2">
     
     <script>/**
  * --------------------------------------------------------------------
@@ -1608,7 +1608,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Quick%20Start%22%0Adescription%3A%20%22Create%2C%20read%2C%20and%20inspect%20a%20Honzo%20file%20in%205%20minutes%22%0A---%0A%0AThis%20guide%20gets%20you%20from%20zero%20to%20a%20working%20Honzo%20file.%20You%20will%20build%20a%20simple%20ebook%2C%20inspect%20its%20structure%2C%20and%20read%20it%20back.%0A%0A%3A%3A%3A%20callout%20tip%20%22Prerequisites%22%0AYou%20need%20Rust%201.75%2B%20or%20Node.js%2018%2B.%20See%20%5BInstallation%5D(.%2Finstallation)%20to%20set%20things%20up.%0A%3A%3A%3A%0A%0A%3A%3A%3A%20steps%0A%0A1.%20**Create%20a%20Honzo%20File**%0A%0A%20%20%20%3A%3A%3A%20tabs%0A%0A%20%20%20%3D%3D%20tab%20%22Rust%22%0A%0A%20%20%20%60%60%60rust%0A%20%20%20use%20honzo_io%3A%3A%7BHonzoBuilder%2C%20Compression%2C%20MarkupType%7D%3B%0A%0A%20%20%20let%20hzo%20%3D%20HonzoBuilder%3A%3Anew()%0A%20%20%20%20%20%20%20.meta_title(%22en%22%2C%20%22My%20First%20Book%22)%0A%20%20%20%20%20%20%20.meta_creator(%22en%22%2C%20%22Author%20Name%22)%0A%20%20%20%20%20%20%20.add_chapter(%22Chapter%201%3A%20The%20Beginning%22%2C%20Compression%3A%3ALz4%2C%20MarkupType%3A%3AMarkdown)%0A%20%20%20%20%20%20%20.add_chapter(%22Chapter%202%3A%20The%20Middle%22%2C%20Compression%3A%3ALz4%2C%20MarkupType%3A%3AMarkdown)%0A%20%20%20%20%20%20%20.add_chapter(%22Chapter%203%3A%20The%20End%22%2C%20Compression%3A%3ANone%2C%20MarkupType%3A%3AMarkdown)%0A%20%20%20%20%20%20%20.finalize()%0A%20%20%20%20%20%20%20.unwrap()%3B%0A%0A%20%20%20std%3A%3Afs%3A%3Awrite(%22my_book.hzo%22%2C%20hzo).unwrap()%3B%0A%20%20%20println!(%22Created%20my_book.hzo%22)%3B%0A%20%20%20%60%60%60%0A%0A%20%20%20%3D%3D%20tab%20%22CLI%22%0A%0A%20%20%20%60%60%60bash%0A%20%20%20honzo%20make%20my_book.hzo%20%5C%0A%20%20%20%20%20--title%20%22My%20First%20Book%22%20%5C%0A%20%20%20%20%20--author%20%22Author%20Name%22%20%5C%0A%20%20%20%20%20--chapters%20chapter1.md%20chapter2.md%20chapter3.md%0A%20%20%20%60%60%60%0A%0A%20%20%20%3A%3A%3A%0A%0A2.%20**Inspect%20the%20File**%0A%0A%20%20%20%3A%3A%3A%20tabs%0A%0A%20%20%20%3D%3D%20tab%20%22Rust%22%0A%0A%20%20%20%60%60%60rust%0A%20%20%20use%20honzo_core%3A%3AHonzoParser%3B%0A%0A%20%20%20let%20data%20%3D%20std%3A%3Afs%3A%3Aread(%22my_book.hzo%22).unwrap()%3B%0A%20%20%20let%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0A%0A%20%20%20let%20head%20%3D%20p.head()%3B%0A%20%20%20println!(%22Format%20version%3A%20%7B%7D%22%2C%20head.format_version)%3B%0A%20%20%20println!(%22Chunk%20count%3A%20%20%20%20%7B%7D%22%2C%20head.chunk_count)%3B%0A%20%20%20println!(%22Layout%20mode%3A%20%20%20%20%7B%7D%22%2C%20head.layout_mode)%3B%0A%0A%20%20%20for%20entry%20in%20p.toc_entries()%20%7B%0A%20%20%20%20%20%20%20let%20tag%20%3D%20std%3A%3Astr%3A%3Afrom_utf8(%26entry.chunk_type).unwrap()%3B%0A%20%20%20%20%20%20%20let%20compressed%20%3D%20if%20entry.compression%20%3D%3D%201%20%7B%20%22%20(lz4)%22%20%7D%20else%20%7B%20%22%22%20%7D%3B%0A%20%20%20%20%20%20%20println!(%22%20%20%7Btag%7D%3A%20size%3D%7B%7D%7B%7D%22%2C%20entry.size%2C%20compressed)%3B%0A%20%20%20%7D%0A%20%20%20%60%60%60%0A%0A%20%20%20%3D%3D%20tab%20%22CLI%22%0A%0A%20%20%20%60%60%60bash%0A%20%20%20honzo%20info%20my_book.hzo%0A%20%20%20%60%60%60%0A%0A%20%20%20Example%20output%3A%0A%0A%20%20%20%60%60%60txt%0A%20%20%20Honzo%20File%3A%20my_book.hzo%0A%20%20%20%20%20Format%20version%3A%201%0A%20%20%20%20%20Chunk%20count%3A%20%20%20%205%0A%20%20%20%20%20Layout%20mode%3A%20%20%20%20reflowable%0A%20%20%20%20%20Chunks%3A%0A%20%20%20%20%20%20%20CHAP%20%20size%3D184%20%20(lz4)%0A%20%20%20%20%20%20%20COVR%20%20size%3D24576%0A%20%20%20%20%20%20%20CHAP%20%20size%3D196%20%20(lz4)%0A%20%20%20%20%20%20%20CHAP%20%20size%3D172%20%20(none)%0A%20%20%20%20%20%20%20META%20%20size%3D128%0A%20%20%20%60%60%60%0A%0A%20%20%20%3A%3A%3A%0A%0A3.%20**Read%20Chapters**%0A%0A%20%20%20%3A%3A%3A%20tabs%0A%0A%20%20%20%3D%3D%20tab%20%22Rust%20Parser%22%0A%0A%20%20%20%60%60%60rust%0A%20%20%20use%20honzo_core%3A%3AHonzoParser%3B%0A%0A%20%20%20let%20data%20%3D%20std%3A%3Afs%3A%3Aread(%22my_book.hzo%22).unwrap()%3B%0A%20%20%20let%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0A%0A%20%20%20for%20entry%20in%20p.toc_entries()%20%7B%0A%20%20%20%20%20%20%20if%20%26entry.chunk_type%20%3D%3D%20b%22CHAP%22%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20let%20chapter_data%20%3D%20p.read_chunk(%26entry).unwrap()%3B%0A%20%20%20%20%20%20%20%20%20%20%20let%20text%20%3D%20std%3A%3Astr%3A%3Afrom_utf8(%26chapter_data).unwrap()%3B%0A%20%20%20%20%20%20%20%20%20%20%20println!(%22Chapter%3A%20%7Btext%7D%22)%3B%0A%20%20%20%20%20%20%20%7D%0A%20%20%20%7D%0A%20%20%20%60%60%60%0A%0A%20%20%20%3D%3D%20tab%20%22Rust%20Streaming%22%0A%0A%20%20%20%60%60%60rust%0A%20%20%20use%20honzo_io%3A%3AHonzoStream%3B%0A%0A%20%20%20let%20file%20%3D%20std%3A%3Afs%3A%3AFile%3A%3Aopen(%22my_book.hzo%22).unwrap()%3B%0A%20%20%20let%20mut%20stream%20%3D%20HonzoStream%3A%3Aopen(file%2C%201).unwrap()%3B%0A%0A%20%20%20for%20chapter%20in%20stream.chapters()%20%7B%0A%20%20%20%20%20%20%20let%20(text%2C%20_meta)%20%3D%20chapter.unwrap()%3B%0A%20%20%20%20%20%20%20println!(%22Chapter%3A%20%7B%7D%20bytes%22%2C%20text.len())%3B%0A%20%20%20%7D%0A%20%20%20%60%60%60%0A%0A%20%20%20%3D%3D%20tab%20%22TypeScript%22%0A%0A%20%20%20%60%60%60typescript%0A%20%20%20import%20%7B%20createReader%20%7D%20from%20&#039;%40nisoku%2Fhonzo&#039;%3B%0A%0A%20%20%20const%20response%20%3D%20await%20fetch(&#039;my_book.hzo&#039;)%3B%0A%20%20%20const%20buf%20%3D%20new%20Uint8Array(await%20response.arrayBuffer())%3B%0A%20%20%20const%20reader%20%3D%20await%20createReader(buf)%3B%0A%0A%20%20%20const%20meta%20%3D%20reader.getMeta()%3B%0A%20%20%20console.log(&#039;Title%3A&#039;%2C%20meta.title%3F.en)%3B%0A%20%20%20console.log(&#039;Chapters%3A&#039;%2C%20reader.chunkCount)%3B%0A%0A%20%20%20for%20(let%20i%20%3D%200%3B%20i%20%3C%20reader.chunkCount%3B%20i%2B%2B)%20%7B%0A%20%20%20%20%20const%20chunk%20%3D%20reader.readChunk(i)%3B%0A%20%20%20%20%20const%20text%20%3D%20new%20TextDecoder().decode(chunk)%3B%0A%20%20%20%20%20console.log(&#039;Chapter%3A&#039;%2C%20text.substring(0%2C%20100))%3B%0A%20%20%20%7D%0A%20%20%20%60%60%60%0A%0A%20%20%20%3A%3A%3A%0A%0A4.%20**Convert%20from%20EPUB**%0A%0A%20%20%20%60%60%60bash%0A%20%20%20honzo%20convert%20book.epub%20book.hzo%0A%20%20%20%60%60%60%0A%0A%20%20%20Or%20with%20Rust%3A%0A%0A%20%20%20%60%60%60rust%0A%20%20%20use%20honzo_convert%3A%3Aconvert_epub%3B%0A%0A%20%20%20let%20hzo%20%3D%20convert_epub(%22book.epub%22).unwrap()%3B%0A%20%20%20std%3A%3Afs%3A%3Awrite(%22book.hzo%22%2C%20hzo).unwrap()%3B%0A%20%20%20%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Installation%22%20.%2Finstallation.md%20icon%3Adownload%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Core%20Concepts%22%20.%2Fconcepts.md%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20..%2Fformat%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22CLI%20Reference%22%20..%2Fcli%2F%20icon%3Aterminal%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Quick%20Start%22%0Adescription%3A%20%22Create%2C%20read%2C%20and%20inspect%20a%20Honzo%20file%20in%205%20minutes%22%0A---%0A%0AThis%20guide%20gets%20you%20from%20zero%20to%20a%20working%20Honzo%20file.%20You%20will%20build%20a%20simple%20ebook%2C%20inspect%20its%20structure%2C%20and%20read%20it%20back.%0A%0A%3A%3A%3A%20callout%20tip%20%22Prerequisites%22%0AYou%20need%20Rust%201.75%2B%20or%20Node.js%2018%2B.%20See%20%5BInstallation%5D(.%2Finstallation)%20to%20set%20things%20up.%0A%3A%3A%3A%0A%0A%3A%3A%3A%20steps%0A%0A1.%20**Create%20a%20Honzo%20File**%0A%0A%20%20%20%3A%3A%3A%20tabs%0A%0A%20%20%20%3D%3D%20tab%20%22Rust%22%0A%0A%20%20%20%60%60%60rust%0A%20%20%20use%20honzo_io%3A%3A%7BHonzoBuilder%2C%20Compression%2C%20MarkupType%7D%3B%0A%0A%20%20%20let%20hzo%20%3D%20HonzoBuilder%3A%3Anew()%0A%20%20%20%20%20%20%20.meta_title(%22en%22%2C%20%22My%20First%20Book%22)%0A%20%20%20%20%20%20%20.meta_creator(%22en%22%2C%20%22Author%20Name%22)%0A%20%20%20%20%20%20%20.add_chapter(%22Chapter%201%3A%20The%20Beginning%22%2C%20Compression%3A%3ALz4%2C%20MarkupType%3A%3AMarkdown)%0A%20%20%20%20%20%20%20.add_chapter(%22Chapter%202%3A%20The%20Middle%22%2C%20Compression%3A%3ALz4%2C%20MarkupType%3A%3AMarkdown)%0A%20%20%20%20%20%20%20.add_chapter(%22Chapter%203%3A%20The%20End%22%2C%20Compression%3A%3ANone%2C%20MarkupType%3A%3AMarkdown)%0A%20%20%20%20%20%20%20.finalize()%0A%20%20%20%20%20%20%20.unwrap()%3B%0A%0A%20%20%20std%3A%3Afs%3A%3Awrite(%22my_book.hzo%22%2C%20hzo).unwrap()%3B%0A%20%20%20println!(%22Created%20my_book.hzo%22)%3B%0A%20%20%20%60%60%60%0A%0A%20%20%20%3D%3D%20tab%20%22CLI%22%0A%0A%20%20%20%60%60%60bash%0A%20%20%20honzo-cli%20make%20my_book.hzo%20%5C%0A%20%20%20%20%20--title%20%22My%20First%20Book%22%20%5C%0A%20%20%20%20%20--author%20%22Author%20Name%22%20%5C%0A%20%20%20%20%20--chapters%20chapter1.md%20chapter2.md%20chapter3.md%0A%20%20%20%60%60%60%0A%0A%20%20%20%3A%3A%3A%0A%0A2.%20**Inspect%20the%20File**%0A%0A%20%20%20%3A%3A%3A%20tabs%0A%0A%20%20%20%3D%3D%20tab%20%22Rust%22%0A%0A%20%20%20%60%60%60rust%0A%20%20%20use%20honzo_core%3A%3AHonzoParser%3B%0A%0A%20%20%20let%20data%20%3D%20std%3A%3Afs%3A%3Aread(%22my_book.hzo%22).unwrap()%3B%0A%20%20%20let%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0A%0A%20%20%20let%20head%20%3D%20p.head()%3B%0A%20%20%20println!(%22Format%20version%3A%20%7B%7D%22%2C%20head.format_version)%3B%0A%20%20%20println!(%22Chunk%20count%3A%20%20%20%20%7B%7D%22%2C%20head.chunk_count)%3B%0A%20%20%20println!(%22Layout%20mode%3A%20%20%20%20%7B%7D%22%2C%20head.layout_mode)%3B%0A%0A%20%20%20for%20entry%20in%20p.toc_entries()%20%7B%0A%20%20%20%20%20%20%20let%20tag%20%3D%20std%3A%3Astr%3A%3Afrom_utf8(%26entry.chunk_type).unwrap()%3B%0A%20%20%20%20%20%20%20let%20compressed%20%3D%20if%20entry.compression%20%3D%3D%201%20%7B%20%22%20(lz4)%22%20%7D%20else%20%7B%20%22%22%20%7D%3B%0A%20%20%20%20%20%20%20println!(%22%20%20%7Btag%7D%3A%20size%3D%7B%7D%7B%7D%22%2C%20entry.size%2C%20compressed)%3B%0A%20%20%20%7D%0A%20%20%20%60%60%60%0A%0A%20%20%20%3D%3D%20tab%20%22CLI%22%0A%0A%20%20%20%60%60%60bash%0A%20%20%20honzo-cli%20info%20my_book.hzo%0A%20%20%20%60%60%60%0A%0A%20%20%20Example%20output%3A%0A%0A%20%20%20%60%60%60txt%0A%20%20%20Honzo%20File%3A%20my_book.hzo%0A%20%20%20%20%20Format%20version%3A%201%0A%20%20%20%20%20Chunk%20count%3A%20%20%20%205%0A%20%20%20%20%20Layout%20mode%3A%20%20%20%20reflowable%0A%20%20%20%20%20Chunks%3A%0A%20%20%20%20%20%20%20CHAP%20%20size%3D184%20%20(lz4)%0A%20%20%20%20%20%20%20COVR%20%20size%3D24576%0A%20%20%20%20%20%20%20CHAP%20%20size%3D196%20%20(lz4)%0A%20%20%20%20%20%20%20CHAP%20%20size%3D172%20%20(none)%0A%20%20%20%20%20%20%20META%20%20size%3D128%0A%20%20%20%60%60%60%0A%0A%20%20%20%3A%3A%3A%0A%0A3.%20**Read%20Chapters**%0A%0A%20%20%20%3A%3A%3A%20tabs%0A%0A%20%20%20%3D%3D%20tab%20%22Rust%20Parser%22%0A%0A%20%20%20%60%60%60rust%0A%20%20%20use%20honzo_core%3A%3AHonzoParser%3B%0A%0A%20%20%20let%20data%20%3D%20std%3A%3Afs%3A%3Aread(%22my_book.hzo%22).unwrap()%3B%0A%20%20%20let%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0A%0A%20%20%20for%20entry%20in%20p.toc_entries()%20%7B%0A%20%20%20%20%20%20%20if%20%26entry.chunk_type%20%3D%3D%20b%22CHAP%22%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20let%20chapter_data%20%3D%20p.read_chunk(%26entry).unwrap()%3B%0A%20%20%20%20%20%20%20%20%20%20%20let%20text%20%3D%20std%3A%3Astr%3A%3Afrom_utf8(%26chapter_data).unwrap()%3B%0A%20%20%20%20%20%20%20%20%20%20%20println!(%22Chapter%3A%20%7Btext%7D%22)%3B%0A%20%20%20%20%20%20%20%7D%0A%20%20%20%7D%0A%20%20%20%60%60%60%0A%0A%20%20%20%3D%3D%20tab%20%22Rust%20Streaming%22%0A%0A%20%20%20%60%60%60rust%0A%20%20%20use%20honzo_io%3A%3AHonzoStream%3B%0A%0A%20%20%20let%20file%20%3D%20std%3A%3Afs%3A%3AFile%3A%3Aopen(%22my_book.hzo%22).unwrap()%3B%0A%20%20%20let%20mut%20stream%20%3D%20HonzoStream%3A%3Aopen(file%2C%201).unwrap()%3B%0A%0A%20%20%20for%20chapter%20in%20stream.chapters()%20%7B%0A%20%20%20%20%20%20%20let%20(text%2C%20_meta)%20%3D%20chapter.unwrap()%3B%0A%20%20%20%20%20%20%20println!(%22Chapter%3A%20%7B%7D%20bytes%22%2C%20text.len())%3B%0A%20%20%20%7D%0A%20%20%20%60%60%60%0A%0A%20%20%20%3D%3D%20tab%20%22TypeScript%22%0A%0A%20%20%20%60%60%60typescript%0A%20%20%20import%20%7B%20createReader%20%7D%20from%20&#039;%40nisoku%2Fhonzo&#039;%3B%0A%0A%20%20%20const%20response%20%3D%20await%20fetch(&#039;my_book.hzo&#039;)%3B%0A%20%20%20const%20buf%20%3D%20new%20Uint8Array(await%20response.arrayBuffer())%3B%0A%20%20%20const%20reader%20%3D%20await%20createReader(buf)%3B%0A%0A%20%20%20const%20meta%20%3D%20reader.getMeta()%3B%0A%20%20%20console.log(&#039;Title%3A&#039;%2C%20meta.title%3F.en)%3B%0A%20%20%20console.log(&#039;Chapters%3A&#039;%2C%20reader.chunkCount)%3B%0A%0A%20%20%20for%20(let%20i%20%3D%200%3B%20i%20%3C%20reader.chunkCount%3B%20i%2B%2B)%20%7B%0A%20%20%20%20%20const%20chunk%20%3D%20reader.readChunk(i)%3B%0A%20%20%20%20%20const%20text%20%3D%20new%20TextDecoder().decode(chunk)%3B%0A%20%20%20%20%20console.log(&#039;Chapter%3A&#039;%2C%20text.substring(0%2C%20100))%3B%0A%20%20%20%7D%0A%20%20%20%60%60%60%0A%0A%20%20%20%3A%3A%3A%0A%0A4.%20**Convert%20from%20EPUB**%0A%0A%20%20%20%60%60%60bash%0A%20%20%20honzo-cli%20convert%20book.epub%20book.hzo%0A%20%20%20%60%60%60%0A%0A%20%20%20Or%20with%20Rust%3A%0A%0A%20%20%20%60%60%60rust%0A%20%20%20use%20honzo_convert%3A%3Aconvert_epub%3B%0A%0A%20%20%20let%20hzo%20%3D%20convert_epub(%22book.epub%22).unwrap()%3B%0A%20%20%20std%3A%3Afs%3A%3Awrite(%22book.hzo%22%2C%20hzo).unwrap()%3B%0A%20%20%20%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Installation%22%20.%2Finstallation.md%20icon%3Adownload%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Core%20Concepts%22%20.%2Fconcepts.md%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20..%2Fformat%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22CLI%20Reference%22%20..%2Fcli%2F%20icon%3Aterminal%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1717,7 +1717,7 @@
 std<span class="hljs-punctuation">::</span>fs<span class="hljs-punctuation">::</span><span class="hljs-title function_">write</span>(<span class="hljs-string">&quot;my_book.hzo&quot;</span>, hzo).<span class="hljs-title function_">unwrap</span>();
 println<span class="hljs-punctuation">!</span>(<span class="hljs-string">&quot;Created my_book.hzo&quot;</span>);
 </code></pre>
-</div><div class="docmd-tab-pane "><pre class="hljs"><code>honzo make my_book.<span class="hljs-attr">hzo</span> \
+</div><div class="docmd-tab-pane "><pre class="hljs"><code>honzo<span class="hljs-punctuation">-</span>cli make my_book.<span class="hljs-attr">hzo</span> \
   <span class="hljs-punctuation">--</span>title <span class="hljs-string">&quot;My First Book&quot;</span> \
   <span class="hljs-punctuation">--</span>author <span class="hljs-string">&quot;Author Name&quot;</span> \
   <span class="hljs-punctuation">--</span>chapters chapter1.<span class="hljs-attr">md</span> chapter2.<span class="hljs-attr">md</span> chapter3.<span class="hljs-attr">md</span>
@@ -1741,7 +1741,7 @@ println<span class="hljs-punctuation">!</span>(<span class="hljs-string">&quot;L
     println<span class="hljs-punctuation">!</span>(<span class="hljs-string">&quot;  {tag}: size={}{}&quot;</span>, entry.<span class="hljs-attr">size</span>, compressed);
 }
 </code></pre>
-</div><div class="docmd-tab-pane "><pre class="hljs"><code>honzo info my_book.<span class="hljs-attr">hzo</span>
+</div><div class="docmd-tab-pane "><pre class="hljs"><code>honzo<span class="hljs-punctuation">-</span>cli info my_book.<span class="hljs-attr">hzo</span>
 </code></pre>
 <p>Example output:</p>
 <pre class="hljs"><code>Honzo File<span class="hljs-punctuation">:</span> my_book.<span class="hljs-attr">hzo</span>
@@ -1799,7 +1799,7 @@ console.<span class="hljs-title function_">log</span>(<span class="hljs-string">
 </code></pre>
 </div></div></div></li>
 <li class="step-item"><p><strong>Convert from EPUB</strong></p>
-<pre class="hljs"><code>honzo convert book.<span class="hljs-attr">epub</span> book.<span class="hljs-attr">hzo</span>
+<pre class="hljs"><code>honzo<span class="hljs-punctuation">-</span>cli convert book.<span class="hljs-attr">epub</span> book.<span class="hljs-attr">hzo</span>
 </code></pre>
 <p>Or with Rust:</p>
 <pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_convert<span class="hljs-punctuation">::</span>convert_epub;
@@ -1952,13 +1952,13 @@ CLI Reference</a></div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1780809817000">
+                <span class="git-last-updated" data-timestamp="1780809944000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1780809817000"></span>
+                  <span class="git-time" data-timestamp="1780809944000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1971,10 +1971,10 @@ CLI Reference</a></div>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="More fixes">More fixes</div>
+                            <div class="git-commit-message" title="And I commited too fast">And I commited too fast</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1780809817000"></span>
+                              <span class="git-commit-date" data-timestamp="1780809944000"></span>
                             </div>
                           </div>
                         </li>
@@ -2067,14 +2067,14 @@ CLI Reference</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mq3cekj9"></script>
+      <script src="../../assets/js/docmd-main.js?v=mq3cgwc2"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mq3cekj9"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cekj9" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mq3cgwc2"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cgwc2" ></script>
 <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=mq3cekj9" ></script>
-<script src="../../assets/js/init-mermaid.js?v=mq3cekj9" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=mq3cekj9" type="module"></script>
+<script src="../../assets/js/docmd-search.js?v=mq3cgwc2" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mq3cgwc2" type="module"></script>
+<script src="../../assets/js/docmd-git.js?v=mq3cgwc2" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"

@@ -87,10 +87,10 @@
       PDF Conversion : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cekj9">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cgwc2">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cekj9" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cekj9" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cgwc2" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cgwc2" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Converting PDF files to Honzo format">
@@ -105,12 +105,12 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cekj9" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cekj9" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cekj9" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cgwc2" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cgwc2" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cgwc2" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cekj9">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cgwc2">
     
     <script>/**
  * --------------------------------------------------------------------
@@ -1608,7 +1608,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22PDF%20Conversion%22%0Adescription%3A%20%22Converting%20PDF%20files%20to%20Honzo%20format%22%0A---%0A%0APDF%20conversion%20provides%20basic%20text%20extraction%20from%20PDF%20files.%20PDF%20is%20fundamentally%20a%20print-oriented%20format%20with%20fixed%20layout%2C%20so%20the%20conversion%20focuses%20on%20recovering%20readable%20text%20rather%20than%20preserving%20visual%20positioning.%0A%0A%3A%3A%3A%20callout%20info%0APDF%20conversion%20is%20the%20roughest%20path%20in%20Honzo.%20Images%2C%20formatting%2C%20tables%2C%20and%20fonts%20are%20not%20carried%20over.%20For%20structured%20documents%2C%20use%20EPUB%20instead.%0A%3A%3A%3A%0A%0A%23%23%20How%20it%20works%0A%0A%3A%3A%3A%20steps%0A%0A1.%20**Extract%20text.**%20PDF%20text%20content%20is%20extracted%20page%20by%20page%20using%20text%20show%20operators.%0A%0A2.%20**Detect%20reading%20order.**%20The%20converter%20applies%20heuristics%20to%20reconstruct%20paragraph%20and%20chapter%20boundaries%20from%20positioned%20text.%0A%0A3.%20**Split%20by%20pages.**%20Each%20PDF%20page%20becomes%20a%20separate%20Honzo%20CHAP%20entry.%0A%0A4.%20**Extract%20metadata.**%20Title%2C%20author%2C%20and%20subject%20come%20from%20the%20PDF%20Info%20dictionary%20or%20XMP%20metadata.%0A%0A5.%20**Build.**%20All%20extracted%20content%20is%20assembled%20into%20the%20final%20Honzo%20file.%0A%0A%3A%3A%3A%0A%0A%23%23%20Metadata%20mapping%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Title%22%20icon%3Abook%0AMaps%20to%20Honzo%20%60title%60%20in%20%60META%60%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Author%22%20icon%3Auser%0AMaps%20to%20Honzo%20%60creator%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Subject%22%20icon%3Atag%0AMaps%20to%20%60subject%5B%5D%60%20array.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Language%22%20icon%3Aglobe%0AMaps%20to%20Honzo%20%60language%60%20(BCP%2047).%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Preserved%20features%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Page%20structure%22%20icon%3Abook%0AOne%20%60CHAP%60%20chunk%20per%20PDF%20page.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Text%20content%22%20icon%3Atype%0AExtracted%20as%20Markdown%20text.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Metadata%22%20icon%3Ainfo%0ATitle%2C%20author%20preserved%20in%20%60META%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20warning%20%22Limitations%22%0A%0A-%20PDF%20layout%20and%20formatting%20are%20not%20preserved.%20Expect%20plain%20text%20without%20bold%2C%20italic%2C%20or%20font%20styling.%0A-%20Images%20embedded%20in%20PDFs%20are%20not%20extracted.%0A-%20Tables%20and%20multi-column%20layouts%20may%20lose%20their%20structural%20relationships.%0A-%20Embedded%20fonts%20are%20not%20carried%20over.%0A-%20PDF%20forms%2C%20annotations%2C%20and%20interactive%20elements%20are%20ignored.%0A-%20OCR-based%20PDFs%20(scanned%20documents)%20produce%20no%20usable%20text%20output.%0A%0A%3A%3A%3A%0A%0A%23%23%20Example%0A%0A%60%60%60bash%0Ahonzo%20convert%20book.pdf%20book.hzo%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22EPUB%20Conversion%22%20.%2Fepub.md%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22MOBI%20Conversion%22%20.%2Fmobi.md%20icon%3Abook-open%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22PDF%20Conversion%22%0Adescription%3A%20%22Converting%20PDF%20files%20to%20Honzo%20format%22%0A---%0A%0APDF%20conversion%20provides%20basic%20text%20extraction%20from%20PDF%20files.%20PDF%20is%20fundamentally%20a%20print-oriented%20format%20with%20fixed%20layout%2C%20so%20the%20conversion%20focuses%20on%20recovering%20readable%20text%20rather%20than%20preserving%20visual%20positioning.%0A%0A%3A%3A%3A%20callout%20info%0APDF%20conversion%20is%20the%20roughest%20path%20in%20Honzo.%20Images%2C%20formatting%2C%20tables%2C%20and%20fonts%20are%20not%20carried%20over.%20For%20structured%20documents%2C%20use%20EPUB%20instead.%0A%3A%3A%3A%0A%0A%23%23%20How%20it%20works%0A%0A%3A%3A%3A%20steps%0A%0A1.%20**Extract%20text.**%20PDF%20text%20content%20is%20extracted%20page%20by%20page%20using%20text%20show%20operators.%0A%0A2.%20**Detect%20reading%20order.**%20The%20converter%20applies%20heuristics%20to%20reconstruct%20paragraph%20and%20chapter%20boundaries%20from%20positioned%20text.%0A%0A3.%20**Split%20by%20pages.**%20Each%20PDF%20page%20becomes%20a%20separate%20Honzo%20CHAP%20entry.%0A%0A4.%20**Extract%20metadata.**%20Title%2C%20author%2C%20and%20subject%20come%20from%20the%20PDF%20Info%20dictionary%20or%20XMP%20metadata.%0A%0A5.%20**Build.**%20All%20extracted%20content%20is%20assembled%20into%20the%20final%20Honzo%20file.%0A%0A%3A%3A%3A%0A%0A%23%23%20Metadata%20mapping%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Title%22%20icon%3Abook%0AMaps%20to%20Honzo%20%60title%60%20in%20%60META%60%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Author%22%20icon%3Auser%0AMaps%20to%20Honzo%20%60creator%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Subject%22%20icon%3Atag%0AMaps%20to%20%60subject%5B%5D%60%20array.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Language%22%20icon%3Aglobe%0AMaps%20to%20Honzo%20%60language%60%20(BCP%2047).%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Preserved%20features%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Page%20structure%22%20icon%3Abook%0AOne%20%60CHAP%60%20chunk%20per%20PDF%20page.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Text%20content%22%20icon%3Atype%0AExtracted%20as%20Markdown%20text.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Metadata%22%20icon%3Ainfo%0ATitle%2C%20author%20preserved%20in%20%60META%60.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20warning%20%22Limitations%22%0A%0A-%20PDF%20layout%20and%20formatting%20are%20not%20preserved.%20Expect%20plain%20text%20without%20bold%2C%20italic%2C%20or%20font%20styling.%0A-%20Images%20embedded%20in%20PDFs%20are%20not%20extracted.%0A-%20Tables%20and%20multi-column%20layouts%20may%20lose%20their%20structural%20relationships.%0A-%20Embedded%20fonts%20are%20not%20carried%20over.%0A-%20PDF%20forms%2C%20annotations%2C%20and%20interactive%20elements%20are%20ignored.%0A-%20OCR-based%20PDFs%20(scanned%20documents)%20produce%20no%20usable%20text%20output.%0A%0A%3A%3A%3A%0A%0A%23%23%20Example%0A%0A%60%60%60bash%0Ahonzo-cli%20convert%20book.pdf%20book.hzo%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22EPUB%20Conversion%22%20.%2Fepub.md%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22MOBI%20Conversion%22%20.%2Fmobi.md%20icon%3Abook-open%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1878,7 +1878,7 @@ Metadata</div><div class="card-content">
 </ul>
 </div></div>
 <h2 id="example" class="docmd-heading"><a href="#example" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Example</h2>
-<pre class="hljs"><code>honzo convert book.<span class="hljs-attr">pdf</span> book.<span class="hljs-attr">hzo</span>
+<pre class="hljs"><code>honzo<span class="hljs-punctuation">-</span>cli convert book.<span class="hljs-attr">pdf</span> book.<span class="hljs-attr">hzo</span>
 </code></pre>
 <h2 id="next-steps" class="docmd-heading"><a href="#next-steps" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Next Steps</h2>
 <div class="docmd-container grids">
@@ -2024,13 +2024,13 @@ MOBI Conversion</a></div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1780809817000">
+                <span class="git-last-updated" data-timestamp="1780809944000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1780809817000"></span>
+                  <span class="git-time" data-timestamp="1780809944000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -2043,10 +2043,10 @@ MOBI Conversion</a></div>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="More fixes">More fixes</div>
+                            <div class="git-commit-message" title="And I commited too fast">And I commited too fast</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1780809817000"></span>
+                              <span class="git-commit-date" data-timestamp="1780809944000"></span>
                             </div>
                           </div>
                         </li>
@@ -2139,14 +2139,14 @@ MOBI Conversion</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mq3cekj9"></script>
+      <script src="../../assets/js/docmd-main.js?v=mq3cgwc2"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mq3cekj9"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cekj9" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mq3cgwc2"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cgwc2" ></script>
 <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=mq3cekj9" ></script>
-<script src="../../assets/js/init-mermaid.js?v=mq3cekj9" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=mq3cekj9" type="module"></script>
+<script src="../../assets/js/docmd-search.js?v=mq3cgwc2" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mq3cgwc2" type="module"></script>
+<script src="../../assets/js/docmd-git.js?v=mq3cgwc2" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
