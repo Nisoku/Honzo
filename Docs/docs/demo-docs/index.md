@@ -20,6 +20,8 @@ Full-featured ebook reader with chapter navigation, cover rendering, and layout 
 - Page turn animations
 
 Built with [Sairin](https://nisoku.org/Sairin/) (reactive UI) and [Satori](https://nisoku.org/Satori/docs/) (observability/logging).
+
+::: button "Open Reader" ../demo/ icon:external-link
 :::
 :::
 ::: grid
@@ -32,6 +34,8 @@ Online GUI for building Honzo files interactively.
 - Per-chapter compression control
 - Drag-and-drop chapter reordering
 - Download the resulting `.hzo` file
+
+::: button "Open Maker" ../demo/maker.html icon:external-link
 :::
 :::
 ::: grid
@@ -44,6 +48,8 @@ Low-level Honzo file inspector for debugging and learning the format.
 - EXTRA section browser
 - META section JSON viewer
 - Chunk data hex dump
+
+::: button "Open Inspect" ../demo/inspect.html icon:external-link
 :::
 :::
 ::: grid
@@ -55,6 +61,8 @@ Browser-based EPUB to Honzo converter.
 - Metadata preview before conversion
 - Download the resulting `.hzo` file
 - All processing is client-side (no server upload)
+
+::: button "Open Convert" ../demo/convert.html icon:external-link
 :::
 :::
 :::

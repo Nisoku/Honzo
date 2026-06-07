@@ -1,6 +1,6 @@
 export default {
   title: "Honzo",
-  url: "https://nisoku.github.io/Honzo",
+  url: "https://nisoku.org/Honzo",
   logo: { alt: "Honzo", href: "./" },
   favicon: "",
   theme: {
@@ -134,10 +134,16 @@ export default {
       ],
     },
     {
-      title: "Demo",
+      title: "Demo Apps",
       icon: "eye",
-      path: "/demo/",
+      path: "/demo-docs/",
       collapsible: false,
+      children: [
+        { title: "Reader", path: "/demo/", icon: "book", external: true },
+        { title: "Maker", path: "/demo/maker.html", icon: "wrench", external: true },
+        { title: "Inspect", path: "/demo/inspect.html", icon: "search", external: true },
+        { title: "Convert", path: "/demo/convert.html", icon: "git-merge", external: true },
+      ],
     },
     {
       title: "Contributing",
