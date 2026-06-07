@@ -87,10 +87,10 @@
       Layout Modes : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3bxcqd">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cekj9">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3bxcqd" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3bxcqd" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cekj9" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cekj9" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Reflowable, fixed, and scroll layout modes in Honzo">
@@ -105,12 +105,12 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3bxcqd" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3bxcqd" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3bxcqd" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cekj9" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cekj9" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cekj9" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3bxcqd">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cekj9">
     
     <script>/**
  * --------------------------------------------------------------------
@@ -1608,7 +1608,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Layout%20Modes%22%0Adescription%3A%20%22Reflowable%2C%20fixed%2C%20and%20scroll%20layout%20modes%20in%20Honzo%22%0A---%0A%0AHonzo%20supports%20three%20layout%20modes.%20The%20mode%20is%20set%20in%20the%20HEAD%20%60layout_mode%60%20field%20and%20applies%20to%20the%20entire%20file.%0A%0A%23%23%20Modes%0A%0A%7C%20Code%20%7C%20Mode%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------%7C------------%7C--------------------------------------------------------------------------------%7C%0A%7C%200%20%20%20%20%7C%20Reflowable%20%7C%20Content%20wraps%20to%20fit%20the%20viewport.%20This%20is%20the%20typical%20ebook%20experience.%20%20%20%20%20%20%20%7C%0A%7C%201%20%20%20%20%7C%20Fixed%20%20%20%20%20%20%7C%20Content%20uses%20fixed%20coordinates.%20This%20resembles%20a%20PDF.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%202%20%20%20%20%7C%20Scroll%20%20%20%20%20%7C%20Content%20appears%20as%20one%20continuous%20scrollable%20flow.%20This%20works%20like%20a%20web%20page.%20%7C%0A%0A%23%23%20Reflowable%20(0)%0A%0AThis%20is%20the%20default.%20Text%20reflows%20to%20fit%20the%20reader&#039;s%20screen%20size%2C%20font%20preference%2C%20and%20orientation.%0A%0A-%20Chapters%20render%20one%20at%20a%20time.%0A-%20The%20reader%20can%20change%20text%20size%20and%20font.%0A-%20Images%20scale%20to%20fit%20the%20viewport.%0A-%20The%20reader%20application%20handles%20pagination.%0A%0AUse%20this%20for%20novels%2C%20text%20heavy%20books%2C%20and%20anything%20that%20should%20adapt%20to%20the%20device.%0A%0A%23%23%20Fixed%20(1)%0A%0AContent%20uses%20fixed%20positions%20and%20sizes%2C%20typically%20measured%20in%20pixels.%20Each%20chapter%20corresponds%20to%20a%20page%20with%20known%20dimensions.%0A%0A-%20All%20content%20has%20absolute%20positions.%0A-%20Font%20size%20and%20layout%20cannot%20change.%0A-%20The%20reader%20application%20renders%20each%20chapter%20as%20is.%0A-%20This%20mode%20works%20for%20comics%2C%20children&#039;s%20books%2C%20and%20textbooks%20with%20complex%20layouts.%0A%0A%23%23%20Scroll%20(2)%0A%0AAll%20chapters%20combine%20into%20a%20single%20scrollable%20view.%0A%0A-%20No%20page%20breaks%20appear%20between%20chapters.%0A-%20The%20reader%20application%20typically%20shows%20a%20continuous%20scroll.%0A-%20This%20mode%20works%20for%20long%20form%20articles%2C%20documentation%2C%20and%20web%20first%20content.%0A-%20Search%20and%20annotation%20span%20all%20chapters%20seamlessly.%0A%0A%23%23%20Reading%20Layout%20Modes%0A%0A%60%60%60rust%0Ause%20honzo_std%3A%3AHonzoParser%3B%0A%0Alet%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0Amatch%20p.head().layout_mode%20%7B%0A%20%20%20%200%20%3D%3E%20println!(%22Reflowable%22)%2C%0A%20%20%20%201%20%3D%3E%20println!(%22Fixed%20layout%22)%2C%0A%20%20%20%202%20%3D%3E%20println!(%22Scroll%22)%2C%0A%20%20%20%20_%20%3D%3E%20println!(%22Unknown%20mode%22)%2C%0A%7D%0A%60%60%60%0A%0A%60%60%60typescript%0Aimport%20%7B%20createReader%20%7D%20from%20&#039;%40nisoku%2Fhonzo&#039;%3B%0Aconst%20reader%20%3D%20await%20createReader(buf)%3B%0A%2F%2F%20reader.layoutMode%3A%200%20%3D%20reflowable%2C%201%20%3D%20fixed%2C%202%20%3D%20scroll%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Chunk%20Types%22%20.%2Fchunk-types.md%20icon%3Apackage%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Layout%20Modes%22%0Adescription%3A%20%22Reflowable%2C%20fixed%2C%20and%20scroll%20layout%20modes%20in%20Honzo%22%0A---%0A%0AHonzo%20supports%20three%20layout%20modes.%20The%20mode%20is%20set%20in%20the%20HEAD%20%60layout_mode%60%20field%20and%20applies%20to%20the%20entire%20file.%0A%0A%23%23%20Modes%0A%0A%7C%20Code%20%7C%20Mode%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------%7C------------%7C--------------------------------------------------------------------------------%7C%0A%7C%200%20%20%20%20%7C%20Reflowable%20%7C%20Content%20wraps%20to%20fit%20the%20viewport.%20This%20is%20the%20typical%20ebook%20experience.%20%20%20%20%20%20%20%7C%0A%7C%201%20%20%20%20%7C%20Fixed%20%20%20%20%20%20%7C%20Content%20uses%20fixed%20coordinates.%20This%20resembles%20a%20PDF.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%202%20%20%20%20%7C%20Scroll%20%20%20%20%20%7C%20Content%20appears%20as%20one%20continuous%20scrollable%20flow.%20This%20works%20like%20a%20web%20page.%20%7C%0A%0A%23%23%20Reflowable%20(0)%0A%0AThis%20is%20the%20default.%20Text%20reflows%20to%20fit%20the%20reader&#039;s%20screen%20size%2C%20font%20preference%2C%20and%20orientation.%0A%0A-%20Chapters%20render%20one%20at%20a%20time.%0A-%20The%20reader%20can%20change%20text%20size%20and%20font.%0A-%20Images%20scale%20to%20fit%20the%20viewport.%0A-%20The%20reader%20application%20handles%20pagination.%0A%0AUse%20this%20for%20novels%2C%20text%20heavy%20books%2C%20and%20anything%20that%20should%20adapt%20to%20the%20device.%0A%0A%23%23%20Fixed%20(1)%0A%0AContent%20uses%20fixed%20positions%20and%20sizes%2C%20typically%20measured%20in%20pixels.%20Each%20chapter%20corresponds%20to%20a%20page%20with%20known%20dimensions.%0A%0A-%20All%20content%20has%20absolute%20positions.%0A-%20Font%20size%20and%20layout%20cannot%20change.%0A-%20The%20reader%20application%20renders%20each%20chapter%20as%20is.%0A-%20This%20mode%20works%20for%20comics%2C%20children&#039;s%20books%2C%20and%20textbooks%20with%20complex%20layouts.%0A%0A%23%23%20Scroll%20(2)%0A%0AAll%20chapters%20combine%20into%20a%20single%20scrollable%20view.%0A%0A-%20No%20page%20breaks%20appear%20between%20chapters.%0A-%20The%20reader%20application%20typically%20shows%20a%20continuous%20scroll.%0A-%20This%20mode%20works%20for%20long%20form%20articles%2C%20documentation%2C%20and%20web%20first%20content.%0A-%20Search%20and%20annotation%20span%20all%20chapters%20seamlessly.%0A%0A%23%23%20Reading%20Layout%20Modes%0A%0A%60%60%60rust%0Ause%20honzo_core%3A%3AHonzoParser%3B%0A%0Alet%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0Amatch%20p.head().layout_mode%20%7B%0A%20%20%20%200%20%3D%3E%20println!(%22Reflowable%22)%2C%0A%20%20%20%201%20%3D%3E%20println!(%22Fixed%20layout%22)%2C%0A%20%20%20%202%20%3D%3E%20println!(%22Scroll%22)%2C%0A%20%20%20%20_%20%3D%3E%20println!(%22Unknown%20mode%22)%2C%0A%7D%0A%60%60%60%0A%0A%60%60%60typescript%0Aimport%20%7B%20createReader%20%7D%20from%20&#039;%40nisoku%2Fhonzo&#039;%3B%0Aconst%20reader%20%3D%20await%20createReader(buf)%3B%0A%2F%2F%20reader.layoutMode%3A%200%20%3D%20reflowable%2C%201%20%3D%20fixed%2C%202%20%3D%20scroll%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Chunk%20Types%22%20.%2Fchunk-types.md%20icon%3Apackage%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1751,7 +1751,7 @@
 <li>Search and annotation span all chapters seamlessly.</li>
 </ul>
 <h2 id="reading-layout-modes" class="docmd-heading"><a href="#reading-layout-modes" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Reading Layout Modes</h2>
-<pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_std<span class="hljs-punctuation">::</span>HonzoParser;
+<pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_core<span class="hljs-punctuation">::</span>HonzoParser;
 
 <span class="hljs-keyword">let</span> p <span class="hljs-punctuation">=</span> HonzoParser<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>(<span class="hljs-punctuation">&amp;</span>data, <span class="hljs-number">1</span>).<span class="hljs-title function_">unwrap</span>();
 <span class="hljs-keyword">match</span> p.<span class="hljs-title function_">head</span>().<span class="hljs-attr">layout_mode</span> {
@@ -1920,13 +1920,13 @@ Chunk Types</a></div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1780809038000">
+                <span class="git-last-updated" data-timestamp="1780809817000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1780809038000"></span>
+                  <span class="git-time" data-timestamp="1780809817000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1939,10 +1939,10 @@ Chunk Types</a></div>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Oops I accidentally published it">Oops I accidentally published it</div>
+                            <div class="git-commit-message" title="More fixes">More fixes</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1780809038000"></span>
+                              <span class="git-commit-date" data-timestamp="1780809817000"></span>
                             </div>
                           </div>
                         </li>
@@ -2035,14 +2035,14 @@ Chunk Types</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mq3bxcqd"></script>
+      <script src="../../assets/js/docmd-main.js?v=mq3cekj9"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mq3bxcqd"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3bxcqd" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mq3cekj9"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cekj9" ></script>
 <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=mq3bxcqd" ></script>
-<script src="../../assets/js/init-mermaid.js?v=mq3bxcqd" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=mq3bxcqd" type="module"></script>
+<script src="../../assets/js/docmd-search.js?v=mq3cekj9" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mq3cekj9" type="module"></script>
+<script src="../../assets/js/docmd-git.js?v=mq3cekj9" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"

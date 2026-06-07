@@ -87,10 +87,10 @@
       DRM &amp; Encryption : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3bxcqd">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cekj9">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3bxcqd" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3bxcqd" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cekj9" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cekj9" id="hljs-dark" disabled>
     
     
 <meta name="description" content="AES-256-GCM content protection with ECDH key exchange">
@@ -105,12 +105,12 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3bxcqd" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3bxcqd" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3bxcqd" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cekj9" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cekj9" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cekj9" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3bxcqd">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cekj9">
     
     <script>/**
  * --------------------------------------------------------------------
@@ -1608,7 +1608,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22DRM%20%26%20Encryption%22%0Adescription%3A%20%22AES-256-GCM%20content%20protection%20with%20ECDH%20key%20exchange%22%0A---%0A%0AHonzo%20supports%20content%20encryption%20via%20an%20EXTRA%20entry%20under%20the%20%60org.nisoku.drm%60%20namespace.%20The%20design%20separates%20content%20encryption%20from%20key%20management.%20Chapters%20are%20encrypted%20with%20a%20random%20content%20encryption%20key%20(CEK).%20The%20CEK%20is%20then%20wrapped%20for%20each%20authorized%20recipient.%0A%0A%23%23%20Model%0A%0A%60%60%60mermaid%0Aflowchart%20TB%0A%20%20%20%20CEK%5B%22Random%20CEK%3Cbr%2F%3EAES-256-GCM%20key%20(256%20bits)%22%5D%0A%20%20%20%20CEK%20--%3E%20Encrypt%5BEncrypts%20chunk%20data%5D%0A%20%20%20%20CEK%20--%3E%20Wrap%5BWrapped%20per%20recipient%5D%0A%0A%20%20%20%20Encrypt%20--%3E%20EncCHAP%5B%22Encrypted%20CHAP%22%5D%0A%20%20%20%20Encrypt%20--%3E%20EncIMG%5B%22Encrypted%20IMG_%22%5D%0A%20%20%20%20Encrypt%20--%3E%20More%5B%22...%22%5D%0A%0A%20%20%20%20Wrap%20--%3E%20KeyEnv%5B%22Key%20Envelope%3Cbr%2F%3Eper%20X25519%20pub%20key%22%5D%0A%60%60%60%0A%0A%23%23%20Key%20Envelope%0A%0AThe%20DRM%20envelope%20is%20a%20MessagePack%20map%20stored%20in%20the%20EXTRA%20entry%3A%0A%0A%60%60%60python%0A%7B%0A%20%20%22version%22%3A%201%2C%0A%20%20%22content_encryption_alg%22%3A%20%22AES-256-GCM%22%2C%0A%20%20%22key_wrapping_alg%22%3A%20%22ECDH-X25519-HKDF-SHA256%22%2C%0A%20%20%22license_url%22%3A%20%22https%3A%2F%2Fexample.com%2Flicense%2Fabc123%22%2C%0A%20%20%22expiry%22%3A%20%222026-01-01T00%3A00%3A00Z%22%2C%0A%20%20%22recipients%22%3A%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22ephemeral_pub%22%3A%20%22%3C32%20bytes%20base64%3E%22%2C%0A%20%20%20%20%20%20%22encrypted_cek%22%3A%20%22%3C48%20bytes%20base64%3E%22%2C%0A%20%20%20%20%20%20%22recipient_id%22%3A%20%22user%40example.com%22%0A%20%20%20%20%7D%0A%20%20%5D%0A%7D%0A%60%60%60%0A%0AEach%20recipient%20gets%20their%20own%20envelope%20entry.%20The%20CEK%20is%20wrapped%20using%20ECDH%20with%20X25519%3A%0A%0A%3A%3A%3A%20steps%0A%0A1.%20Generate%20an%20ephemeral%20X25519%20key%20pair.%0A2.%20Derive%20a%20shared%20secret%20from%20the%20ephemeral%20private%20key%20and%20the%20recipient&#039;s%20public%20key.%0A3.%20Use%20HKDF-SHA256%20to%20expand%20the%20shared%20secret%20into%20an%20AES-256-GCM%20wrapping%20key.%0A4.%20Encrypt%20the%20CEK%20with%20AES-256-GCM%20using%20the%20wrapping%20key%20and%20a%20random%20nonce.%0A5.%20Store%20the%20result%20as%20%60encrypted_cek%60%3A%20a%20concatenation%20of%20the%2032-byte%20ephemeral%20public%20key%2C%2012-byte%20nonce%2C%20encrypted%20CEK%2C%20and%2016-byte%20tag.%0A%0A%3A%3A%3A%0A%0A%23%23%20Reading%20Encrypted%20Files%0A%0A%60%60%60rust%0Ause%20honzo_std%3A%3AHonzoReader%3B%0A%0Alet%20private_key%3A%20%5Bu8%3B%2032%5D%20%3D%20load_private_key()%3B%0A%0Alet%20mut%20reader%20%3D%20HonzoReader%3A%3Anew(%26data%2C%201)%0A%20%20%20%20.with_drm_key(%26private_key)%3B%0Areader.parse().unwrap()%3B%0A%0Afor%20entry%20in%20reader.toc_entries()%20%7B%0A%20%20%20%20let%20chunk_data%20%3D%20reader.read_chunk(%26entry).unwrap()%3B%0A%7D%0A%60%60%60%0A%0AIf%20a%20DRM%20key%20is%20not%20provided%2C%20encrypted%20chunks%20cannot%20be%20read%3A%0A%0A%60%60%60rust%0Alet%20reader%20%3D%20HonzoReader%3A%3Anew(%26data%2C%201)%3B%0Areader.parse().unwrap()%3B%0A%0Amatch%20reader.read_chunk(%26entry)%20%7B%0A%20%20%20%20Err(e)%20if%20e.is_drm_error()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20println!(%22This%20chapter%20requires%20a%20DRM%20key%22)%3B%0A%20%20%20%20%7D%0A%20%20%20%20_%20%3D%3E%20%7B%7D%0A%7D%0A%60%60%60%0A%0A%23%23%20Building%20Encrypted%20Files%0A%0A%60%60%60rust%0Ause%20honzo_std%3A%3A%7BBuilder%2C%20DrmConfig%7D%3B%0A%0Alet%20drm%20%3D%20DrmConfig%3A%3Anew()%0A%20%20%20%20.encrypt_chunks(%26%5B0%2C%201%2C%202%5D)%0A%20%20%20%20.add_recipient(%26alice_pub_key%2C%20%22alice%40example.com%22)%0A%20%20%20%20.expiry(%222026-01-01T00%3A00%3A00Z%22)%0A%20%20%20%20.license_url(%22https%3A%2F%2Fexample.com%2Flicense%2Fabc123%22)%3B%0A%0Alet%20hzo%20%3D%20Builder%3A%3Anew()%0A%20%20%20%20.with_drm(drm)%0A%20%20%20%20.add_chapter(%22Chapter%201%22%2C%20...)%0A%20%20%20%20.add_chapter(%22Chapter%202%22%2C%20...)%0A%20%20%20%20.add_chapter(%22Chapter%203%22%2C%20...)%0A%20%20%20%20.finalize()%0A%20%20%20%20.unwrap()%3B%0A%60%60%60%0A%0A%23%23%20Supported%20Algorithms%0A%0A%7C%20Component%20%20%20%20%20%20%20%20%20%20%7C%20Algorithm%20%20%20%7C%0A%7C--------------------%7C-------------%7C%0A%7C%20Content%20encryption%20%7C%20AES-256-GCM%20%7C%0A%7C%20Key%20agreement%20%20%20%20%20%20%7C%20X25519%20ECDH%20%7C%0A%7C%20Key%20derivation%20%20%20%20%20%7C%20HKDF-SHA256%20%7C%0A%7C%20Key%20wrapping%20%20%20%20%20%20%20%7C%20AES-256-GCM%20%7C%0A%7C%20Random%20generation%20%20%7C%20OS%20CSPRNG%20%20%20%7C%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Annotations%22%20..%2Ffeatures%2Fannotations.md%20icon%3Abookmark%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22DRM%20%26%20Encryption%22%0Adescription%3A%20%22AES-256-GCM%20content%20protection%20with%20ECDH%20key%20exchange%22%0A---%0A%0AHonzo%20supports%20content%20encryption%20via%20an%20EXTRA%20entry%20under%20the%20%60org.nisoku.drm%60%20namespace.%20The%20design%20separates%20content%20encryption%20from%20key%20management.%20Chapters%20are%20encrypted%20with%20a%20random%20content%20encryption%20key%20(CEK).%20The%20CEK%20is%20then%20wrapped%20for%20each%20authorized%20recipient.%0A%0A%23%23%20Model%0A%0A%60%60%60mermaid%0Aflowchart%20TB%0A%20%20%20%20CEK%5B%22Random%20CEK%3Cbr%2F%3EAES-256-GCM%20key%20(256%20bits)%22%5D%0A%20%20%20%20CEK%20--%3E%20Encrypt%5BEncrypts%20chunk%20data%5D%0A%20%20%20%20CEK%20--%3E%20Wrap%5BWrapped%20per%20recipient%5D%0A%0A%20%20%20%20Encrypt%20--%3E%20EncCHAP%5B%22Encrypted%20CHAP%22%5D%0A%20%20%20%20Encrypt%20--%3E%20EncIMG%5B%22Encrypted%20IMG_%22%5D%0A%20%20%20%20Encrypt%20--%3E%20More%5B%22...%22%5D%0A%0A%20%20%20%20Wrap%20--%3E%20KeyEnv%5B%22Key%20Envelope%3Cbr%2F%3Eper%20X25519%20pub%20key%22%5D%0A%60%60%60%0A%0A%23%23%20Key%20Envelope%0A%0AThe%20DRM%20envelope%20is%20a%20MessagePack%20map%20stored%20in%20the%20EXTRA%20entry%3A%0A%0A%60%60%60python%0A%7B%0A%20%20%22version%22%3A%201%2C%0A%20%20%22content_encryption_alg%22%3A%20%22AES-256-GCM%22%2C%0A%20%20%22key_wrapping_alg%22%3A%20%22ECDH-X25519-HKDF-SHA256%22%2C%0A%20%20%22license_url%22%3A%20%22https%3A%2F%2Fexample.com%2Flicense%2Fabc123%22%2C%0A%20%20%22expiry%22%3A%20%222026-01-01T00%3A00%3A00Z%22%2C%0A%20%20%22recipients%22%3A%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22ephemeral_pub%22%3A%20%22%3C32%20bytes%20base64%3E%22%2C%0A%20%20%20%20%20%20%22encrypted_cek%22%3A%20%22%3C48%20bytes%20base64%3E%22%2C%0A%20%20%20%20%20%20%22recipient_id%22%3A%20%22user%40example.com%22%0A%20%20%20%20%7D%0A%20%20%5D%0A%7D%0A%60%60%60%0A%0AEach%20recipient%20gets%20their%20own%20envelope%20entry.%20The%20CEK%20is%20wrapped%20using%20ECDH%20with%20X25519%3A%0A%0A%3A%3A%3A%20steps%0A%0A1.%20Generate%20an%20ephemeral%20X25519%20key%20pair.%0A2.%20Derive%20a%20shared%20secret%20from%20the%20ephemeral%20private%20key%20and%20the%20recipient&#039;s%20public%20key.%0A3.%20Use%20HKDF-SHA256%20to%20expand%20the%20shared%20secret%20into%20an%20AES-256-GCM%20wrapping%20key.%0A4.%20Encrypt%20the%20CEK%20with%20AES-256-GCM%20using%20the%20wrapping%20key%20and%20a%20random%20nonce.%0A5.%20Store%20the%20result%20as%20%60encrypted_cek%60%3A%20a%20concatenation%20of%20the%2032-byte%20ephemeral%20public%20key%2C%2012-byte%20nonce%2C%20encrypted%20CEK%2C%20and%2016-byte%20tag.%0A%0A%3A%3A%3A%0A%0A%23%23%20Reading%20Encrypted%20Files%0A%0A%60%60%60rust%0Ause%20honzo_io%3A%3AHonzoReader%3B%0A%0Alet%20private_key%3A%20%5Bu8%3B%2032%5D%20%3D%20load_private_key()%3B%0A%0Alet%20mut%20reader%20%3D%20HonzoReader%3A%3Anew(%26data%2C%201)%0A%20%20%20%20.with_drm_key(%26private_key)%3B%0Areader.parse().unwrap()%3B%0A%0Afor%20entry%20in%20reader.toc_entries()%20%7B%0A%20%20%20%20let%20chunk_data%20%3D%20reader.read_chunk(%26entry).unwrap()%3B%0A%7D%0A%60%60%60%0A%0AIf%20a%20DRM%20key%20is%20not%20provided%2C%20encrypted%20chunks%20cannot%20be%20read%3A%0A%0A%60%60%60rust%0Alet%20reader%20%3D%20HonzoReader%3A%3Anew(%26data%2C%201)%3B%0Areader.parse().unwrap()%3B%0A%0Amatch%20reader.read_chunk(%26entry)%20%7B%0A%20%20%20%20Err(e)%20if%20e.is_drm_error()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20println!(%22This%20chapter%20requires%20a%20DRM%20key%22)%3B%0A%20%20%20%20%7D%0A%20%20%20%20_%20%3D%3E%20%7B%7D%0A%7D%0A%60%60%60%0A%0A%23%23%20Building%20Encrypted%20Files%0A%0A%60%60%60rust%0Ause%20honzo_io%3A%3A%7BHonzoBuilder%2C%20DrmConfig%7D%3B%0A%0Alet%20drm%20%3D%20DrmConfig%3A%3Anew()%0A%20%20%20%20.encrypt_chunks(%26%5B0%2C%201%2C%202%5D)%0A%20%20%20%20.add_recipient(%26alice_pub_key%2C%20%22alice%40example.com%22)%0A%20%20%20%20.expiry(%222026-01-01T00%3A00%3A00Z%22)%0A%20%20%20%20.license_url(%22https%3A%2F%2Fexample.com%2Flicense%2Fabc123%22)%3B%0A%0Alet%20hzo%20%3D%20HonzoBuilder%3A%3Anew()%0A%20%20%20%20.with_drm(drm)%0A%20%20%20%20.add_chapter(%22Chapter%201%22%2C%20...)%0A%20%20%20%20.add_chapter(%22Chapter%202%22%2C%20...)%0A%20%20%20%20.add_chapter(%22Chapter%203%22%2C%20...)%0A%20%20%20%20.finalize()%0A%20%20%20%20.unwrap()%3B%0A%60%60%60%0A%0A%23%23%20Supported%20Algorithms%0A%0A%7C%20Component%20%20%20%20%20%20%20%20%20%20%7C%20Algorithm%20%20%20%7C%0A%7C--------------------%7C-------------%7C%0A%7C%20Content%20encryption%20%7C%20AES-256-GCM%20%7C%0A%7C%20Key%20agreement%20%20%20%20%20%20%7C%20X25519%20ECDH%20%7C%0A%7C%20Key%20derivation%20%20%20%20%20%7C%20HKDF-SHA256%20%7C%0A%7C%20Key%20wrapping%20%20%20%20%20%20%20%7C%20AES-256-GCM%20%7C%0A%7C%20Random%20generation%20%20%7C%20OS%20CSPRNG%20%20%20%7C%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Annotations%22%20..%2Ffeatures%2Fannotations.md%20icon%3Abookmark%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1735,7 +1735,7 @@
 <li class="step-item">Store the result as <code>encrypted_cek</code>: a concatenation of the 32-byte ephemeral public key, 12-byte nonce, encrypted CEK, and 16-byte tag.</li>
 </ol>
 </div><h2 id="reading-encrypted-files" class="docmd-heading"><a href="#reading-encrypted-files" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Reading Encrypted Files</h2>
-<pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_std<span class="hljs-punctuation">::</span>HonzoReader;
+<pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_io<span class="hljs-punctuation">::</span>HonzoReader;
 
 <span class="hljs-keyword">let</span> private_key<span class="hljs-punctuation">:</span> [u8; <span class="hljs-number">32</span>] <span class="hljs-punctuation">=</span> <span class="hljs-title function_">load_private_key</span>();
 
@@ -1759,7 +1759,7 @@ reader.<span class="hljs-title function_">parse</span>().<span class="hljs-title
 }
 </code></pre>
 <h2 id="building-encrypted-files" class="docmd-heading"><a href="#building-encrypted-files" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Building Encrypted Files</h2>
-<pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_std<span class="hljs-punctuation">::</span>{Builder, DrmConfig};
+<pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_io<span class="hljs-punctuation">::</span>{HonzoBuilder, DrmConfig};
 
 <span class="hljs-keyword">let</span> drm <span class="hljs-punctuation">=</span> DrmConfig<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>()
     .<span class="hljs-title function_">encrypt_chunks</span>(<span class="hljs-punctuation">&amp;</span>[<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>])
@@ -1767,7 +1767,7 @@ reader.<span class="hljs-title function_">parse</span>().<span class="hljs-title
     .<span class="hljs-title function_">expiry</span>(<span class="hljs-string">&quot;2026-01-01T00:00:00Z&quot;</span>)
     .<span class="hljs-title function_">license_url</span>(<span class="hljs-string">&quot;https://example.com/license/abc123&quot;</span>);
 
-<span class="hljs-keyword">let</span> hzo <span class="hljs-punctuation">=</span> Builder<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>()
+<span class="hljs-keyword">let</span> hzo <span class="hljs-punctuation">=</span> HonzoBuilder<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>()
     .<span class="hljs-title function_">with_drm</span>(drm)
     .<span class="hljs-title function_">add_chapter</span>(<span class="hljs-string">&quot;Chapter 1&quot;</span>, ...)
     .<span class="hljs-title function_">add_chapter</span>(<span class="hljs-string">&quot;Chapter 2&quot;</span>, ...)
@@ -1958,13 +1958,13 @@ Annotations</a></div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1780809038000">
+                <span class="git-last-updated" data-timestamp="1780809817000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1780809038000"></span>
+                  <span class="git-time" data-timestamp="1780809817000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1977,10 +1977,10 @@ Annotations</a></div>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Oops I accidentally published it">Oops I accidentally published it</div>
+                            <div class="git-commit-message" title="More fixes">More fixes</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1780809038000"></span>
+                              <span class="git-commit-date" data-timestamp="1780809817000"></span>
                             </div>
                           </div>
                         </li>
@@ -2073,14 +2073,14 @@ Annotations</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mq3bxcqd"></script>
+      <script src="../../assets/js/docmd-main.js?v=mq3cekj9"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mq3bxcqd"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3bxcqd" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mq3cekj9"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cekj9" ></script>
 <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=mq3bxcqd" ></script>
-<script src="../../assets/js/init-mermaid.js?v=mq3bxcqd" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=mq3bxcqd" type="module"></script>
+<script src="../../assets/js/docmd-search.js?v=mq3cekj9" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mq3cekj9" type="module"></script>
+<script src="../../assets/js/docmd-git.js?v=mq3cekj9" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"

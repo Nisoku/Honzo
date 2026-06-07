@@ -1683,11 +1683,11 @@ Annotations are stored as a MessagePack map:
 ## Storing annotations
 
 ```rust
-use honzo_std::{Builder, ExtraEntry};
+use honzo_io::{HonzoBuilder, ExtraEntry};
 
 // Add annotation data as an EXTRA entry
 let anno_data = serde_json::to_vec(&annotation_map).unwrap();
-let hzo = Builder::new()
+let hzo = HonzoBuilder::new()
     .add_extra("org.nisoku.anno", &anno_data)
     .add_chapter("Chapter 1", ...)
     .finalize()
@@ -1697,7 +1697,7 @@ let hzo = Builder::new()
 ## Reading annotations
 
 ```rust
-use honzo_std::HonzoParser;
+use honzo_core::HonzoParser;
 
 let p = HonzoParser::new(&data, 1).unwrap();
 for entry in p.extra_entries() {
@@ -1898,7 +1898,7 @@ A 2GB book with 200 chapters uses memory proportional to the largest single chap
 ## HonzoStream
 
 ```rust
-use honzo_std::HonzoStream;
+use honzo_io::HonzoStream;
 
 let file = std::fs::File::open("massive_book.hzo").unwrap();
 let mut stream = HonzoStream::open(file, 1).unwrap();
@@ -2331,9 +2331,9 @@ When `compression` equals 0, `size` equals `orig_size`. Alternatively `orig_size
 == tab "Rust Builder"
 
 ```rust
-use honzo_std::{Builder, Compression, MarkupType};
+use honzo_io::{HonzoBuilder, Compression, MarkupType};
 
-Builder::new()
+HonzoBuilder::new()
     .add_chapter("Chapter 1", Compression::Lz4, MarkupType::Markdown)
     .add_chapter("Chapter 2", Compression::None, MarkupType::HTML)
     .finalize()
@@ -2342,7 +2342,7 @@ Builder::new()
 == tab "Rust Reader"
 
 ```rust
-use honzo_std::HonzoParser;
+use honzo_core::HonzoParser;
 
 let p = HonzoParser::new(&data, 1).unwrap();
 for entry in p.toc_entries() {
@@ -2427,7 +2427,7 @@ Each recipient gets their own envelope entry. The CEK is wrapped using ECDH with
 ## Reading Encrypted Files
 
 ```rust
-use honzo_std::HonzoReader;
+use honzo_io::HonzoReader;
 
 let private_key: [u8; 32] = load_private_key();
 
@@ -2457,7 +2457,7 @@ match reader.read_chunk(&entry) {
 ## Building Encrypted Files
 
 ```rust
-use honzo_std::{Builder, DrmConfig};
+use honzo_io::{HonzoBuilder, DrmConfig};
 
 let drm = DrmConfig::new()
     .encrypt_chunks(&[0, 1, 2])
@@ -2465,7 +2465,7 @@ let drm = DrmConfig::new()
     .expiry("2026-01-01T00:00:00Z")
     .license_url("https://example.com/license/abc123");
 
-let hzo = Builder::new()
+let hzo = HonzoBuilder::new()
     .with_drm(drm)
     .add_chapter("Chapter 1", ...)
     .add_chapter("Chapter 2", ...)
@@ -2622,7 +2622,7 @@ All chapters combine into a single scrollable view.
 ## Reading Layout Modes
 
 ```rust
-use honzo_std::HonzoParser;
+use honzo_core::HonzoParser;
 
 let p = HonzoParser::new(&data, 1).unwrap();
 match p.head().layout_mode {
@@ -3092,9 +3092,9 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "Rust"
 
    ```rust
-   use honzo_std::{Builder, Compression, MarkupType};
+   use honzo_io::{HonzoBuilder, Compression, MarkupType};
 
-   let hzo = Builder::new()
+   let hzo = HonzoBuilder::new()
        .meta_title("en", "My First Book")
        .meta_creator("en", "Author Name")
        .add_chapter("Chapter 1: The Beginning", Compression::Lz4, MarkupType::Markdown)
@@ -3125,7 +3125,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "Rust"
 
    ```rust
-   use honzo_std::HonzoParser;
+   use honzo_core::HonzoParser;
 
    let data = std::fs::read("my_book.hzo").unwrap();
    let p = HonzoParser::new(&data, 1).unwrap();
@@ -3172,7 +3172,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "Rust Parser"
 
    ```rust
-   use honzo_std::HonzoParser;
+   use honzo_core::HonzoParser;
 
    let data = std::fs::read("my_book.hzo").unwrap();
    let p = HonzoParser::new(&data, 1).unwrap();
@@ -3189,7 +3189,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "Rust Streaming"
 
    ```rust
-   use honzo_std::HonzoStream;
+   use honzo_io::HonzoStream;
 
    let file = std::fs::File::open("my_book.hzo").unwrap();
    let mut stream = HonzoStream::open(file, 1).unwrap();
@@ -3335,7 +3335,7 @@ AES-256-GCM content protection via `org.nisoku.drm`. ECDH key exchange with X255
 == tab "Rust"
 
 ```rust
-use honzo_std::HonzoParser;
+use honzo_core::HonzoParser;
 
 let data = std::fs::read("book.hzo").unwrap();
 let p = HonzoParser::new(&data, 1).unwrap();

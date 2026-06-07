@@ -87,10 +87,10 @@
       Compression : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3bxcqd">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mq3cekj9">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3bxcqd" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3bxcqd" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mq3cekj9" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mq3cekj9" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Per-chunk LZ4 compression in Honzo files">
@@ -105,12 +105,12 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3bxcqd" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3bxcqd" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3bxcqd" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mq3cekj9" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mq3cekj9" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mq3cekj9" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3bxcqd">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mq3cekj9">
     
     <script>/**
  * --------------------------------------------------------------------
@@ -1608,7 +1608,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Compression%22%0Adescription%3A%20%22Per-chunk%20LZ4%20compression%20in%20Honzo%20files%22%0A---%0A%0AHonzo%20applies%20compression%20at%20the%20chunk%20level.%20Each%20TOC%20entry%20selects%20its%20own%20compression%20algorithm%20independently%20of%20every%20other%20chunk.%0A%0A%23%23%20Compression%20Codes%0A%0A%7C%20Code%20%7C%20Algorithm%20%7C%20Typical%20Use%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------%7C-----------%7C----------------------------------------%7C%0A%7C%200%20%20%20%20%7C%20None%20%20%20%20%20%20%7C%20Images%2C%20fonts%2C%20already%20compressed%20data%20%7C%0A%7C%201%20%20%20%20%7C%20LZ4%20%20%20%20%20%20%20%7C%20Chapter%20text%2C%20CSS%2C%20metadata%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20LZ4%0A%0A%5BLZ4%5D(https%3A%2F%2Flz4.org)%20is%20a%20fast%20compression%20algorithm%20that%20prioritizes%20decode%20speed%20over%20compression%20ratio.%20Honzo%20uses%20it%20for%20text%20heavy%20chunks%20where%20decode%20speed%20matters%20more%20than%20squeezing%20every%20byte.%0A%0ATypical%20compression%20ratios%20for%20chapter%20text%3A%0A%0A%7C%20Content%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Uncompressed%20%7C%20Compressed%20with%20LZ4%20%7C%20Ratio%20%20%20%20%20%20%7C%0A%7C---------------------------%7C--------------%7C---------------------%7C------------%7C%0A%7C%20Short%20chapter%20around%202KB%20%20%7C%202%2C048%20%20%20%20%20%20%20%20%7C%20About%201%2C000%20%20%20%20%20%20%20%20%20%7C%20Around%2050%25%20%7C%0A%7C%20Novel%20chapter%20around%2010KB%20%7C%2010%2C240%20%20%20%20%20%20%20%7C%20About%204%2C600%20%20%20%20%20%20%20%20%20%7C%20Around%2045%25%20%7C%0A%7C%20CSS%20file%20around%2050KB%20%20%20%20%20%20%7C%2051%2C200%20%20%20%20%20%20%20%7C%20About%2015%2C000%20%20%20%20%20%20%20%20%7C%20Around%2029%25%20%7C%0A%0A%23%23%20Per%20Chunk%20Tradeoff%0A%0AEach%20TOC%20entry%20selects%20its%20own%20compression.%20This%20lets%20you%20optimize%20per%20chunk.%0A%0ALeave%20images%20uncompressed.%20JPEG%20and%20WebP%20are%20already%20compressed.%20Running%20LZ4%20on%20them%20wastes%20CPU%20and%20may%20increase%20size%20slightly.%0A%0ACompress%20chapters.%20Text%20benefits%20from%20LZ4.%20The%20decode%20speed%20is%20fast%20enough%20that%20page%20turns%20feel%20instant.%0A%0ADo%20not%20compress%20fonts.%20WOFF2%20is%20already%20compressed.%20TTF%20and%20OTF%20may%20see%20modest%20gains%20but%20the%20overhead%20rarely%20matters.%0A%0A%23%23%20Size%20Tracking%20in%20the%20TOC%0A%0AEach%20TOC%20entry%20tracks%20two%20sizes%3A%0A%0A%7C%20Field%20%20%20%20%20%20%20%7C%20What%20It%20Holds%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------%7C----------------------------------------------------------------------------------------------%7C%0A%7C%20%60size%60%20%20%20%20%20%20%7C%20Stored%20size.%20This%20is%20the%20compressed%20size%20or%20the%20uncompressed%20size%20if%20no%20compression%20applies.%20%7C%0A%7C%20%60orig_size%60%20%7C%20Original%20uncompressed%20size.%20Zero%20if%20same%20as%20%60size%60.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AWhen%20%60compression%60%20equals%201%2C%20%60size%60%20is%20the%20compressed%20length.%20%60orig_size%60%20is%20the%20decompressed%20length%20and%20is%20non%20zero.%0A%0AWhen%20%60compression%60%20equals%200%2C%20%60size%60%20equals%20%60orig_size%60.%20Alternatively%20%60orig_size%60%20is%200.%0A%0A%23%23%20Implementation%0A%0A%3A%3A%3A%20tabs%0A%0A%3D%3D%20tab%20%22Rust%20Builder%22%0A%0A%60%60%60rust%0Ause%20honzo_std%3A%3A%7BBuilder%2C%20Compression%2C%20MarkupType%7D%3B%0A%0ABuilder%3A%3Anew()%0A%20%20%20%20.add_chapter(%22Chapter%201%22%2C%20Compression%3A%3ALz4%2C%20MarkupType%3A%3AMarkdown)%0A%20%20%20%20.add_chapter(%22Chapter%202%22%2C%20Compression%3A%3ANone%2C%20MarkupType%3A%3AHTML)%0A%20%20%20%20.finalize()%0A%60%60%60%0A%0A%3D%3D%20tab%20%22Rust%20Reader%22%0A%0A%60%60%60rust%0Ause%20honzo_std%3A%3AHonzoParser%3B%0A%0Alet%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0Afor%20entry%20in%20p.toc_entries()%20%7B%0A%20%20%20%20let%20compressed%20%3D%20entry.compression%20%3D%3D%201%3B%0A%20%20%20%20let%20chunk_data%20%3D%20p.read_chunk(%26entry).unwrap()%3B%0A%7D%0A%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22DRM%20%26%20Encryption%22%20.%2Fdrm.md%20icon%3Alock%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Compression%22%0Adescription%3A%20%22Per-chunk%20LZ4%20compression%20in%20Honzo%20files%22%0A---%0A%0AHonzo%20applies%20compression%20at%20the%20chunk%20level.%20Each%20TOC%20entry%20selects%20its%20own%20compression%20algorithm%20independently%20of%20every%20other%20chunk.%0A%0A%23%23%20Compression%20Codes%0A%0A%7C%20Code%20%7C%20Algorithm%20%7C%20Typical%20Use%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------%7C-----------%7C----------------------------------------%7C%0A%7C%200%20%20%20%20%7C%20None%20%20%20%20%20%20%7C%20Images%2C%20fonts%2C%20already%20compressed%20data%20%7C%0A%7C%201%20%20%20%20%7C%20LZ4%20%20%20%20%20%20%20%7C%20Chapter%20text%2C%20CSS%2C%20metadata%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20LZ4%0A%0A%5BLZ4%5D(https%3A%2F%2Flz4.org)%20is%20a%20fast%20compression%20algorithm%20that%20prioritizes%20decode%20speed%20over%20compression%20ratio.%20Honzo%20uses%20it%20for%20text%20heavy%20chunks%20where%20decode%20speed%20matters%20more%20than%20squeezing%20every%20byte.%0A%0ATypical%20compression%20ratios%20for%20chapter%20text%3A%0A%0A%7C%20Content%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Uncompressed%20%7C%20Compressed%20with%20LZ4%20%7C%20Ratio%20%20%20%20%20%20%7C%0A%7C---------------------------%7C--------------%7C---------------------%7C------------%7C%0A%7C%20Short%20chapter%20around%202KB%20%20%7C%202%2C048%20%20%20%20%20%20%20%20%7C%20About%201%2C000%20%20%20%20%20%20%20%20%20%7C%20Around%2050%25%20%7C%0A%7C%20Novel%20chapter%20around%2010KB%20%7C%2010%2C240%20%20%20%20%20%20%20%7C%20About%204%2C600%20%20%20%20%20%20%20%20%20%7C%20Around%2045%25%20%7C%0A%7C%20CSS%20file%20around%2050KB%20%20%20%20%20%20%7C%2051%2C200%20%20%20%20%20%20%20%7C%20About%2015%2C000%20%20%20%20%20%20%20%20%7C%20Around%2029%25%20%7C%0A%0A%23%23%20Per%20Chunk%20Tradeoff%0A%0AEach%20TOC%20entry%20selects%20its%20own%20compression.%20This%20lets%20you%20optimize%20per%20chunk.%0A%0ALeave%20images%20uncompressed.%20JPEG%20and%20WebP%20are%20already%20compressed.%20Running%20LZ4%20on%20them%20wastes%20CPU%20and%20may%20increase%20size%20slightly.%0A%0ACompress%20chapters.%20Text%20benefits%20from%20LZ4.%20The%20decode%20speed%20is%20fast%20enough%20that%20page%20turns%20feel%20instant.%0A%0ADo%20not%20compress%20fonts.%20WOFF2%20is%20already%20compressed.%20TTF%20and%20OTF%20may%20see%20modest%20gains%20but%20the%20overhead%20rarely%20matters.%0A%0A%23%23%20Size%20Tracking%20in%20the%20TOC%0A%0AEach%20TOC%20entry%20tracks%20two%20sizes%3A%0A%0A%7C%20Field%20%20%20%20%20%20%20%7C%20What%20It%20Holds%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------%7C----------------------------------------------------------------------------------------------%7C%0A%7C%20%60size%60%20%20%20%20%20%20%7C%20Stored%20size.%20This%20is%20the%20compressed%20size%20or%20the%20uncompressed%20size%20if%20no%20compression%20applies.%20%7C%0A%7C%20%60orig_size%60%20%7C%20Original%20uncompressed%20size.%20Zero%20if%20same%20as%20%60size%60.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AWhen%20%60compression%60%20equals%201%2C%20%60size%60%20is%20the%20compressed%20length.%20%60orig_size%60%20is%20the%20decompressed%20length%20and%20is%20non%20zero.%0A%0AWhen%20%60compression%60%20equals%200%2C%20%60size%60%20equals%20%60orig_size%60.%20Alternatively%20%60orig_size%60%20is%200.%0A%0A%23%23%20Implementation%0A%0A%3A%3A%3A%20tabs%0A%0A%3D%3D%20tab%20%22Rust%20Builder%22%0A%0A%60%60%60rust%0Ause%20honzo_io%3A%3A%7BHonzoBuilder%2C%20Compression%2C%20MarkupType%7D%3B%0A%0AHonzoBuilder%3A%3Anew()%0A%20%20%20%20.add_chapter(%22Chapter%201%22%2C%20Compression%3A%3ALz4%2C%20MarkupType%3A%3AMarkdown)%0A%20%20%20%20.add_chapter(%22Chapter%202%22%2C%20Compression%3A%3ANone%2C%20MarkupType%3A%3AHTML)%0A%20%20%20%20.finalize()%0A%60%60%60%0A%0A%3D%3D%20tab%20%22Rust%20Reader%22%0A%0A%60%60%60rust%0Ause%20honzo_core%3A%3AHonzoParser%3B%0A%0Alet%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0Afor%20entry%20in%20p.toc_entries()%20%7B%0A%20%20%20%20let%20compressed%20%3D%20entry.compression%20%3D%3D%201%3B%0A%20%20%20%20let%20chunk_data%20%3D%20p.read_chunk(%26entry).unwrap()%3B%0A%7D%0A%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22DRM%20%26%20Encryption%22%20.%2Fdrm.md%20icon%3Alock%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1782,14 +1782,14 @@
 <p>When <code>compression</code> equals 0, <code>size</code> equals <code>orig_size</code>. Alternatively <code>orig_size</code> is 0.</p>
 <h2 id="implementation" class="docmd-heading"><a href="#implementation" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Implementation</h2>
 <div class="docmd-tabs">
-<div class="docmd-tabs-nav"><div class="docmd-tabs-nav-item active"><span>Rust Builder</span></div><div class="docmd-tabs-nav-item "><span>Rust Reader</span></div></div><div class="docmd-tabs-content"><div class="docmd-tab-pane active"><pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_std<span class="hljs-punctuation">::</span>{Builder, Compression, MarkupType};
+<div class="docmd-tabs-nav"><div class="docmd-tabs-nav-item active"><span>Rust Builder</span></div><div class="docmd-tabs-nav-item "><span>Rust Reader</span></div></div><div class="docmd-tabs-content"><div class="docmd-tab-pane active"><pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_io<span class="hljs-punctuation">::</span>{HonzoBuilder, Compression, MarkupType};
 
-Builder<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>()
+HonzoBuilder<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>()
     .<span class="hljs-title function_">add_chapter</span>(<span class="hljs-string">&quot;Chapter 1&quot;</span>, Compression<span class="hljs-punctuation">::</span>Lz4, MarkupType<span class="hljs-punctuation">::</span>Markdown)
     .<span class="hljs-title function_">add_chapter</span>(<span class="hljs-string">&quot;Chapter 2&quot;</span>, Compression<span class="hljs-punctuation">::</span><span class="hljs-keyword">None</span>, MarkupType<span class="hljs-punctuation">::</span>HTML)
     .<span class="hljs-title function_">finalize</span>()
 </code></pre>
-</div><div class="docmd-tab-pane "><pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_std<span class="hljs-punctuation">::</span>HonzoParser;
+</div><div class="docmd-tab-pane "><pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_core<span class="hljs-punctuation">::</span>HonzoParser;
 
 <span class="hljs-keyword">let</span> p <span class="hljs-punctuation">=</span> HonzoParser<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>(<span class="hljs-punctuation">&amp;</span>data, <span class="hljs-number">1</span>).<span class="hljs-title function_">unwrap</span>();
 <span class="hljs-keyword">for</span> entry <span class="hljs-keyword">in</span> p.<span class="hljs-title function_">toc_entries</span>() {
@@ -1950,13 +1950,13 @@ DRM &amp; Encryption</a></div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1780809038000">
+                <span class="git-last-updated" data-timestamp="1780809817000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1780809038000"></span>
+                  <span class="git-time" data-timestamp="1780809817000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1969,10 +1969,10 @@ DRM &amp; Encryption</a></div>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Oops I accidentally published it">Oops I accidentally published it</div>
+                            <div class="git-commit-message" title="More fixes">More fixes</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1780809038000"></span>
+                              <span class="git-commit-date" data-timestamp="1780809817000"></span>
                             </div>
                           </div>
                         </li>
@@ -2065,14 +2065,14 @@ DRM &amp; Encryption</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mq3bxcqd"></script>
+      <script src="../../assets/js/docmd-main.js?v=mq3cekj9"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mq3bxcqd"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3bxcqd" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mq3cekj9"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mq3cekj9" ></script>
 <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=mq3bxcqd" ></script>
-<script src="../../assets/js/init-mermaid.js?v=mq3bxcqd" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=mq3bxcqd" type="module"></script>
+<script src="../../assets/js/docmd-search.js?v=mq3cekj9" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mq3cekj9" type="module"></script>
+<script src="../../assets/js/docmd-git.js?v=mq3cekj9" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
