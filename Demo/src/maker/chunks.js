@@ -121,6 +121,11 @@ function renderChunkBody(ch, i) {
         </select>
       </div>
       <textarea class="chunk-content" data-id="${ch.id}" placeholder="Write ${ch.contentType} content here..." rows="8">${esc(ch.content)}</textarea>
+      <div class="chunk-toolbar">
+        <button class="btn btn-xs chunk-pagebreak-btn" data-action="insert-pagebreak" data-id="${ch.id}" title="Insert page break marker">
+          ${icon("FilePlus", 12)} Page Break
+        </button>
+      </div>
     </div>`;
   }
   if (t.binary) {

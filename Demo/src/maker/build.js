@@ -82,15 +82,48 @@ function collectPmap() {
   return Array.from(rows).map((row) => ({
     printPage: parseInt(row.querySelector(".pmap-print")?.value, 10) || 1,
     chunkId: parseInt(row.querySelector(".pmap-chunk")?.value, 10) || 0,
-    byteOffset: parseInt(row.querySelector(".pmap-offset")?.value, 10) || 0,
   }));
+}
+
+function resolvePmapByteOffsets(pmap, ch) {
+  const chunkBreakOffsets = {};
+  for (let ci = 0; ci < ch.length; ci++) {
+    const c = ch[ci];
+    if (c.tag !== "CHAP" && c.tag !== "NOTE") continue;
+    const text = new TextDecoder().decode(c.data);
+    const offsets = [];
+    const re = /<!--\s*pagebreak(?:\s+(\d+))?\s*-->/g;
+    let match;
+    while ((match = re.exec(text)) !== null) {
+      offsets.push({ byteOffset: match.index });
+    }
+    chunkBreakOffsets[ci] = offsets;
+  }
+
+  const usedMarkers = {};
+  return pmap.map((entry) => {
+    const ci = entry.chunkId;
+    if (ci >= ch.length) return { ...entry, byteOffset: 0 };
+
+    const marks = chunkBreakOffsets[ci] || [];
+    const key = `${ci}`;
+    if (!usedMarkers[key]) usedMarkers[key] = 0;
+
+    const idx = usedMarkers[key];
+    usedMarkers[key]++;
+
+    if (idx < marks.length) {
+      return { ...entry, byteOffset: marks[idx].byteOffset };
+    }
+    return { ...entry, byteOffset: 0 };
+  });
 }
 
 export async function buildBook() {
   try {
     await ensureWasm();
     const ch = collectChunks();
-    const pmap = collectPmap();
+    const pmap = resolvePmapByteOffsets(collectPmap(), ch);
     const { meta, minVer } = collectMeta();
     if (ch.length === 0) {
       showStatus("error", "Add at least one chunk before building");

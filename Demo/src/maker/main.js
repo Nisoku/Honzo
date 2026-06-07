@@ -135,6 +135,20 @@ bindEvent(chunksList, "click", (e) => {
     if (ch) { ch.fileData = null; ch.fileName = ""; ch.fileType = ""; }
     renderChunks();
   }
+  if (action === "insert-pagebreak") {
+    const card = btn.closest(".chunk-card");
+    const ta = card?.querySelector(".chunk-content");
+    if (ta) {
+      const start = ta.selectionStart;
+      const before = ta.value.substring(0, start);
+      const after = ta.value.substring(start);
+      ta.value = `${before}<!-- pagebreak -->\n${after}`;
+      ta.selectionStart = ta.selectionEnd = start + 20;
+      ta.focus();
+      const ch = chunks.find((c) => c.id === id);
+      if (ch) ch.content = ta.value;
+    }
+  }
 });
 
 // File input for binary chunks
@@ -250,7 +264,6 @@ bindEvent(pmapBody, "input", (e) => {
   const entries = [...pmapEntries];
   if (target.classList.contains("pmap-print")) entries[idx].printPage = val || 1;
   else if (target.classList.contains("pmap-chunk")) entries[idx].chunkId = val;
-  else if (target.classList.contains("pmap-offset")) entries[idx].byteOffset = val;
   setPmapEntries(entries);
 });
 bindEvent(pmapBody, "click", (e) => {

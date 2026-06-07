@@ -916,6 +916,35 @@ body.page-scroll #app-header {
 }
 
 
+/* Powered by footer */
+.powered-by {
+  text-align: center;
+  padding: 12px 20px;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  border-top: 1px solid var(--border);
+  background: var(--header-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  flex-shrink: 0;
+}
+
+.powered-by a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.powered-by a:hover {
+  color: var(--accent);
+}
+
+.powered-by .sep {
+  margin: 0 6px;
+  color: var(--text-tertiary);
+}
+
 /* Identifier fields */
 .id-type,
 .id-value {

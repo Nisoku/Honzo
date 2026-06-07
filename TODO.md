@@ -1,10 +1,9 @@
 # TODO
 
-## Demo
+## Comic/Manga/etc Support
 
-- [X] Book Maker (online GUI builder) doesn't exist
-
-## Docs / CI
-
-- [ ] API reference docs don't exist
-- [ ] Getting-started guide doesn't exist
+- [ ] CBZ converter
+- [ ] `org.nisoku.comic` EXTRA chunk (stuff from the `ComicInfo` spec: AlternateSeries, Teams, SeriesGroup, Page.Type per image)
+- [ ] Add general fields to HonzoMeta struct (Count/Volume on SeriesMeta, Characters/Locations on HonzoMeta, monochrome on RenderHints or HonzoMeta, community_rating)
+- [ ] Build the CBZ converter (cbz.rs): ZIP read, image filter/sort, ComicInfo.xml parse, HonzoBuilder assembly, CLI dispatch
+- [ ] Update conversion docs with CBZ format card, steps, and metadata mapping

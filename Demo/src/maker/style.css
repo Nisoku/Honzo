@@ -255,6 +255,35 @@
   min-height: 80px;
 }
 
+/* Chunk toolbar */
+.chunk-toolbar {
+  display: flex;
+  gap: 6px;
+  padding: 6px 0 0;
+}
+
+.btn-xs {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition);
+}
+
+.btn-xs:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
 /* File drop area */
 .chunk-file-area {
   margin-top: 4px;

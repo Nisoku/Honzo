@@ -1,0 +1,174 @@
+:root[data-theme="light"] {
+  --ruby-primary: #d97706;
+  --ruby-primary-light: #fffbeb;
+  --ruby-primary-dark: #b45309;
+  --ruby-accent: #f59e0b;
+  --ruby-accent-light: #fef3c7;
+
+  --ruby-text: #1c1917;
+  --ruby-text-light: #44403c;
+  --ruby-text-lightest: #78716c;
+
+  --ruby-background: #fafaf9;
+  --ruby-background-alt: #f5f5f4;
+
+  --ruby-border: #e7e5e4;
+  --ruby-border-light: #f5f5f4;
+
+  --bg-color: var(--ruby-background);
+  --text-color: var(--ruby-text);
+  --sidebar-bg: #f5f5f4;
+  --sidebar-text: var(--ruby-text-light);
+  --sidebar-link-active-bg: #fffbeb;
+  --link-color: var(--ruby-primary);
+  --border-color: var(--ruby-border);
+  --code-bg: #fffbeb;
+  --code-text: #92400e;
+  --header-bg: var(--ruby-background);
+  --header-border: var(--ruby-border);
+
+  --shadow-sm: 0 2px 4px rgba(217, 119, 6, 0.1);
+  --shadow-md: 0 4px 8px rgba(217, 119, 6, 0.12);
+  --shadow-lg: 0 8px 16px rgba(217, 119, 6, 0.15);
+}
+
+:root[data-theme="dark"] {
+  --ruby-primary: #fbbf24;
+  --ruby-primary-light: #451a03;
+  --ruby-primary-dark: #f59e0b;
+  --ruby-accent: #f59e0b;
+  --ruby-accent-light: #422006;
+
+  --ruby-text: #fafaf9;
+  --ruby-text-light: #d6d3d1;
+  --ruby-text-lightest: #a8a29e;
+
+  --ruby-background: #0c0a09;
+  --ruby-background-alt: #1c1917;
+
+  --ruby-border: #292524;
+  --ruby-border-light: #1c1917;
+
+  --bg-color: var(--ruby-background);
+  --text-color: var(--ruby-text);
+  --sidebar-bg: #0c0a09;
+  --sidebar-text: var(--ruby-text-light);
+  --sidebar-link-active-bg: #451a03;
+  --link-color: var(--ruby-primary);
+  --border-color: var(--ruby-border);
+  --code-bg: #1c1917;
+  --code-text: #fbbf24;
+  --header-bg: var(--ruby-background);
+  --header-border: var(--ruby-border);
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;
+}
+
+.header .logo img {
+  filter: brightness(0) invert(1);
+}
+
+.header .nav-link {
+  color: white !important;
+}
+
+.header .nav-link:hover {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.sidebar .nav-item.active {
+  background: linear-gradient(135deg, var(--ruby-primary) 0%, var(--ruby-accent) 100%) !important;
+  color: white !important;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--ruby-primary) 0%, var(--ruby-accent) 100%) !important;
+  border-color: var(--ruby-primary) !important;
+  color: white !important;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--ruby-primary-dark) 0%, var(--ruby-primary) 100%) !important;
+}
+
+a {
+  color: var(--ruby-primary) !important;
+}
+
+a:hover {
+  color: var(--ruby-primary-dark) !important;
+}
+
+pre {
+  border-left: 3px solid var(--ruby-primary) !important;
+}
+
+.sidebar nav li a:hover {
+  color: var(--ruby-primary) !important;
+}
+
+th {
+  background-color: var(--ruby-primary-light) !important;
+  color: var(--ruby-primary-dark) !important;
+}
+
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] .sidebar,
+:root[data-theme="dark"] .content-area {
+  color: #fafaf9 !important;
+}
+
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3,
+:root[data-theme="dark"] h4,
+:root[data-theme="dark"] h5,
+:root[data-theme="dark"] h6 {
+  color: #fafaf9 !important;
+}
+
+:root[data-theme="dark"] code,
+:root[data-theme="dark"] pre {
+  color: #e2e8f0 !important;
+}
+
+.docmd-tag {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  font-size: 0.85em;
+  color: var(--ruby-primary-dark);
+  background-color: var(--ruby-primary-light);
+  border: 1px solid var(--ruby-border);
+}
+
+.docmd-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--ruby-primary) 0%, var(--ruby-accent) 100%);
+  border: 1px solid var(--ruby-primary);
+  color: white !important;
+  transition: background 0.2s ease;
+}
+
+.docmd-button:hover {
+  background: linear-gradient(135deg, var(--ruby-primary-dark) 0%, var(--ruby-primary) 100%);
+  color: white !important;
+}
+
+:root[data-theme="dark"] .docmd-button {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border-color: #fbbf24;
+}

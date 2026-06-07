@@ -1,7 +1,8 @@
 {
-  "name": "libhonzo-docs",
-  "version": "1.0.0",
+  "name": "honzo-docs",
+  "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "docmd dev",
     "test": "npm run build",
@@ -9,6 +10,8 @@
     "preview": "npx serve site"
   },
   "dependencies": {
-    "@docmd/core": "^0.8.4"
+    "@docmd/core": "^0.8.6",
+    "@huggingface/transformers": "^4.2.0",
+    "docmd-search": "^0.1.0-alpha.1"
   }
 }
