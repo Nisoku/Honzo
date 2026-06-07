@@ -4,6 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 description = "Honzo ebook reader, builder, writer, and DRM support"
+readme = "../../../README.md"
 
 [dependencies]
 honzo-core = { path = "../honzo-core", version = "0.1", features = ["alloc"] }

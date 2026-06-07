@@ -4,6 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 description = "Honzo ebook format conversion from EPUB, MOBI, PDF, and CBZ"
+readme = "../../../README.md"
 
 [features]
 default = []
