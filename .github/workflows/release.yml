@@ -75,7 +75,7 @@ jobs:
           mkdir -p /tmp/honzo-release/{bin,lib,include,wasm}
 
           # CLI binary
-          cp target/release/honzo /tmp/honzo-release/bin/
+          cp target/release/honzo-cli /tmp/honzo-release/bin/honzo-cli
 
           # Native artifacts
           for artifact in \
