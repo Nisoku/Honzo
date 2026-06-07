@@ -5,6 +5,8 @@ edition.workspace = true
 license.workspace = true
 description = "Honzo ebook format conversion from EPUB, MOBI, PDF, and CBZ"
 readme = "../../../README.md"
+homepage = "https://honzo.nisoku.org"
+repository = "https://github.com/Nisoku/Honzo"
 
 [features]
 default = []
