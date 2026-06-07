@@ -1,12 +1,13 @@
 [package]
 name = "honzo-io"
-version = "0.1.0"
-edition = "2021"
-license = "Apache-2.0"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Honzo ebook reader, builder, writer, and DRM support"
 
 [dependencies]
-honzo-core = { path = "../honzo-core", features = ["alloc"] }
-honzo-chunks = { path = "../honzo-chunks" }
+honzo-core = { path = "../honzo-core", version = "0.1", features = ["alloc"] }
+honzo-chunks = { path = "../honzo-chunks", version = "0.1" }
 
 lz4_flex = "0.13.1"
 crc32fast = "1.5.0"

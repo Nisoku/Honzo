@@ -11,3 +11,11 @@ members = [
   "Build/crates/honzo-cli",
   "Tests",
 ]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+homepage = "https://honzo.nisoku.org"
+repository = "https://github.com/Nisoku/Honzo"
+documentation = "https://docs.rs/honzo-core"

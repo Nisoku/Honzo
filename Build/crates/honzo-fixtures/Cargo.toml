@@ -1,19 +1,21 @@
 [package]
 name = "honzo-fixtures"
-version = "0.1.0"
-edition = "2021"
-license = "Apache-2.0"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Test fixtures for Honzo ebook format crates"
+publish = false
 
 [dependencies]
-honzo-chunks = { path = "../honzo-chunks" }
-honzo-io = { path = "../honzo-io" }
+honzo-chunks = { path = "../honzo-chunks", version = "0.1" }
+honzo-io = { path = "../honzo-io", version = "0.1" }
 image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
 
 [build-dependencies]
-honzo-chunks = { path = "../honzo-chunks" }
-honzo-io = { path = "../honzo-io" }
+honzo-chunks = { path = "../honzo-chunks", version = "0.1" }
+honzo-io = { path = "../honzo-io", version = "0.1" }
 image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }

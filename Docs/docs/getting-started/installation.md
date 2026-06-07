@@ -5,14 +5,14 @@ description: "Install Honzo on your platform"
 
 ## Rust
 
-Add `honzo-std` to your `Cargo.toml`:
+Add `honzo-io` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-honzo-std = "0.1"
+honzo-io = "0.1"
 ```
 
-The `honzo-std` crate includes the parser, builder, streaming reader, and compression. It requires `std`.
+The `honzo-io` crate includes the parser, builder, streaming reader, and compression. It requires `std`.
 
 For embedded targets, use `honzo-core` with no_std support:
 

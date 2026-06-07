@@ -30,8 +30,13 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
-      - name: Publish honzo-std
-        run: cargo publish -p honzo-std
+      - name: Publish honzo-chunks
+        run: cargo publish -p honzo-chunks
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Publish honzo-io
+        run: cargo publish -p honzo-io
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 

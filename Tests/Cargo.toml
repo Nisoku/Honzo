@@ -1,16 +1,17 @@
 [package]
 name = "honzo-tests"
-version = "0.1.0"
-edition = "2021"
-license = "Apache-2.0"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Integration tests for the Honzo ebook format"
 publish = false
 
 [dependencies]
-honzo-c = { path = "../Build/crates/honzo-c" }
-honzo-core = { path = "../Build/crates/honzo-core" }
-honzo-convert = { path = "../Build/crates/honzo-convert" }
-honzo-chunks = { path = "../Build/crates/honzo-chunks" }
-honzo-io = { path = "../Build/crates/honzo-io" }
+honzo-c = { path = "../Build/crates/honzo-c", version = "0.1" }
+honzo-core = { path = "../Build/crates/honzo-core", version = "0.1" }
+honzo-convert = { path = "../Build/crates/honzo-convert", version = "0.1" }
+honzo-chunks = { path = "../Build/crates/honzo-chunks", version = "0.1" }
+honzo-io = { path = "../Build/crates/honzo-io", version = "0.1" }
 rmp-serde = "1.3.1"
 serde = { version = "1.0.228", features = ["derive"] }
 lopdf = "0.41.0"

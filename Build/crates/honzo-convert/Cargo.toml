@@ -1,16 +1,17 @@
 [package]
 name = "honzo-convert"
-version = "0.1.0"
-edition = "2021"
-license = "Apache-2.0"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Honzo ebook format conversion from EPUB, MOBI, PDF, and CBZ"
 
 [features]
 default = []
 lowmem = []
 
 [dependencies]
-honzo-io = { path = "../honzo-io" }
-honzo-chunks = { path = "../honzo-chunks" }
+honzo-io = { path = "../honzo-io", version = "0.1" }
+honzo-chunks = { path = "../honzo-chunks", version = "0.1" }
 lexepub = "0.1"
 bytes = "1"
 quick-xml = "0.39"
@@ -22,5 +23,5 @@ pdf_oxide = "0.3"
 futures = "0.3"
 
 [dev-dependencies]
-honzo-core = { path = "../honzo-core" }
-honzo-io = { path = "../honzo-io" }
+honzo-core = { path = "../honzo-core", version = "0.1" }
+honzo-io = { path = "../honzo-io", version = "0.1" }

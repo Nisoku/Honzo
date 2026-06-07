@@ -115,7 +115,7 @@ uint32_t count = HonzoHandle_chunk_count(handle);
 
 ```toml
 [dependencies]
-honzo-std = "0.1"
+honzo-io = "0.1"
 ```
 
 == tab "TypeScript"

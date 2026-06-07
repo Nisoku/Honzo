@@ -59,7 +59,6 @@ jobs:
 
       - name: Build C library and generate headers
         run: |
-          cargo build --release
           if command -v diplomat-tool >/dev/null 2>&1; then
             diplomat-tool c .
           fi
@@ -70,7 +69,10 @@ jobs:
           set -e
           ARCHIVE_NAME="honzo-${{ github.ref_name }}.tar.gz"
           rm -rf /tmp/honzo-release
-          mkdir -p /tmp/honzo-release/{lib,include,wasm}
+          mkdir -p /tmp/honzo-release/{bin,lib,include,wasm}
+
+          # CLI binary
+          cp target/release/honzo /tmp/honzo-release/bin/
 
           # Native artifacts
           for artifact in \
