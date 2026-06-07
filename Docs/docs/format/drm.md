@@ -56,7 +56,7 @@ Each recipient gets their own envelope entry. The CEK is wrapped using ECDH with
 ## Reading Encrypted Files
 
 ```rust
-use honzo_std::HonzoReader;
+use honzo_io::HonzoReader;
 
 let private_key: [u8; 32] = load_private_key();
 
@@ -86,7 +86,7 @@ match reader.read_chunk(&entry) {
 ## Building Encrypted Files
 
 ```rust
-use honzo_std::{Builder, DrmConfig};
+use honzo_io::{HonzoBuilder, DrmConfig};
 
 let drm = DrmConfig::new()
     .encrypt_chunks(&[0, 1, 2])
@@ -94,7 +94,7 @@ let drm = DrmConfig::new()
     .expiry("2026-01-01T00:00:00Z")
     .license_url("https://example.com/license/abc123");
 
-let hzo = Builder::new()
+let hzo = HonzoBuilder::new()
     .with_drm(drm)
     .add_chapter("Chapter 1", ...)
     .add_chapter("Chapter 2", ...)

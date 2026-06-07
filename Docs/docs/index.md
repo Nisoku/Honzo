@@ -72,7 +72,7 @@ AES-256-GCM content protection via `org.nisoku.drm`. ECDH key exchange with X255
 == tab "Rust"
 
 ```rust
-use honzo_std::HonzoParser;
+use honzo_core::HonzoParser;
 
 let data = std::fs::read("book.hzo").unwrap();
 let p = HonzoParser::new(&data, 1).unwrap();

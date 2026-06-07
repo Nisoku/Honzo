@@ -8,6 +8,11 @@ readme = "../../../README.md"
 homepage = "https://nisoku.org/Honzo"
 repository = "https://github.com/Nisoku/Honzo"
 
+[[bin]]
+name = "honzo"
+path = "src/main.rs"
+
+
 [dependencies]
 honzo-core = { path = "../honzo-core", version = "0.1" }
 honzo-io = { path = "../honzo-io", version = "0.1" }

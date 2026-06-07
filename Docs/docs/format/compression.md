@@ -54,9 +54,9 @@ When `compression` equals 0, `size` equals `orig_size`. Alternatively `orig_size
 == tab "Rust Builder"
 
 ```rust
-use honzo_std::{Builder, Compression, MarkupType};
+use honzo_io::{HonzoBuilder, Compression, MarkupType};
 
-Builder::new()
+HonzoBuilder::new()
     .add_chapter("Chapter 1", Compression::Lz4, MarkupType::Markdown)
     .add_chapter("Chapter 2", Compression::None, MarkupType::HTML)
     .finalize()
@@ -65,7 +65,7 @@ Builder::new()
 == tab "Rust Reader"
 
 ```rust
-use honzo_std::HonzoParser;
+use honzo_core::HonzoParser;
 
 let p = HonzoParser::new(&data, 1).unwrap();
 for entry in p.toc_entries() {

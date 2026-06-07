@@ -57,11 +57,11 @@ Annotations are stored as a MessagePack map:
 ## Storing annotations
 
 ```rust
-use honzo_std::{Builder, ExtraEntry};
+use honzo_io::{HonzoBuilder, ExtraEntry};
 
 // Add annotation data as an EXTRA entry
 let anno_data = serde_json::to_vec(&annotation_map).unwrap();
-let hzo = Builder::new()
+let hzo = HonzoBuilder::new()
     .add_extra("org.nisoku.anno", &anno_data)
     .add_chapter("Chapter 1", ...)
     .finalize()
@@ -71,7 +71,7 @@ let hzo = Builder::new()
 ## Reading annotations
 
 ```rust
-use honzo_std::HonzoParser;
+use honzo_core::HonzoParser;
 
 let p = HonzoParser::new(&data, 1).unwrap();
 for entry in p.extra_entries() {

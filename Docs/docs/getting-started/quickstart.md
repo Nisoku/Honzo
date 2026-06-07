@@ -18,9 +18,9 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "Rust"
 
    ```rust
-   use honzo_std::{Builder, Compression, MarkupType};
+   use honzo_io::{HonzoBuilder, Compression, MarkupType};
 
-   let hzo = Builder::new()
+   let hzo = HonzoBuilder::new()
        .meta_title("en", "My First Book")
        .meta_creator("en", "Author Name")
        .add_chapter("Chapter 1: The Beginning", Compression::Lz4, MarkupType::Markdown)
@@ -51,7 +51,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "Rust"
 
    ```rust
-   use honzo_std::HonzoParser;
+   use honzo_core::HonzoParser;
 
    let data = std::fs::read("my_book.hzo").unwrap();
    let p = HonzoParser::new(&data, 1).unwrap();
@@ -98,7 +98,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "Rust Parser"
 
    ```rust
-   use honzo_std::HonzoParser;
+   use honzo_core::HonzoParser;
 
    let data = std::fs::read("my_book.hzo").unwrap();
    let p = HonzoParser::new(&data, 1).unwrap();
@@ -115,7 +115,7 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "Rust Streaming"
 
    ```rust
-   use honzo_std::HonzoStream;
+   use honzo_io::HonzoStream;
 
    let file = std::fs::File::open("my_book.hzo").unwrap();
    let mut stream = HonzoStream::open(file, 1).unwrap();

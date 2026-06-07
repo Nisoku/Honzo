@@ -45,7 +45,7 @@ All chapters combine into a single scrollable view.
 ## Reading Layout Modes
 
 ```rust
-use honzo_std::HonzoParser;
+use honzo_core::HonzoParser;
 
 let p = HonzoParser::new(&data, 1).unwrap();
 match p.head().layout_mode {

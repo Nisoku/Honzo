@@ -14,7 +14,7 @@ A 2GB book with 200 chapters uses memory proportional to the largest single chap
 ## HonzoStream
 
 ```rust
-use honzo_std::HonzoStream;
+use honzo_io::HonzoStream;
 
 let file = std::fs::File::open("massive_book.hzo").unwrap();
 let mut stream = HonzoStream::open(file, 1).unwrap();
