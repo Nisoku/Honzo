@@ -10,7 +10,7 @@ fn main() {
     std::fs::create_dir_all("include").ok();
     std::fs::create_dir_all("include/cpp").ok();
 
-    let diplomat_bin = std::env::var("CARGO_BIN_EXE_diplomat-tool").unwrap_or_else(|_| {
+    let diplomat_bin = std::env::var("CARGO_BIN_EXE_diplomat_tool").unwrap_or_else(|_| {
         std::env::var("DIPLOMAT_TOOL_PATH").unwrap_or_else(|_| "diplomat-tool".into())
     });
 
