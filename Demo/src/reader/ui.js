@@ -1,5 +1,3 @@
-import { closeSidebar } from "./state.js";
-
 export function showLoading() {
   const el = document.getElementById("loading-message");
   if (el) el.classList.add("show");

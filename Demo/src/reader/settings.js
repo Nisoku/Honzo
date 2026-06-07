@@ -1,8 +1,7 @@
-import { icon } from "./icons.js";
+import { icon } from "../icons.js";
 import { fontFamily, fontSize, gapless, layoutMode, pageZoom, textAlign, theme } from "./state.js";
 import { setMangaZoom } from "./book.js";
 
-// Theme engine
 const THEMES = {
   light: {
     "--bg": "#ffffff",
@@ -108,7 +107,6 @@ export function applyTheme() {
   html.setAttribute("data-font-family", fontFamily.get());
 }
 
-// Apply on changes
 theme.subscribe(applyTheme);
 fontSize.subscribe(applyTheme);
 fontFamily.subscribe(applyTheme);
@@ -204,13 +202,11 @@ export function renderSettings(container) {
       const setting = group.dataset.setting;
       const value = btn.dataset.value;
 
-      // Update active state
       group
         .querySelectorAll(".setting-option")
         .forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
 
-      // Apply
       switch (setting) {
         case "theme":
           theme.set(value);
@@ -235,7 +231,6 @@ export function renderSettings(container) {
     });
   });
 
-  // Zoom controls
   const zoomIn = container.querySelector('[data-action="zoomIn"]');
   const zoomOut = container.querySelector('[data-action="zoomOut"]');
   const zoomReset = container.querySelector('[data-action="zoomReset"]');

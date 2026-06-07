@@ -3,7 +3,7 @@ import { marked } from "marked";
 import init, {
   HonzoWasm,
   normalize_search_term as normalizeSearchTerm,
-} from "./wasm/honzo_wasm.js";
+} from "../wasm/honzo_wasm.js";
 import { showLoading, hideLoading, showError } from "./ui.js";
 import {
   bookTitle,
@@ -29,9 +29,10 @@ import {
   removeBookmark,
   toggleSidebar,
 } from "./state.js";
-import "./satori.js";
+import "../satori.js";
 import { renderBookmarks } from "./bookmarks.js";
 import { renderMath } from "./math.js";
+import { esc } from "../shared/esc.js";
 
 let reader = null;
 let meta = null;
@@ -196,7 +197,6 @@ function updateReferencePage(chapter) {
     referencePage.set("");
     return;
   }
-  // Show the first PMAP entry for this chunk (page where this chapter starts)
   let refPage = "";
   for (const entry of pmapEntries) {
     if (entry.chunkId === chapter.chunk_id) {
@@ -310,7 +310,6 @@ async function loadBook(data, fileName) {
     }
   }
 
-  // Inject CSS_ stylesheets
   for (const e of tocEntries) {
     if (e.chunk_type === "CSS_") {
       const css = new TextDecoder().decode(reader.get_chunk(e.chunk_id));
@@ -340,7 +339,6 @@ async function loadBook(data, fileName) {
   if (chapters.length === 0)
     throw new Error("This file has no readable content.");
 
-  // Book ID for persistence
   const titleVal = getMetaStr(meta, "title") || "Untitled";
   const bookId = `${titleVal}_${data.length}`;
   setCurrentBookId(bookId);
@@ -363,25 +361,21 @@ async function loadBook(data, fileName) {
 
   bookTitle.set(titleVal);
 
-  // Detect text direction from book metadata
   const direction = meta?.direction || "ltr";
   currentDirection.set(direction);
   if (direction === "rtl") {
     textAlign.set("rtl");
   }
 
-  // Restore progress
   const progress = getProgress(bookId);
   if (progress && progress.chapter >= 0 && progress.chapter < chapters.length) {
     goToChapter(progress.chapter);
   }
 
-  // Render bookmarks sidebar
   if (elements.bookmarksContent) {
     renderBookmarks(elements.bookmarksContent, bookId, chapters);
   }
 
-  // Re-render on layout mode or gapless change
   if (window._layoutSub) window._layoutSub();
   window._layoutSub = layoutMode.subscribe(() => {
     if (layoutMode.get() === "manga") {
@@ -406,7 +400,6 @@ async function loadBook(data, fileName) {
   });
 }
 
-// Teardown on unload
 export function unloadBook() {
   if (window._layoutSub) { window._layoutSub(); window._layoutSub = null; }
   if (window._gaplessSub) { window._gaplessSub(); window._gaplessSub = null; }
@@ -421,7 +414,6 @@ export function unloadBook() {
   resetReaderState();
 }
 
-// Manga mode 
 function renderManga() {
   if (!mangaPages.length || !elements.viewer) return;
   elements.viewer.innerHTML = "";
@@ -476,7 +468,6 @@ function renderManga() {
     elements.viewer.classList.add("gapless");
   }
 
-  // Add scroll tracking
   if (window._mangaScrollHandler) {
     elements.viewer.removeEventListener("scroll", window._mangaScrollHandler);
   }
@@ -516,16 +507,13 @@ function updateMangaPageInfo() {
 
   updateReferencePage(entry);
 
-  // Persist progress
   const bookId = getCurrentBookId();
   if (bookId) setProgress(bookId, idx, entry.chunk_id);
 
-  // Update progress bar
   if (elements.progressFill) {
     elements.progressFill.style.width = `${((idx + 1) / mangaPages.length) * 100}%`;
   }
 
-  // Update TOC active state
   if (elements.tocContent) {
     elements.tocContent.querySelectorAll(".toc-item").forEach((item, i) => {
       item.classList.toggle("active", i === idx);
@@ -569,7 +557,6 @@ function generateMangaToc() {
   });
 }
 
-// Chapter rendering with decorations
 function renderCurrentChapter(scrollToAnchor) {
   if (layoutMode.get() === "manga") {
     renderManga();
@@ -616,11 +603,9 @@ function renderCurrentChapter(scrollToAnchor) {
       content = renderMarkdown(raw);
     }
 
-    // Wrap in decorated container
     container.innerHTML = `<div class="chapter-body">${content}</div>`;
   }
 
-  // Resolve <ref> tags
   for (const ref of container.querySelectorAll("ref")) {
     const type = ref.getAttribute("type");
     const chunkId = parseInt(ref.getAttribute("chunk"), 10);
@@ -659,7 +644,6 @@ function renderCurrentChapter(scrollToAnchor) {
     if (target) target.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  // Scroll to top when navigating chapters
   if (!scrollToAnchor) {
     elements.viewer.scrollTop = 0;
   }
@@ -667,20 +651,16 @@ function renderCurrentChapter(scrollToAnchor) {
   currentChapter.set(currentChapterIndex);
   currentChunkId.set(chapter.chunk_id);
 
-  // Resolve reference page from PMAP
   updateReferencePage(chapter);
 
-  // Update chapter label
   const label = `${chapter.chunk_type} ${chapter.chunk_id}${chapter.size_raw ? ` (${(chapter.size_raw / 1024).toFixed(0)} KB)` : ""}`;
   chapterLabel.set(label);
 
-  // Update progress bar
   if (elements.progressFill) {
     const t = chapters.length;
     elements.progressFill.style.width = `${t > 1 ? ((currentChapterIndex + 1) / t) * 100 : 0}%`;
   }
 
-  // Persist reading progress
   const bookId = getCurrentBookId();
   if (bookId) {
     setProgress(bookId, currentChapterIndex, chapter.chunk_id);
@@ -699,109 +679,20 @@ export function goToChapter(index, anchor) {
 
 function sanitizeHtml(html) {
   const allowedTags = [
-    "p",
-    "div",
-    "span",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "ul",
-    "ol",
-    "li",
-    "dl",
-    "dt",
-    "dd",
-    "table",
-    "thead",
-    "tbody",
-    "tr",
-    "th",
-    "td",
-    "blockquote",
-    "pre",
-    "code",
-    "br",
-    "hr",
-    "em",
-    "strong",
-    "i",
-    "b",
-    "u",
-    "s",
-    "sub",
-    "sup",
-    "img",
-    "a",
-    "figure",
-    "figcaption",
-    "section",
-    "article",
-    "header",
-    "main",
-    "aside",
-    "ref",
-    "math",
-    "mi",
-    "mo",
-    "mn",
-    "msup",
-    "msub",
-    "mfrac",
-    "msqrt",
-    "mroot",
-    "mstyle",
-    "mrow",
-    "mspace",
-    "mtext",
-    "munder",
-    "mover",
-    "munderover",
-    "msubsup",
-    "mmultiscripts",
-    "mprescripts",
-    "none",
-    "mtable",
-    "mtr",
-    "mtd",
-    "mphantom",
-    "mfenced",
-    "menclose",
-    "merror",
-    "mpadded",
-    "maction",
-    "mlabeledtr",
-    "maligngroup",
-    "malignmark",
-    "msline",
+    "p", "div", "span", "h1", "h2", "h3", "h4", "h5", "h6",
+    "ul", "ol", "li", "dl", "dt", "dd",
+    "table", "thead", "tbody", "tr", "th", "td",
+    "blockquote", "pre", "code", "br", "hr", "em", "strong", "i", "b", "u", "s", "sub", "sup",
+    "img", "a", "figure", "figcaption", "section", "article", "header", "main", "aside",
+    "ref", "math", "mi", "mo", "mn", "msup", "msub", "mfrac", "msqrt", "mroot", "mstyle",
+    "mrow", "mspace", "mtext", "munder", "mover", "munderover", "msubsup", "mmultiscripts",
+    "mprescripts", "none", "mtable", "mtr", "mtd", "mphantom", "mfenced", "menclose",
+    "merror", "mpadded", "maction", "mlabeledtr", "maligngroup", "malignmark", "msline",
   ];
   const allowedAttrs = [
-    "href",
-    "src",
-    "alt",
-    "title",
-    "class",
-    "id",
-    "name",
-    "target",
-    "rel",
-    "width",
-    "height",
-    "type",
-    "chunk",
-    "anchor",
-    "xmlns",
-    "display",
-    "alttext",
-    "rowspan",
-    "columnspan",
-    "linethickness",
-    "lspace",
-    "voffset",
-    "scriptlevel",
-    "displaystyle",
+    "href", "src", "alt", "title", "class", "id", "name", "target", "rel",
+    "width", "height", "type", "chunk", "anchor", "xmlns", "display", "alttext",
+    "rowspan", "columnspan", "linethickness", "lspace", "voffset", "scriptlevel", "displaystyle",
   ];
   const doc = new DOMParser().parseFromString(html, "text/html");
   const walk = (node) => {
@@ -837,10 +728,6 @@ function sanitizeHtml(html) {
 
 function renderMarkdown(text) {
   return marked.parse(text);
-}
-
-function esc(s) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function generateToc() {

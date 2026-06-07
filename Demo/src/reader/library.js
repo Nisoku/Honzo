@@ -1,6 +1,6 @@
 import { openBookFromEntry } from "./book.js";
 import { showError } from "./ui.js";
-import init, { HonzoWasm } from "./wasm/honzo_wasm.js";
+import init, { HonzoWasm } from "../wasm/honzo_wasm.js";
 
 let elLibraryContent = null;
 let elLibraryInput = null;

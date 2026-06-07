@@ -1,6 +1,6 @@
 import { bindDisabled, bindEvent, bindText } from "@nisoku/sairin";
 import { createIcons } from "lucide";
-import { icons } from "./icons.js";
+import { icons } from "../icons.js";
 import {
   activeSidebar,
   bookTitle,
@@ -30,7 +30,6 @@ import { renderSettings, applyTheme } from "./settings.js";
 
 applyTheme();
 
-// DOM refs
 const openButton = document.getElementById("open-button");
 const fileInput = document.getElementById("file-input");
 const tocButton = document.getElementById("toc-button");
@@ -63,7 +62,6 @@ const refPageSpan = document.getElementById("ref-page");
 const progressFill = document.getElementById("progress-fill");
 const footer = document.getElementById("app-footer");
 
-// Demo select
 const demoBookSelect = document.getElementById("demo-book-select");
 
 setBookElements({
@@ -79,7 +77,6 @@ setBookElements({
   metaContent,
 });
 
-// Sidebar open/close via class toggle
 const sidebarEls = {
   toc: tocSidebar,
   bookmarks: bookmarksSidebar,
@@ -95,7 +92,6 @@ activeSidebar.subscribe(() => {
   overlay.classList.toggle("open", name !== null);
 });
 
-// Events
 bindEvent(openButton, "click", () => fileInput.click());
 bindEvent(fileInput, "change", openBook);
 if (demoBookSelect) {
@@ -109,7 +105,6 @@ if (demoBookSelect) {
 bindEvent(prevButton, "click", prevPage);
 bindEvent(nextButton, "click", nextPage);
 
-// Sidebar toggles
 bindEvent(tocButton, "click", () => toggleSidebar("toc"));
 bindEvent(bookmarksButton, "click", () => toggleSidebar("bookmarks"));
 bindEvent(searchButton, "click", () => {
@@ -122,7 +117,6 @@ bindEvent(settingsButton, "click", () => {
   renderSettings(settingsContent);
 });
 
-// Close buttons
 const closeButtons = {
   toc: document.getElementById("close-toc"),
   bookmarks: document.getElementById("close-bookmarks"),
@@ -142,7 +136,6 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeSidebar();
 });
 
-// Text bindings
 bindText(bookTitleSpan, bookTitle);
 bindText(totalPagesSpan, totalPagesText);
 bindText(currentPageSpan, currentPageText);
@@ -150,11 +143,9 @@ bindText(errorTextNode, errorText);
 bindText(chapterLabelSpan, chapterLabel);
 bindText(refPageSpan, referencePage);
 
-// Disabled bindings for prev/next
 bindDisabled(prevButton, prevDisabled);
 bindDisabled(nextButton, nextDisabled);
 
-// Sidebar buttons
 function updateSidebar(v) {
   [
     tocButton,
@@ -169,13 +160,10 @@ function updateSidebar(v) {
 updateSidebar(false);
 hasBook.subscribe(() => updateSidebar(hasBook.get()));
 
-// Text alignment on body
 textAlign.subscribe(() => {
   document.body.setAttribute("data-text-align", textAlign.get());
 });
 
-// Lucide icons
 createIcons({ icons });
 
-// Initial render
 renderSettings(settingsContent);

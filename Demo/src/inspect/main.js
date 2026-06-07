@@ -1,13 +1,15 @@
-import init, { HonzoWasm, honzo_build } from "./wasm/honzo_wasm.js";
+import init, { HonzoWasm, honzo_build } from "../wasm/honzo_wasm.js";
 import { createIcons } from "lucide";
-import { icons } from "./icons.js";
+import { icons } from "../icons.js";
 import { bindClass, bindEvent, bindText } from "@nisoku/sairin";
 import { derived, path, signal } from "@nisoku/sairin";
+import { esc } from "../shared/esc.js";
+import { formatSize } from "../shared/format.js";
+import { download } from "../shared/download.js";
 
 let wasmReady = false;
 let reader = null;
 
-// State
 const fileLoaded = signal(path("inspect", "fileLoaded"), false);
 const fileName = signal(path("inspect", "fileName"), "");
 const fileSize = signal(path("inspect", "fileSize"), 0);
@@ -54,7 +56,6 @@ const revertDisabled = derived(
   () => !fileLoaded.get(),
 );
 
-// DOM refs
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
 const statusEl = document.getElementById("status");
@@ -71,7 +72,6 @@ const extraInfo = document.getElementById("extraInfo");
 const revertBtn = document.getElementById("revertBtn");
 const saveBtn = document.getElementById("saveBtn");
 
-// Bindings
 bindClass(statusEl, statusClass);
 bindText(statusTextEl, statusMessage);
 bindClass(filePanel, filePanelClass);
@@ -88,7 +88,6 @@ const origBindDisabled = (el, signal) => {
 origBindDisabled(saveBtn, saveDisabled);
 origBindDisabled(revertBtn, revertDisabled);
 
-// Events
 bindEvent(dropZone, "click", () => fileInput.click());
 bindEvent(dropZone, "dragover", (e) => {
   e.preventDefault();
@@ -108,7 +107,6 @@ bindEvent(revertBtn, "click", onRevert);
 
 createIcons({ icons });
 
-// Delegated events for meta panel (identifiers, tags)
 bindEvent(metaPanel, "click", (e) => {
   const addId = e.target.closest("[data-add-id]");
   if (addId) {
@@ -142,7 +140,6 @@ bindEvent(metaPanel, "click", (e) => {
   if (tagRem) tagRem.parentElement.remove();
 });
 
-// File loading
 async function ensureWasm() {
   if (!wasmReady) {
     await init();
@@ -174,8 +171,6 @@ async function loadFile(file) {
     const chunks = buildChunksData(reader);
     const meta = reader.get_meta_parsed();
 
-    // Use WASM functions to get header info
-    // Use WASM functions to get all file information
     fileInfoData.set({
       versionMajor: reader.version_major(),
       versionMinor: reader.version_minor(),
@@ -225,7 +220,6 @@ function buildChunksData(r) {
   }));
 }
 
-// Render helpers
 function renderFileInfo() {
   const d = fileInfoData.get();
   if (!d || !reader) return;
@@ -438,7 +432,6 @@ function renderExtra() {
   </details>`;
 }
 
-// Collect edited metadata
 function collectMeta() {
   const meta = JSON.parse(JSON.stringify(originalMeta.get()));
   setStr(meta, "title", document.getElementById("mf_title")?.value);
@@ -528,7 +521,6 @@ function collectTags(id) {
   return items.length > 0 ? items : undefined;
 }
 
-// Save / Revert
 function onSave() {
   if (!reader) {
     showStatus("error", "No file loaded to save");
@@ -579,13 +571,11 @@ function onRevert() {
   }
 }
 
-// Utilities
 function showStatus(kind, msg) {
   statusVisible.set(true);
   statusKind.set(kind);
   statusMessage.set(msg);
 
-  // Auto-hide success/loading messages after 5 seconds
   if (kind === "success" || kind === "loading") {
     setTimeout(() => {
       if (statusKind.get() === kind) {
@@ -595,33 +585,6 @@ function showStatus(kind, msg) {
   }
 }
 
-function download(bytes, filename) {
-  const blob = new Blob([bytes], { type: "application/octet-stream" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function formatSize(bytes) {
-  // Convert to Number to handle BigInt values
-  const numBytes = Number(bytes);
-  if (numBytes < 1024) return numBytes + " B";
-  if (numBytes < 1048576) return (numBytes / 1024).toFixed(1) + " KB";
-  if (numBytes < 1073741824) return (numBytes / 1048576).toFixed(1) + " MB";
-  return (numBytes / 1073741824).toFixed(1) + " GB";
-}
-function esc(s) {
-  if (!s) return "";
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 function bytesToHex(bytes) {
   const b = new Uint8Array(bytes || []);
   let s = "";

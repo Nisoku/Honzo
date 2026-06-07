@@ -1,7 +1,8 @@
-import { icon } from "./icons.js";
+import { icon } from "../icons.js";
 import { getBookmarks, removeBookmark } from "./state.js";
 import { goToChapter } from "./book.js";
 import { toggleSidebar } from "./state.js";
+import { esc } from "../shared/esc.js";
 
 export function renderBookmarks(container, bookId, chapters) {
   const marks = getBookmarks(bookId);
@@ -53,11 +54,4 @@ export function renderBookmarks(container, bookId, chapters) {
 
     container.appendChild(item);
   });
-}
-
-function esc(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
 }

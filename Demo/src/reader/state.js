@@ -1,15 +1,12 @@
 import { derived, path, signal } from "@nisoku/sairin";
 
-// UI State
 export const loadingVisible = signal(path("ui", "loadingVisible"), false);
 export const errorVisible = signal(path("ui", "errorVisible"), false);
 export const errorText = signal(path("ui", "errorText"), "");
 export const overlayVisible = signal(path("ui", "overlayVisible"), false);
 
-// Open sidebar panels (only one at a time, using overlap)
-export const activeSidebar = signal(path("ui", "activeSidebar"), null); // null | 'toc' | 'bookmarks' | 'search' | 'meta' | 'settings'
+export const activeSidebar = signal(path("ui", "activeSidebar"), null);
 
-// Reader State
 export const bookTitle = signal(path("reader", "bookTitle"), "");
 export const currentChapter = signal(path("reader", "currentChapter"), 0);
 export const totalChapters = signal(path("reader", "totalChapters"), 0);
@@ -57,7 +54,6 @@ export const progressPct = derived(path("reader", "progressPct"), () => {
   return ((currentChapter.get() + 1) / t) * 100;
 });
 
-// Settings State
 function loadSetting(key, defaultVal) {
   try {
     const v = localStorage.getItem("honzo_" + key);
@@ -114,7 +110,6 @@ export const textAlign = signal(
 );
 textAlign.subscribe(() => saveSetting("textAlign", textAlign.get()));
 
-// Reading Progress
 function loadProgress(bookId) {
   try {
     const d = localStorage.getItem("honzo_progress_" + bookId);
@@ -147,7 +142,6 @@ export function clearProgress(bookId) {
   } catch {}
 }
 
-// Bookmarks
 function loadBookmarks(bookId) {
   try {
     const d = localStorage.getItem("honzo_bookmarks_" + bookId);
@@ -196,10 +190,8 @@ export function updateBookmarkNote(bookId, index, note) {
   return marks;
 }
 
-// Sidebar helper
 export function toggleSidebar(name) {
   const current = activeSidebar.get();
-
   activeSidebar.set(current === name ? null : name);
 }
 
@@ -207,7 +199,6 @@ export function closeSidebar() {
   activeSidebar.set(null);
 }
 
-// Book ID (derived from file name + size, used for persistence)
 let currentBookId = null;
 export function setCurrentBookId(id) {
   currentBookId = id;

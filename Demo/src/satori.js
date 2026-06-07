@@ -1,5 +1,4 @@
 import { createSatori } from "@nisoku/satori";
-import { gapless, layoutMode, pageZoom } from "./state.js";
 
 export const satori = createSatori({
   logLevel: "debug",

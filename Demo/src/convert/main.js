@@ -1,6 +1,6 @@
-import initHonzo, { convert_epub } from "./wasm/honzo_wasm.js";
+import initHonzo, { convert_epub } from "../wasm/honzo_wasm.js";
 import { createIcons } from "lucide";
-import { icons } from "./icons.js";
+import { icons } from "../icons.js";
 import { bindClass, bindEvent, bindStyle, bindText } from "@nisoku/sairin";
 import { derived, path, signal } from "@nisoku/sairin";
 
