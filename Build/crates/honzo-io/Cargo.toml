@@ -20,5 +20,5 @@ image = { version = "0.25.10", default-features = false, features = ["png", "jpe
 getrandom = { version = "0.4.2", features = ["wasm_js"] }
 aes-gcm = "0.10"
 hkdf = "0.12"
-sha2 = "0.10"
+sha2 = "0.11"
 x25519-dalek = { version = "2", default-features = false, features = ["static_secrets", "getrandom"] }
