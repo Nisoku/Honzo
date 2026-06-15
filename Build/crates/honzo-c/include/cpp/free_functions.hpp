@@ -20,6 +20,9 @@ namespace capi {
     typedef struct diplomat_external_guess_font_format_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} diplomat_external_guess_font_format_result;
     diplomat_external_guess_font_format_result diplomat_external_guess_font_format(diplomat::capi::DiplomatU8View bytes, diplomat::capi::DiplomatWrite* write);
 
+    typedef struct diplomat_external_guess_image_mime_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} diplomat_external_guess_image_mime_result;
+    diplomat_external_guess_image_mime_result diplomat_external_guess_image_mime(diplomat::capi::DiplomatU8View bytes, diplomat::capi::DiplomatWrite* write);
+
     typedef struct diplomat_external_latex_to_mathml_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} diplomat_external_latex_to_mathml_result;
     diplomat_external_latex_to_mathml_result diplomat_external_latex_to_mathml(diplomat::capi::DiplomatU8View bytes, diplomat::capi::DiplomatWrite* write);
 
@@ -49,6 +52,20 @@ template<typename W>
 inline diplomat::result<std::monostate, HonzoErrorCode> guess_font_format_write(diplomat::span<const uint8_t> bytes, W& writeable) {
     diplomat::capi::DiplomatWrite write = diplomat::WriteTrait<W>::Construct(writeable);
     auto result = diplomat::capi::diplomat_external_guess_font_format({bytes.data(), bytes.size()},
+        &write);
+    return result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+inline diplomat::result<std::string, HonzoErrorCode> guess_image_mime(diplomat::span<const uint8_t> bytes) {
+    std::string output;
+    diplomat::capi::DiplomatWrite write = diplomat::WriteFromString(output);
+    auto result = diplomat::capi::diplomat_external_guess_image_mime({bytes.data(), bytes.size()},
+        &write);
+    return result.is_ok ? diplomat::result<std::string, HonzoErrorCode>(diplomat::Ok<std::string>(std::move(output))) : diplomat::result<std::string, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+template<typename W>
+inline diplomat::result<std::monostate, HonzoErrorCode> guess_image_mime_write(diplomat::span<const uint8_t> bytes, W& writeable) {
+    diplomat::capi::DiplomatWrite write = diplomat::WriteTrait<W>::Construct(writeable);
+    auto result = diplomat::capi::diplomat_external_guess_image_mime({bytes.data(), bytes.size()},
         &write);
     return result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
 }

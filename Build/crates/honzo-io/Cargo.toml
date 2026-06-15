@@ -8,9 +8,13 @@ readme = "../../../README.md"
 homepage = "https://nisoku.org/Honzo"
 repository = "https://github.com/Nisoku/Honzo"
 
+[features]
+default = ["image"]
+image = ["honzo-chunks/image"]
+
 [dependencies]
 honzo-core = { path = "../honzo-core", version = "0.1", features = ["alloc"] }
-honzo-chunks = { path = "../honzo-chunks", version = "0.1" }
+honzo-chunks = { path = "../honzo-chunks", version = "0.1", default-features = false }
 
 lz4_flex = "0.13.1"
 crc32fast = "1.5.0"

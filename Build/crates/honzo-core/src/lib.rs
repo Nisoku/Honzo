@@ -4,6 +4,7 @@
 extern crate alloc;
 
 mod error;
+pub mod mime;
 mod parse;
 mod types;
 
@@ -11,6 +12,7 @@ mod types;
 mod write;
 
 pub use error::HonzoError;
+pub use mime::guess_image_mime;
 pub use parse::{HonzoParser, PmapEntryIter, TocEntryIter};
 pub use types::MathType;
 pub use types::{

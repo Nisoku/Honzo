@@ -55,6 +55,20 @@ Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk
 | `HonzoFileReader_get_chunk`                    | `HonzoFileReader* self, uint32_t index`       | `HonzoFileReader_get_chunk_result` | Decompressed chunk data. Valid until next call to this function.                                                        |
 | `HonzoFileReader_get_meta`                     | `HonzoFileReader* self, DiplomatWrite* write` | `HonzoFileReader_get_meta_result`  | JSON metadata string.                                                                                                   |
 
+## Image format detection
+
+`diplomat_external_guess_image_mime` identifies image formats from raw bytes without linking the full `image` crate, which doesn't compile for embedded targets. Returns `Ok(mime_string)` on recognition or an error for unknown formats.
+
+```c
+diplomat_external_guess_image_mime_result res =
+    diplomat_external_guess_image_mime(chunk_bytes, &write);
+if (res.is_ok) {
+    // write.buf contains e.g. "image/png", "image/jpeg", "image/gif", etc.
+}
+```
+
+Recognizes: PNG, JPEG, GIF, BMP, TIFF (LE/BE), WebP, ICO, PNM (PBM/PGM/PPM/PAM).
+
 ### Example
 
 ```c
@@ -76,7 +90,25 @@ int main(void) {
     for (uint32_t i = 0; i < n; i++) {
         uint32_t tag = HonzoFileReader_get_chunk_type(reader, i);
 
-        // Only process CHAP chunks
+        // Identify image chunks by type
+        if (tag == *(const uint32_t*)"COVR" ||
+            tag == *(const uint32_t*)"COVT" ||
+            tag == *(const uint32_t*)"IMG_") {
+            HonzoFileReader_get_chunk_result c =
+                HonzoFileReader_get_chunk(reader, i);
+            if (c.is_ok) {
+                char mime_buf[32];
+                DiplomatWrite mime_write = diplomat_simple_write(mime_buf, sizeof(mime_buf));
+                diplomat_external_guess_image_mime_result mr =
+                    diplomat_external_guess_image_mime(
+                        (DiplomatU8View){c.ok.data, c.ok.len}, &mime_write);
+                printf("chunk %u: %s\n", i,
+                       mr.is_ok ? mime_buf : "unknown");
+            }
+            continue;
+        }
+
+        // Only process CHAP chunks beyond images
         if (tag != *(const uint32_t*)"CHAP") continue;
 
         uint8_t kind = HonzoFileReader_get_chunk_content_type_kind(reader, i);
@@ -174,7 +206,23 @@ typedef struct {
 } TocEntry;
 ```
 
+## Feature flags
+
+The `image` feature (default: on) enables cover thumbnail generation and image validation, and is only needed when writing/building Honzo files. The streaming reader path (`HonzoFileReader`) never uses it.
+
+```bash
+# Host build (default, includes image support for builder tools)
+cargo build -p honzo-c --release
+
+# Embedded build (no image crate, smaller compile)
+cargo build -p honzo-c --release --no-default-features
+```
+
+Feature propagation: `honzo-c --image --> honzo-io --image --> honzo-chunks --image`.
+
 ## Building
+
+### Host
 
 ```bash
 cargo build -p honzo-c --release
@@ -187,6 +235,21 @@ Link with:
 ```bash
 cc -o reader reader.c -L./target/release -lhonzo_c -lpthread -ldl -lm
 ```
+
+### ESP32
+
+Requires the `xtensa-esp32-espidf` target. Install via [espup](https://github.com/esp-rs/espup).
+
+```bash
+# Build staticlib without image processing
+cargo +esp build --release -p honzo-c \
+  --target xtensa-esp32-espidf \
+  -Zbuild-std=std,panic_abort \
+  --no-default-features
+# Produces: target/xtensa-esp32-espidf/release/libhonzo_c.a
+```
+
+Link your C firmware against the staticlib using the ESP-IDF toolchain. The resulting binary occupies roughly **434 KB** total (431 KB text, 2.2 KB RAM) for a minimal reader.
 
 ## Related
 

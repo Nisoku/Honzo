@@ -94,6 +94,19 @@ HonzoFileReader_destroy(reader);
 
 The C++ binding in `HonzoFileReader.hpp` wraps the same functions with a destructor-based RAII guard.
 
+### ESP32
+
+The staticlib compiles and links for `xtensa-esp32-espidf`. Build with `--no-default-features` to skip the `image` crate (unsupported on Xtensa LLVM):
+
+```bash
+cargo +esp build --release -p honzo-c \
+  --target xtensa-esp32-espidf \
+  -Zbuild-std=std,panic_abort \
+  --no-default-features
+```
+
+A minimal C reader links to ~431 KB flash + 2.2 KB static RAM. Chunks are allocated on the heap one at a time — peak heap scales with the largest chapter, not the total book size. ESP-IDF provides the symbols (`esp_fill_random`, `posix_memalign`, `realpath`) that `std` expects.
+
 ## Next Steps
 
 ::: grids

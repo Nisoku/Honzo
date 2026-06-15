@@ -8,7 +8,9 @@ pub use honzo_chunks::data::math::{
     latex_to_mathml_bytes, render_math_bytes, validate_mathml_bytes,
 };
 pub use honzo_chunks::data::sidx::normalize_search_term;
-pub use honzo_core::{FontEmbedding, HonzoError, HonzoParser, LayoutMode, MathType, PmapEntry};
+pub use honzo_core::{
+    guess_image_mime, FontEmbedding, HonzoError, HonzoParser, LayoutMode, MathType, PmapEntry,
+};
 pub use honzo_io::DrmConfig;
 pub use honzo_io::{decompress, Compression, CoverType, HonzoBuilder, HonzoMeta, MarkupType};
 
@@ -47,7 +49,8 @@ fn map_honzo_error(err: HonzoError) -> ffi::HonzoErrorCode {
 #[diplomat::bridge]
 pub mod ffi {
     use crate::{
-        decompress, guess_font_format as guess_font_format_impl, latex_to_mathml_bytes,
+        decompress, guess_font_format as guess_font_format_impl,
+        guess_image_mime as guess_image_mime_impl, latex_to_mathml_bytes,
         normalize_search_term as normalize_search_term_impl, render_math_bytes, validate_css_bytes,
         validate_mathml_bytes, CachedEntry, Compression, CoverType, DrmConfig, FontEmbedding,
         HonzoBuilder, HonzoMeta, HonzoParser, LayoutMode, MarkupType, MathType, PmapEntry,
@@ -451,7 +454,8 @@ pub mod ffi {
 
         pub fn open(path: &str, reader_version: u16) -> Result<Box<Self>, HonzoErrorCode> {
             let file = std::fs::File::open(path).map_err(|_| HonzoErrorCode::FileNotFound)?;
-            let mut stream = HonzoStream::open(file, reader_version).map_err(crate::map_honzo_error)?;
+            let mut stream =
+                HonzoStream::open(file, reader_version).map_err(crate::map_honzo_error)?;
             let toc_cache = Self::cache_toc(&mut stream);
             Ok(Box::new(HonzoFileReader {
                 stream,
@@ -907,6 +911,19 @@ pub mod ffi {
                 Ok(())
             }
             None => Err(HonzoErrorCode::Truncated),
+        }
+    }
+
+    pub fn guess_image_mime(
+        bytes: &[u8],
+        write: &mut diplomat_runtime::DiplomatWrite,
+    ) -> Result<(), HonzoErrorCode> {
+        match guess_image_mime_impl(bytes) {
+            Some(mime) => {
+                write.write_str(mime).map_err(|_| HonzoErrorCode::Unknown)?;
+                Ok(())
+            }
+            None => Err(HonzoErrorCode::Unknown),
         }
     }
 
