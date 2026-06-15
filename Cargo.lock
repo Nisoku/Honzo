@@ -1351,7 +1351,6 @@ dependencies = [
  "hkdf",
  "honzo-chunks",
  "honzo-core",
- "image",
  "lz4_flex",
  "rmp-serde",
  "serde",

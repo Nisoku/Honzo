@@ -13,16 +13,20 @@ pub use honzo_io::DrmConfig;
 pub use honzo_io::{decompress, Compression, CoverType, HonzoBuilder, HonzoMeta, MarkupType};
 
 struct CachedEntry {
-    chunk_type: u32,
+    chunk_type: [u8; 4],
     chunk_id: u32,
     offset: u64,
     size_compressed: u32,
     size_raw: u32,
-    compression: u8,
+    compression: Compression,
     content_type_kind: u8,
     content_type_value: u8,
+    cover_type: CoverType,
     flags: u8,
     crc32: u32,
+    alt_text: Option<String>,
+    font_embedding: Option<FontEmbedding>,
+    font_license_url: Option<String>,
 }
 
 fn map_honzo_error(err: HonzoError) -> ffi::HonzoErrorCode {
@@ -420,32 +424,35 @@ pub mod ffi {
     }
 
     impl HonzoFileReader {
-        fn cache_toc(stream: &HonzoStream<std::fs::File>) -> Vec<CachedEntry> {
-            stream
+        fn cache_toc(stream: &mut HonzoStream<std::fs::File>) -> Vec<CachedEntry> {
+            let cached: Vec<CachedEntry> = stream
                 .toc()
                 .into_iter()
-                .map(|e| {
-                    let chunk_type = u32::from_le_bytes(e.chunk_type);
-                    CachedEntry {
-                        chunk_type,
-                        chunk_id: e.chunk_id,
-                        offset: e.offset,
-                        size_compressed: e.size_compressed,
-                        size_raw: e.size_raw,
-                        compression: e.compression as u8,
-                        content_type_kind: e.content_type_kind,
-                        content_type_value: e.content_type_value,
-                        flags: e.flags,
-                        crc32: e.crc32,
-                    }
+                .map(|e| CachedEntry {
+                    chunk_type: e.chunk_type,
+                    chunk_id: e.chunk_id,
+                    offset: e.offset,
+                    size_compressed: e.size_compressed,
+                    size_raw: e.size_raw,
+                    compression: e.compression,
+                    content_type_kind: e.content_type_kind,
+                    content_type_value: e.content_type_value,
+                    cover_type: e.cover_type,
+                    flags: e.flags,
+                    crc32: e.crc32,
+                    alt_text: e.alt_text.map(|s| s.to_string()),
+                    font_embedding: e.font_embedding,
+                    font_license_url: e.font_license_url.map(|s| s.to_string()),
                 })
-                .collect()
+                .collect();
+            stream.drop_toc_buf();
+            cached
         }
 
         pub fn open(path: &str, reader_version: u16) -> Result<Box<Self>, HonzoErrorCode> {
             let file = std::fs::File::open(path).map_err(|_| HonzoErrorCode::FileNotFound)?;
-            let stream = HonzoStream::open(file, reader_version).map_err(crate::map_honzo_error)?;
-            let toc_cache = Self::cache_toc(&stream);
+            let mut stream = HonzoStream::open(file, reader_version).map_err(crate::map_honzo_error)?;
+            let toc_cache = Self::cache_toc(&mut stream);
             Ok(Box::new(HonzoFileReader {
                 stream,
                 chunk_buf: Vec::new(),
@@ -459,9 +466,9 @@ pub mod ffi {
             private_key: &[u8],
         ) -> Result<Box<Self>, HonzoErrorCode> {
             let file = std::fs::File::open(path).map_err(|_| HonzoErrorCode::FileNotFound)?;
-            let stream = HonzoStream::open_with_private_key(file, reader_version, private_key)
+            let mut stream = HonzoStream::open_with_private_key(file, reader_version, private_key)
                 .map_err(crate::map_honzo_error)?;
-            let toc_cache = Self::cache_toc(&stream);
+            let toc_cache = Self::cache_toc(&mut stream);
             Ok(Box::new(HonzoFileReader {
                 stream,
                 chunk_buf: Vec::new(),
@@ -476,7 +483,7 @@ pub mod ffi {
         pub fn get_chunk_type(&self, index: u32) -> u32 {
             self.toc_cache
                 .get(index as usize)
-                .map(|e| e.chunk_type)
+                .map(|e| u32::from_le_bytes(e.chunk_type))
                 .unwrap_or(0)
         }
 
@@ -502,26 +509,21 @@ pub mod ffi {
         /// must copy the data if they need it to outlive a subsequent call.
         pub fn get_chunk<'a>(&'a mut self, index: u32) -> Option<&'a [u8]> {
             let cached = self.toc_cache.get(index as usize)?;
-            let compression = match cached.compression {
-                0 => honzo_core::Compression::None,
-                1 => honzo_core::Compression::Lz4,
-                _ => return None,
-            };
             let entry = honzo_core::TocEntry {
-                chunk_type: cached.chunk_type.to_le_bytes(),
+                chunk_type: cached.chunk_type,
                 chunk_id: cached.chunk_id,
                 offset: cached.offset,
                 size_compressed: cached.size_compressed,
                 size_raw: cached.size_raw,
-                compression,
+                compression: cached.compression,
                 content_type_kind: cached.content_type_kind,
                 content_type_value: cached.content_type_value,
-                cover_type: honzo_core::CoverType::Front,
+                cover_type: cached.cover_type,
                 flags: cached.flags,
                 crc32: cached.crc32,
-                alt_text: None,
-                font_embedding: None,
-                font_license_url: None,
+                alt_text: cached.alt_text.as_deref(),
+                font_embedding: cached.font_embedding,
+                font_license_url: cached.font_license_url.as_deref(),
             };
 
             let data = self.stream.read_chunk(&entry).ok()?;

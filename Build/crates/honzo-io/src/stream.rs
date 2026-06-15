@@ -120,6 +120,12 @@ impl<R: Read + Seek> HonzoStream<R> {
         })
     }
 
+    /// Drop the raw TOC buffer after all entry data has been cached elsewhere.
+    /// Frees the memory held by the serialised TOC, which is ~32 bytes per entry.
+    pub fn drop_toc_buf(&mut self) {
+        self.toc_buf = Vec::new();
+    }
+
     pub fn head(&self) -> &HonzoHead {
         &self.head
     }
