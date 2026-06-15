@@ -37,21 +37,6 @@ pub fn validate_img(bytes: &[u8]) -> Result<&[u8], HonzoError> {
     Ok(bytes)
 }
 
-/// Attempt to guess the image MIME type from the bytes.
-pub fn guess_mime(bytes: &[u8]) -> Option<&'static str> {
-    match image::guess_format(bytes).ok()? {
-        image::ImageFormat::Png => Some("image/png"),
-        image::ImageFormat::Jpeg => Some("image/jpeg"),
-        image::ImageFormat::Gif => Some("image/gif"),
-        image::ImageFormat::Bmp => Some("image/bmp"),
-        image::ImageFormat::Tiff => Some("image/tiff"),
-        image::ImageFormat::WebP => Some("image/webp"),
-        image::ImageFormat::Ico => Some("image/x-icon"),
-        image::ImageFormat::Pnm => Some("image/x-portable-anymap"),
-        _ => None,
-    }
-}
-
 /// Helper to encode a `DynamicImage` to JPEG bytes with quality.
 pub fn encode_jpeg(img: &DynamicImage, quality: u8) -> Result<Vec<u8>, HonzoError> {
     let rgb = img.to_rgb8();

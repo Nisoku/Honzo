@@ -1,3 +1,4 @@
+#[cfg(feature = "image")]
 use honzo_chunks::data::covr::generate_covt;
 use honzo_chunks::data::font;
 use honzo_chunks::data::sidx::build_sidx;
@@ -300,6 +301,7 @@ impl HonzoBuilder {
                 .map_err(|e| eprintln!("Warning: extra data has unrecognised namespace: {:?}", e));
         }
 
+        #[cfg(feature = "image")]
         if final_builder.auto_covt {
             let has_covr = final_builder.chunks.iter().any(|c| c.tag == *b"COVR");
             let has_covt = final_builder.chunks.iter().any(|c| c.tag == *b"COVT");

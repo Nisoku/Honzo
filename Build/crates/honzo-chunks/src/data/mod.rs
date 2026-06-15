@@ -1,7 +1,9 @@
 pub mod chap;
+#[cfg(feature = "image")]
 pub mod covr;
 pub mod css;
 pub mod font;
+#[cfg(feature = "image")]
 pub mod img;
 pub mod math;
 pub mod sidx;

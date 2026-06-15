@@ -20,6 +20,7 @@
     "vite-plugin-wasm": "^3.6.0"
   },
   "devDependencies": {
+    "esbuild": "^0.28.1",
     "prettier": "^3.8.4",
     "vite-plugin-pwa": "^1.0.0"
   },

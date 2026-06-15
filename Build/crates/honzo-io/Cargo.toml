@@ -8,17 +8,20 @@ readme = "../../../README.md"
 homepage = "https://nisoku.org/Honzo"
 repository = "https://github.com/Nisoku/Honzo"
 
+[features]
+default = ["image"]
+image = ["honzo-chunks/image"]
+
 [dependencies]
 honzo-core = { path = "../honzo-core", version = "0.1", features = ["alloc"] }
-honzo-chunks = { path = "../honzo-chunks", version = "0.1" }
+honzo-chunks = { path = "../honzo-chunks", version = "0.1", default-features = false }
 
 lz4_flex = "0.13.1"
 crc32fast = "1.5.0"
 rmp-serde = "1.3.1"
 serde = { version = "1.0.228", features = ["derive"] }
-image = { version = "0.25.10", default-features = false, features = ["png", "jpeg", "gif", "bmp", "tiff", "webp", "ico", "pnm"] }
 getrandom = { version = "0.4.2", features = ["wasm_js"] }
 aes-gcm = "0.10"
-hkdf = "0.12"
-sha2 = "0.10"
+hkdf = "0.13"
+sha2 = "0.11"
 x25519-dalek = { version = "2", default-features = false, features = ["static_secrets", "getrandom"] }

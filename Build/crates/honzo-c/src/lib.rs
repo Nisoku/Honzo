@@ -8,22 +8,59 @@ pub use honzo_chunks::data::math::{
     latex_to_mathml_bytes, render_math_bytes, validate_mathml_bytes,
 };
 pub use honzo_chunks::data::sidx::normalize_search_term;
-pub use honzo_core::{FontEmbedding, HonzoParser, LayoutMode, MathType, PmapEntry};
+pub use honzo_core::{
+    guess_image_mime, FontEmbedding, HonzoError, HonzoParser, LayoutMode, MathType, PmapEntry,
+};
 pub use honzo_io::DrmConfig;
 pub use honzo_io::{decompress, Compression, CoverType, HonzoBuilder, HonzoMeta, MarkupType};
+
+struct CachedEntry {
+    chunk_type: [u8; 4],
+    chunk_id: u32,
+    offset: u64,
+    size_compressed: u32,
+    size_raw: u32,
+    compression: Compression,
+    content_type_kind: u8,
+    content_type_value: u8,
+    cover_type: CoverType,
+    flags: u8,
+    crc32: u32,
+    alt_text: Option<String>,
+    font_embedding: Option<FontEmbedding>,
+    font_license_url: Option<String>,
+}
+
+fn map_honzo_error(err: HonzoError) -> ffi::HonzoErrorCode {
+    match err {
+        HonzoError::InvalidMagic => ffi::HonzoErrorCode::InvalidMagic,
+        HonzoError::ReaderVersionTooOld { .. } => ffi::HonzoErrorCode::ReaderVersionTooOld,
+        HonzoError::BufferTooShort => ffi::HonzoErrorCode::BufferTooShort,
+        HonzoError::CrcMismatch { .. } => ffi::HonzoErrorCode::CrcMismatch,
+        HonzoError::EncryptedChunk { .. } => ffi::HonzoErrorCode::EncryptedChunk,
+        HonzoError::InvalidMathML => ffi::HonzoErrorCode::InvalidMathML,
+        HonzoError::Truncated => ffi::HonzoErrorCode::Truncated,
+        HonzoError::InvalidCss => ffi::HonzoErrorCode::InvalidCss,
+        HonzoError::InvalidSyncCue => ffi::HonzoErrorCode::InvalidSyncCue,
+        _ => ffi::HonzoErrorCode::Unknown,
+    }
+}
 
 #[diplomat::bridge]
 pub mod ffi {
     use crate::{
-        decompress, guess_font_format as guess_font_format_impl, latex_to_mathml_bytes,
+        decompress, guess_font_format as guess_font_format_impl,
+        guess_image_mime as guess_image_mime_impl, latex_to_mathml_bytes,
         normalize_search_term as normalize_search_term_impl, render_math_bytes, validate_css_bytes,
-        validate_mathml_bytes, Compression, CoverType, DrmConfig, FontEmbedding, HonzoBuilder,
-        HonzoMeta, HonzoParser, LayoutMode, MarkupType, MathType, PmapEntry,
+        validate_mathml_bytes, CachedEntry, Compression, CoverType, DrmConfig, FontEmbedding,
+        HonzoBuilder, HonzoMeta, HonzoParser, LayoutMode, MarkupType, MathType, PmapEntry,
     };
     use core::fmt::Write as _;
     use honzo_chunks::extra::{anno, sync};
+    use honzo_io::HonzoStream;
 
     #[repr(C)]
+    #[derive(Debug)]
     pub enum HonzoErrorCode {
         Ok = 0,
         InvalidMagic = 1,
@@ -35,6 +72,7 @@ pub mod ffi {
         Truncated = 7,
         InvalidCss = 8,
         InvalidSyncCue = 9,
+        FileNotFound = 10,
         Unknown = 255,
     }
 
@@ -374,6 +412,140 @@ pub mod ffi {
                 })
                 .collect();
             let json = serde_json::to_string(&entries).map_err(|_| HonzoErrorCode::Unknown)?;
+            write
+                .write_str(&json)
+                .map_err(|_| HonzoErrorCode::Unknown)?;
+            Ok(())
+        }
+    }
+
+    #[diplomat::opaque_mut]
+    pub struct HonzoFileReader {
+        stream: HonzoStream<std::fs::File>,
+        chunk_buf: Vec<u8>,
+        toc_cache: Vec<CachedEntry>,
+    }
+
+    impl HonzoFileReader {
+        fn cache_toc(stream: &mut HonzoStream<std::fs::File>) -> Vec<CachedEntry> {
+            let cached: Vec<CachedEntry> = stream
+                .toc()
+                .into_iter()
+                .map(|e| CachedEntry {
+                    chunk_type: e.chunk_type,
+                    chunk_id: e.chunk_id,
+                    offset: e.offset,
+                    size_compressed: e.size_compressed,
+                    size_raw: e.size_raw,
+                    compression: e.compression,
+                    content_type_kind: e.content_type_kind,
+                    content_type_value: e.content_type_value,
+                    cover_type: e.cover_type,
+                    flags: e.flags,
+                    crc32: e.crc32,
+                    alt_text: e.alt_text.map(|s| s.to_string()),
+                    font_embedding: e.font_embedding,
+                    font_license_url: e.font_license_url.map(|s| s.to_string()),
+                })
+                .collect();
+            stream.drop_toc_buf();
+            cached
+        }
+
+        pub fn open(path: &str, reader_version: u16) -> Result<Box<Self>, HonzoErrorCode> {
+            let file = std::fs::File::open(path).map_err(|_| HonzoErrorCode::FileNotFound)?;
+            let mut stream =
+                HonzoStream::open(file, reader_version).map_err(crate::map_honzo_error)?;
+            let toc_cache = Self::cache_toc(&mut stream);
+            Ok(Box::new(HonzoFileReader {
+                stream,
+                chunk_buf: Vec::new(),
+                toc_cache,
+            }))
+        }
+
+        pub fn open_with_private_key(
+            path: &str,
+            reader_version: u16,
+            private_key: &[u8],
+        ) -> Result<Box<Self>, HonzoErrorCode> {
+            let file = std::fs::File::open(path).map_err(|_| HonzoErrorCode::FileNotFound)?;
+            let mut stream = HonzoStream::open_with_private_key(file, reader_version, private_key)
+                .map_err(crate::map_honzo_error)?;
+            let toc_cache = Self::cache_toc(&mut stream);
+            Ok(Box::new(HonzoFileReader {
+                stream,
+                chunk_buf: Vec::new(),
+                toc_cache,
+            }))
+        }
+
+        pub fn chunk_count(&self) -> u32 {
+            self.stream.head().chunk_count
+        }
+
+        pub fn get_chunk_type(&self, index: u32) -> u32 {
+            self.toc_cache
+                .get(index as usize)
+                .map(|e| u32::from_le_bytes(e.chunk_type))
+                .unwrap_or(0)
+        }
+
+        pub fn get_chunk_content_type_kind(&self, index: u32) -> u8 {
+            self.toc_cache
+                .get(index as usize)
+                .map(|e| e.content_type_kind)
+                .unwrap_or(0)
+        }
+
+        pub fn get_chunk_content_type_value(&self, index: u32) -> u8 {
+            self.toc_cache
+                .get(index as usize)
+                .map(|e| e.content_type_value)
+                .unwrap_or(0)
+        }
+
+        #[allow(clippy::needless_lifetimes)]
+        /// Returns the decompressed data for chunk `index`.
+        ///
+        /// The returned slice is backed by an internal buffer and is valid only
+        /// until the next call to `get_chunk` on the same reader. C/C++ callers
+        /// must copy the data if they need it to outlive a subsequent call.
+        pub fn get_chunk<'a>(&'a mut self, index: u32) -> Option<&'a [u8]> {
+            let cached = self.toc_cache.get(index as usize)?;
+            let entry = honzo_core::TocEntry {
+                chunk_type: cached.chunk_type,
+                chunk_id: cached.chunk_id,
+                offset: cached.offset,
+                size_compressed: cached.size_compressed,
+                size_raw: cached.size_raw,
+                compression: cached.compression,
+                content_type_kind: cached.content_type_kind,
+                content_type_value: cached.content_type_value,
+                cover_type: cached.cover_type,
+                flags: cached.flags,
+                crc32: cached.crc32,
+                alt_text: cached.alt_text.as_deref(),
+                font_embedding: cached.font_embedding,
+                font_license_url: cached.font_license_url.as_deref(),
+            };
+
+            let data = self.stream.read_chunk(&entry).ok()?;
+            self.chunk_buf = data;
+            Some(&self.chunk_buf)
+        }
+
+        pub fn get_meta(
+            &mut self,
+            write: &mut diplomat_runtime::DiplomatWrite,
+        ) -> Result<(), HonzoErrorCode> {
+            let meta = self
+                .stream
+                .meta_bytes()
+                .map_err(|_| HonzoErrorCode::Truncated)?;
+            let meta: HonzoMeta =
+                rmp_serde::from_slice(&meta).map_err(|_| HonzoErrorCode::Truncated)?;
+            let json = serde_json::to_string(&meta).map_err(|_| HonzoErrorCode::Unknown)?;
             write
                 .write_str(&json)
                 .map_err(|_| HonzoErrorCode::Unknown)?;
@@ -739,6 +911,19 @@ pub mod ffi {
                 Ok(())
             }
             None => Err(HonzoErrorCode::Truncated),
+        }
+    }
+
+    pub fn guess_image_mime(
+        bytes: &[u8],
+        write: &mut diplomat_runtime::DiplomatWrite,
+    ) -> Result<(), HonzoErrorCode> {
+        match guess_image_mime_impl(bytes) {
+            Some(mime) => {
+                write.write_str(mime).map_err(|_| HonzoErrorCode::Unknown)?;
+                Ok(())
+            }
+            None => Err(HonzoErrorCode::Unknown),
         }
     }
 

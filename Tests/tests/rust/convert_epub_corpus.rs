@@ -253,10 +253,8 @@ fn all_epubs_fully_validated() {
                 {
                     last_resource = i;
                 }
-                b"CHAP" => {
-                    if i < first_chap {
-                        first_chap = i;
-                    }
+                b"CHAP" if i < first_chap => {
+                    first_chap = i;
                 }
                 _ => {}
             }
