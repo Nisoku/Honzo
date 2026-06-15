@@ -407,3 +407,83 @@ fn ffi_get_sync_cues() {
     assert!(json.contains("\"offset\":100"));
     assert!(json.contains("\"timestamp_ms\":5000"));
 }
+
+// HonzoFileReader tests (file-backed streaming)
+fn temp_fixture_path(test_name: &str, fixture_name: &str) -> std::path::PathBuf {
+    let data = fixture(fixture_name);
+    let path = std::env::temp_dir().join(format!("honzo_c_{}_{}", test_name, fixture_name));
+    std::fs::write(&path, &data).unwrap();
+    path
+}
+
+#[test]
+fn ffi_filereader_open_novel() {
+    let path = temp_fixture_path("open_novel", "novel.hzo");
+    let reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+    assert_eq!(reader.chunk_count(), 7);
+    std::fs::remove_file(&path).ok();
+}
+
+#[test]
+fn ffi_filereader_chunks_match_handle() {
+    let path = temp_fixture_path("chunks_match_handle", "novel.hzo");
+    let mut reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+    let mut handle = honzo_c::ffi::HonzoHandle::parse(&fixture("novel.hzo"), 1).unwrap();
+
+    assert_eq!(reader.chunk_count(), handle.chunk_count());
+
+    for i in 0..reader.chunk_count() {
+        let file_chunk = reader.get_chunk(i).unwrap();
+        let handle_chunk = handle.get_chunk(i).unwrap();
+        assert_eq!(file_chunk, handle_chunk, "chunk {} mismatch", i);
+    }
+
+    std::fs::remove_file(&path).ok();
+}
+
+#[test]
+fn ffi_filereader_get_meta() {
+    let path = temp_fixture_path("get_meta", "novel.hzo");
+    let mut reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+    let mut buffer = diplomat_runtime::rust_interop::RustWriteVec::with_capacity(512);
+    let result = reader.get_meta(unsafe { buffer.borrow_mut() });
+    assert!(result.is_ok());
+    let meta_json = std::str::from_utf8(buffer.borrow().as_bytes()).unwrap();
+    assert!(meta_json.contains("\"language\":\"en\""));
+    assert!(meta_json.contains("\"title\""));
+    std::fs::remove_file(&path).ok();
+}
+
+#[test]
+fn ffi_filereader_not_found() {
+    let result = honzo_c::ffi::HonzoFileReader::open("/nonexistent/path.hzo", 1);
+    assert!(result.is_err());
+}
+
+#[test]
+fn ffi_filereader_bad_magic() {
+    let bad = b"NOPE";
+    let path = std::env::temp_dir().join("honzo_c_bad_magic.hzo");
+    std::fs::write(&path, bad).unwrap();
+    let result = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1);
+    assert!(result.is_err());
+    std::fs::remove_file(&path).ok();
+}
+
+#[test]
+fn ffi_filereader_open_lz4() {
+    let path = temp_fixture_path("open_lz4", "compressed_lz4.hzo");
+    let mut reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+    assert!(reader.chunk_count() > 0);
+    let chunk = reader.get_chunk(1).unwrap();
+    assert!(!chunk.is_empty());
+    std::fs::remove_file(&path).ok();
+}
+
+#[test]
+fn ffi_filereader_minimal() {
+    let path = temp_fixture_path("minimal", "minimal.hzo");
+    let reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+    assert_eq!(reader.chunk_count(), 0);
+    std::fs::remove_file(&path).ok();
+}

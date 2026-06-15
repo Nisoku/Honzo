@@ -22,8 +22,10 @@ pub mod ffi {
     };
     use core::fmt::Write as _;
     use honzo_chunks::extra::{anno, sync};
+    use honzo_io::HonzoStream;
 
     #[repr(C)]
+    #[derive(Debug)]
     pub enum HonzoErrorCode {
         Ok = 0,
         InvalidMagic = 1,
@@ -374,6 +376,86 @@ pub mod ffi {
                 })
                 .collect();
             let json = serde_json::to_string(&entries).map_err(|_| HonzoErrorCode::Unknown)?;
+            write
+                .write_str(&json)
+                .map_err(|_| HonzoErrorCode::Unknown)?;
+            Ok(())
+        }
+    }
+
+    #[diplomat::opaque_mut]
+    pub struct HonzoFileReader {
+        stream: HonzoStream<std::fs::File>,
+        chunk_buf: Vec<u8>,
+    }
+
+    impl HonzoFileReader {
+        pub fn open(path: &str, reader_version: u16) -> Result<Box<Self>, HonzoErrorCode> {
+            let file = std::fs::File::open(path).map_err(|_| HonzoErrorCode::Truncated)?;
+            let stream = HonzoStream::open(file, reader_version)
+                .map_err(|_| HonzoErrorCode::InvalidMagic)?;
+            Ok(Box::new(HonzoFileReader {
+                stream,
+                chunk_buf: Vec::new(),
+            }))
+        }
+
+        pub fn open_with_private_key(
+            path: &str,
+            reader_version: u16,
+            private_key: &[u8],
+        ) -> Result<Box<Self>, HonzoErrorCode> {
+            let file = std::fs::File::open(path).map_err(|_| HonzoErrorCode::Truncated)?;
+            let stream = HonzoStream::open_with_private_key(file, reader_version, private_key)
+                .map_err(|_| HonzoErrorCode::InvalidMagic)?;
+            Ok(Box::new(HonzoFileReader {
+                stream,
+                chunk_buf: Vec::new(),
+            }))
+        }
+
+        pub fn chunk_count(&self) -> u32 {
+            self.stream.head().chunk_count
+        }
+
+        #[allow(clippy::needless_lifetimes)]
+        pub fn get_chunk<'a>(&'a mut self, index: u32) -> Option<&'a [u8]> {
+            let entries = self.stream.toc();
+            let entry = entries.get(index as usize)?;
+            let toc_entry = honzo_core::TocEntry {
+                chunk_type: entry.chunk_type,
+                chunk_id: entry.chunk_id,
+                offset: entry.offset,
+                size_compressed: entry.size_compressed,
+                size_raw: entry.size_raw,
+                compression: entry.compression,
+                content_type_kind: entry.content_type_kind,
+                content_type_value: entry.content_type_value,
+                cover_type: entry.cover_type,
+                flags: entry.flags,
+                crc32: entry.crc32,
+                alt_text: None,
+                font_embedding: entry.font_embedding,
+                font_license_url: None,
+            };
+            drop(entries);
+
+            let data = self.stream.read_chunk(&toc_entry).ok()?;
+            self.chunk_buf = data;
+            Some(&self.chunk_buf)
+        }
+
+        pub fn get_meta(
+            &mut self,
+            write: &mut diplomat_runtime::DiplomatWrite,
+        ) -> Result<(), HonzoErrorCode> {
+            let meta = self
+                .stream
+                .meta_bytes()
+                .map_err(|_| HonzoErrorCode::Truncated)?;
+            let meta: HonzoMeta =
+                rmp_serde::from_slice(&meta).map_err(|_| HonzoErrorCode::Truncated)?;
+            let json = serde_json::to_string(&meta).map_err(|_| HonzoErrorCode::Unknown)?;
             write
                 .write_str(&json)
                 .map_err(|_| HonzoErrorCode::Unknown)?;
