@@ -77,8 +77,9 @@ Recognizes: PNG, JPEG, GIF, BMP, TIFF (LE/BE), WebP, ICO, PNM (PBM/PGM/PPM/PAM).
 #include <string.h>
 
 int main(void) {
+    DiplomatStringView book_path = {"/sdcard/books/book.hzo", 22};
     HonzoFileReader_open_result r =
-        HonzoFileReader_open("/sdcard/books/book.hzo", 1);
+        HonzoFileReader_open(book_path, 1);
     if (!r.is_ok) {
         fprintf(stderr, "open failed: error %d\n", r.err);
         return 1;
@@ -87,13 +88,17 @@ int main(void) {
 
     uint32_t n = HonzoFileReader_chunk_count(reader);
 
+    uint32_t covr_tag, covt_tag, img_tag, chap_tag;
+    memcpy(&covr_tag, "COVR", 4);
+    memcpy(&covt_tag, "COVT", 4);
+    memcpy(&img_tag,  "IMG_", 4);
+    memcpy(&chap_tag, "CHAP", 4);
+
     for (uint32_t i = 0; i < n; i++) {
         uint32_t tag = HonzoFileReader_get_chunk_type(reader, i);
 
         // Identify image chunks by type
-        if (tag == *(const uint32_t*)"COVR" ||
-            tag == *(const uint32_t*)"COVT" ||
-            tag == *(const uint32_t*)"IMG_") {
+        if (tag == covr_tag || tag == covt_tag || tag == img_tag) {
             HonzoFileReader_get_chunk_result c =
                 HonzoFileReader_get_chunk(reader, i);
             if (c.is_ok) {
@@ -109,7 +114,7 @@ int main(void) {
         }
 
         // Only process CHAP chunks beyond images
-        if (tag != *(const uint32_t*)"CHAP") continue;
+        if (tag != chap_tag) continue;
 
         uint8_t kind = HonzoFileReader_get_chunk_content_type_kind(reader, i);
         uint8_t val  = HonzoFileReader_get_chunk_content_type_value(reader, i);

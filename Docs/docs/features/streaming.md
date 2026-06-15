@@ -71,16 +71,22 @@ The C binding exposes the same streaming pattern via `HonzoFileReader`. All chun
 ```c
 #include "HonzoFileReader.h"
 
+DiplomatStringView book_path = {"/sdcard/books/book.hzo", 22};
+// reader_version=1: Honzo format v1 (current). Pass the expected format version;
+// the library rejects files whose format_version > reader_version.
 HonzoFileReader_open_result r =
-    HonzoFileReader_open("/sdcard/books/book.hzo", 1);
+    HonzoFileReader_open(book_path, 1);
 if (!r.is_ok) return;
 
 HonzoFileReader* reader = r.ok;
 uint32_t n = HonzoFileReader_chunk_count(reader);
 
+uint32_t chap_tag;
+memcpy(&chap_tag, "CHAP", 4);
+
 for (uint32_t i = 0; i < n; i++) {
     uint32_t tag = HonzoFileReader_get_chunk_type(reader, i);
-    if (tag != *(const uint32_t*)"CHAP") continue;
+    if (tag != chap_tag) continue;
 
     HonzoFileReader_get_chunk_result c =
         HonzoFileReader_get_chunk(reader, i);
@@ -105,7 +111,7 @@ cargo +esp build --release -p honzo-c \
   --no-default-features
 ```
 
-A minimal C reader links to ~431 KB flash + 2.2 KB static RAM. Chunks are allocated on the heap one at a time — peak heap scales with the largest chapter, not the total book size. ESP-IDF provides the symbols (`esp_fill_random`, `posix_memalign`, `realpath`) that `std` expects.
+A minimal C reader links to ~431 KB flash + 2.2 KB static RAM (measured from xtensa-esp32-elf-nm on the linked ELF; confirm on actual hardware if flash budget is tight). Chunks are allocated on the heap one at a time — peak heap scales with the largest chapter, not the total book size. ESP-IDF provides the symbols (`esp_fill_random`, `posix_memalign`, `realpath`) that `std` expects.
 
 ## Next Steps
 

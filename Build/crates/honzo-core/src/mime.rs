@@ -8,10 +8,6 @@ pub fn guess_image_mime(bytes: &[u8]) -> Option<&'static str> {
         return Some("image/x-portable-anymap");
     }
 
-    if bytes.len() < 4 {
-        return None;
-    }
-
     if match_prefix(bytes, &[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]) {
         return Some("image/png");
     }
