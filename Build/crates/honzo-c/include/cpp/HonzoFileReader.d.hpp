@@ -31,6 +31,19 @@ public:
 
   inline uint32_t chunk_count() const;
 
+  inline uint32_t get_chunk_type(uint32_t index) const;
+
+  inline uint8_t get_chunk_content_type_kind(uint32_t index) const;
+
+  inline uint8_t get_chunk_content_type_value(uint32_t index) const;
+
+  /**
+   * Returns the decompressed data for chunk `index`.
+   *
+   * The returned slice is backed by an internal buffer and is valid only
+   * until the next call to `get_chunk` on the same reader. C/C++ callers
+   * must copy the data if they need it to outlive a subsequent call.
+   */
   inline std::optional<diplomat::span<const uint8_t>> get_chunk(uint32_t index);
 
   inline diplomat::result<std::string, HonzoErrorCode> get_meta();

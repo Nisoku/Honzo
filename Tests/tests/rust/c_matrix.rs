@@ -410,8 +410,11 @@ fn ffi_get_sync_cues() {
 
 // HonzoFileReader tests (file-backed streaming)
 fn temp_fixture_path(test_name: &str, fixture_name: &str) -> std::path::PathBuf {
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static COUNTER: AtomicU64 = AtomicU64::new(0);
     let data = fixture(fixture_name);
-    let path = std::env::temp_dir().join(format!("honzo_c_{}_{}", test_name, fixture_name));
+    let id = COUNTER.fetch_add(1, Ordering::Relaxed);
+    let path = std::env::temp_dir().join(format!("honzo_c_{}_{}_{}", test_name, fixture_name, id));
     std::fs::write(&path, &data).unwrap();
     path
 }
@@ -457,16 +460,25 @@ fn ffi_filereader_get_meta() {
 #[test]
 fn ffi_filereader_not_found() {
     let result = honzo_c::ffi::HonzoFileReader::open("/nonexistent/path.hzo", 1);
-    assert!(result.is_err());
+    assert!(matches!(
+        result,
+        Err(honzo_c::ffi::HonzoErrorCode::FileNotFound)
+    ));
 }
 
 #[test]
 fn ffi_filereader_bad_magic() {
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static COUNTER: AtomicU64 = AtomicU64::new(0);
     let bad = b"NOPE";
-    let path = std::env::temp_dir().join("honzo_c_bad_magic.hzo");
+    let id = COUNTER.fetch_add(1, Ordering::Relaxed);
+    let path = std::env::temp_dir().join(format!("honzo_c_bad_magic_{}.hzo", id));
     std::fs::write(&path, bad).unwrap();
     let result = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1);
-    assert!(result.is_err());
+    assert!(matches!(
+        result,
+        Err(honzo_c::ffi::HonzoErrorCode::InvalidMagic)
+    ));
     std::fs::remove_file(&path).ok();
 }
 
@@ -474,16 +486,126 @@ fn ffi_filereader_bad_magic() {
 fn ffi_filereader_open_lz4() {
     let path = temp_fixture_path("open_lz4", "compressed_lz4.hzo");
     let mut reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
-    assert!(reader.chunk_count() > 0);
+    assert!(reader.chunk_count() > 1);
     let chunk = reader.get_chunk(1).unwrap();
     assert!(!chunk.is_empty());
     std::fs::remove_file(&path).ok();
 }
-
 #[test]
 fn ffi_filereader_minimal() {
     let path = temp_fixture_path("minimal", "minimal.hzo");
     let reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
     assert_eq!(reader.chunk_count(), 0);
+    std::fs::remove_file(&path).ok();
+}
+
+#[test]
+fn ffi_filereader_chunk_types_novel() {
+    let path = temp_fixture_path("chunk_types_novel", "novel.hzo");
+    let reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+    assert_eq!(reader.chunk_count(), 7);
+
+    // novel.hzo: COVR + 3 CHAP + CSS + auto-SIDX + auto-COVT
+    let covr = reader.get_chunk_type(0);
+    assert_eq!(covr, u32::from_le_bytes(*b"COVR"), "chunk 0 tag");
+
+    let chap = reader.get_chunk_type(1);
+    assert_eq!(chap, u32::from_le_bytes(*b"CHAP"), "chunk 1 tag");
+
+    let chap2 = reader.get_chunk_type(2);
+    assert_eq!(chap2, u32::from_le_bytes(*b"CHAP"), "chunk 2 tag");
+
+    let sidx = reader.get_chunk_type(5);
+    assert_eq!(sidx, u32::from_le_bytes(*b"SIDX"), "chunk 5 tag");
+
+    std::fs::remove_file(&path).ok();
+}
+
+#[test]
+fn ffi_filereader_content_types_novel() {
+    let path = temp_fixture_path("content_types_novel", "novel.hzo");
+    let reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+
+    // CHAP chunks are Markdown in novel.hzo (kind=1, value=0)
+    for i in 1..=3 {
+        assert_eq!(
+            reader.get_chunk_content_type_kind(i),
+            1,
+            "chunk {} content_type_kind",
+            i
+        );
+        assert_eq!(
+            reader.get_chunk_content_type_value(i),
+            0,
+            "chunk {} content_type_value",
+            i
+        );
+    }
+
+    // COVR, CSS, SIDX, COVT have kind=1, value=0
+    for i in [0u32, 4, 5, 6] {
+        assert_eq!(
+            reader.get_chunk_content_type_kind(i),
+            1,
+            "chunk {} content_type_kind",
+            i
+        );
+        assert_eq!(
+            reader.get_chunk_content_type_value(i),
+            0,
+            "chunk {} content_type_value",
+            i
+        );
+    }
+
+    std::fs::remove_file(&path).ok();
+}
+
+#[test]
+fn ffi_filereader_content_types_textbook() {
+    // textbook.hzo has CHAP chunks with MarkupType::Html (value=1)
+    let path = temp_fixture_path("content_types_textbook", "textbook.hzo");
+    let reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+
+    // MATH chunk: kind=2, value=0 (MathML)
+    // auto-SIDX is last chunk
+    let chap1_index = 0;
+    let chap2_index = 1;
+    let math_index = 2;
+
+    assert_eq!(reader.get_chunk_content_type_kind(math_index), 2);
+    assert_eq!(reader.get_chunk_content_type_value(math_index), 0);
+
+    // CHAP chunks are HTML (kind=1, value=1)
+    assert_eq!(reader.get_chunk_content_type_kind(chap1_index), 1);
+    assert_eq!(reader.get_chunk_content_type_value(chap1_index), 1);
+    assert_eq!(reader.get_chunk_content_type_kind(chap2_index), 1);
+    assert_eq!(reader.get_chunk_content_type_value(chap2_index), 1);
+
+    // Verify chunk tags
+    assert_eq!(
+        reader.get_chunk_type(chap1_index),
+        u32::from_le_bytes(*b"CHAP")
+    );
+    assert_eq!(
+        reader.get_chunk_type(chap2_index),
+        u32::from_le_bytes(*b"CHAP")
+    );
+    assert_eq!(
+        reader.get_chunk_type(math_index),
+        u32::from_le_bytes(*b"MATH")
+    );
+
+    std::fs::remove_file(&path).ok();
+}
+
+#[test]
+fn ffi_filereader_chunk_type_out_of_range() {
+    let path = temp_fixture_path("type_oob", "novel.hzo");
+    let reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+    // Out-of-range indices return 0 / 0 / 0
+    assert_eq!(reader.get_chunk_type(99), 0);
+    assert_eq!(reader.get_chunk_content_type_kind(99), 0);
+    assert_eq!(reader.get_chunk_content_type_value(99), 0);
     std::fs::remove_file(&path).ok();
 }

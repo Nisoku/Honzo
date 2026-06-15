@@ -3,7 +3,7 @@ title: "C API Reference"
 description: "The C binding for Honzo via Diplomat"
 ---
 
-The C binding wraps `honzo-core` into a plain C API using [Diplomat](https://github.com/rust-diplomat/diplomat). It provides read only access to Honzo files. You can parse, inspect, and read chunks. Building and streaming are not available.
+The C binding wraps `honzo-core` and `honzo-io` into a plain C API using [Diplomat](https://github.com/rust-diplomat/diplomat). Two modes are provided: the in-memory parser (`HonzoHandle`) and the file-backed streaming reader (`HonzoFileReader`). Building is not yet available.
 
 ## Usage
 
@@ -23,12 +23,86 @@ HonzoHandle_destroy(handle);
 
 ## Exported types
 
-- `HonzoHandle` -- Opaque handle to a parsed Honzo file
+- `HonzoHandle` -- In-memory parser handle (reads entire file into a buffer)
+- `HonzoFileReader` -- File-backed streaming reader (reads one chunk at a time)
+- `HonzoErrorCode` -- Error codes returned by fallible functions
 - `HonzoHead` -- File header struct
 - `TocEntry` -- TOC entry struct
 - `MetaMap` -- META data as key-value pairs
 
-## HonzoHandle lifecycle
+---
+
+## HonzoFileReader (streaming)
+
+Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk` call performs one seek, one read, and one LZ4 decompression. The returned data is valid only until the next `get_chunk` call on the same reader.
+
+### HonzoFileReader lifecycle
+
+| Symbol                                  | Signature                                                                      | Returns                                        | Notes                |
+|-----------------------------------------|--------------------------------------------------------------------------------|------------------------------------------------|----------------------|
+| `HonzoFileReader_open`                  | `DiplomatStringView path, uint16_t reader_version`                             | `HonzoFileReader_open_result`                  | Open from file path. |
+| `HonzoFileReader_open_with_private_key` | `DiplomatStringView path, uint16_t reader_version, DiplomatU8View private_key` | `HonzoFileReader_open_with_private_key_result` | Open with DRM key.   |
+| `HonzoFileReader_destroy`               | `HonzoFileReader* self`                                                        | `void`                                         | Free the reader.     |
+
+### HonzoFileReader accessors
+
+| Symbol                                         | Signature                                     | Returns                            | Notes                                                                                                                   |
+|------------------------------------------------|-----------------------------------------------|------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `HonzoFileReader_chunk_count`                  | `const HonzoFileReader* self`                 | `uint32_t`                         | Number of chunks.                                                                                                       |
+| `HonzoFileReader_get_chunk_type`               | `const HonzoFileReader* self, uint32_t index` | `uint32_t`                         | 4-byte chunk tag as native-endian u32 (e.g. `0x50414843` for `"CHAP"`). Returns 0 if index out of range.                |
+| `HonzoFileReader_get_chunk_content_type_kind`  | `const HonzoFileReader* self, uint32_t index` | `uint8_t`                          | Content type kind: `1` = markup, `2` = math. Returns 0 if index out of range.                                           |
+| `HonzoFileReader_get_chunk_content_type_value` | `const HonzoFileReader* self, uint32_t index` | `uint8_t`                          | Content type value: markup `0` = Markdown, `1` = HTML; math `0` = MathML, `1` = LaTeX. Returns 0 if index out of range. |
+| `HonzoFileReader_get_chunk`                    | `HonzoFileReader* self, uint32_t index`       | `HonzoFileReader_get_chunk_result` | Decompressed chunk data. Valid until next call to this function.                                                        |
+| `HonzoFileReader_get_meta`                     | `HonzoFileReader* self, DiplomatWrite* write` | `HonzoFileReader_get_meta_result`  | JSON metadata string.                                                                                                   |
+
+### Example
+
+```c
+#include "HonzoFileReader.h"
+#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    HonzoFileReader_open_result r =
+        HonzoFileReader_open("/sdcard/books/book.hzo", 1);
+    if (!r.is_ok) {
+        fprintf(stderr, "open failed: error %d\n", r.err);
+        return 1;
+    }
+    HonzoFileReader* reader = r.ok;
+
+    uint32_t n = HonzoFileReader_chunk_count(reader);
+
+    for (uint32_t i = 0; i < n; i++) {
+        uint32_t tag = HonzoFileReader_get_chunk_type(reader, i);
+
+        // Only process CHAP chunks
+        if (tag != *(const uint32_t*)"CHAP") continue;
+
+        uint8_t kind = HonzoFileReader_get_chunk_content_type_kind(reader, i);
+        uint8_t val  = HonzoFileReader_get_chunk_content_type_value(reader, i);
+
+        HonzoFileReader_get_chunk_result c =
+            HonzoFileReader_get_chunk(reader, i);
+        if (!c.is_ok) continue;
+
+        // c.ok.data / c.ok.len -- copy before next get_chunk call
+        printf("chunk %u: kind=%u val=%u size=%zu\n",
+               i, kind, val, c.ok.len);
+    }
+
+    HonzoFileReader_destroy(reader);
+    return 0;
+}
+```
+
+---
+
+## HonzoHandle (in-memory parser)
+
+Parse a Honzo file from a byte buffer in memory.
+
+### HonzoHandle lifecycle
 
 | Symbol                | Signature                                           | Returns        | Notes                                          |
 |-----------------------|-----------------------------------------------------|----------------|------------------------------------------------|
@@ -45,6 +119,27 @@ HonzoHandle_destroy(handle);
 | `HonzoHandle_chunk_data`  | `const HonzoHandle*, uint32_t index, const uint8_t** out, size_t* out_len` | `int32_t`     | Pointer to chunk data. Don't free. |
 | `HonzoHandle_meta_raw`    | `const HonzoHandle*, const uint8_t** out, size_t* out_len`                 | `int32_t`     | Raw META MessagePack bytes.        |
 | `HonzoHandle_error`       | `const HonzoHandle*`                                                       | `const char*` | Last error message (UTF-8).        |
+
+---
+
+## HonzoErrorCode
+
+| Code                                     | Meaning                   |
+|------------------------------------------|---------------------------|
+| `HonzoErrorCode_Ok = 0`                  | Success                   |
+| `HonzoErrorCode_InvalidMagic = 1`        | Not a Honzo file          |
+| `HonzoErrorCode_ReaderVersionTooOld = 2` | Reader version too low    |
+| `HonzoErrorCode_BufferTooShort = 3`      | Unexpected end of data    |
+| `HonzoErrorCode_CrcMismatch = 4`         | CRC32 checksum mismatch   |
+| `HonzoErrorCode_EncryptedChunk = 5`      | Chunk requires DRM key    |
+| `HonzoErrorCode_InvalidMathML = 6`       | Malformed MathML content  |
+| `HonzoErrorCode_Truncated = 7`           | Truncated or corrupt data |
+| `HonzoErrorCode_InvalidCss = 8`          | Malformed CSS content     |
+| `HonzoErrorCode_InvalidSyncCue = 9`      | Invalid sync cue entry    |
+| `HonzoErrorCode_FileNotFound = 10`       | File does not exist       |
+| `HonzoErrorCode_Unknown = 255`           | Unspecified error         |
+
+---
 
 ## HonzoHead struct
 
@@ -77,17 +172,6 @@ typedef struct {
     uint32_t size;
     uint32_t orig_size;
 } TocEntry;
-```
-
-## Error handling
-
-Functions return `0` on success and nonzero on error. Get the error message:
-
-```c
-const char* msg = HonzoHandle_error(handle);
-if (msg) {
-    fprintf(stderr, "Honzo error: %s\n", msg);
-}
 ```
 
 ## Building

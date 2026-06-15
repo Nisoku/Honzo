@@ -25,6 +25,7 @@ namespace capi {
       HonzoErrorCode_Truncated = 7,
       HonzoErrorCode_InvalidCss = 8,
       HonzoErrorCode_InvalidSyncCue = 9,
+      HonzoErrorCode_FileNotFound = 10,
       HonzoErrorCode_Unknown = 255,
     };
 
@@ -45,6 +46,7 @@ public:
         Truncated = 7,
         InvalidCss = 8,
         InvalidSyncCue = 9,
+        FileNotFound = 10,
         Unknown = 255,
     };
 

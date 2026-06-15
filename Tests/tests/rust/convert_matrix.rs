@@ -278,10 +278,8 @@ fn epub_conversion_resources_appear_before_chapters() {
             t if *t == *b"COVR" || *t == *b"IMG_" || *t == *b"CSS_" || *t == *b"FONT" => {
                 last_resource_idx = i;
             }
-            b"CHAP" => {
-                if i < first_chap_idx {
-                    first_chap_idx = i;
-                }
+            b"CHAP" if i < first_chap_idx => {
+                first_chap_idx = i;
             }
             _ => {}
         }

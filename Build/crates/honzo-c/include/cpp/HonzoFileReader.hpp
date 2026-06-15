@@ -27,6 +27,12 @@ namespace capi {
 
     uint32_t HonzoFileReader_chunk_count(const diplomat::capi::HonzoFileReader* self);
 
+    uint32_t HonzoFileReader_get_chunk_type(const diplomat::capi::HonzoFileReader* self, uint32_t index);
+
+    uint8_t HonzoFileReader_get_chunk_content_type_kind(const diplomat::capi::HonzoFileReader* self, uint32_t index);
+
+    uint8_t HonzoFileReader_get_chunk_content_type_value(const diplomat::capi::HonzoFileReader* self, uint32_t index);
+
     typedef struct HonzoFileReader_get_chunk_result {union {diplomat::capi::DiplomatU8View ok; }; bool is_ok;} HonzoFileReader_get_chunk_result;
     HonzoFileReader_get_chunk_result HonzoFileReader_get_chunk(diplomat::capi::HonzoFileReader* self, uint32_t index);
 
@@ -60,6 +66,24 @@ inline diplomat::result<diplomat::result<std::unique_ptr<HonzoFileReader>, Honzo
 
 inline uint32_t HonzoFileReader::chunk_count() const {
     auto result = diplomat::capi::HonzoFileReader_chunk_count(this->AsFFI());
+    return result;
+}
+
+inline uint32_t HonzoFileReader::get_chunk_type(uint32_t index) const {
+    auto result = diplomat::capi::HonzoFileReader_get_chunk_type(this->AsFFI(),
+        index);
+    return result;
+}
+
+inline uint8_t HonzoFileReader::get_chunk_content_type_kind(uint32_t index) const {
+    auto result = diplomat::capi::HonzoFileReader_get_chunk_content_type_kind(this->AsFFI(),
+        index);
+    return result;
+}
+
+inline uint8_t HonzoFileReader::get_chunk_content_type_value(uint32_t index) const {
+    auto result = diplomat::capi::HonzoFileReader_get_chunk_content_type_value(this->AsFFI(),
+        index);
     return result;
 }
 

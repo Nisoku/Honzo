@@ -24,6 +24,12 @@ HonzoFileReader_open_with_private_key_result HonzoFileReader_open_with_private_k
 
 uint32_t HonzoFileReader_chunk_count(const HonzoFileReader* self);
 
+uint32_t HonzoFileReader_get_chunk_type(const HonzoFileReader* self, uint32_t index);
+
+uint8_t HonzoFileReader_get_chunk_content_type_kind(const HonzoFileReader* self, uint32_t index);
+
+uint8_t HonzoFileReader_get_chunk_content_type_value(const HonzoFileReader* self, uint32_t index);
+
 typedef struct HonzoFileReader_get_chunk_result {union {DiplomatU8View ok; }; bool is_ok;} HonzoFileReader_get_chunk_result;
 HonzoFileReader_get_chunk_result HonzoFileReader_get_chunk(HonzoFileReader* self, uint32_t index);
 
