@@ -1,0 +1,2 @@
+function e(e){let t=Number(e);return t<1024?t+` B`:t<1048576?(t/1024).toFixed(1)+` KB`:t<1073741824?(t/1048576).toFixed(1)+` MB`:(t/1073741824).toFixed(1)+` GB`}function t(e,t){let n=new Blob([e],{type:`application/octet-stream`}),r=document.createElement(`a`);r.href=URL.createObjectURL(n),r.download=t,r.click(),URL.revokeObjectURL(r.href)}export{e as n,t};
+//# sourceMappingURL=download-DA2FER3_.js.map

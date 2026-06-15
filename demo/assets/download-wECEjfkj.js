@@ -1,2 +1,0 @@
-function r(o){const e=Number(o);return e<1024?e+" B":e<1048576?(e/1024).toFixed(1)+" KB":e<1073741824?(e/1048576).toFixed(1)+" MB":(e/1073741824).toFixed(1)+" GB"}function c(o,e){const n=new Blob([o],{type:"application/octet-stream"}),t=document.createElement("a");t.href=URL.createObjectURL(n),t.download=e,t.click(),URL.revokeObjectURL(t.href)}export{c as d,r as f};
-//# sourceMappingURL=download-wECEjfkj.js.map
