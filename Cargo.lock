@@ -1259,7 +1259,7 @@ dependencies = [
 
 [[package]]
 name = "honzo-c"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "diplomat",
  "diplomat-runtime",
@@ -1274,7 +1274,7 @@ dependencies = [
 
 [[package]]
 name = "honzo-chunks"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "cssparser",
  "honzo-core",
@@ -1292,7 +1292,7 @@ dependencies = [
 
 [[package]]
 name = "honzo-cli"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "clap",
  "glob",
@@ -1306,7 +1306,7 @@ dependencies = [
 
 [[package]]
 name = "honzo-convert"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "bytes",
  "futures",
@@ -1324,7 +1324,7 @@ dependencies = [
 
 [[package]]
 name = "honzo-core"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "crc32fast",
  "lz4_flex",
@@ -1332,7 +1332,7 @@ dependencies = [
 
 [[package]]
 name = "honzo-fixtures"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "honzo-chunks",
  "honzo-io",
@@ -1343,7 +1343,7 @@ dependencies = [
 
 [[package]]
 name = "honzo-io"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "aes-gcm",
  "crc32fast",
@@ -1360,7 +1360,7 @@ dependencies = [
 
 [[package]]
 name = "honzo-tests"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "diplomat-runtime",
  "honzo-c",
@@ -1379,7 +1379,7 @@ dependencies = [
 
 [[package]]
 name = "honzo-wasm"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "getrandom 0.2.17",
  "honzo-chunks",
