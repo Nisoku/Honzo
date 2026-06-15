@@ -3278,7 +3278,8 @@ A binary ebook format for simplicity, performance, and portability.
 ::: tag "Portable"
 
 ::: button "Quick Start" ./getting-started/quickstart.md icon:play
-::: button "GitHub" external:<https://github.com/Nisoku/Honzo> icon:github
+<!--markdownlint-disable MD034-->
+::: button "GitHub" external:https://github.com/Nisoku/Honzo icon:github
 
 == side
 

@@ -87,10 +87,10 @@
       Honzo
     </title>
     
-    <link rel="stylesheet" href="./assets/css/docmd-main.css?v=mqd2zbra">
+    <link rel="stylesheet" href="./assets/css/docmd-main.css?v=mqfl2nq6">
     
-    <link rel="stylesheet" href="./assets/css/docmd-highlight-light.css?v=mqd2zbra" id="hljs-light" >
-    <link rel="stylesheet" href="./assets/css/docmd-highlight-dark.css?v=mqd2zbra" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="./assets/css/docmd-highlight-light.css?v=mqfl2nq6" id="hljs-light" >
+    <link rel="stylesheet" href="./assets/css/docmd-highlight-dark.css?v=mqfl2nq6" id="hljs-dark" disabled>
     
     
 <meta name="description" content="A binary ebook format designed for simplicity, performance, and portability">
@@ -105,12 +105,12 @@
 
 
 
-<link rel="stylesheet" href="./assets/css/docmd-theme-ruby.css?v=mqd2zbra" >
-<link rel="stylesheet" href="./assets/css/docmd-git.css?v=mqd2zbra" >
-<link rel="stylesheet" href="./assets/css/docmd-openapi.css?v=mqd2zbra" >
+<link rel="stylesheet" href="./assets/css/docmd-theme-ruby.css?v=mqfl2nq6" >
+<link rel="stylesheet" href="./assets/css/docmd-git.css?v=mqfl2nq6" >
+<link rel="stylesheet" href="./assets/css/docmd-openapi.css?v=mqfl2nq6" >
 
     
-      <link rel="stylesheet" href="./assets/css/theme.css?v=mqd2zbra">
+      <link rel="stylesheet" href="./assets/css/theme.css?v=mqfl2nq6">
     
     <script>/**
  * --------------------------------------------------------------------
@@ -1608,7 +1608,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Honzo%22%0Adescription%3A%20%22A%20binary%20ebook%20format%20designed%20for%20simplicity%2C%20performance%2C%20and%20portability%22%0A---%0A%0A%3A%3A%3A%20hero%20layout%3Asplit%20glow%3Atrue%0A%0A%3C!--%20markdownlint-disable%20MD025%20--%3E%0A%23%20Honzo%0A%0AA%20binary%20ebook%20format%20for%20simplicity%2C%20performance%2C%20and%20portability.%0A%0A%3A%3A%3A%20tag%20%22Zero%20Copy%22%0A%3A%3A%3A%20tag%20%22Streaming%22%0A%3A%3A%3A%20tag%20%22Portable%22%0A%0A%3A%3A%3A%20button%20%22Quick%20Start%22%20.%2Fgetting-started%2Fquickstart.md%20icon%3Aplay%0A%3A%3A%3A%20button%20%22GitHub%22%20external%3A%3Chttps%3A%2F%2Fgithub.com%2FNisoku%2FHonzo%3E%20icon%3Agithub%0A%0A%3D%3D%20side%0A%0A%3A%3A%3A%20card%20%22Why%20Honzo%3F%22%0AExisting%20ebook%20formats%20are%20designed%20for%20authoring%2C%20not%20consumption.%20XML%20parsing%2C%20incremental%20loading%2C%20and%20memory%20waste%20on%20the%20reader&#039;s%20device.%0A**Honzo%20flips%20this.**%20Optimized%20for%20reading%2C%20not%20writing.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Features%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Zero%20Copy%20Parsing%22%20icon%3Azap%0AParse%20without%20allocating.%20Memory%20map%20the%20file%20and%20read%20directly%20from%20the%20buffer.%20This%20works%20on%20bare%20metal.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Pull%20Based%20Streaming%22%20icon%3Awind%0ADecompress%20chapters%20on%20demand.%20Never%20hold%20the%20whole%20book%20in%20memory.%20Open%20a%202GB%20book%20with%20zero%20heap%20allocation%20until%20you%20turn%20a%20page.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Per%20Chunk%20Compression%22%20icon%3Acompress%0AEach%20TOC%20entry%20selects%20its%20compression%20algorithm%20independently.%20Chapters%20with%20text%20compress%20well.%20Images%20and%20fonts%20stay%20raw.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Tail%20Mutability%22%20icon%3Aedit%0AMETA%20sits%20at%20the%20end%20of%20the%20file.%20Edit%20the%20title%2C%20tags%2C%20or%20revision%20without%20touching%20the%20data%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Portable%20Annotations%22%20icon%3Abookmark%0AHighlights%2C%20bookmarks%2C%20and%20notes%20stored%20as%20EXTRA%20entries%20under%20%60org.nisoku.anno%60.%20They%20travel%20with%20the%20file%20and%20survive%20reconversion.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Encryption%20Envelope%22%20icon%3Alock%0AAES-256-GCM%20content%20protection%20via%20%60org.nisoku.drm%60.%20ECDH%20key%20exchange%20with%20X25519.%20Per%20recipient%20wrapping.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Quick%20Example%0A%0A%3A%3A%3A%20tabs%0A%0A%3D%3D%20tab%20%22Rust%22%0A%0A%60%60%60rust%0Ause%20honzo_core%3A%3AHonzoParser%3B%0A%0Alet%20data%20%3D%20std%3A%3Afs%3A%3Aread(%22book.hzo%22).unwrap()%3B%0Alet%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0A%0Aprintln!(%22%7B%7D%20chunks%22%2C%20p.head().chunk_count)%3B%0Afor%20entry%20in%20p.toc_entries()%20%7B%0A%20%20%20%20println!(%22%20%20%7B%7D%20-%20%7B%3A%3F%7D%22%2C%20entry.chunk_id%2C%20std%3A%3Astr%3A%3Afrom_utf8(%26entry.chunk_type))%3B%0A%7D%0A%60%60%60%0A%0A%3D%3D%20tab%20%22TypeScript%22%0A%0A%60%60%60typescript%0Aimport%20%7B%20createReader%20%7D%20from%20&#039;%40nisoku%2Fhonzo&#039;%3B%0A%0Aconst%20response%20%3D%20await%20fetch(&#039;book.hzo&#039;)%3B%0Aconst%20buf%20%3D%20new%20Uint8Array(await%20response.arrayBuffer())%3B%0Aconst%20reader%20%3D%20await%20createReader(buf)%3B%0A%0Aconst%20meta%20%3D%20reader.getMeta()%3B%0Aconsole.log(meta.title%3F.en)%3B%0A%60%60%60%0A%0A%3D%3D%20tab%20%22C%22%0A%0A%60%60%60c%0A%23include%20%22honzo.h%22%0A%0AHonzoHandle*%20handle%20%3D%20HonzoHandle_parse(data%2C%20data_len%2C%201)%3B%0Auint32_t%20count%20%3D%20HonzoHandle_chunk_count(handle)%3B%0A%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20Installation%0A%0A%3A%3A%3A%20tabs%0A%0A%3D%3D%20tab%20%22Rust%22%0A%0A%60%60%60toml%0A%5Bdependencies%5D%0Ahonzo-io%20%3D%20%220.1%22%0A%60%60%60%0A%0A%3D%3D%20tab%20%22TypeScript%22%0A%0A%60%60%60bash%0Anpm%20install%20%40nisoku%2Fhonzo%0A%60%60%60%0A%0A%3D%3D%20tab%20%22C%22%0A%0A%60%60%60c%0A%23include%20%22honzo.h%22%0A%2F%2F%20link%20libhonzo_c.a%0A%60%60%60%0A%0A%3D%3D%20tab%20%22CLI%22%0A%0A%60%60%60bash%0Acargo%20install%20honzo-cli%0A%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%0A%23%23%23%20Getting%20Started%0A%0AStart%20here%20if%20you%20are%20new%20to%20Honzo.%0A%0A%3A%3A%3A%20button%20%22Quick%20Start%22%20.%2Fgetting-started%2Fquickstart.md%20icon%3Aplay%0A%3A%3A%3A%20button%20%22Installation%22%20.%2Fgetting-started%2Finstallation.md%20icon%3Adownload%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%0A%23%23%23%20Learn%20the%20Format%0A%0AUnderstand%20how%20Honzo%20works%20under%20the%20hood.%0A%0A%3A%3A%3A%20button%20%22Core%20Concepts%22%20.%2Fgetting-started%2Fconcepts.md%20icon%3Abook%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fformat%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%0A%23%23%23%20Reference%0A%0ABrowse%20the%20full%20API%20and%20CLI%20documentation.%0A%0A%3A%3A%3A%20button%20%22CLI%20Reference%22%20.%2Fcli%2F%20icon%3Aterminal%0A%3A%3A%3A%20button%20%22API%20Reference%22%20.%2Fapi%2F%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Honzo%22%0Adescription%3A%20%22A%20binary%20ebook%20format%20designed%20for%20simplicity%2C%20performance%2C%20and%20portability%22%0A---%0A%0A%3A%3A%3A%20hero%20layout%3Asplit%20glow%3Atrue%0A%0A%3C!--%20markdownlint-disable%20MD025%20--%3E%0A%23%20Honzo%0A%0AA%20binary%20ebook%20format%20for%20simplicity%2C%20performance%2C%20and%20portability.%0A%0A%3A%3A%3A%20tag%20%22Zero%20Copy%22%0A%3A%3A%3A%20tag%20%22Streaming%22%0A%3A%3A%3A%20tag%20%22Portable%22%0A%0A%3A%3A%3A%20button%20%22Quick%20Start%22%20.%2Fgetting-started%2Fquickstart.md%20icon%3Aplay%0A%3C!--markdownlint-disable%20MD034--%3E%0A%3A%3A%3A%20button%20%22GitHub%22%20external%3Ahttps%3A%2F%2Fgithub.com%2FNisoku%2FHonzo%20icon%3Agithub%0A%0A%3D%3D%20side%0A%0A%3A%3A%3A%20card%20%22Why%20Honzo%3F%22%0AExisting%20ebook%20formats%20are%20designed%20for%20authoring%2C%20not%20consumption.%20XML%20parsing%2C%20incremental%20loading%2C%20and%20memory%20waste%20on%20the%20reader&#039;s%20device.%0A**Honzo%20flips%20this.**%20Optimized%20for%20reading%2C%20not%20writing.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Features%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Zero%20Copy%20Parsing%22%20icon%3Azap%0AParse%20without%20allocating.%20Memory%20map%20the%20file%20and%20read%20directly%20from%20the%20buffer.%20This%20works%20on%20bare%20metal.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Pull%20Based%20Streaming%22%20icon%3Awind%0ADecompress%20chapters%20on%20demand.%20Never%20hold%20the%20whole%20book%20in%20memory.%20Open%20a%202GB%20book%20with%20zero%20heap%20allocation%20until%20you%20turn%20a%20page.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Per%20Chunk%20Compression%22%20icon%3Acompress%0AEach%20TOC%20entry%20selects%20its%20compression%20algorithm%20independently.%20Chapters%20with%20text%20compress%20well.%20Images%20and%20fonts%20stay%20raw.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Tail%20Mutability%22%20icon%3Aedit%0AMETA%20sits%20at%20the%20end%20of%20the%20file.%20Edit%20the%20title%2C%20tags%2C%20or%20revision%20without%20touching%20the%20data%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Portable%20Annotations%22%20icon%3Abookmark%0AHighlights%2C%20bookmarks%2C%20and%20notes%20stored%20as%20EXTRA%20entries%20under%20%60org.nisoku.anno%60.%20They%20travel%20with%20the%20file%20and%20survive%20reconversion.%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Encryption%20Envelope%22%20icon%3Alock%0AAES-256-GCM%20content%20protection%20via%20%60org.nisoku.drm%60.%20ECDH%20key%20exchange%20with%20X25519.%20Per%20recipient%20wrapping.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Quick%20Example%0A%0A%3A%3A%3A%20tabs%0A%0A%3D%3D%20tab%20%22Rust%22%0A%0A%60%60%60rust%0Ause%20honzo_core%3A%3AHonzoParser%3B%0A%0Alet%20data%20%3D%20std%3A%3Afs%3A%3Aread(%22book.hzo%22).unwrap()%3B%0Alet%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0A%0Aprintln!(%22%7B%7D%20chunks%22%2C%20p.head().chunk_count)%3B%0Afor%20entry%20in%20p.toc_entries()%20%7B%0A%20%20%20%20println!(%22%20%20%7B%7D%20-%20%7B%3A%3F%7D%22%2C%20entry.chunk_id%2C%20std%3A%3Astr%3A%3Afrom_utf8(%26entry.chunk_type))%3B%0A%7D%0A%60%60%60%0A%0A%3D%3D%20tab%20%22TypeScript%22%0A%0A%60%60%60typescript%0Aimport%20%7B%20createReader%20%7D%20from%20&#039;%40nisoku%2Fhonzo&#039;%3B%0A%0Aconst%20response%20%3D%20await%20fetch(&#039;book.hzo&#039;)%3B%0Aconst%20buf%20%3D%20new%20Uint8Array(await%20response.arrayBuffer())%3B%0Aconst%20reader%20%3D%20await%20createReader(buf)%3B%0A%0Aconst%20meta%20%3D%20reader.getMeta()%3B%0Aconsole.log(meta.title%3F.en)%3B%0A%60%60%60%0A%0A%3D%3D%20tab%20%22C%22%0A%0A%60%60%60c%0A%23include%20%22honzo.h%22%0A%0AHonzoHandle*%20handle%20%3D%20HonzoHandle_parse(data%2C%20data_len%2C%201)%3B%0Auint32_t%20count%20%3D%20HonzoHandle_chunk_count(handle)%3B%0A%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20Installation%0A%0A%3A%3A%3A%20tabs%0A%0A%3D%3D%20tab%20%22Rust%22%0A%0A%60%60%60toml%0A%5Bdependencies%5D%0Ahonzo-io%20%3D%20%220.1%22%0A%60%60%60%0A%0A%3D%3D%20tab%20%22TypeScript%22%0A%0A%60%60%60bash%0Anpm%20install%20%40nisoku%2Fhonzo%0A%60%60%60%0A%0A%3D%3D%20tab%20%22C%22%0A%0A%60%60%60c%0A%23include%20%22honzo.h%22%0A%2F%2F%20link%20libhonzo_c.a%0A%60%60%60%0A%0A%3D%3D%20tab%20%22CLI%22%0A%0A%60%60%60bash%0Acargo%20install%20honzo-cli%0A%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%0A%23%23%23%20Getting%20Started%0A%0AStart%20here%20if%20you%20are%20new%20to%20Honzo.%0A%0A%3A%3A%3A%20button%20%22Quick%20Start%22%20.%2Fgetting-started%2Fquickstart.md%20icon%3Aplay%0A%3A%3A%3A%20button%20%22Installation%22%20.%2Fgetting-started%2Finstallation.md%20icon%3Adownload%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%0A%23%23%23%20Learn%20the%20Format%0A%0AUnderstand%20how%20Honzo%20works%20under%20the%20hood.%0A%0A%3A%3A%3A%20button%20%22Core%20Concepts%22%20.%2Fgetting-started%2Fconcepts.md%20icon%3Abook%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fformat%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%0A%23%23%23%20Reference%0A%0ABrowse%20the%20full%20API%20and%20CLI%20documentation.%0A%0A%3A%3A%3A%20button%20%22CLI%20Reference%22%20.%2Fcli%2F%20icon%3Aterminal%0A%3A%3A%3A%20button%20%22API%20Reference%22%20.%2Fapi%2F%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1695,7 +1695,8 @@
 >
   <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
 </svg>
-Quick Start</a><a href="<https://github.com/Nisoku/Honzo>/" class="docmd-button" target="_blank" rel="noopener noreferrer">
+Quick Start</a><!--markdownlint-disable MD034-->
+<a href="https://github.com/Nisoku/Honzo" class="docmd-button" target="_blank" rel="noopener noreferrer">
 <svg class="lucide-icon icon-github button-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-github"
   xmlns="http://www.w3.org/2000/svg"
@@ -2065,13 +2066,13 @@ API Reference</a></div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1781398748000">
+                <span class="git-last-updated" data-timestamp="1781549973000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1781398748000"></span>
+                  <span class="git-time" data-timestamp="1781549973000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -2084,10 +2085,10 @@ API Reference</a></div>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Merge pull request #14 from Nisoku/dependabot/npm_and_yarn/Demo/marked-18.0.5">Merge pull request #14 from Nisoku/de...</div>
+                            <div class="git-commit-message" title="Fix Docs">Fix Docs</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1781398748000"></span>
+                              <span class="git-commit-date" data-timestamp="1781549973000"></span>
                             </div>
                           </div>
                         </li>
@@ -2099,7 +2100,7 @@ API Reference</a></div>
               
               <span class="git-spacer"></span>
               
-                <a href="https://github.com/Nisoku/Honzo/edit/main/Docs/docs/Docs/docs/index.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                <a href="https://github.com/Nisoku/Honzo/edit/main/Docs/docs/index.md" target="_blank" rel="noopener noreferrer" class="edit-link">
                   
 <svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-pencil"
@@ -2180,14 +2181,14 @@ API Reference</a></div>
         </div>
       </div>
       
-      <script src="./assets/js/docmd-main.js?v=mqd2zbra"></script>
+      <script src="./assets/js/docmd-main.js?v=mqfl2nq6"></script>
       
-      <script src="./assets/js/docmd-git.js?v=mqd2zbra"></script>
-      <script src="./assets/js/docmd-image-lightbox.js?v=mqd2zbra" ></script>
+      <script src="./assets/js/docmd-git.js?v=mqfl2nq6"></script>
+      <script src="./assets/js/docmd-image-lightbox.js?v=mqfl2nq6" ></script>
 <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="./assets/js/docmd-search.js?v=mqd2zbra" ></script>
-<script src="./assets/js/init-mermaid.js?v=mqd2zbra" type="module"></script>
-<script src="./assets/js/docmd-git.js?v=mqd2zbra" type="module"></script>
+<script src="./assets/js/docmd-search.js?v=mqfl2nq6" ></script>
+<script src="./assets/js/init-mermaid.js?v=mqfl2nq6" type="module"></script>
+<script src="./assets/js/docmd-git.js?v=mqfl2nq6" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
@@ -2260,7 +2261,7 @@ API Reference</a></div>
       })();
     </script>
 
-<script>window.__git_config={"repo":"https://github.com/Nisoku/Honzo/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+<script>window.__git_config={"repo":"https://github.com/Nisoku/Honzo/edit/main/","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
       
   </body>
 </html>
