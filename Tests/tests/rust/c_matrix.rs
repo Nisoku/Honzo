@@ -672,8 +672,7 @@ fn ffi_filereader_chunk_alt_text_roundtrip() {
     let path = std::env::temp_dir().join(format!("honzo_c_alt_text_roundtrip_{}.hzo", id));
     std::fs::write(&path, builder.get_result()).unwrap();
     // Open with HonzoFileReader and verify alt_text
-    let reader =
-        honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+    let reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
 
     // The builder may add auto-generated chunks (SIDX, COVT); search for
     // our explicitly-added chunks by checking their alt_text exists.
