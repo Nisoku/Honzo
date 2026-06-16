@@ -84,7 +84,7 @@
       window.DOCMD_DEFAULT_LOCALE = "";
     </script>
     <title>
-      C API Reference : Honzo
+      C++ API Reference : Honzo
     </title>
     
     <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mqh40100">
@@ -93,15 +93,15 @@
     <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mqh40100" id="hljs-dark" disabled>
     
     
-<meta name="description" content="The C binding for Honzo via Diplomat">
-<link rel="canonical" href="https://nisoku.org/Honzo/api/c/">
-<meta property="og:title" content="C API Reference - Honzo">
-<meta property="og:description" content="The C binding for Honzo via Diplomat">
-<meta property="og:url" content="https://nisoku.org/Honzo/api/c/">
+<meta name="description" content="The C++ binding for Honzo via Diplomat">
+<link rel="canonical" href="https://nisoku.org/Honzo/api/cpp/">
+<meta property="og:title" content="C++ API Reference - Honzo">
+<meta property="og:description" content="The C++ binding for Honzo via Diplomat">
+<meta property="og:url" content="https://nisoku.org/Honzo/api/cpp/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="C API Reference - Honzo">
-<meta name="twitter:description" content="The C binding for Honzo via Diplomat">
+<meta name="twitter:title" content="C++ API Reference - Honzo">
+<meta name="twitter:description" content="The C++ binding for Honzo via Diplomat">
 
 
 
@@ -164,7 +164,7 @@
   <body
     class="sidebar-collapsible"
     data-default-collapsed="false"
-    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/api/c.md">
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/api/cpp.md">
 
     <a href="#main-content" class="skip-link">skipToContent</a>
 
@@ -587,7 +587,7 @@
         
       </li>
     
-      <li class="active-parent expanded nav-group" >
+      <li class="expanded nav-group" >
       
         <a href="../../api/" class=" nav-group"
           >
@@ -699,9 +699,9 @@
         
       </li>
     
-      <li class="active" >
+      <li class="" >
       
-        <a href="../../api/c/" class="active "
+        <a href="../../api/c/" class=" "
           >
            
 <svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1514,7 +1514,7 @@
               
               <div class="header-titles-wrapper">
                 <span class="header-title">
-                  C API Reference
+                  C++ API Reference
                 </span>
               </div>
             </div>
@@ -1608,45 +1608,9 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22C%20API%20Reference%22%0Adescription%3A%20%22The%20C%20binding%20for%20Honzo%20via%20Diplomat%22%0A---%0A%0AThe%20C%20binding%20wraps%20%60honzo-core%60%20and%20%60honzo-io%60%20into%20a%20plain%20C%20API%20using%20%5BDiplomat%5D(https%3A%2F%2Fgithub.com%2Frust-diplomat%2Fdiplomat).%20Two%20modes%20are%20provided%3A%20the%20in-memory%20parser%20(%60HonzoHandle%60)%20and%20the%20file-backed%20streaming%20reader%20(%60HonzoFileReader%60).%20Building%20is%20not%20yet%20available.%0A%0A%23%23%20Usage%0A%0A%60%60%60c%0A%23include%20%22honzo.h%22%0A%0AHonzoHandle*%20handle%20%3D%20HonzoHandle_parse(data%2C%20data_len%2C%201)%3B%0Auint32_t%20count%20%3D%20HonzoHandle_chunk_count(handle)%3B%0A%2F%2F%20...%20use%20handle%20...%0AHonzoHandle_destroy(handle)%3B%0A%60%60%60%0A%0A%7C%20Return%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Meaning%20%7C%0A%7C---------------------------------%7C---------%7C%0A%7C%20%3A%3A%3A%20tag%20%220%22%20color%3A%2322c55e%20%20%20%20%20%20%20%7C%20Success%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22nonzero%22%20color%3A%23ef4444%20%7C%20Error%20%20%20%7C%0A%0A%23%23%20Exported%20types%0A%0A-%20%60HonzoHandle%60%20--%20In-memory%20parser%20handle%20(reads%20entire%20file%20into%20a%20buffer)%0A-%20%60HonzoFileReader%60%20--%20File-backed%20streaming%20reader%20(reads%20one%20chunk%20at%20a%20time)%0A-%20%60HonzoErrorCode%60%20--%20Error%20codes%20returned%20by%20fallible%20functions%0A-%20%60HonzoHead%60%20--%20File%20header%20struct%0A-%20%60TocEntry%60%20--%20TOC%20entry%20struct%0A-%20%60MetaMap%60%20--%20META%20data%20as%20key-value%20pairs%0A%0A---%0A%0A%23%23%20HonzoFileReader%20(streaming)%0A%0AOpen%20a%20Honzo%20file%20from%20the%20filesystem%20and%20read%20chunks%20on%20demand.%20Each%20%60get_chunk%60%20call%20performs%20one%20seek%2C%20one%20read%2C%20and%20one%20LZ4%20decompression.%20The%20returned%20data%20is%20valid%20only%20until%20the%20next%20%60get_chunk%60%20call%20on%20the%20same%20reader.%0A%0A%23%23%23%20HonzoFileReader%20lifecycle%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-----------------------------------------%7C--------------------------------------------------------------------------------%7C------------------------------------------------%7C----------------------%7C%0A%7C%20%60HonzoFileReader_open%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60DiplomatStringView%20path%2C%20uint16_t%20reader_version%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60HonzoFileReader_open_result%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Open%20from%20file%20path.%20%7C%0A%7C%20%60HonzoFileReader_open_with_private_key%60%20%7C%20%60DiplomatStringView%20path%2C%20uint16_t%20reader_version%2C%20DiplomatU8View%20private_key%60%20%7C%20%60HonzoFileReader_open_with_private_key_result%60%20%7C%20Open%20with%20DRM%20key.%20%20%20%7C%0A%7C%20%60HonzoFileReader_destroy%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60HonzoFileReader*%20self%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60void%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Free%20the%20reader.%20%20%20%20%20%7C%0A%0A%23%23%23%20HonzoFileReader%20accessors%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------------------------------------------------%7C-----------------------------------------------%7C---------------------------------------------%7C-------------------------------------------------------------------------------------------------------------------------%7C%0A%7C%20%60HonzoFileReader_chunk_count%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60const%20HonzoFileReader*%20self%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60uint32_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Number%20of%20chunks.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoFileReader_get_chunk_type%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60const%20HonzoFileReader*%20self%2C%20uint32_t%20index%60%20%7C%20%60uint32_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%204-byte%20chunk%20tag%20as%20native-endian%20u32%20(e.g.%20%600x50414843%60%20for%20%60%22CHAP%22%60).%20Returns%200%20if%20index%20out%20of%20range.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoFileReader_get_chunk_content_type_kind%60%20%20%7C%20%60const%20HonzoFileReader*%20self%2C%20uint32_t%20index%60%20%7C%20%60uint8_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Content%20type%20kind%3A%20%601%60%20%3D%20markup%2C%20%602%60%20%3D%20math.%20Returns%200%20if%20index%20out%20of%20range.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoFileReader_get_chunk_content_type_value%60%20%7C%20%60const%20HonzoFileReader*%20self%2C%20uint32_t%20index%60%20%7C%20%60uint8_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Content%20type%20value%3A%20markup%20%600%60%20%3D%20Markdown%2C%20%601%60%20%3D%20HTML%3B%20math%20%600%60%20%3D%20MathML%2C%20%601%60%20%3D%20LaTeX.%20Returns%200%20if%20index%20out%20of%20range.%20%7C%0A%7C%20%60HonzoFileReader_get_chunk_alt_text%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60const%20HonzoFileReader*%20self%2C%20uint32_t%20index%60%20%7C%20%60HonzoFileReader_get_chunk_alt_text_result%60%20%7C%20Human-readable%20label%3A%20chapter%20title%20for%20CHAP%2C%20alt%20text%20for%20IMG_%2C%20etc.%20Empty%20view%20if%20index%20out%20of%20range%20or%20no%20label.%20%20%20%20%20%7C%0A%7C%20%60HonzoFileReader_get_chunk%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60HonzoFileReader*%20self%2C%20uint32_t%20index%60%20%20%20%20%20%20%20%7C%20%60HonzoFileReader_get_chunk_result%60%20%20%20%20%20%20%20%20%20%20%7C%20Decompressed%20chunk%20data.%20Valid%20until%20next%20call%20to%20this%20function.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoFileReader_get_meta%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60HonzoFileReader*%20self%2C%20DiplomatWrite*%20write%60%20%7C%20%60HonzoFileReader_get_meta_result%60%20%20%20%20%20%20%20%20%20%20%20%7C%20JSON%20metadata%20string.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20Image%20format%20detection%0A%0A%60diplomat_external_guess_image_mime%60%20identifies%20image%20formats%20from%20raw%20bytes%20without%20linking%20the%20full%20%60image%60%20crate%2C%20which%20doesn&#039;t%20compile%20for%20embedded%20targets.%20Returns%20%60Ok(mime_string)%60%20on%20recognition%20or%20an%20error%20for%20unknown%20formats.%0A%0A%60%60%60c%0Adiplomat_external_guess_image_mime_result%20res%20%3D%0A%20%20%20%20diplomat_external_guess_image_mime(chunk_bytes%2C%20%26write)%3B%0Aif%20(res.is_ok)%20%7B%0A%20%20%20%20%2F%2F%20write.buf%20contains%20e.g.%20%22image%2Fpng%22%2C%20%22image%2Fjpeg%22%2C%20%22image%2Fgif%22%2C%20etc.%0A%7D%0A%60%60%60%0A%0ARecognizes%3A%20PNG%2C%20JPEG%2C%20GIF%2C%20BMP%2C%20TIFF%20(LE%2FBE)%2C%20WebP%2C%20ICO%2C%20PNM%20(PBM%2FPGM%2FPPM%2FPAM).%0A%0A%23%23%23%20Example%0A%0A%60%60%60c%0A%23include%20%22HonzoFileReader.h%22%0A%23include%20%3Cstdio.h%3E%0A%23include%20%3Cstring.h%3E%0A%0Aint%20main(void)%20%7B%0A%20%20%20%20DiplomatStringView%20book_path%20%3D%20%7B%22%2Fsdcard%2Fbooks%2Fbook.hzo%22%2C%2022%7D%3B%0A%20%20%20%20HonzoFileReader_open_result%20r%20%3D%0A%20%20%20%20%20%20%20%20HonzoFileReader_open(book_path%2C%201)%3B%0A%20%20%20%20if%20(!r.is_ok)%20%7B%0A%20%20%20%20%20%20%20%20fprintf(stderr%2C%20%22open%20failed%3A%20error%20%25d%5Cn%22%2C%20r.err)%3B%0A%20%20%20%20%20%20%20%20return%201%3B%0A%20%20%20%20%7D%0A%20%20%20%20HonzoFileReader*%20reader%20%3D%20r.ok%3B%0A%0A%20%20%20%20uint32_t%20n%20%3D%20HonzoFileReader_chunk_count(reader)%3B%0A%0A%20%20%20%20uint32_t%20covr_tag%2C%20covt_tag%2C%20img_tag%2C%20chap_tag%3B%0A%20%20%20%20memcpy(%26covr_tag%2C%20%22COVR%22%2C%204)%3B%0A%20%20%20%20memcpy(%26covt_tag%2C%20%22COVT%22%2C%204)%3B%0A%20%20%20%20memcpy(%26img_tag%2C%20%20%22IMG_%22%2C%204)%3B%0A%20%20%20%20memcpy(%26chap_tag%2C%20%22CHAP%22%2C%204)%3B%0A%0A%20%20%20%20for%20(uint32_t%20i%20%3D%200%3B%20i%20%3C%20n%3B%20i%2B%2B)%20%7B%0A%20%20%20%20%20%20%20%20uint32_t%20tag%20%3D%20HonzoFileReader_get_chunk_type(reader%2C%20i)%3B%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20Identify%20image%20chunks%20by%20type%0A%20%20%20%20%20%20%20%20if%20(tag%20%3D%3D%20covr_tag%20%7C%7C%20tag%20%3D%3D%20covt_tag%20%7C%7C%20tag%20%3D%3D%20img_tag)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20HonzoFileReader_get_chunk_result%20c%20%3D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20HonzoFileReader_get_chunk(reader%2C%20i)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20(c.is_ok)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20char%20mime_buf%5B32%5D%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20DiplomatWrite%20mime_write%20%3D%20diplomat_simple_write(mime_buf%2C%20sizeof(mime_buf))%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20diplomat_external_guess_image_mime_result%20mr%20%3D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20diplomat_external_guess_image_mime(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20(DiplomatU8View)%7Bc.ok.data%2C%20c.ok.len%7D%2C%20%26mime_write)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20printf(%22chunk%20%25u%3A%20%25s%5Cn%22%2C%20i%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mr.is_ok%20%3F%20mime_buf%20%3A%20%22unknown%22)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20continue%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20Only%20process%20CHAP%20chunks%20beyond%20images%0A%20%20%20%20%20%20%20%20if%20(tag%20!%3D%20chap_tag)%20continue%3B%0A%0A%20%20%20%20%20%20%20%20uint8_t%20kind%20%3D%20HonzoFileReader_get_chunk_content_type_kind(reader%2C%20i)%3B%0A%20%20%20%20%20%20%20%20uint8_t%20val%20%20%3D%20HonzoFileReader_get_chunk_content_type_value(reader%2C%20i)%3B%0A%0A%20%20%20%20%20%20%20%20HonzoFileReader_get_chunk_result%20c%20%3D%0A%20%20%20%20%20%20%20%20%20%20%20%20HonzoFileReader_get_chunk(reader%2C%20i)%3B%0A%20%20%20%20%20%20%20%20if%20(!c.is_ok)%20continue%3B%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20c.ok.data%20%2F%20c.ok.len%20--%20copy%20before%20next%20get_chunk%20call%0A%20%20%20%20%20%20%20%20printf(%22chunk%20%25u%3A%20kind%3D%25u%20val%3D%25u%20size%3D%25zu%5Cn%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20i%2C%20kind%2C%20val%2C%20c.ok.len)%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20HonzoFileReader_destroy(reader)%3B%0A%20%20%20%20return%200%3B%0A%7D%0A%60%60%60%0A%0A---%0A%0A%23%23%20HonzoHandle%20(in-memory%20parser)%0A%0AParse%20a%20Honzo%20file%20from%20a%20byte%20buffer%20in%20memory.%0A%0A%23%23%23%20HonzoHandle%20lifecycle%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-----------------------%7C-----------------------------------------------------%7C----------------%7C------------------------------------------------%7C%0A%7C%20%60HonzoHandle_parse%60%20%20%20%7C%20%60const%20uint8_t*%20data%2C%20size_t%20len%2C%20uint32_t%20version%60%20%7C%20%60HonzoHandle*%60%20%7C%20Parse%20from%20byte%20buffer.%20Returns%20NULL%20on%20error.%20%7C%0A%7C%20%60HonzoHandle_destroy%60%20%7C%20%60HonzoHandle*%20handle%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60void%60%20%20%20%20%20%20%20%20%20%7C%20Free%20the%20handle.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20HonzoHandle%20accessors%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C---------------------------%7C----------------------------------------------------------------------------%7C---------------%7C------------------------------------%7C%0A%7C%20%60HonzoHandle_chunk_count%60%20%7C%20%60const%20HonzoHandle*%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60uint32_t%60%20%20%20%20%7C%20Number%20of%20chunks.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoHandle_head%60%20%20%20%20%20%20%20%20%7C%20%60const%20HonzoHandle*%2C%20HonzoHead*%20out%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60int32_t%60%20%20%20%20%20%7C%200%20on%20success%2C%20nonzero%20on%20error.%20%20%20%20%7C%0A%7C%20%60HonzoHandle_toc_entry%60%20%20%20%7C%20%60const%20HonzoHandle*%2C%20uint32_t%20index%2C%20TocEntry*%20out%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60int32_t%60%20%20%20%20%20%7C%200%20on%20success%2C%20nonzero%20on%20error.%20%20%20%20%7C%0A%7C%20%60HonzoHandle_chunk_data%60%20%20%7C%20%60const%20HonzoHandle*%2C%20uint32_t%20index%2C%20const%20uint8_t**%20out%2C%20size_t*%20out_len%60%20%7C%20%60int32_t%60%20%20%20%20%20%7C%20Pointer%20to%20chunk%20data.%20Don&#039;t%20free.%20%7C%0A%7C%20%60HonzoHandle_meta_raw%60%20%20%20%20%7C%20%60const%20HonzoHandle*%2C%20const%20uint8_t**%20out%2C%20size_t*%20out_len%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60int32_t%60%20%20%20%20%20%7C%20Raw%20META%20MessagePack%20bytes.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoHandle_error%60%20%20%20%20%20%20%20%7C%20%60const%20HonzoHandle*%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60const%20char*%60%20%7C%20Last%20error%20message%20(UTF-8).%20%20%20%20%20%20%20%20%7C%0A%0A---%0A%0A%23%23%20HonzoErrorCode%0A%0A%7C%20Code%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Meaning%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------------------------------------------%7C---------------------------%7C%0A%7C%20%60HonzoErrorCode_Ok%20%3D%200%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Success%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode_InvalidMagic%20%3D%201%60%20%20%20%20%20%20%20%20%7C%20Not%20a%20Honzo%20file%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode_ReaderVersionTooOld%20%3D%202%60%20%7C%20Reader%20version%20too%20low%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode_BufferTooShort%20%3D%203%60%20%20%20%20%20%20%7C%20Unexpected%20end%20of%20data%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode_CrcMismatch%20%3D%204%60%20%20%20%20%20%20%20%20%20%7C%20CRC32%20checksum%20mismatch%20%20%20%7C%0A%7C%20%60HonzoErrorCode_EncryptedChunk%20%3D%205%60%20%20%20%20%20%20%7C%20Chunk%20requires%20DRM%20key%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode_InvalidMathML%20%3D%206%60%20%20%20%20%20%20%20%7C%20Malformed%20MathML%20content%20%20%7C%0A%7C%20%60HonzoErrorCode_Truncated%20%3D%207%60%20%20%20%20%20%20%20%20%20%20%20%7C%20Truncated%20or%20corrupt%20data%20%7C%0A%7C%20%60HonzoErrorCode_InvalidCss%20%3D%208%60%20%20%20%20%20%20%20%20%20%20%7C%20Malformed%20CSS%20content%20%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode_InvalidSyncCue%20%3D%209%60%20%20%20%20%20%20%7C%20Invalid%20sync%20cue%20entry%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode_FileNotFound%20%3D%2010%60%20%20%20%20%20%20%20%7C%20File%20does%20not%20exist%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode_Unknown%20%3D%20255%60%20%20%20%20%20%20%20%20%20%20%20%7C%20Unspecified%20error%20%20%20%20%20%20%20%20%20%7C%0A%0A---%0A%0A%23%23%20HonzoHead%20struct%0A%0A%60%60%60c%0Atypedef%20struct%20%7B%0A%20%20%20%20uint32_t%20format_version%3B%0A%20%20%20%20uint16_t%20chunk_count%3B%0A%20%20%20%20uint8_t%20%20layout_mode%3B%0A%20%20%20%20uint8_t%20%20flags%3B%0A%20%20%20%20uint64_t%20data_offset%3B%0A%20%20%20%20uint64_t%20extra_offset%3B%0A%20%20%20%20uint64_t%20meta_offset%3B%0A%20%20%20%20uint32_t%20meta_size%3B%0A%7D%20HonzoHead%3B%0A%60%60%60%0A%0A%23%23%20TocEntry%20struct%0A%0A%60%60%60c%0Atypedef%20struct%20%7B%0A%20%20%20%20uint8_t%20%20chunk_type%5B4%5D%3B%0A%20%20%20%20uint8_t%20%20content_type%3B%0A%20%20%20%20uint8_t%20%20compression%3B%0A%20%20%20%20uint8_t%20%20markup_type%3B%0A%20%20%20%20uint8_t%20%20cover_type%3B%0A%20%20%20%20uint16_t%20language%3B%0A%20%20%20%20uint16_t%20font_embedding%3B%0A%20%20%20%20uint16_t%20font_license_url_len%3B%0A%20%20%20%20uint64_t%20offset%3B%0A%20%20%20%20uint32_t%20size%3B%0A%20%20%20%20uint32_t%20orig_size%3B%0A%7D%20TocEntry%3B%0A%60%60%60%0A%0A%23%23%20Feature%20flags%0A%0AThe%20%60image%60%20feature%20(default%3A%20on)%20enables%20cover%20thumbnail%20generation%20and%20image%20validation%2C%20and%20is%20only%20needed%20when%20writing%2Fbuilding%20Honzo%20files.%20The%20streaming%20reader%20path%20(%60HonzoFileReader%60)%20never%20uses%20it.%0A%0A%60%60%60bash%0A%23%20Host%20build%20(default%2C%20includes%20image%20support%20for%20builder%20tools)%0Acargo%20build%20-p%20honzo-c%20--release%0A%0A%23%20Embedded%20build%20(no%20image%20crate%2C%20smaller%20compile)%0Acargo%20build%20-p%20honzo-c%20--release%20--no-default-features%0A%60%60%60%0A%0AFeature%20propagation%3A%20%60honzo-c%20--image%20--%3E%20honzo-io%20--image%20--%3E%20honzo-chunks%20--image%60.%0A%0A%23%23%20Building%0A%0A%23%23%23%20Host%0A%0A%60%60%60bash%0Acargo%20build%20-p%20honzo-c%20--release%0A%23%20Produces%3A%20target%2Frelease%2Flibhonzo_c.a%0A%23%20Headers%3A%20%20Build%2Fcrates%2Fhonzo-c%2Finclude%2F%0A%60%60%60%0A%0ALink%20with%3A%0A%0A%60%60%60bash%0Acc%20-o%20reader%20reader.c%20-L.%2Ftarget%2Frelease%20-lhonzo_c%20-lpthread%20-ldl%20-lm%0A%60%60%60%0A%0A%23%23%23%20ESP32%0A%0ARequires%20the%20%60xtensa-esp32-espidf%60%20target.%20Install%20via%20%5Bespup%5D(https%3A%2F%2Fgithub.com%2Fesp-rs%2Fespup).%0A%0A%60%60%60bash%0A%23%20Build%20staticlib%20without%20image%20processing%0Acargo%20%2Besp%20build%20--release%20-p%20honzo-c%20%5C%0A%20%20--target%20xtensa-esp32-espidf%20%5C%0A%20%20-Zbuild-std%3Dstd%2Cpanic_abort%20%5C%0A%20%20--no-default-features%0A%23%20Produces%3A%20target%2Fxtensa-esp32-espidf%2Frelease%2Flibhonzo_c.a%0A%60%60%60%0A%0ALink%20your%20C%20firmware%20against%20the%20staticlib%20using%20the%20ESP-IDF%20toolchain.%20The%20resulting%20binary%20occupies%20roughly%20**434%20KB**%20total%20(431%20KB%20text%2C%202.2%20KB%20RAM)%20for%20a%20minimal%20reader.%0A%0A%23%23%20Related%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22C%2B%2B%20API%22%20.%2Fcpp.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Rust%20API%22%20.%2Frust.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22WASM%20%2F%20TypeScript%20API%22%20.%2Fwasm.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20..%2Fformat%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22C%2B%2B%20API%20Reference%22%0Adescription%3A%20%22The%20C%2B%2B%20binding%20for%20Honzo%20via%20Diplomat%22%0A---%0A%0AHeader-only%20C%2B%2B%20RAII%20layer%20over%20%5BDiplomat%5D(https%3A%2F%2Fgithub.com%2Frust-diplomat%2Fdiplomat).%20All%20methods%20are%20%60inline%60.%20Include%20headers%2C%20link%20%60libhonzo_c.a%60.%0A%0A%23%23%20Usage%0A%0A%60%60%60cpp%0A%23include%20%3Ccpp%2FHonzoFileReader.hpp%3E%0A%0AHonzoFileReader_open_result%20r%20%3D%20HonzoFileReader%3A%3Aopen(%22%2Fsdcard%2Fbooks%2Fbook.hzo%22%2C%201)%3B%0Aif%20(!r.is_ok())%20return%3B%0A%0Aauto%20reader%20%3D%20std%3A%3Amove(r).ok()%3B%0Auint32_t%20n%20%3D%20reader-%3Echunk_count()%3B%0A%0Afor%20(uint32_t%20i%20%3D%200%3B%20i%20%3C%20n%3B%20i%2B%2B)%20%7B%0A%20%20%20%20uint32_t%20tag%20%3D%20reader-%3Eget_chunk_type(i)%3B%0A%20%20%20%20%2F%2F%20...%20process%20chunks%20...%0A%7D%0A%60%60%60%0A%0A%7C%20Return%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Meaning%20%7C%0A%7C---------------------------------%7C---------%7C%0A%7C%20%3A%3A%3A%20tag%20%220%22%20color%3A%2322c55e%20%20%20%20%20%20%20%7C%20Success%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22nonzero%22%20color%3A%23ef4444%20%7C%20Error%20%20%20%7C%0A%0A%23%23%20Exported%20types%0A%0A-%20%60HonzoFileReader%60%20-%20file-backed%20streaming%20reader%20(owns%20an%20open%20FD)%0A-%20%60HonzoHandle%60%20-%20in-memory%20parser%20handle%0A-%20%60HonzoBuilderHandle%60%20-%20builder%2Fwriter%20for%20creating%20Honzo%20files%0A-%20%60TocEntryOwned%60%20-%20owned%20C%2B%2B%20struct%20with%20per-chunk%20TOC%20metadata%0A-%20%60HonzoErrorCode%60%20-%20error%20code%20enum%0A-%20Free%20functions%20(%60guess_image_mime%60%2C%20%60guess_font_format%60%2C%20%60validate_css%60%2C%20%60validate_mathml%60%2C%20%60latex_to_mathml%60%2C%20%60render_math%60%2C%20%60normalize_search_term%60)%0A%0A---%0A%0A%23%23%20HonzoFileReader%20(streaming)%0A%0AOpen%20a%20Honzo%20file%20from%20the%20filesystem%20and%20read%20chunks%20on%20demand.%20Each%20%60get_chunk%60%20call%20performs%20one%20seek%2C%20one%20read%2C%20and%20one%20LZ4%20decompression.%20The%20returned%20span%20is%20valid%20only%20until%20the%20next%20%60get_chunk%60%20call%20on%20the%20same%20reader.%0A%0A%23%23%23%20HonzoFileReader%20lifecycle%0A%0AInclude%3A%20%60%23include%20%3Ccpp%2FHonzoFileReader.hpp%3E%60%0A%0A%7C%20Method%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C--------------------------------------------%7C-----------------------------------------------------------------------------%7C----------------------------------------------------------------------%7C---------------------%7C%0A%7C%20%60open%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60static%20(std%3A%3Astring_view%20path%2C%20uint16_t%20reader_version)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Aunique_ptr%3CHonzoFileReader%3E%2C%20HonzoErrorCode%3E%60%20%7C%20Static%20factory.%20%20%20%20%20%7C%0A%7C%20%60open_with_private_key%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60static%20(std%3A%3Astring_view%20path%2C%20uint16_t%20version%2C%20span%3Cconst%20uint8_t%3E%20key)%60%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Aunique_ptr%3CHonzoFileReader%3E%2C%20HonzoErrorCode%3E%60%20%7C%20Open%20with%20DRM%20key.%20%20%7C%0A%7C%20%60~HonzoFileReader%60%20(via%20%60operator%20delete%60)%20%7C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Closes%20the%20file%20FD.%20%7C%0A%0A%23%23%23%20HonzoFileReader%20accessors%0A%0A%7C%20Method%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C--------------------------------%7C--------------------------%7C-------------------------------------------------%7C---------------------------------------------------------------------------------------------%7C%0A%7C%20%60chunk_count%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60uint32_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Number%20of%20chunks.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60get_chunk_type%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60(uint32_t%20index)%20const%60%20%7C%20%60uint32_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%204-byte%20tag%20as%20native-endian%20u32%20(e.g.%20%600x50414843%60%20for%20%60%22CHAP%22%60).%200%20if%20OOB.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60get_chunk_content_type_kind%60%20%20%7C%20%60(uint32_t%20index)%20const%60%20%7C%20%60uint8_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%201%20%3D%20markup%2C%202%20%3D%20math.%200%20if%20OOB.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60get_chunk_content_type_value%60%20%7C%20%60(uint32_t%20index)%20const%60%20%7C%20%60uint8_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Markup%3A%200%20%3D%20Markdown%2C%201%20%3D%20HTML.%200%20if%20OOB.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60get_chunk_alt_text%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60(uint32_t%20index)%20const%60%20%7C%20%60std%3A%3Aoptional%3Cstd%3A%3Astring_view%3E%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Human-readable%20label%20(chapter%20title%2C%20image%20alt%20text%2C%20etc.).%20%60std%3A%3Anullopt%60%20if%20OOB%20or%20empty.%20%7C%0A%7C%20%60get_chunk%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60(uint32_t%20index)%60%20%20%20%20%20%20%20%7C%20%60std%3A%3Aoptional%3Cdiplomat%3A%3Aspan%3Cconst%20uint8_t%3E%3E%60%20%20%7C%20Decompressed%20chunk%20data.%20Valid%20until%20next%20call%20on%20same%20reader.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60get_meta%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60()%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Astring%2C%20HonzoErrorCode%3E%60%20%7C%20JSON%20metadata%20string.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A---%0A%0A%23%23%20HonzoHandle%20(in-memory%20parser)%0A%0AParse%20a%20Honzo%20file%20from%20a%20byte%20buffer%20in%20memory.%20Returns%20%60nullptr%60%20(via%20%60std%3A%3Aunique_ptr%60)%20on%20error.%0A%0A%23%23%23%20HonzoHandle%20lifecycle%0A%0AInclude%3A%20%60%23include%20%3Ccpp%2FHonzoHandle.hpp%3E%60%0A%0A%7C%20Method%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C--------------------------%7C--------------------------------------------------------------------------------%7C--------------------------------%7C-----------------------------%7C%0A%7C%20%60parse%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60static%20(span%3Cconst%20uint8_t%3E%20data%2C%20uint16_t%20reader_version)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60std%3A%3Aunique_ptr%3CHonzoHandle%3E%60%20%7C%20Returns%20%60nullptr%60%20on%20error.%20%7C%0A%7C%20%60parse_with_private_key%60%20%7C%20%60static%20(span%3Cconst%20uint8_t%3E%20data%2C%20uint16_t%20version%2C%20span%3Cconst%20uint8_t%3E%20key)%60%20%7C%20%60std%3A%3Aunique_ptr%3CHonzoHandle%3E%60%20%7C%20Parse%20with%20DRM%20key.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60~HonzoHandle%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Frees%20the%20handle.%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%23%20HonzoHandle%20accessors%0A%0A%7C%20Method%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C----------------------%7C--------------------%7C-------------------------------------------------%7C----------------------------------%7C%0A%7C%20%60chunk_count%60%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60uint32_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Number%20of%20chunks.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60version_major%60%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60uint8_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20File%20format%20major%20version.%20%20%20%20%20%20%20%7C%0A%7C%20%60version_minor%60%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60uint8_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20File%20format%20minor%20version.%20%20%20%20%20%20%20%7C%0A%7C%20%60min_reader_version%60%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60uint16_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Minimum%20reader%20version%20required.%20%7C%0A%7C%20%60flags%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60uint32_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Header%20flags.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60toc_size%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60uint64_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Size%20of%20TOC%20section%20in%20bytes.%20%20%20%20%7C%0A%7C%20%60data_size%60%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60uint64_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Size%20of%20DATA%20section%20in%20bytes.%20%20%20%7C%0A%7C%20%60extra_size%60%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60uint64_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Size%20of%20EXTRA%20section%20in%20bytes.%20%20%7C%0A%7C%20%60meta_size%60%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60uint64_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Size%20of%20META%20section%20in%20bytes.%20%20%20%7C%0A%7C%20%60layout_mode%60%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60uint8_t%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Layout%20mode%20from%20header.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60has_drm%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Whether%20file%20has%20DRM.%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60has_sidx%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Whether%20file%20has%20SIDX.%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60has_annotations%60%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Whether%20file%20has%20annotations.%20%20%20%20%7C%0A%7C%20%60has_sync%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Whether%20file%20has%20sync%20cues.%20%20%20%20%20%20%7C%0A%7C%20%60get_extra%60%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aspan%3Cconst%20uint8_t%3E%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Raw%20EXTRA%20section%20bytes.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60get_chunk%60%20%20%20%20%20%20%20%20%20%20%7C%20%60(uint32_t%20index)%60%20%7C%20%60std%3A%3Aoptional%3Cdiplomat%3A%3Aspan%3Cconst%20uint8_t%3E%3E%60%20%20%7C%20Decompressed%20chunk%20data.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60get_meta%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aspan%3Cconst%20uint8_t%3E%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Raw%20META%20MessagePack%20bytes.%20%20%20%20%20%20%7C%0A%7C%20%60get_meta_parsed%60%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Astring%2C%20HonzoErrorCode%3E%60%20%7C%20JSON%20metadata%20string.%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60get_annotations%60%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Astring%2C%20HonzoErrorCode%3E%60%20%7C%20JSON%20annotations%20string.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60get_sync_cues%60%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Astring%2C%20HonzoErrorCode%3E%60%20%7C%20JSON%20sync%20cues%20string.%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60get_pmap%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Astring%2C%20HonzoErrorCode%3E%60%20%7C%20JSON%20page%20map%20string.%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60get_toc%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Astring%2C%20HonzoErrorCode%3E%60%20%7C%20JSON%20TOC%20string.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AMethods%20ending%20in%20%60_write(W%26)%60%20overloads%20are%20also%20available%20for%20writing%20directly%20to%20a%20custom%20writeable%20(e.g.%20a%20fixed%20buffer).%0A%0A---%0A%0A%23%23%20HonzoBuilderHandle%20(builder)%0A%0AConstruct%20Honzo%20files%20programmatically.%20Add%20chunks%2C%20set%20metadata%2C%20configure%20DRM%2C%20then%20%60finalize()%60%20and%20read%20the%20result.%0A%0A%23%23%23%20HonzoBuilderHandle%20lifecycle%0A%0AInclude%3A%20%60%23include%20%3Ccpp%2FHonzoBuilderHandle.hpp%3E%60%0A%0A%7C%20Method%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-----------------------%7C-------------%7C---------------------------------------%7C--------------------------%7C%0A%7C%20%60new_%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60static%20()%60%20%7C%20%60std%3A%3Aunique_ptr%3CHonzoBuilderHandle%3E%60%20%7C%20Create%20empty%20builder.%20%20%20%20%7C%0A%7C%20%60finalize%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60()%60%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Finalize%20the%20file.%20%20%20%20%20%20%20%7C%0A%7C%20%60get_result%60%20%20%20%20%20%20%20%20%20%20%7C%20%60()%20const%60%20%20%7C%20%60diplomat%3A%3Aspan%3Cconst%20uint8_t%3E%60%20%20%20%20%20%20%20%7C%20Finalized%20Honzo%20bytes.%20%20%20%7C%0A%7C%20%60~HonzoBuilderHandle%60%20%7C%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Frees%20builder%20resources.%20%7C%0A%0A%23%23%23%20HonzoBuilderHandle%20setters%0A%0A%7C%20Method%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C--------------------------%7C---------------------------------------------------------------------------------------------------------------------------%7C---------%7C-------------------------------------------%7C%0A%7C%20%60add_chunk%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60(tag%2C%20data%2C%20compression%2C%20content_type_kind%2C%20content_type_value%2C%20cover_type%2C%20alt_text%2C%20font_embedding%2C%20font_license_url)%60%20%7C%20%60bool%60%20%20%7C%20Add%20a%20data%20chunk.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60set_language%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60(std%3A%3Astring_view%20lang)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Set%20book%20language%20(ISO%20639-1).%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60set_auto_sidx%60%20%20%20%20%20%20%20%20%20%20%7C%20%60(bool%20enable)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Auto-generate%20SIDX%20on%20finalize.%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60set_auto_covt%60%20%20%20%20%20%20%20%20%20%20%7C%20%60(bool%20enable)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Auto-generate%20COVT%20from%20COVR%20on%20finalize.%20%7C%0A%7C%20%60set_layout%60%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60(uint8_t%20layout)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Set%20layout%20mode.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60set_flags%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60(uint32_t%20flags)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Set%20header%20flags.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60set_min_reader_version%60%20%7C%20%60(uint16_t%20version)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Set%20minimum%20reader%20version.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60add_pmap_entry%60%20%20%20%20%20%20%20%20%20%7C%20%60(uint32_t%20print_page%2C%20uint32_t%20chunk_id%2C%20uint32_t%20byte_offset)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Add%20page%20map%20entry.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60add_math_chunk%60%20%20%20%20%20%20%20%20%20%7C%20%60(span%3Cconst%20uint8_t%3E%20data%2C%20uint8_t%20math_type%2C%20uint8_t%20compression)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Add%20a%20math%20chunk.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60set_meta%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60(span%3Cconst%20uint8_t%3E%20msgpack)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Set%20raw%20MessagePack%20metadata.%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60set_extra%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60(span%3Cconst%20uint8_t%3E%20extra)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Set%20raw%20EXTRA%20section%20bytes.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60add_extra_entry%60%20%20%20%20%20%20%20%20%7C%20%60(tag%2C%20std%3A%3Astring_view%20namespace_%2C%20span%3Cconst%20uint8_t%3E%20body)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Add%20an%20EXTRA%20entry.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60add_annotation%60%20%20%20%20%20%20%20%20%20%7C%20%60(span%3Cconst%20uint8_t%3E%20body)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Add%20an%20annotation%20body.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60set_drm_config%60%20%20%20%20%20%20%20%20%20%7C%20%60(encrypt_chunk_ids%2C%20recipient_public_key%2C%20license_url%2C%20expires_at)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Configure%20DRM%20encryption.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60add_sync_cue%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60(span%3Cconst%20uint8_t%3E%20body)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%7C%20Add%20a%20sync%20cue%20entry.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AParameters%20follow%20the%20same%20semantics%20as%20the%20%5BRust%20builder%5D(.%2Frust.md%23honzobuilder).%0A%0A---%0A%0A%23%23%20TocEntryOwned%20struct%0A%0AInclude%3A%20%60%23include%20%3Ccpp%2FTocEntryOwned.hpp%3E%60%0A%0A%60%60%60cpp%0Astruct%20TocEntryOwned%20%7B%0A%20%20%20%20uint32_t%20chunk_id%3B%0A%20%20%20%20uint64_t%20offset%3B%0A%20%20%20%20uint32_t%20size_compressed%3B%0A%20%20%20%20uint32_t%20size_raw%3B%0A%20%20%20%20uint8_t%20%20compression%3B%0A%20%20%20%20uint8_t%20%20ctype_kind%3B%0A%20%20%20%20uint8_t%20%20ctype_value%3B%0A%20%20%20%20uint8_t%20%20cover_type%3B%0A%20%20%20%20uint8_t%20%20flags%3B%0A%20%20%20%20uint32_t%20crc32%3B%0A%7D%3B%0A%60%60%60%0A%0AOwned%20(non-opaque)%20C%2B%2B%20struct%2C%20safe%20to%20copy.%0A%0A---%0A%0A%23%23%20HonzoErrorCode%0A%0AInclude%3A%20%60%23include%20%3Ccpp%2FHonzoErrorCode.hpp%3E%60%0A%0A%7C%20Value%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Meaning%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------------------------------------%7C---------------------------%7C%0A%7C%20%60HonzoErrorCode%3A%3AOk%20%3D%200%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Success%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode%3A%3AInvalidMagic%20%3D%201%60%20%20%20%20%20%20%20%20%7C%20Not%20a%20Honzo%20file%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode%3A%3AReaderVersionTooOld%20%3D%202%60%20%7C%20Reader%20version%20too%20low%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode%3A%3ABufferTooShort%20%3D%203%60%20%20%20%20%20%20%7C%20Unexpected%20end%20of%20data%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode%3A%3ACrcMismatch%20%3D%204%60%20%20%20%20%20%20%20%20%20%7C%20CRC32%20checksum%20mismatch%20%20%20%7C%0A%7C%20%60HonzoErrorCode%3A%3AEncryptedChunk%20%3D%205%60%20%20%20%20%20%20%7C%20Chunk%20requires%20DRM%20key%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode%3A%3AInvalidMathML%20%3D%206%60%20%20%20%20%20%20%20%7C%20Malformed%20MathML%20content%20%20%7C%0A%7C%20%60HonzoErrorCode%3A%3ATruncated%20%3D%207%60%20%20%20%20%20%20%20%20%20%20%20%7C%20Truncated%20or%20corrupt%20data%20%7C%0A%7C%20%60HonzoErrorCode%3A%3AInvalidCss%20%3D%208%60%20%20%20%20%20%20%20%20%20%20%7C%20Malformed%20CSS%20content%20%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode%3A%3AInvalidSyncCue%20%3D%209%60%20%20%20%20%20%20%7C%20Invalid%20sync%20cue%20entry%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode%3A%3AFileNotFound%20%3D%2010%60%20%20%20%20%20%20%20%7C%20File%20does%20not%20exist%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoErrorCode%3A%3AUnknown%20%3D%20255%60%20%20%20%20%20%20%20%20%20%20%20%7C%20Unspecified%20error%20%20%20%20%20%20%20%20%20%7C%0A%0A---%0A%0A%23%23%20Free%20functions%0A%0AInclude%3A%20%60%23include%20%3Ccpp%2Ffree_functions.hpp%3E%60%0A%0A%7C%20Function%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------------------%7C--------------------------------------------------%7C-------------------------------------------------%7C-------------------------------------%7C%0A%7C%20%60guess_image_mime%60%20%20%20%20%20%20%7C%20%60(span%3Cconst%20uint8_t%3E%20bytes)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Astring%2C%20HonzoErrorCode%3E%60%20%7C%20Detect%20image%20format%20from%20raw%20bytes.%20%7C%0A%7C%20%60guess_font_format%60%20%20%20%20%20%7C%20%60(span%3Cconst%20uint8_t%3E%20bytes)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Astring%2C%20HonzoErrorCode%3E%60%20%7C%20Detect%20font%20format.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60latex_to_mathml%60%20%20%20%20%20%20%20%7C%20%60(span%3Cconst%20uint8_t%3E%20bytes)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Astring%2C%20HonzoErrorCode%3E%60%20%7C%20Convert%20LaTeX%20to%20MathML.%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60render_math%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60(span%3Cconst%20uint8_t%3E%20bytes%2C%20uint8_t%20math_type)%60%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Astring%2C%20HonzoErrorCode%3E%60%20%7C%20Render%20math%20expression.%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60normalize_search_term%60%20%7C%20%60(std%3A%3Astring_view%20term%2C%20std%3A%3Astring_view%20lang)%60%20%7C%20%60diplomat%3A%3Aresult%3Cstd%3A%3Astring%2C%20HonzoErrorCode%3E%60%20%7C%20Normalize%20text%20for%20search%20indexing.%20%7C%0A%7C%20%60validate_css%60%20%20%20%20%20%20%20%20%20%20%7C%20%60(span%3Cconst%20uint8_t%3E%20bytes)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Validate%20CSS%20syntax.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60validate_mathml%60%20%20%20%20%20%20%20%7C%20%60(span%3Cconst%20uint8_t%3E%20bytes)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60bool%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Validate%20MathML%20syntax.%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AEach%20function%20also%20has%20a%20%60_write(W%26)%60%20overload%20for%20custom%20writeable%20targets.%0A%0A%23%23%23%20Image%20format%20detection%20example%0A%0A%60%60%60cpp%0A%23include%20%3Ccpp%2FHonzoFileReader.hpp%3E%0A%23include%20%3Ccpp%2Ffree_functions.hpp%3E%0A%0Aauto%20r%20%3D%20HonzoFileReader%3A%3Aopen(%22%2Fsdcard%2Fbooks%2Fbook.hzo%22%2C%201)%3B%0Aif%20(!r.is_ok())%20return%3B%0Aauto%20reader%20%3D%20std%3A%3Amove(r).ok()%3B%0A%0Aauto%20chunk%20%3D%20reader-%3Eget_chunk(0)%3B%0Aif%20(chunk.has_value())%20%7B%0A%20%20%20%20auto%20mime%20%3D%20guess_image_mime(chunk.value())%3B%0A%20%20%20%20if%20(mime.is_ok())%20%7B%0A%20%20%20%20%20%20%20%20%2F%2F%20mime.ok()%20%3D%3D%20%22image%2Fpng%22%2C%20%22image%2Fjpeg%22%2C%20etc.%0A%20%20%20%20%7D%0A%7D%0A%60%60%60%0A%0ARecognizes%3A%20PNG%2C%20JPEG%2C%20GIF%2C%20BMP%2C%20TIFF%20(LE%2FBE)%2C%20WebP%2C%20ICO%2C%20PNM%20(PBM%2FPGM%2FPPM%2FPAM).%0A%0A---%0A%0A%23%23%20Building%0A%0A%23%23%23%20Host%0A%0A%60%60%60bash%0Acargo%20build%20-p%20honzo-c%20--release%0A%23%20Produces%3A%20target%2Frelease%2Flibhonzo_c.a%0A%23%20Headers%3A%20%20Build%2Fcrates%2Fhonzo-c%2Finclude%2Fcpp%2F%0A%60%60%60%0A%0ALink%20your%20C%2B%2B%20program%20against%20the%20static%20library%3A%0A%0A%60%60%60bash%0Ac%2B%2B%20-o%20reader%20reader.cpp%20-L.%2Ftarget%2Frelease%20-lhonzo_c%20-lpthread%20-ldl%20-lm%0A%60%60%60%0A%0A%23%23%23%20ESP32%0A%0ARequires%20the%20%60xtensa-esp32-espidf%60%20target%20(install%20via%20%5Bespup%5D(https%3A%2F%2Fgithub.com%2Fesp-rs%2Fespup)).%0A%0A%60%60%60bash%0A%23%20Build%20staticlib%20without%20image%20processing%0Acargo%20%2Besp%20build%20--release%20-p%20honzo-c%20%5C%0A%20%20--target%20xtensa-esp32-espidf%20%5C%0A%20%20-Zbuild-std%3Dstd%2Cpanic_abort%20%5C%0A%20%20--no-default-features%0A%0A%23%20Link%20firmware%20(PlatformIO%20extra_script.py)%3A%0A%23%20%20%20env.Prepend(LIBPATH%3D%5B%22lib%2Fhonzo_c%2Fxtensa-esp32s3-espidf%2Frelease%22%5D)%0A%23%20%20%20env.Prepend(LIBS%3D%5B%22honzo_c%22%5D)%0A%60%60%60%0A%0AAdd%20to%20%60platformio.ini%60%3A%0A%0A%60%60%60ini%0Abuild_flags%20%3D%0A%20%20%20%20-Ithird_party%2Fhonzo%2FBuild%2Fcrates%2Fhonzo-c%2Finclude%0Alib_deps%20%3D%0A%20%20%20%20%23%20...%20add%20the%20.a%20via%20extra_script.py%0A%60%60%60%0A%0A%23%23%23%20Feature%20flags%0A%0AThe%20%60image%60%20feature%20(default%3A%20on)%20enables%20cover%20thumbnail%20generation%20and%20is%20only%20needed%20when%20building%20files.%20The%20streaming%20reader%20path%20(%60HonzoFileReader%60)%20never%20uses%20it.%0A%0A%60%60%60bash%0A%23%20Embedded%20build%20(no%20image%20crate%2C%20smaller%20compile)%0Acargo%20build%20-p%20honzo-c%20--release%20--no-default-features%0A%60%60%60%0A%0A%23%23%20Related%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22C%20API%22%20.%2Fc.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Rust%20API%22%20.%2Frust.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22WASM%20%2F%20TypeScript%20API%22%20.%2Fwasm.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20..%2Fformat%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
-                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
-                      <ol>
-                        
-                        
-                          <li class="breadcrumb-item " >
-                            
-                              <a href="../../api/">API Reference</a>
-                            
-                            
-                              <span class="breadcrumb-separator">
-<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-chevron-right"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m9 18 6-6-6-6" />
-</svg>
-</span>
-                            
-                          </li>
-                        
-                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
-                            
-                              <span>C</span>
-                            
-                            
-                          </li>
-                        
-                      </ol>
-                    </nav>
+                    <div class="docmd-breadcrumbs-spacer"></div>
                   
 
                   
@@ -1697,14 +1661,20 @@
                   
                 </div>
                 
-                <p>The C binding wraps <code>honzo-core</code> and <code>honzo-io</code> into a plain C API using <a href="https://github.com/rust-diplomat/diplomat">Diplomat</a>. Two modes are provided: the in-memory parser (<code>HonzoHandle</code>) and the file-backed streaming reader (<code>HonzoFileReader</code>). Building is not yet available.</p>
+                <p>Header-only C++ RAII layer over <a href="https://github.com/rust-diplomat/diplomat">Diplomat</a>. All methods are <code>inline</code>. Include headers, link <code>libhonzo_c.a</code>.</p>
 <h2 id="usage" class="docmd-heading"><a href="#usage" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Usage</h2>
-<pre class="hljs"><code><span class="hljs-comment">#include &quot;honzo.h&quot;</span>
+<pre class="hljs"><code><span class="hljs-comment">#include &lt;cpp/HonzoFileReader.hpp&gt;</span>
 
-HonzoHandle<span class="hljs-punctuation">*</span> handle <span class="hljs-punctuation">=</span> <span class="hljs-title function_">HonzoHandle_parse</span>(data, data_len, <span class="hljs-number">1</span>);
-uint32_t count <span class="hljs-punctuation">=</span> <span class="hljs-title function_">HonzoHandle_chunk_count</span>(handle);
-<span class="hljs-comment">// ... use handle ...</span>
-<span class="hljs-title function_">HonzoHandle_destroy</span>(handle);
+HonzoFileReader_open_result r <span class="hljs-punctuation">=</span> HonzoFileReader<span class="hljs-punctuation">::</span><span class="hljs-title function_">open</span>(<span class="hljs-string">&quot;/sdcard/books/book.hzo&quot;</span>, <span class="hljs-number">1</span>);
+<span class="hljs-keyword">if</span> (<span class="hljs-punctuation">!</span>r.<span class="hljs-title function_">is_ok</span>()) <span class="hljs-keyword">return</span>;
+
+auto reader <span class="hljs-punctuation">=</span> std<span class="hljs-punctuation">::</span><span class="hljs-title function_">move</span>(r).<span class="hljs-title function_">ok</span>();
+uint32_t n <span class="hljs-punctuation">=</span> reader<span class="hljs-punctuation">-&gt;</span><span class="hljs-title function_">chunk_count</span>();
+
+<span class="hljs-keyword">for</span> (uint32_t i <span class="hljs-punctuation">=</span> <span class="hljs-number">0</span>; i <span class="hljs-punctuation">&lt;</span> n; i<span class="hljs-punctuation">++</span>) {
+    uint32_t tag <span class="hljs-punctuation">=</span> reader<span class="hljs-punctuation">-&gt;</span><span class="hljs-title function_">get_chunk_type</span>(i);
+    <span class="hljs-comment">// ... process chunks ...</span>
+}
 </code></pre>
 <div class="table-wrapper"><table>
 <thead>
@@ -1726,21 +1696,22 @@ uint32_t count <span class="hljs-punctuation">=</span> <span class="hljs-title f
 </table>
 </div><h2 id="exported-types" class="docmd-heading"><a href="#exported-types" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Exported types</h2>
 <ul>
-<li><code>HonzoHandle</code> – In-memory parser handle (reads entire file into a buffer)</li>
-<li><code>HonzoFileReader</code> – File-backed streaming reader (reads one chunk at a time)</li>
-<li><code>HonzoErrorCode</code> – Error codes returned by fallible functions</li>
-<li><code>HonzoHead</code> – File header struct</li>
-<li><code>TocEntry</code> – TOC entry struct</li>
-<li><code>MetaMap</code> – META data as key-value pairs</li>
+<li><code>HonzoFileReader</code> - file-backed streaming reader (owns an open FD)</li>
+<li><code>HonzoHandle</code> - in-memory parser handle</li>
+<li><code>HonzoBuilderHandle</code> - builder/writer for creating Honzo files</li>
+<li><code>TocEntryOwned</code> - owned C++ struct with per-chunk TOC metadata</li>
+<li><code>HonzoErrorCode</code> - error code enum</li>
+<li>Free functions (<code>guess_image_mime</code>, <code>guess_font_format</code>, <code>validate_css</code>, <code>validate_mathml</code>, <code>latex_to_mathml</code>, <code>render_math</code>, <code>normalize_search_term</code>)</li>
 </ul>
 <hr>
 <h2 id="honzofilereader-streaming" class="docmd-heading"><a href="#honzofilereader-streaming" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoFileReader (streaming)</h2>
-<p>Open a Honzo file from the filesystem and read chunks on demand. Each <code>get_chunk</code> call performs one seek, one read, and one LZ4 decompression. The returned data is valid only until the next <code>get_chunk</code> call on the same reader.</p>
+<p>Open a Honzo file from the filesystem and read chunks on demand. Each <code>get_chunk</code> call performs one seek, one read, and one LZ4 decompression. The returned span is valid only until the next <code>get_chunk</code> call on the same reader.</p>
 <h3 id="honzofilereader-streaming-honzofilereader-lifecycle" class="docmd-heading"><a href="#honzofilereader-streaming-honzofilereader-lifecycle" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoFileReader lifecycle</h3>
+<p>Include: <code>#include &lt;cpp/HonzoFileReader.hpp&gt;</code></p>
 <div class="table-wrapper"><table>
 <thead>
 <tr>
-<th>Symbol</th>
+<th>Method</th>
 <th>Signature</th>
 <th>Returns</th>
 <th>Notes</th>
@@ -1748,22 +1719,22 @@ uint32_t count <span class="hljs-punctuation">=</span> <span class="hljs-title f
 </thead>
 <tbody>
 <tr>
-<td><code>HonzoFileReader_open</code></td>
-<td><code>DiplomatStringView path, uint16_t reader_version</code></td>
-<td><code>HonzoFileReader_open_result</code></td>
-<td>Open from file path.</td>
+<td><code>open</code></td>
+<td><code>static (std::string_view path, uint16_t reader_version)</code></td>
+<td><code>diplomat::result&lt;std::unique_ptr&lt;HonzoFileReader&gt;, HonzoErrorCode&gt;</code></td>
+<td>Static factory.</td>
 </tr>
 <tr>
-<td><code>HonzoFileReader_open_with_private_key</code></td>
-<td><code>DiplomatStringView path, uint16_t reader_version, DiplomatU8View private_key</code></td>
-<td><code>HonzoFileReader_open_with_private_key_result</code></td>
+<td><code>open_with_private_key</code></td>
+<td><code>static (std::string_view path, uint16_t version, span&lt;const uint8_t&gt; key)</code></td>
+<td><code>diplomat::result&lt;std::unique_ptr&lt;HonzoFileReader&gt;, HonzoErrorCode&gt;</code></td>
 <td>Open with DRM key.</td>
 </tr>
 <tr>
-<td><code>HonzoFileReader_destroy</code></td>
-<td><code>HonzoFileReader* self</code></td>
-<td><code>void</code></td>
-<td>Free the reader.</td>
+<td><code>~HonzoFileReader</code> (via <code>operator delete</code>)</td>
+<td></td>
+<td></td>
+<td>Closes the file FD.</td>
 </tr>
 </tbody>
 </table>
@@ -1771,7 +1742,7 @@ uint32_t count <span class="hljs-punctuation">=</span> <span class="hljs-title f
 <div class="table-wrapper"><table>
 <thead>
 <tr>
-<th>Symbol</th>
+<th>Method</th>
 <th>Signature</th>
 <th>Returns</th>
 <th>Notes</th>
@@ -1779,127 +1750,58 @@ uint32_t count <span class="hljs-punctuation">=</span> <span class="hljs-title f
 </thead>
 <tbody>
 <tr>
-<td><code>HonzoFileReader_chunk_count</code></td>
-<td><code>const HonzoFileReader* self</code></td>
+<td><code>chunk_count</code></td>
+<td><code>() const</code></td>
 <td><code>uint32_t</code></td>
 <td>Number of chunks.</td>
 </tr>
 <tr>
-<td><code>HonzoFileReader_get_chunk_type</code></td>
-<td><code>const HonzoFileReader* self, uint32_t index</code></td>
+<td><code>get_chunk_type</code></td>
+<td><code>(uint32_t index) const</code></td>
 <td><code>uint32_t</code></td>
-<td>4-byte chunk tag as native-endian u32 (e.g. <code>0x50414843</code> for <code>&quot;CHAP&quot;</code>). Returns 0 if index out of range.</td>
+<td>4-byte tag as native-endian u32 (e.g. <code>0x50414843</code> for <code>&quot;CHAP&quot;</code>). 0 if OOB.</td>
 </tr>
 <tr>
-<td><code>HonzoFileReader_get_chunk_content_type_kind</code></td>
-<td><code>const HonzoFileReader* self, uint32_t index</code></td>
+<td><code>get_chunk_content_type_kind</code></td>
+<td><code>(uint32_t index) const</code></td>
 <td><code>uint8_t</code></td>
-<td>Content type kind: <code>1</code> = markup, <code>2</code> = math. Returns 0 if index out of range.</td>
+<td>1 = markup, 2 = math. 0 if OOB.</td>
 </tr>
 <tr>
-<td><code>HonzoFileReader_get_chunk_content_type_value</code></td>
-<td><code>const HonzoFileReader* self, uint32_t index</code></td>
+<td><code>get_chunk_content_type_value</code></td>
+<td><code>(uint32_t index) const</code></td>
 <td><code>uint8_t</code></td>
-<td>Content type value: markup <code>0</code> = Markdown, <code>1</code> = HTML; math <code>0</code> = MathML, <code>1</code> = LaTeX. Returns 0 if index out of range.</td>
+<td>Markup: 0 = Markdown, 1 = HTML. 0 if OOB.</td>
 </tr>
 <tr>
-<td><code>HonzoFileReader_get_chunk_alt_text</code></td>
-<td><code>const HonzoFileReader* self, uint32_t index</code></td>
-<td><code>HonzoFileReader_get_chunk_alt_text_result</code></td>
-<td>Human-readable label: chapter title for CHAP, alt text for IMG_, etc. Empty view if index out of range or no label.</td>
+<td><code>get_chunk_alt_text</code></td>
+<td><code>(uint32_t index) const</code></td>
+<td><code>std::optional&lt;std::string_view&gt;</code></td>
+<td>Human-readable label (chapter title, image alt text, etc.). <code>std::nullopt</code> if OOB or empty.</td>
 </tr>
 <tr>
-<td><code>HonzoFileReader_get_chunk</code></td>
-<td><code>HonzoFileReader* self, uint32_t index</code></td>
-<td><code>HonzoFileReader_get_chunk_result</code></td>
-<td>Decompressed chunk data. Valid until next call to this function.</td>
+<td><code>get_chunk</code></td>
+<td><code>(uint32_t index)</code></td>
+<td><code>std::optional&lt;diplomat::span&lt;const uint8_t&gt;&gt;</code></td>
+<td>Decompressed chunk data. Valid until next call on same reader.</td>
 </tr>
 <tr>
-<td><code>HonzoFileReader_get_meta</code></td>
-<td><code>HonzoFileReader* self, DiplomatWrite* write</code></td>
-<td><code>HonzoFileReader_get_meta_result</code></td>
+<td><code>get_meta</code></td>
+<td><code>()</code></td>
+<td><code>diplomat::result&lt;std::string, HonzoErrorCode&gt;</code></td>
 <td>JSON metadata string.</td>
 </tr>
 </tbody>
 </table>
-</div><h2 id="image-format-detection" class="docmd-heading"><a href="#image-format-detection" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Image format detection</h2>
-<p><code>diplomat_external_guess_image_mime</code> identifies image formats from raw bytes without linking the full <code>image</code> crate, which doesn’t compile for embedded targets. Returns <code>Ok(mime_string)</code> on recognition or an error for unknown formats.</p>
-<pre class="hljs"><code>diplomat_external_guess_image_mime_result res <span class="hljs-punctuation">=</span>
-    <span class="hljs-title function_">diplomat_external_guess_image_mime</span>(chunk_bytes, <span class="hljs-punctuation">&amp;</span>write);
-<span class="hljs-keyword">if</span> (res.<span class="hljs-attr">is_ok</span>) {
-    <span class="hljs-comment">// write.buf contains e.g. &quot;image/png&quot;, &quot;image/jpeg&quot;, &quot;image/gif&quot;, etc.</span>
-}
-</code></pre>
-<p>Recognizes: PNG, JPEG, GIF, BMP, TIFF (LE/BE), WebP, ICO, PNM (PBM/PGM/PPM/PAM).</p>
-<h3 id="image-format-detection-example" class="docmd-heading"><a href="#image-format-detection-example" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Example</h3>
-<pre class="hljs"><code><span class="hljs-comment">#include &quot;HonzoFileReader.h&quot;</span>
-<span class="hljs-comment">#include &lt;stdio.h&gt;</span>
-<span class="hljs-comment">#include &lt;string.h&gt;</span>
-
-<span class="hljs-keyword">int</span> <span class="hljs-title function_">main</span>(<span class="hljs-keyword">void</span>) {
-    DiplomatStringView book_path <span class="hljs-punctuation">=</span> {<span class="hljs-string">&quot;/sdcard/books/book.hzo&quot;</span>, <span class="hljs-number">22</span>};
-    HonzoFileReader_open_result r <span class="hljs-punctuation">=</span>
-        <span class="hljs-title function_">HonzoFileReader_open</span>(book_path, <span class="hljs-number">1</span>);
-    <span class="hljs-keyword">if</span> (<span class="hljs-punctuation">!</span>r.<span class="hljs-attr">is_ok</span>) {
-        <span class="hljs-title function_">fprintf</span>(stderr, <span class="hljs-string">&quot;open failed: error %d\n&quot;</span>, r.<span class="hljs-attr">err</span>);
-        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
-    }
-    HonzoFileReader<span class="hljs-punctuation">*</span> reader <span class="hljs-punctuation">=</span> r.<span class="hljs-attr">ok</span>;
-
-    uint32_t n <span class="hljs-punctuation">=</span> <span class="hljs-title function_">HonzoFileReader_chunk_count</span>(reader);
-
-    uint32_t covr_tag, covt_tag, img_tag, chap_tag;
-    <span class="hljs-title function_">memcpy</span>(<span class="hljs-punctuation">&amp;</span>covr_tag, <span class="hljs-string">&quot;COVR&quot;</span>, <span class="hljs-number">4</span>);
-    <span class="hljs-title function_">memcpy</span>(<span class="hljs-punctuation">&amp;</span>covt_tag, <span class="hljs-string">&quot;COVT&quot;</span>, <span class="hljs-number">4</span>);
-    <span class="hljs-title function_">memcpy</span>(<span class="hljs-punctuation">&amp;</span>img_tag,  <span class="hljs-string">&quot;IMG_&quot;</span>, <span class="hljs-number">4</span>);
-    <span class="hljs-title function_">memcpy</span>(<span class="hljs-punctuation">&amp;</span>chap_tag, <span class="hljs-string">&quot;CHAP&quot;</span>, <span class="hljs-number">4</span>);
-
-    <span class="hljs-keyword">for</span> (uint32_t i <span class="hljs-punctuation">=</span> <span class="hljs-number">0</span>; i <span class="hljs-punctuation">&lt;</span> n; i<span class="hljs-punctuation">++</span>) {
-        uint32_t tag <span class="hljs-punctuation">=</span> <span class="hljs-title function_">HonzoFileReader_get_chunk_type</span>(reader, i);
-
-        <span class="hljs-comment">// Identify image chunks by type</span>
-        <span class="hljs-keyword">if</span> (tag <span class="hljs-punctuation">==</span> covr_tag <span class="hljs-punctuation">||</span> tag <span class="hljs-punctuation">==</span> covt_tag <span class="hljs-punctuation">||</span> tag <span class="hljs-punctuation">==</span> img_tag) {
-            HonzoFileReader_get_chunk_result c <span class="hljs-punctuation">=</span>
-                <span class="hljs-title function_">HonzoFileReader_get_chunk</span>(reader, i);
-            <span class="hljs-keyword">if</span> (c.<span class="hljs-attr">is_ok</span>) {
-                <span class="hljs-keyword">char</span> mime_buf[<span class="hljs-number">32</span>];
-                DiplomatWrite mime_write <span class="hljs-punctuation">=</span> <span class="hljs-title function_">diplomat_simple_write</span>(mime_buf, <span class="hljs-title function_">sizeof</span>(mime_buf));
-                diplomat_external_guess_image_mime_result mr <span class="hljs-punctuation">=</span>
-                    <span class="hljs-title function_">diplomat_external_guess_image_mime</span>(
-                        (DiplomatU8View){c.<span class="hljs-attr">ok</span>.<span class="hljs-attr">data</span>, c.<span class="hljs-attr">ok</span>.<span class="hljs-attr">len</span>}, <span class="hljs-punctuation">&amp;</span>mime_write);
-                <span class="hljs-keyword">printf</span>(<span class="hljs-string">&quot;chunk %u: %s\n&quot;</span>, i,
-                       mr.<span class="hljs-attr">is_ok</span> <span class="hljs-punctuation">?</span> mime_buf <span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;unknown&quot;</span>);
-            }
-            <span class="hljs-keyword">continue</span>;
-        }
-
-        <span class="hljs-comment">// Only process CHAP chunks beyond images</span>
-        <span class="hljs-keyword">if</span> (tag <span class="hljs-punctuation">!=</span> chap_tag) <span class="hljs-keyword">continue</span>;
-
-        uint8_t kind <span class="hljs-punctuation">=</span> <span class="hljs-title function_">HonzoFileReader_get_chunk_content_type_kind</span>(reader, i);
-        uint8_t val  <span class="hljs-punctuation">=</span> <span class="hljs-title function_">HonzoFileReader_get_chunk_content_type_value</span>(reader, i);
-
-        HonzoFileReader_get_chunk_result c <span class="hljs-punctuation">=</span>
-            <span class="hljs-title function_">HonzoFileReader_get_chunk</span>(reader, i);
-        <span class="hljs-keyword">if</span> (<span class="hljs-punctuation">!</span>c.<span class="hljs-attr">is_ok</span>) <span class="hljs-keyword">continue</span>;
-
-        <span class="hljs-comment">// c.ok.data / c.ok.len -- copy before next get_chunk call</span>
-        <span class="hljs-keyword">printf</span>(<span class="hljs-string">&quot;chunk %u: kind=%u val=%u size=%zu\n&quot;</span>,
-               i, kind, val, c.<span class="hljs-attr">ok</span>.<span class="hljs-attr">len</span>);
-    }
-
-    <span class="hljs-title function_">HonzoFileReader_destroy</span>(reader);
-    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
-}
-</code></pre>
-<hr>
+</div><hr>
 <h2 id="honzohandle-in-memory-parser" class="docmd-heading"><a href="#honzohandle-in-memory-parser" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoHandle (in-memory parser)</h2>
-<p>Parse a Honzo file from a byte buffer in memory.</p>
+<p>Parse a Honzo file from a byte buffer in memory. Returns <code>nullptr</code> (via <code>std::unique_ptr</code>) on error.</p>
 <h3 id="honzohandle-in-memory-parser-honzohandle-lifecycle" class="docmd-heading"><a href="#honzohandle-in-memory-parser-honzohandle-lifecycle" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoHandle lifecycle</h3>
+<p>Include: <code>#include &lt;cpp/HonzoHandle.hpp&gt;</code></p>
 <div class="table-wrapper"><table>
 <thead>
 <tr>
-<th>Symbol</th>
+<th>Method</th>
 <th>Signature</th>
 <th>Returns</th>
 <th>Notes</th>
@@ -1907,24 +1809,30 @@ uint32_t count <span class="hljs-punctuation">=</span> <span class="hljs-title f
 </thead>
 <tbody>
 <tr>
-<td><code>HonzoHandle_parse</code></td>
-<td><code>const uint8_t* data, size_t len, uint32_t version</code></td>
-<td><code>HonzoHandle*</code></td>
-<td>Parse from byte buffer. Returns NULL on error.</td>
+<td><code>parse</code></td>
+<td><code>static (span&lt;const uint8_t&gt; data, uint16_t reader_version)</code></td>
+<td><code>std::unique_ptr&lt;HonzoHandle&gt;</code></td>
+<td>Returns <code>nullptr</code> on error.</td>
 </tr>
 <tr>
-<td><code>HonzoHandle_destroy</code></td>
-<td><code>HonzoHandle* handle</code></td>
-<td><code>void</code></td>
-<td>Free the handle.</td>
+<td><code>parse_with_private_key</code></td>
+<td><code>static (span&lt;const uint8_t&gt; data, uint16_t version, span&lt;const uint8_t&gt; key)</code></td>
+<td><code>std::unique_ptr&lt;HonzoHandle&gt;</code></td>
+<td>Parse with DRM key.</td>
+</tr>
+<tr>
+<td><code>~HonzoHandle</code></td>
+<td></td>
+<td></td>
+<td>Frees the handle.</td>
 </tr>
 </tbody>
 </table>
-</div><h2 id="honzohandle-accessors" class="docmd-heading"><a href="#honzohandle-accessors" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoHandle accessors</h2>
+</div><h3 id="honzohandle-in-memory-parser-honzohandle-accessors" class="docmd-heading"><a href="#honzohandle-in-memory-parser-honzohandle-accessors" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoHandle accessors</h3>
 <div class="table-wrapper"><table>
 <thead>
 <tr>
-<th>Symbol</th>
+<th>Method</th>
 <th>Signature</th>
 <th>Returns</th>
 <th>Notes</th>
@@ -1932,163 +1840,475 @@ uint32_t count <span class="hljs-punctuation">=</span> <span class="hljs-title f
 </thead>
 <tbody>
 <tr>
-<td><code>HonzoHandle_chunk_count</code></td>
-<td><code>const HonzoHandle*</code></td>
+<td><code>chunk_count</code></td>
+<td><code>() const</code></td>
 <td><code>uint32_t</code></td>
 <td>Number of chunks.</td>
 </tr>
 <tr>
-<td><code>HonzoHandle_head</code></td>
-<td><code>const HonzoHandle*, HonzoHead* out</code></td>
-<td><code>int32_t</code></td>
-<td>0 on success, nonzero on error.</td>
+<td><code>version_major</code></td>
+<td><code>() const</code></td>
+<td><code>uint8_t</code></td>
+<td>File format major version.</td>
 </tr>
 <tr>
-<td><code>HonzoHandle_toc_entry</code></td>
-<td><code>const HonzoHandle*, uint32_t index, TocEntry* out</code></td>
-<td><code>int32_t</code></td>
-<td>0 on success, nonzero on error.</td>
+<td><code>version_minor</code></td>
+<td><code>() const</code></td>
+<td><code>uint8_t</code></td>
+<td>File format minor version.</td>
 </tr>
 <tr>
-<td><code>HonzoHandle_chunk_data</code></td>
-<td><code>const HonzoHandle*, uint32_t index, const uint8_t** out, size_t* out_len</code></td>
-<td><code>int32_t</code></td>
-<td>Pointer to chunk data. Don’t free.</td>
+<td><code>min_reader_version</code></td>
+<td><code>() const</code></td>
+<td><code>uint16_t</code></td>
+<td>Minimum reader version required.</td>
 </tr>
 <tr>
-<td><code>HonzoHandle_meta_raw</code></td>
-<td><code>const HonzoHandle*, const uint8_t** out, size_t* out_len</code></td>
-<td><code>int32_t</code></td>
+<td><code>flags</code></td>
+<td><code>() const</code></td>
+<td><code>uint32_t</code></td>
+<td>Header flags.</td>
+</tr>
+<tr>
+<td><code>toc_size</code></td>
+<td><code>() const</code></td>
+<td><code>uint64_t</code></td>
+<td>Size of TOC section in bytes.</td>
+</tr>
+<tr>
+<td><code>data_size</code></td>
+<td><code>() const</code></td>
+<td><code>uint64_t</code></td>
+<td>Size of DATA section in bytes.</td>
+</tr>
+<tr>
+<td><code>extra_size</code></td>
+<td><code>() const</code></td>
+<td><code>uint64_t</code></td>
+<td>Size of EXTRA section in bytes.</td>
+</tr>
+<tr>
+<td><code>meta_size</code></td>
+<td><code>() const</code></td>
+<td><code>uint64_t</code></td>
+<td>Size of META section in bytes.</td>
+</tr>
+<tr>
+<td><code>layout_mode</code></td>
+<td><code>() const</code></td>
+<td><code>uint8_t</code></td>
+<td>Layout mode from header.</td>
+</tr>
+<tr>
+<td><code>has_drm</code></td>
+<td><code>() const</code></td>
+<td><code>bool</code></td>
+<td>Whether file has DRM.</td>
+</tr>
+<tr>
+<td><code>has_sidx</code></td>
+<td><code>() const</code></td>
+<td><code>bool</code></td>
+<td>Whether file has SIDX.</td>
+</tr>
+<tr>
+<td><code>has_annotations</code></td>
+<td><code>() const</code></td>
+<td><code>bool</code></td>
+<td>Whether file has annotations.</td>
+</tr>
+<tr>
+<td><code>has_sync</code></td>
+<td><code>() const</code></td>
+<td><code>bool</code></td>
+<td>Whether file has sync cues.</td>
+</tr>
+<tr>
+<td><code>get_extra</code></td>
+<td><code>() const</code></td>
+<td><code>diplomat::span&lt;const uint8_t&gt;</code></td>
+<td>Raw EXTRA section bytes.</td>
+</tr>
+<tr>
+<td><code>get_chunk</code></td>
+<td><code>(uint32_t index)</code></td>
+<td><code>std::optional&lt;diplomat::span&lt;const uint8_t&gt;&gt;</code></td>
+<td>Decompressed chunk data.</td>
+</tr>
+<tr>
+<td><code>get_meta</code></td>
+<td><code>() const</code></td>
+<td><code>diplomat::span&lt;const uint8_t&gt;</code></td>
 <td>Raw META MessagePack bytes.</td>
 </tr>
 <tr>
-<td><code>HonzoHandle_error</code></td>
-<td><code>const HonzoHandle*</code></td>
-<td><code>const char*</code></td>
-<td>Last error message (UTF-8).</td>
+<td><code>get_meta_parsed</code></td>
+<td><code>() const</code></td>
+<td><code>diplomat::result&lt;std::string, HonzoErrorCode&gt;</code></td>
+<td>JSON metadata string.</td>
+</tr>
+<tr>
+<td><code>get_annotations</code></td>
+<td><code>() const</code></td>
+<td><code>diplomat::result&lt;std::string, HonzoErrorCode&gt;</code></td>
+<td>JSON annotations string.</td>
+</tr>
+<tr>
+<td><code>get_sync_cues</code></td>
+<td><code>() const</code></td>
+<td><code>diplomat::result&lt;std::string, HonzoErrorCode&gt;</code></td>
+<td>JSON sync cues string.</td>
+</tr>
+<tr>
+<td><code>get_pmap</code></td>
+<td><code>() const</code></td>
+<td><code>diplomat::result&lt;std::string, HonzoErrorCode&gt;</code></td>
+<td>JSON page map string.</td>
+</tr>
+<tr>
+<td><code>get_toc</code></td>
+<td><code>() const</code></td>
+<td><code>diplomat::result&lt;std::string, HonzoErrorCode&gt;</code></td>
+<td>JSON TOC string.</td>
 </tr>
 </tbody>
 </table>
-</div><hr>
-<h2 id="honzoerrorcode" class="docmd-heading"><a href="#honzoerrorcode" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoErrorCode</h2>
+</div><p>Methods ending in <code>_write(W&amp;)</code> overloads are also available for writing directly to a custom writeable (e.g. a fixed buffer).</p>
+<hr>
+<h2 id="honzobuilderhandle-builder" class="docmd-heading"><a href="#honzobuilderhandle-builder" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoBuilderHandle (builder)</h2>
+<p>Construct Honzo files programmatically. Add chunks, set metadata, configure DRM, then <code>finalize()</code> and read the result.</p>
+<h3 id="honzobuilderhandle-builder-honzobuilderhandle-lifecycle" class="docmd-heading"><a href="#honzobuilderhandle-builder-honzobuilderhandle-lifecycle" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoBuilderHandle lifecycle</h3>
+<p>Include: <code>#include &lt;cpp/HonzoBuilderHandle.hpp&gt;</code></p>
 <div class="table-wrapper"><table>
 <thead>
 <tr>
-<th>Code</th>
+<th>Method</th>
+<th>Signature</th>
+<th>Returns</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>new_</code></td>
+<td><code>static ()</code></td>
+<td><code>std::unique_ptr&lt;HonzoBuilderHandle&gt;</code></td>
+<td>Create empty builder.</td>
+</tr>
+<tr>
+<td><code>finalize</code></td>
+<td><code>()</code></td>
+<td><code>bool</code></td>
+<td>Finalize the file.</td>
+</tr>
+<tr>
+<td><code>get_result</code></td>
+<td><code>() const</code></td>
+<td><code>diplomat::span&lt;const uint8_t&gt;</code></td>
+<td>Finalized Honzo bytes.</td>
+</tr>
+<tr>
+<td><code>~HonzoBuilderHandle</code></td>
+<td></td>
+<td></td>
+<td>Frees builder resources.</td>
+</tr>
+</tbody>
+</table>
+</div><h3 id="honzobuilderhandle-builder-honzobuilderhandle-setters" class="docmd-heading"><a href="#honzobuilderhandle-builder-honzobuilderhandle-setters" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoBuilderHandle setters</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Signature</th>
+<th>Returns</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>add_chunk</code></td>
+<td><code>(tag, data, compression, content_type_kind, content_type_value, cover_type, alt_text, font_embedding, font_license_url)</code></td>
+<td><code>bool</code></td>
+<td>Add a data chunk.</td>
+</tr>
+<tr>
+<td><code>set_language</code></td>
+<td><code>(std::string_view lang)</code></td>
+<td><code>bool</code></td>
+<td>Set book language (ISO 639-1).</td>
+</tr>
+<tr>
+<td><code>set_auto_sidx</code></td>
+<td><code>(bool enable)</code></td>
+<td><code>bool</code></td>
+<td>Auto-generate SIDX on finalize.</td>
+</tr>
+<tr>
+<td><code>set_auto_covt</code></td>
+<td><code>(bool enable)</code></td>
+<td><code>bool</code></td>
+<td>Auto-generate COVT from COVR on finalize.</td>
+</tr>
+<tr>
+<td><code>set_layout</code></td>
+<td><code>(uint8_t layout)</code></td>
+<td><code>bool</code></td>
+<td>Set layout mode.</td>
+</tr>
+<tr>
+<td><code>set_flags</code></td>
+<td><code>(uint32_t flags)</code></td>
+<td><code>bool</code></td>
+<td>Set header flags.</td>
+</tr>
+<tr>
+<td><code>set_min_reader_version</code></td>
+<td><code>(uint16_t version)</code></td>
+<td><code>bool</code></td>
+<td>Set minimum reader version.</td>
+</tr>
+<tr>
+<td><code>add_pmap_entry</code></td>
+<td><code>(uint32_t print_page, uint32_t chunk_id, uint32_t byte_offset)</code></td>
+<td><code>bool</code></td>
+<td>Add page map entry.</td>
+</tr>
+<tr>
+<td><code>add_math_chunk</code></td>
+<td><code>(span&lt;const uint8_t&gt; data, uint8_t math_type, uint8_t compression)</code></td>
+<td><code>bool</code></td>
+<td>Add a math chunk.</td>
+</tr>
+<tr>
+<td><code>set_meta</code></td>
+<td><code>(span&lt;const uint8_t&gt; msgpack)</code></td>
+<td><code>bool</code></td>
+<td>Set raw MessagePack metadata.</td>
+</tr>
+<tr>
+<td><code>set_extra</code></td>
+<td><code>(span&lt;const uint8_t&gt; extra)</code></td>
+<td><code>bool</code></td>
+<td>Set raw EXTRA section bytes.</td>
+</tr>
+<tr>
+<td><code>add_extra_entry</code></td>
+<td><code>(tag, std::string_view namespace_, span&lt;const uint8_t&gt; body)</code></td>
+<td><code>bool</code></td>
+<td>Add an EXTRA entry.</td>
+</tr>
+<tr>
+<td><code>add_annotation</code></td>
+<td><code>(span&lt;const uint8_t&gt; body)</code></td>
+<td><code>bool</code></td>
+<td>Add an annotation body.</td>
+</tr>
+<tr>
+<td><code>set_drm_config</code></td>
+<td><code>(encrypt_chunk_ids, recipient_public_key, license_url, expires_at)</code></td>
+<td><code>bool</code></td>
+<td>Configure DRM encryption.</td>
+</tr>
+<tr>
+<td><code>add_sync_cue</code></td>
+<td><code>(span&lt;const uint8_t&gt; body)</code></td>
+<td><code>bool</code></td>
+<td>Add a sync cue entry.</td>
+</tr>
+</tbody>
+</table>
+</div><p>Parameters follow the same semantics as the <a href="../rust/#honzobuilder">Rust builder</a>.</p>
+<hr>
+<h2 id="tocentryowned-struct" class="docmd-heading"><a href="#tocentryowned-struct" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>TocEntryOwned struct</h2>
+<p>Include: <code>#include &lt;cpp/TocEntryOwned.hpp&gt;</code></p>
+<pre class="hljs"><code><span class="hljs-keyword">struct</span> TocEntryOwned {
+    uint32_t chunk_id;
+    uint64_t offset;
+    uint32_t size_compressed;
+    uint32_t size_raw;
+    uint8_t  compression;
+    uint8_t  ctype_kind;
+    uint8_t  ctype_value;
+    uint8_t  cover_type;
+    uint8_t  flags;
+    uint32_t crc32;
+};
+</code></pre>
+<p>Owned (non-opaque) C++ struct, safe to copy.</p>
+<hr>
+<h2 id="honzoerrorcode" class="docmd-heading"><a href="#honzoerrorcode" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoErrorCode</h2>
+<p>Include: <code>#include &lt;cpp/HonzoErrorCode.hpp&gt;</code></p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Value</th>
 <th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>HonzoErrorCode_Ok = 0</code></td>
+<td><code>HonzoErrorCode::Ok = 0</code></td>
 <td>Success</td>
 </tr>
 <tr>
-<td><code>HonzoErrorCode_InvalidMagic = 1</code></td>
+<td><code>HonzoErrorCode::InvalidMagic = 1</code></td>
 <td>Not a Honzo file</td>
 </tr>
 <tr>
-<td><code>HonzoErrorCode_ReaderVersionTooOld = 2</code></td>
+<td><code>HonzoErrorCode::ReaderVersionTooOld = 2</code></td>
 <td>Reader version too low</td>
 </tr>
 <tr>
-<td><code>HonzoErrorCode_BufferTooShort = 3</code></td>
+<td><code>HonzoErrorCode::BufferTooShort = 3</code></td>
 <td>Unexpected end of data</td>
 </tr>
 <tr>
-<td><code>HonzoErrorCode_CrcMismatch = 4</code></td>
+<td><code>HonzoErrorCode::CrcMismatch = 4</code></td>
 <td>CRC32 checksum mismatch</td>
 </tr>
 <tr>
-<td><code>HonzoErrorCode_EncryptedChunk = 5</code></td>
+<td><code>HonzoErrorCode::EncryptedChunk = 5</code></td>
 <td>Chunk requires DRM key</td>
 </tr>
 <tr>
-<td><code>HonzoErrorCode_InvalidMathML = 6</code></td>
+<td><code>HonzoErrorCode::InvalidMathML = 6</code></td>
 <td>Malformed MathML content</td>
 </tr>
 <tr>
-<td><code>HonzoErrorCode_Truncated = 7</code></td>
+<td><code>HonzoErrorCode::Truncated = 7</code></td>
 <td>Truncated or corrupt data</td>
 </tr>
 <tr>
-<td><code>HonzoErrorCode_InvalidCss = 8</code></td>
+<td><code>HonzoErrorCode::InvalidCss = 8</code></td>
 <td>Malformed CSS content</td>
 </tr>
 <tr>
-<td><code>HonzoErrorCode_InvalidSyncCue = 9</code></td>
+<td><code>HonzoErrorCode::InvalidSyncCue = 9</code></td>
 <td>Invalid sync cue entry</td>
 </tr>
 <tr>
-<td><code>HonzoErrorCode_FileNotFound = 10</code></td>
+<td><code>HonzoErrorCode::FileNotFound = 10</code></td>
 <td>File does not exist</td>
 </tr>
 <tr>
-<td><code>HonzoErrorCode_Unknown = 255</code></td>
+<td><code>HonzoErrorCode::Unknown = 255</code></td>
 <td>Unspecified error</td>
 </tr>
 </tbody>
 </table>
 </div><hr>
-<h2 id="honzohead-struct" class="docmd-heading"><a href="#honzohead-struct" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HonzoHead struct</h2>
-<pre class="hljs"><code>typedef <span class="hljs-keyword">struct</span> {
-    uint32_t format_version;
-    uint16_t chunk_count;
-    uint8_t  layout_mode;
-    uint8_t  flags;
-    uint64_t data_offset;
-    uint64_t extra_offset;
-    uint64_t meta_offset;
-    uint32_t meta_size;
-} HonzoHead;
-</code></pre>
-<h2 id="tocentry-struct" class="docmd-heading"><a href="#tocentry-struct" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>TocEntry struct</h2>
-<pre class="hljs"><code>typedef <span class="hljs-keyword">struct</span> {
-    uint8_t  chunk_type[<span class="hljs-number">4</span>];
-    uint8_t  content_type;
-    uint8_t  compression;
-    uint8_t  markup_type;
-    uint8_t  cover_type;
-    uint16_t language;
-    uint16_t font_embedding;
-    uint16_t font_license_url_len;
-    uint64_t offset;
-    uint32_t size;
-    uint32_t orig_size;
-} TocEntry;
-</code></pre>
-<h2 id="feature-flags" class="docmd-heading"><a href="#feature-flags" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Feature flags</h2>
-<p>The <code>image</code> feature (default: on) enables cover thumbnail generation and image validation, and is only needed when writing/building Honzo files. The streaming reader path (<code>HonzoFileReader</code>) never uses it.</p>
-<pre class="hljs"><code><span class="hljs-comment"># Host build (default, includes image support for builder tools)</span>
-<span class="hljs-keyword">cargo</span> build <span class="hljs-punctuation">-</span>p honzo<span class="hljs-punctuation">-</span>c <span class="hljs-punctuation">--</span>release
+<h2 id="free-functions" class="docmd-heading"><a href="#free-functions" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Free functions</h2>
+<p>Include: <code>#include &lt;cpp/free_functions.hpp&gt;</code></p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Signature</th>
+<th>Returns</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>guess_image_mime</code></td>
+<td><code>(span&lt;const uint8_t&gt; bytes)</code></td>
+<td><code>diplomat::result&lt;std::string, HonzoErrorCode&gt;</code></td>
+<td>Detect image format from raw bytes.</td>
+</tr>
+<tr>
+<td><code>guess_font_format</code></td>
+<td><code>(span&lt;const uint8_t&gt; bytes)</code></td>
+<td><code>diplomat::result&lt;std::string, HonzoErrorCode&gt;</code></td>
+<td>Detect font format.</td>
+</tr>
+<tr>
+<td><code>latex_to_mathml</code></td>
+<td><code>(span&lt;const uint8_t&gt; bytes)</code></td>
+<td><code>diplomat::result&lt;std::string, HonzoErrorCode&gt;</code></td>
+<td>Convert LaTeX to MathML.</td>
+</tr>
+<tr>
+<td><code>render_math</code></td>
+<td><code>(span&lt;const uint8_t&gt; bytes, uint8_t math_type)</code></td>
+<td><code>diplomat::result&lt;std::string, HonzoErrorCode&gt;</code></td>
+<td>Render math expression.</td>
+</tr>
+<tr>
+<td><code>normalize_search_term</code></td>
+<td><code>(std::string_view term, std::string_view lang)</code></td>
+<td><code>diplomat::result&lt;std::string, HonzoErrorCode&gt;</code></td>
+<td>Normalize text for search indexing.</td>
+</tr>
+<tr>
+<td><code>validate_css</code></td>
+<td><code>(span&lt;const uint8_t&gt; bytes)</code></td>
+<td><code>bool</code></td>
+<td>Validate CSS syntax.</td>
+</tr>
+<tr>
+<td><code>validate_mathml</code></td>
+<td><code>(span&lt;const uint8_t&gt; bytes)</code></td>
+<td><code>bool</code></td>
+<td>Validate MathML syntax.</td>
+</tr>
+</tbody>
+</table>
+</div><p>Each function also has a <code>_write(W&amp;)</code> overload for custom writeable targets.</p>
+<h3 id="free-functions-image-format-detection-example" class="docmd-heading"><a href="#free-functions-image-format-detection-example" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Image format detection example</h3>
+<pre class="hljs"><code><span class="hljs-comment">#include &lt;cpp/HonzoFileReader.hpp&gt;</span>
+<span class="hljs-comment">#include &lt;cpp/free_functions.hpp&gt;</span>
 
-<span class="hljs-comment"># Embedded build (no image crate, smaller compile)</span>
-<span class="hljs-keyword">cargo</span> build <span class="hljs-punctuation">-</span>p honzo<span class="hljs-punctuation">-</span>c <span class="hljs-punctuation">--</span>release <span class="hljs-punctuation">--</span>no<span class="hljs-punctuation">-</span><span class="hljs-keyword">default</span><span class="hljs-punctuation">-</span>features
+auto r <span class="hljs-punctuation">=</span> HonzoFileReader<span class="hljs-punctuation">::</span><span class="hljs-title function_">open</span>(<span class="hljs-string">&quot;/sdcard/books/book.hzo&quot;</span>, <span class="hljs-number">1</span>);
+<span class="hljs-keyword">if</span> (<span class="hljs-punctuation">!</span>r.<span class="hljs-title function_">is_ok</span>()) <span class="hljs-keyword">return</span>;
+auto reader <span class="hljs-punctuation">=</span> std<span class="hljs-punctuation">::</span><span class="hljs-title function_">move</span>(r).<span class="hljs-title function_">ok</span>();
+
+auto chunk <span class="hljs-punctuation">=</span> reader<span class="hljs-punctuation">-&gt;</span><span class="hljs-title function_">get_chunk</span>(<span class="hljs-number">0</span>);
+<span class="hljs-keyword">if</span> (chunk.<span class="hljs-title function_">has_value</span>()) {
+    auto mime <span class="hljs-punctuation">=</span> <span class="hljs-title function_">guess_image_mime</span>(chunk.<span class="hljs-title function_">value</span>());
+    <span class="hljs-keyword">if</span> (mime.<span class="hljs-title function_">is_ok</span>()) {
+        <span class="hljs-comment">// mime.ok() == &quot;image/png&quot;, &quot;image/jpeg&quot;, etc.</span>
+    }
+}
 </code></pre>
-<p>Feature propagation: <code>honzo-c --image --&gt; honzo-io --image --&gt; honzo-chunks --image</code>.</p>
+<p>Recognizes: PNG, JPEG, GIF, BMP, TIFF (LE/BE), WebP, ICO, PNM (PBM/PGM/PPM/PAM).</p>
+<hr>
 <h2 id="building" class="docmd-heading"><a href="#building" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Building</h2>
 <h3 id="building-host" class="docmd-heading"><a href="#building-host" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Host</h3>
 <pre class="hljs"><code><span class="hljs-keyword">cargo</span> build <span class="hljs-punctuation">-</span>p honzo<span class="hljs-punctuation">-</span>c <span class="hljs-punctuation">--</span>release
 <span class="hljs-comment"># Produces: target/release/libhonzo_c.a</span>
-<span class="hljs-comment"># Headers:  Build/crates/honzo-c/include/</span>
+<span class="hljs-comment"># Headers:  Build/crates/honzo-c/include/cpp/</span>
 </code></pre>
-<p>Link with:</p>
-<pre class="hljs"><code>cc <span class="hljs-punctuation">-</span>o reader reader.<span class="hljs-attr">c</span> <span class="hljs-punctuation">-</span>L.<span class="hljs-punctuation">/</span>target<span class="hljs-punctuation">/</span>release <span class="hljs-punctuation">-</span>lhonzo_c <span class="hljs-punctuation">-</span>lpthread <span class="hljs-punctuation">-</span>ldl <span class="hljs-punctuation">-</span>lm
+<p>Link your C++ program against the static library:</p>
+<pre class="hljs"><code>c<span class="hljs-punctuation">++</span> <span class="hljs-punctuation">-</span>o reader reader.<span class="hljs-attr">cpp</span> <span class="hljs-punctuation">-</span>L.<span class="hljs-punctuation">/</span>target<span class="hljs-punctuation">/</span>release <span class="hljs-punctuation">-</span>lhonzo_c <span class="hljs-punctuation">-</span>lpthread <span class="hljs-punctuation">-</span>ldl <span class="hljs-punctuation">-</span>lm
 </code></pre>
 <h3 id="building-esp32" class="docmd-heading"><a href="#building-esp32" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>ESP32</h3>
-<p>Requires the <code>xtensa-esp32-espidf</code> target. Install via <a href="https://github.com/esp-rs/espup">espup</a>.</p>
+<p>Requires the <code>xtensa-esp32-espidf</code> target (install via <a href="https://github.com/esp-rs/espup">espup</a>).</p>
 <pre class="hljs"><code><span class="hljs-comment"># Build staticlib without image processing</span>
 <span class="hljs-keyword">cargo</span> <span class="hljs-punctuation">+</span>esp build <span class="hljs-punctuation">--</span>release <span class="hljs-punctuation">-</span>p honzo<span class="hljs-punctuation">-</span>c \
   <span class="hljs-punctuation">--</span>target xtensa<span class="hljs-punctuation">-</span>esp32<span class="hljs-punctuation">-</span>espidf \
   <span class="hljs-punctuation">-</span>Zbuild<span class="hljs-punctuation">-</span>std<span class="hljs-punctuation">=</span>std,panic_abort \
   <span class="hljs-punctuation">--</span>no<span class="hljs-punctuation">-</span><span class="hljs-keyword">default</span><span class="hljs-punctuation">-</span>features
-<span class="hljs-comment"># Produces: target/xtensa-esp32-espidf/release/libhonzo_c.a</span>
+
+<span class="hljs-comment"># Link firmware (PlatformIO extra_script.py):</span>
+<span class="hljs-comment">#   env.Prepend(LIBPATH=[&quot;lib/honzo_c/xtensa-esp32s3-espidf/release&quot;])</span>
+<span class="hljs-comment">#   env.Prepend(LIBS=[&quot;honzo_c&quot;])</span>
 </code></pre>
-<p>Link your C firmware against the staticlib using the ESP-IDF toolchain. The resulting binary occupies roughly <strong>434 KB</strong> total (431 KB text, 2.2 KB RAM) for a minimal reader.</p>
+<p>Add to <code>platformio.ini</code>:</p>
+<pre class="hljs"><code>build_flags <span class="hljs-punctuation">=</span>
+    <span class="hljs-punctuation">-</span>Ithird_party<span class="hljs-punctuation">/</span>honzo<span class="hljs-punctuation">/</span>Build<span class="hljs-punctuation">/</span>crates<span class="hljs-punctuation">/</span>honzo<span class="hljs-punctuation">-</span>c<span class="hljs-punctuation">/</span>include
+lib_deps <span class="hljs-punctuation">=</span>
+    <span class="hljs-comment"># ... add the .a via extra_script.py</span>
+</code></pre>
+<h3 id="building-feature-flags" class="docmd-heading"><a href="#building-feature-flags" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Feature flags</h3>
+<p>The <code>image</code> feature (default: on) enables cover thumbnail generation and is only needed when building files. The streaming reader path (<code>HonzoFileReader</code>) never uses it.</p>
+<pre class="hljs"><code><span class="hljs-comment"># Embedded build (no image crate, smaller compile)</span>
+<span class="hljs-keyword">cargo</span> build <span class="hljs-punctuation">-</span>p honzo<span class="hljs-punctuation">-</span>c <span class="hljs-punctuation">--</span>release <span class="hljs-punctuation">--</span>no<span class="hljs-punctuation">-</span><span class="hljs-keyword">default</span><span class="hljs-punctuation">-</span>features
+</code></pre>
 <h2 id="related" class="docmd-heading"><a href="#related" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Related</h2>
 <div class="docmd-container grids">
 <div class="docmd-container grid-item">
-<a href="../cpp/" class="docmd-button">
+<a href="../c/" class="docmd-button">
 <svg class="lucide-icon icon-code button-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-code"
   xmlns="http://www.w3.org/2000/svg"
@@ -2104,7 +2324,7 @@ uint32_t count <span class="hljs-punctuation">=</span> <span class="hljs-title f
   <path d="m16 18 6-6-6-6" />
   <path d="m8 6-6 6 6 6" />
 </svg>
-C++ API</a></div>
+C API</a></div>
 <div class="docmd-container grid-item">
 <a href="../rust/" class="docmd-button">
 <svg class="lucide-icon icon-code button-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -2168,34 +2388,14 @@ Wire Format</a></div>
                 
                   <div class="page-navigation">
                     
-                      <a href="../../api/wasm/" class="prev-page">
-                        
-<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-arrow-left"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m12 19-7-7 7-7" />
-  <path d="M19 12H5" />
-</svg>
-
-                        <span><small>previous</small><strong>
-                            WASM / TypeScript
-                          </strong></span>
-                      </a>
+                      <div class="prev-page-placeholder">
+                      </div>
                     
                     
-                      <a href="../../cli/" class="next-page">
+                      <a href="../../" class="next-page">
                         <span><small>next</small>
                           <strong>
-                            CLI Reference
+                            Home
                           </strong></span>
                         
 <svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -2263,14 +2463,6 @@ Wire Format</a></div>
         </li>
       
         <li class="toc-item toc-level-2">
-          <a href="#image-format-detection" class="toc-link">Image format detection</a>
-        </li>
-      
-        <li class="toc-item toc-level-3">
-          <a href="#image-format-detection-example" class="toc-link">Example</a>
-        </li>
-      
-        <li class="toc-item toc-level-2">
           <a href="#honzohandle-in-memory-parser" class="toc-link">HonzoHandle (in-memory parser)</a>
         </li>
       
@@ -2278,8 +2470,24 @@ Wire Format</a></div>
           <a href="#honzohandle-in-memory-parser-honzohandle-lifecycle" class="toc-link">HonzoHandle lifecycle</a>
         </li>
       
+        <li class="toc-item toc-level-3">
+          <a href="#honzohandle-in-memory-parser-honzohandle-accessors" class="toc-link">HonzoHandle accessors</a>
+        </li>
+      
         <li class="toc-item toc-level-2">
-          <a href="#honzohandle-accessors" class="toc-link">HonzoHandle accessors</a>
+          <a href="#honzobuilderhandle-builder" class="toc-link">HonzoBuilderHandle (builder)</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#honzobuilderhandle-builder-honzobuilderhandle-lifecycle" class="toc-link">HonzoBuilderHandle lifecycle</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#honzobuilderhandle-builder-honzobuilderhandle-setters" class="toc-link">HonzoBuilderHandle setters</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#tocentryowned-struct" class="toc-link">TocEntryOwned struct</a>
         </li>
       
         <li class="toc-item toc-level-2">
@@ -2287,15 +2495,11 @@ Wire Format</a></div>
         </li>
       
         <li class="toc-item toc-level-2">
-          <a href="#honzohead-struct" class="toc-link">HonzoHead struct</a>
+          <a href="#free-functions" class="toc-link">Free functions</a>
         </li>
       
-        <li class="toc-item toc-level-2">
-          <a href="#tocentry-struct" class="toc-link">TocEntry struct</a>
-        </li>
-      
-        <li class="toc-item toc-level-2">
-          <a href="#feature-flags" class="toc-link">Feature flags</a>
+        <li class="toc-item toc-level-3">
+          <a href="#free-functions-image-format-detection-example" class="toc-link">Image format detection example</a>
         </li>
       
         <li class="toc-item toc-level-2">
@@ -2308,6 +2512,10 @@ Wire Format</a></div>
       
         <li class="toc-item toc-level-3">
           <a href="#building-esp32" class="toc-link">ESP32</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#building-feature-flags" class="toc-link">Feature flags</a>
         </li>
       
         <li class="toc-item toc-level-2">
@@ -2356,7 +2564,7 @@ Wire Format</a></div>
               
               <span class="git-spacer"></span>
               
-                <a href="https://github.com/Nisoku/Honzo/edit/main/Docs/docs/api/c.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                <a href="https://github.com/Nisoku/Honzo/edit/main/Docs/docs/api/cpp.md" target="_blank" rel="noopener noreferrer" class="edit-link">
                   
 <svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-pencil"

@@ -6,6 +6,8 @@
 
 - [C API Reference](https://nisoku.org/Honzo/api/c/)
   The C binding for Honzo via Diplomat
+- [C++ API Reference](https://nisoku.org/Honzo/api/cpp/)
+  The C++ binding for Honzo via Diplomat
 - [API Reference](https://nisoku.org/Honzo/api/)
   Language-specific API guides for Honzo
 - [Rust API Reference](https://nisoku.org/Honzo/api/rust/)

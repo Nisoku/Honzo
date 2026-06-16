@@ -9,6 +9,12 @@
       "priority": "medium"
     },
     {
+      "title": "C++ API Reference",
+      "url": "https://nisoku.org/Honzo/api/cpp/",
+      "description": "The C++ binding for Honzo via Diplomat",
+      "priority": "medium"
+    },
+    {
       "title": "API Reference",
       "url": "https://nisoku.org/Honzo/api/",
       "description": "Language-specific API guides for Honzo",

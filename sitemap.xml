@@ -6,6 +6,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://nisoku.org/Honzo/api/cpp/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://nisoku.org/Honzo/api/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
