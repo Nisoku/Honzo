@@ -632,7 +632,7 @@ fn ffi_filereader_chunk_alt_text_queen_victoria() {
 
     // SIDX has no alt_text (auto-generated chunk)
     let sidx = reader.get_chunk_alt_text(24);
-    assert!(sidx.is_none() || sidx.unwrap().is_empty());
+    assert!(sidx.is_none());
 
     // Out-of-range returns None
     let oob = reader.get_chunk_alt_text(999);
@@ -649,7 +649,7 @@ fn ffi_filereader_chunk_alt_text_novel() {
     // novel.hzo was built without alt_text on any chunk
     for i in 0..reader.chunk_count() {
         let alt = reader.get_chunk_alt_text(i);
-        assert!(alt.is_none() || alt.unwrap().is_empty());
+        assert!(alt.is_none());
     }
 
     std::fs::remove_file(&path).ok();
