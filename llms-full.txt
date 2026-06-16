@@ -2147,7 +2147,7 @@ cargo +esp build --release -p honzo-c \
   --no-default-features
 ```
 
-A minimal C reader links to ~431 KB flash + 2.2 KB static RAM (measured from xtensa-esp32-elf-nm on the linked ELF; confirm on actual hardware if flash budget is tight). Chunks are allocated on the heap one at a time — peak heap scales with the largest chapter, not the total book size. ESP-IDF provides the symbols (`esp_fill_random`, `posix_memalign`, `realpath`) that `std` expects.
+A minimal C reader links to ~431 KB flash + 2.2 KB static RAM (measured from xtensa-esp32-elf-nm on the linked ELF; confirm on actual hardware if flash budget is tight). Chunks are allocated on the heap one at a time and peak heap scales with the largest chapter, not the total book size. ESP-IDF provides the symbols (`esp_fill_random`, `posix_memalign`, `realpath`) that `std` expects.
 
 ## Next Steps
 
