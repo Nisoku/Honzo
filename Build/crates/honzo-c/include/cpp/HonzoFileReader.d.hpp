@@ -38,6 +38,17 @@ public:
   inline uint8_t get_chunk_content_type_value(uint32_t index) const;
 
   /**
+   * Returns the human-readable label for chunk `index`.
+   *
+   * For CHAP / NOTE chunks this is the chapter or note title; for
+   * IMG_ / COVR / COVT chunks it is accessibility alt text; for
+   * other chunk types it is a descriptive label or empty.
+   * Returns `None` when `index` is out of range or the entry has
+   * no label.
+   */
+  inline std::optional<std::string_view> get_chunk_alt_text(uint32_t index) const;
+
+  /**
    * Returns the decompressed data for chunk `index`.
    *
    * The returned slice is backed by an internal buffer and is valid only

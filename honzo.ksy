@@ -63,8 +63,10 @@ seq:
     doc: |
       Table of contents. Describes every subchunk inside DATA:
       type, ID, offset (relative to DATA start), size, compression,
-      markup type, CRC32 (CHAP only), alt text (IMG_ only),
+      markup type, CRC32 (CHAP only), human-readable label (all types),
       font license (FONT only). Also contains the page map (PMAP).
+      The label stores the chapter title for CHAP chunks, alt text for
+      IMG_ chunks, and a descriptive name for other chunk types.
 
   - id: data
     type: data_chunk
@@ -348,15 +350,20 @@ types:
       - id: alt_text_len
         type: u2
         doc: |
-          Length of alt_text string in bytes.
-          Meaningful for IMG_ chunks. 0 = no alt text.
+          Length of the human-readable label in bytes.
+          Present for all chunk types. 0 = no label stored.
 
       - id: alt_text
         type: str
         size: alt_text_len
         encoding: UTF-8
         if: alt_text_len > 0
-        doc: Accessibility alt text for images. Also useful for secret messages.
+        doc: |
+          Human-readable label for this chunk.
+          - CHAP / NOTE: chapter or note title
+          - IMG_ / COVR / COVT: accessibility alt text for the image
+          - FONT: font family name
+          - All other types: descriptive label, or empty if unused.
 
       - id: font_embedding
         type: u1

@@ -3,7 +3,7 @@ title: "API Reference"
 description: "Language-specific API guides for Honzo"
 ---
 
-Honzo exposes APIs for three surfaces. Each is a thin layer over the same core format.
+Honzo exposes APIs for four surfaces. Each is a thin layer over the same core format.
 
 ## Available APIs
 
@@ -13,6 +13,13 @@ Honzo exposes APIs for three surfaces. Each is a thin layer over the same core f
 Full featured parser, builder, streaming, compression, and DRM support.
 
 ::: button "Rust API" ./rust.md icon:code
+:::
+:::
+::: grid
+::: card "C++" icon:terminal
+RAII wrapper over the C binding. Embedded-friendly, header-only, no STL required.
+
+::: button "C++ API" ./cpp.md icon:code
 :::
 :::
 ::: grid
@@ -33,15 +40,15 @@ FFI friendly single header binding for read only access.
 
 ## Surface comparison
 
-| Feature          | Rust                        | WASM/TS                     | C                           |
-|------------------|-----------------------------|-----------------------------|-----------------------------|
-| Parse & inspect  | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e |
-| Builder          | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  |
-| Streaming reader | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  | ::: tag "No" color:#ef4444  |
-| Compression      | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  |
-| DRM              | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  |
-| EPUB conversion  | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  |
-| no_std support   | `honzo-core`                | N/A                         | N/A                         |
+| Feature          | Rust                        | C++                         | WASM/TS                     | C                           |
+|------------------|-----------------------------|-----------------------------|-----------------------------|-----------------------------|
+| Parse & inspect  | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e |
+| Builder          | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  |
+| Streaming reader | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  | ::: tag "Yes" color:#22c55e |
+| Compression      | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  |
+| DRM              | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  |
+| EPUB conversion  | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  |
+| no_std support   | `honzo-core`                | N/A                         | N/A                         | N/A                         |
 
 ::: collapsible "Underlying crates"
 

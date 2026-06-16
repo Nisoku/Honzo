@@ -506,6 +506,20 @@ pub mod ffi {
         }
 
         #[allow(clippy::needless_lifetimes)]
+        /// Returns the human-readable label for chunk `index`.
+        ///
+        /// For CHAP / NOTE chunks this is the chapter or note title; for
+        /// IMG_ / COVR / COVT chunks it is accessibility alt text; for
+        /// other chunk types it is a descriptive label or empty.
+        /// Returns `None` when `index` is out of range or the entry has
+        /// no label.
+        pub fn get_chunk_alt_text<'a>(&'a self, index: u32) -> Option<&'a str> {
+            self.toc_cache
+                .get(index as usize)
+                .and_then(|e| e.alt_text.as_deref())
+        }
+
+        #[allow(clippy::needless_lifetimes)]
         /// Returns the decompressed data for chunk `index`.
         ///
         /// The returned slice is backed by an internal buffer and is valid only

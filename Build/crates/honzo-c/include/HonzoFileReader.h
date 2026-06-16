@@ -30,6 +30,9 @@ uint8_t HonzoFileReader_get_chunk_content_type_kind(const HonzoFileReader* self,
 
 uint8_t HonzoFileReader_get_chunk_content_type_value(const HonzoFileReader* self, uint32_t index);
 
+typedef struct HonzoFileReader_get_chunk_alt_text_result {union {DiplomatStringView ok; }; bool is_ok;} HonzoFileReader_get_chunk_alt_text_result;
+HonzoFileReader_get_chunk_alt_text_result HonzoFileReader_get_chunk_alt_text(const HonzoFileReader* self, uint32_t index);
+
 typedef struct HonzoFileReader_get_chunk_result {union {DiplomatU8View ok; }; bool is_ok;} HonzoFileReader_get_chunk_result;
 HonzoFileReader_get_chunk_result HonzoFileReader_get_chunk(HonzoFileReader* self, uint32_t index);
 
