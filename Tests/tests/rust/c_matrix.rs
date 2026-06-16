@@ -609,3 +609,87 @@ fn ffi_filereader_chunk_type_out_of_range() {
     assert_eq!(reader.get_chunk_content_type_value(99), 0);
     std::fs::remove_file(&path).ok();
 }
+
+#[test]
+fn ffi_filereader_chunk_alt_text_queen_victoria() {
+    let path = temp_fixture_path("chunk_alt_text_qv", "lytton-strachey_queen-victoria.hzo");
+    let reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+
+    let chap0 = reader.get_chunk_alt_text(7);
+    assert_eq!(chap0, Some("Titlepage"));
+
+    let chap1 = reader.get_chunk_alt_text(8);
+    assert_eq!(chap1, Some("Imprint"));
+
+    let chap2 = reader.get_chunk_alt_text(9);
+    assert_eq!(chap2, Some("Foreword"));
+
+    let chap3 = reader.get_chunk_alt_text(10);
+    assert_eq!(chap3, Some("Queen Victoria"));
+
+    let chap4 = reader.get_chunk_alt_text(11);
+    assert_eq!(chap4, Some("I: Antecedents"));
+
+    // SIDX has no alt_text (auto-generated chunk)
+    let sidx = reader.get_chunk_alt_text(24);
+    assert!(sidx.is_none());
+
+    // Out-of-range returns None
+    let oob = reader.get_chunk_alt_text(999);
+    assert!(oob.is_none());
+
+    std::fs::remove_file(&path).ok();
+}
+
+#[test]
+fn ffi_filereader_chunk_alt_text_novel() {
+    let path = temp_fixture_path("chunk_alt_text_novel", "novel.hzo");
+    let reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+
+    // novel.hzo was built without alt_text on any chunk
+    for i in 0..reader.chunk_count() {
+        let alt = reader.get_chunk_alt_text(i);
+        assert!(alt.is_none());
+    }
+
+    std::fs::remove_file(&path).ok();
+}
+
+#[test]
+fn ffi_filereader_chunk_alt_text_roundtrip() {
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static ROUNDTRIP_COUNTER: AtomicU64 = AtomicU64::new(0);
+
+    // Build a file with known alt_text via the builder
+    let mut builder = honzo_c::ffi::HonzoBuilderHandle::new();
+    builder.add_chunk(b"CHAP", b"chapter one", 0, 1, 0, 0, "Chapter 1", -1, "");
+    builder.add_chunk(b"CHAP", b"chapter two", 0, 1, 0, 0, "Chapter 2", -1, "");
+    builder.add_chunk(b"IMG_", b"\xff\xd8\xff", 0, 1, 0, 0, "A test image", -1, "");
+    assert!(builder.finalize());
+
+    // Write to temp file
+    let id = ROUNDTRIP_COUNTER.fetch_add(1, Ordering::Relaxed);
+    let path = std::env::temp_dir().join(format!("honzo_c_alt_text_roundtrip_{}.hzo", id));
+    std::fs::write(&path, builder.get_result()).unwrap();
+    // Open with HonzoFileReader and verify alt_text
+    let reader = honzo_c::ffi::HonzoFileReader::open(path.to_str().unwrap(), 1).unwrap();
+
+    // The builder may add auto-generated chunks (SIDX, COVT); search for
+    // our explicitly-added chunks by checking their alt_text exists.
+    let mut found_chap1 = false;
+    let mut found_chap2 = false;
+    let mut found_img = false;
+    for i in 0..reader.chunk_count() {
+        match reader.get_chunk_alt_text(i) {
+            Some("Chapter 1") => found_chap1 = true,
+            Some("Chapter 2") => found_chap2 = true,
+            Some("A test image") => found_img = true,
+            _ => {}
+        }
+    }
+    assert!(found_chap1, "Chapter 1 alt_text not found");
+    assert!(found_chap2, "Chapter 2 alt_text not found");
+    assert!(found_img, "A test image alt_text not found");
+
+    std::fs::remove_file(&path).ok();
+}

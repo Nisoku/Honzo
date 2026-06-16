@@ -33,6 +33,9 @@ namespace capi {
 
     uint8_t HonzoFileReader_get_chunk_content_type_value(const diplomat::capi::HonzoFileReader* self, uint32_t index);
 
+    typedef struct HonzoFileReader_get_chunk_alt_text_result {union {diplomat::capi::DiplomatStringView ok; }; bool is_ok;} HonzoFileReader_get_chunk_alt_text_result;
+    HonzoFileReader_get_chunk_alt_text_result HonzoFileReader_get_chunk_alt_text(const diplomat::capi::HonzoFileReader* self, uint32_t index);
+
     typedef struct HonzoFileReader_get_chunk_result {union {diplomat::capi::DiplomatU8View ok; }; bool is_ok;} HonzoFileReader_get_chunk_result;
     HonzoFileReader_get_chunk_result HonzoFileReader_get_chunk(diplomat::capi::HonzoFileReader* self, uint32_t index);
 
@@ -85,6 +88,12 @@ inline uint8_t HonzoFileReader::get_chunk_content_type_value(uint32_t index) con
     auto result = diplomat::capi::HonzoFileReader_get_chunk_content_type_value(this->AsFFI(),
         index);
     return result;
+}
+
+inline std::optional<std::string_view> HonzoFileReader::get_chunk_alt_text(uint32_t index) const {
+    auto result = diplomat::capi::HonzoFileReader_get_chunk_alt_text(this->AsFFI(),
+        index);
+    return result.is_ok ? std::optional<std::string_view>(std::string_view(result.ok.data, result.ok.len)) : std::nullopt;
 }
 
 inline std::optional<diplomat::span<const uint8_t>> HonzoFileReader::get_chunk(uint32_t index) {

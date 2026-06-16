@@ -46,14 +46,15 @@ Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk
 
 ### HonzoFileReader accessors
 
-| Symbol                                         | Signature                                     | Returns                            | Notes                                                                                                                   |
-|------------------------------------------------|-----------------------------------------------|------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| `HonzoFileReader_chunk_count`                  | `const HonzoFileReader* self`                 | `uint32_t`                         | Number of chunks.                                                                                                       |
-| `HonzoFileReader_get_chunk_type`               | `const HonzoFileReader* self, uint32_t index` | `uint32_t`                         | 4-byte chunk tag as native-endian u32 (e.g. `0x50414843` for `"CHAP"`). Returns 0 if index out of range.                |
-| `HonzoFileReader_get_chunk_content_type_kind`  | `const HonzoFileReader* self, uint32_t index` | `uint8_t`                          | Content type kind: `1` = markup, `2` = math. Returns 0 if index out of range.                                           |
-| `HonzoFileReader_get_chunk_content_type_value` | `const HonzoFileReader* self, uint32_t index` | `uint8_t`                          | Content type value: markup `0` = Markdown, `1` = HTML; math `0` = MathML, `1` = LaTeX. Returns 0 if index out of range. |
-| `HonzoFileReader_get_chunk`                    | `HonzoFileReader* self, uint32_t index`       | `HonzoFileReader_get_chunk_result` | Decompressed chunk data. Valid until next call to this function.                                                        |
-| `HonzoFileReader_get_meta`                     | `HonzoFileReader* self, DiplomatWrite* write` | `HonzoFileReader_get_meta_result`  | JSON metadata string.                                                                                                   |
+| Symbol                                         | Signature                                     | Returns                                     | Notes                                                                                                                   |
+|------------------------------------------------|-----------------------------------------------|---------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `HonzoFileReader_chunk_count`                  | `const HonzoFileReader* self`                 | `uint32_t`                                  | Number of chunks.                                                                                                       |
+| `HonzoFileReader_get_chunk_type`               | `const HonzoFileReader* self, uint32_t index` | `uint32_t`                                  | 4-byte chunk tag as native-endian u32 (e.g. `0x50414843` for `"CHAP"`). Returns 0 if index out of range.                |
+| `HonzoFileReader_get_chunk_content_type_kind`  | `const HonzoFileReader* self, uint32_t index` | `uint8_t`                                   | Content type kind: `1` = markup, `2` = math. Returns 0 if index out of range.                                           |
+| `HonzoFileReader_get_chunk_content_type_value` | `const HonzoFileReader* self, uint32_t index` | `uint8_t`                                   | Content type value: markup `0` = Markdown, `1` = HTML; math `0` = MathML, `1` = LaTeX. Returns 0 if index out of range. |
+| `HonzoFileReader_get_chunk_alt_text`           | `const HonzoFileReader* self, uint32_t index` | `HonzoFileReader_get_chunk_alt_text_result` | Human-readable label: chapter title for CHAP, alt text for IMG_, etc. Empty view if index out of range or no label.     |
+| `HonzoFileReader_get_chunk`                    | `HonzoFileReader* self, uint32_t index`       | `HonzoFileReader_get_chunk_result`          | Decompressed chunk data. Valid until next call to this function.                                                        |
+| `HonzoFileReader_get_meta`                     | `HonzoFileReader* self, DiplomatWrite* write` | `HonzoFileReader_get_meta_result`           | JSON metadata string.                                                                                                   |
 
 ## Image format detection
 
@@ -259,6 +260,9 @@ Link your C firmware against the staticlib using the ESP-IDF toolchain. The resu
 ## Related
 
 ::: grids
+::: grid
+::: button "C++ API" ./cpp.md icon:code
+:::
 ::: grid
 ::: button "Rust API" ./rust.md icon:code
 :::
