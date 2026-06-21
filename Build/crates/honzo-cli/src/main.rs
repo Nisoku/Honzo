@@ -468,8 +468,59 @@ fn detect_format(data: &[u8]) -> &'static str {
 }
 
 fn cmd_convert(input: &PathBuf, out: &PathBuf) {
-    let data = read_file(input);
+    // Directory mode: convert markdown project
+    if input.is_dir() {
+        eprintln!("Detected format: markdown (directory)");
+        let result = honzo_convert::from_markdown_dir(input);
+        match result {
+            Ok(hzo) => {
+                fs::write(out, &hzo).unwrap_or_else(|e| {
+                    eprintln!("Error writing {}: {}", out.display(), e);
+                    std::process::exit(1);
+                });
+                println!(
+                    "Converted {} -> {} ({} bytes)",
+                    input.display(),
+                    out.display(),
+                    hzo.len()
+                );
+            }
+            Err(e) => {
+                eprintln!("Conversion failed: {:?}", e);
+                std::process::exit(1);
+            }
+        }
+        return;
+    }
 
+    // Markdown file mode
+    let ext = input.extension().and_then(|e| e.to_str()).unwrap_or("");
+    if ext == "md" || ext == "markdown" {
+        eprintln!("Detected format: markdown (file)");
+        let result = honzo_convert::from_markdown_file(input);
+        match result {
+            Ok(hzo) => {
+                fs::write(out, &hzo).unwrap_or_else(|e| {
+                    eprintln!("Error writing {}: {}", out.display(), e);
+                    std::process::exit(1);
+                });
+                println!(
+                    "Converted {} -> {} ({} bytes)",
+                    input.display(),
+                    out.display(),
+                    hzo.len()
+                );
+            }
+            Err(e) => {
+                eprintln!("Conversion failed: {:?}", e);
+                std::process::exit(1);
+            }
+        }
+        return;
+    }
+
+    // Existing magic-byte detection for epub/mobi/pdf
+    let data = read_file(input);
     let detected = detect_format(&data);
     eprintln!("Detected format: {}", detected);
 
@@ -526,6 +577,15 @@ fn cmd_convert_batch(pattern: &str, out_dir: &PathBuf) {
         };
 
         if !input.is_file() {
+            continue;
+        }
+
+        // Skip macOS resource fork files
+        if input
+            .file_name()
+            .and_then(|n| n.to_str())
+            .map_or(false, |n| n.starts_with("._"))
+        {
             continue;
         }
 

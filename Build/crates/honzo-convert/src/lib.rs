@@ -8,11 +8,13 @@ use honzo_io::{
     build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
     HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType, PmapEntry,
 };
+mod markdown;
 mod mobi;
 mod pagebreaks;
 mod pdf;
 mod refs;
 
+pub use markdown::{from_markdown_dir, from_markdown_file};
 pub use pagebreaks::{detect_pagebreaks, estimate_pagebreaks};
 use refs::{normalize_path, rewrite_html_to_ref, rewrite_links_to_ref};
 
@@ -21,6 +23,7 @@ pub enum ConvertError {
     UnsupportedFormat,
     MissingSpine,
     MissingMetadata,
+    MdParseError(String),
     IoError(String),
     HonzoError(honzo_io::HonzoError),
 }
