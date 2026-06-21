@@ -58,6 +58,7 @@ pub mod ffi {
     use core::fmt::Write as _;
     use honzo_chunks::extra::{anno, sync};
     use honzo_io::HonzoStream;
+    use std::io::{Read, Seek, SeekFrom};
 
     #[repr(C)]
     #[derive(Debug)]
@@ -939,6 +940,59 @@ pub mod ffi {
             }
             None => Err(HonzoErrorCode::Unknown),
         }
+    }
+
+    /// Lightweight meta extraction: reads only the HEAD (52 bytes) and META
+    /// section from an HZO file, skipping the TOC entirely.
+    /// This avoids the memory spike from caching entries for books with
+    /// thousands of chunks (e.g. graphic novels).
+    pub fn hzo_extract_meta_from_file(
+        path: &str,
+        reader_version: u16,
+        write: &mut diplomat_runtime::DiplomatWrite,
+    ) -> Result<(), HonzoErrorCode> {
+
+
+
+        let mut file = std::fs::File::open(path).map_err(|_| HonzoErrorCode::FileNotFound)?;
+
+        // Read magic (4) + head (48) = 52 bytes
+        let mut head = [0u8; 52];
+        file.read_exact(&mut head).map_err(|_| HonzoErrorCode::Truncated)?;
+
+        if &head[0..4] != b"HONO" {
+            return Err(HonzoErrorCode::InvalidMagic);
+        }
+
+        let min_ver = u16::from_le_bytes([head[6], head[7]]);
+        if reader_version < min_ver {
+            return Err(HonzoErrorCode::ReaderVersionTooOld);
+        }
+
+        let toc_size  = u64::from_le_bytes(head[16..24].try_into().unwrap());
+        let data_size = u64::from_le_bytes(head[24..32].try_into().unwrap());
+        let extra_size = u64::from_le_bytes(head[32..40].try_into().unwrap());
+        let meta_size = u64::from_le_bytes(head[40..48].try_into().unwrap());
+
+        if meta_size == 0 {
+            return Err(HonzoErrorCode::Truncated);
+        }
+
+        let meta_offset: u64 = 52 + toc_size + data_size + extra_size;
+        file.seek(SeekFrom::Start(meta_offset))
+            .map_err(|_| HonzoErrorCode::Truncated)?;
+
+        let mut meta_raw = vec![0u8; meta_size as usize];
+        file.read_exact(&mut meta_raw)
+            .map_err(|_| HonzoErrorCode::Truncated)?;
+
+        let meta: HonzoMeta = rmp_serde::from_slice(&meta_raw)
+            .map_err(|_| HonzoErrorCode::Truncated)?;
+        let json = serde_json::to_string(&meta)
+            .map_err(|_| HonzoErrorCode::Unknown)?;
+
+        write.write_str(&json).map_err(|_| HonzoErrorCode::Unknown)?;
+        Ok(())
     }
 
     fn read_le_u16(buf: &[u8], offset: usize) -> Option<u16> {
