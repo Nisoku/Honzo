@@ -14,7 +14,7 @@ honzo-chunks = { path = "../Build/crates/honzo-chunks", version = "0.1" }
 honzo-io = { path = "../Build/crates/honzo-io", version = "0.1" }
 rmp-serde = "1.3.1"
 serde = { version = "1.0.228", features = ["derive"] }
-lopdf = "0.41.0"
+lopdf = "0.42.0"
 image = { version = "0.25.10", default-features = false, features = ["jpeg"] }
 diplomat-runtime = "0.15.1"
 zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
