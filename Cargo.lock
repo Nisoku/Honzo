@@ -1824,9 +1824,9 @@ checksum = "f38d5652c16fde515bb1ecef450ab0f6a219d619a7274976324d5e377f7dceba"
 
 [[package]]
 name = "pdf_oxide"
-version = "0.3.69"
+version = "0.3.71"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be6568c747aa463eaafd23459961a9f58ff6f71706f67369e270e2d18b7060f0"
+checksum = "2474f2d20a29b0c960b9fefb422ad304968f96b52df5a18aa60adf1364cb673b"
 dependencies = [
  "aes 0.9.1",
  "base64",
@@ -1851,7 +1851,7 @@ dependencies = [
  "office_oxide",
  "phf 0.14.0",
  "qcms",
- "quick-xml 0.40.1",
+ "quick-xml 0.41.0",
  "regex",
  "serde",
  "serde_json",
