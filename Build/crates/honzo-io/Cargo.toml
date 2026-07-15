@@ -21,7 +21,7 @@ crc32fast = "1.5.0"
 rmp-serde = "1.3.1"
 serde = { version = "1.0.228", features = ["derive"] }
 getrandom = { version = "0.4.2", features = ["wasm_js"] }
-aes-gcm = "0.10"
+aes-gcm = "0.11"
 hkdf = "0.13"
 sha2 = "0.11"
 x25519-dalek = { version = "3", default-features = false, features = ["static_secrets", "getrandom"] }
