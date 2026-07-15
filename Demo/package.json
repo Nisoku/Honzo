@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.28.1",
-    "prettier": "^3.9.4",
+    "prettier": "^3.9.5",
     "vite-plugin-pwa": "^1.0.0"
   },
   "private": true,
