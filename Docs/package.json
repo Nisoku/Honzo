@@ -13,6 +13,6 @@
   "dependencies": {
     "@docmd/core": "^0.8.6",
     "@huggingface/transformers": "^4.2.0",
-    "docmd-search": "^0.1.0-alpha.1"
+    "docmd-search": "^0.1.1"
   }
 }
