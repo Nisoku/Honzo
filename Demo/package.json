@@ -15,7 +15,7 @@
     "@nisoku/sairin": "^0.1.2",
     "lucide": "^1.25.0",
     "marked": "^18.0.5",
-    "vite": "^8.0.16",
+    "vite": "^8.1.5",
     "vite-plugin-top-level-await": "^1.6.0",
     "vite-plugin-wasm": "^3.6.0"
   },
