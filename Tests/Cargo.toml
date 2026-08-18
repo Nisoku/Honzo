@@ -16,7 +16,7 @@ rmp-serde = "1.3.1"
 serde = { version = "1.0.228", features = ["derive"] }
 lopdf = { version = "0.44.0", default-features = false, features = ["chrono"] }
 image = { version = "0.25.10", default-features = false, features = ["jpeg"] }
-diplomat-runtime = "0.15.1"
+diplomat-runtime = "0.16.0"
 zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
 quick-xml = "0.41"
 x25519-dalek = { version = "2", default-features = false, features = ["static_secrets", "getrandom"] }
