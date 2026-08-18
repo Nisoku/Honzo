@@ -20,7 +20,7 @@ image = { version = "0.25.10", default-features = false, features = ["png", "jpe
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
 cssparser = "0.37"
-pulldown-latex = "0.7"
+pulldown-latex = "0.8"
 quick-xml = "0.41"
 rust-stemmers = "1"
 lexepub = "0.1"
