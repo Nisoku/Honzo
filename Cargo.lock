@@ -688,9 +688,15 @@ dependencies = [
 
 [[package]]
 name = "diplomat-runtime"
-version = "0.15.1"
+version = "0.15.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "970ac38ad677632efcee6d517e783958da9bc78ec206d8d5e35b459ffc5e4864"
+checksum = "25b2f28ba90d2ffa95a531ea479769d4a6b2f5f187cd76ab5fd3bdcd64b3603e"
+
+[[package]]
+name = "diplomat-runtime"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ae517853d9f82b2d144393b1c32c34c46c2e361de2b6c44a8fdfce23beb211cd"
 
 [[package]]
 name = "diplomat-tool"
@@ -1202,7 +1208,7 @@ name = "honzo-c"
 version = "0.1.2"
 dependencies = [
  "diplomat 0.16.0",
- "diplomat-runtime",
+ "diplomat-runtime 0.16.0",
  "diplomat-tool",
  "honzo-chunks",
  "honzo-core",
@@ -1302,7 +1308,7 @@ dependencies = [
 name = "honzo-tests"
 version = "0.1.2"
 dependencies = [
- "diplomat-runtime",
+ "diplomat-runtime 0.16.0",
  "honzo-c",
  "honzo-chunks",
  "honzo-convert",
@@ -1555,7 +1561,7 @@ dependencies = [
  "async_zip",
  "bytes",
  "diplomat 0.15.0",
- "diplomat-runtime",
+ "diplomat-runtime 0.15.2",
  "futures",
  "getrandom 0.4.2",
  "html-escape",
