@@ -112,12 +112,15 @@ bindEvent(metaPanel, "click", (e) => {
   if (addId) {
     const container = document.getElementById("idList");
     if (container) {
-      container.insertAdjacentHTML("beforeend", `
+      container.insertAdjacentHTML(
+        "beforeend",
+        `
       <div class="field" style="display:flex;gap:0.5rem;align-items:end">
         <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="" /></div>
         <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="" /></div>
         <button class="btn btn-secondary" data-remove="inspect-id" style="padding:0.4rem 0.6rem;font-size:0.8rem">×</button>
-      </div>`);
+      </div>`,
+      );
     }
   }
   const rem = e.target.closest("[data-remove]");
@@ -130,8 +133,10 @@ bindEvent(metaPanel, "click", (e) => {
     if (value) {
       const container = document.getElementById(`tags_${id}`);
       if (container) {
-        container.insertAdjacentHTML("beforeend",
-          `<span class="tag"><span class="tag-text">${esc(value)}</span> <span class="tag-remove" data-tag-id="${id}">×</span></span>`);
+        container.insertAdjacentHTML(
+          "beforeend",
+          `<span class="tag"><span class="tag-text">${esc(value)}</span> <span class="tag-remove" data-tag-id="${id}">×</span></span>`,
+        );
       }
       input.value = "";
     }

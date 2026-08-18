@@ -83,13 +83,34 @@
   flex-shrink: 0;
 }
 
-.chunk-type-badge[data-type="CHAP"] { background: #e3f2fd; color: #1565c0; }
-.chunk-type-badge[data-type="NOTE"] { background: #f3e5f5; color: #7b1fa2; }
-.chunk-type-badge[data-type="IMG_"] { background: #e8f5e9; color: #2e7d32; }
-.chunk-type-badge[data-type="CSS_"] { background: #fff3e0; color: #e65100; }
-.chunk-type-badge[data-type="FONT"] { background: #e0f7fa; color: #00695c; }
-.chunk-type-badge[data-type="COVR"] { background: #fce4ec; color: #c62828; }
-.chunk-type-badge[data-type="MATH"] { background: #ede7f6; color: #4527a0; }
+.chunk-type-badge[data-type="CHAP"] {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+.chunk-type-badge[data-type="NOTE"] {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+.chunk-type-badge[data-type="IMG_"] {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.chunk-type-badge[data-type="CSS_"] {
+  background: #fff3e0;
+  color: #e65100;
+}
+.chunk-type-badge[data-type="FONT"] {
+  background: #e0f7fa;
+  color: #00695c;
+}
+.chunk-type-badge[data-type="COVR"] {
+  background: #fce4ec;
+  color: #c62828;
+}
+.chunk-type-badge[data-type="MATH"] {
+  background: #ede7f6;
+  color: #4527a0;
+}
 
 .chunk-title-display {
   font-size: 0.85rem;

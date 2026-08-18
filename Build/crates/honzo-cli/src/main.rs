@@ -584,7 +584,7 @@ fn cmd_convert_batch(pattern: &str, out_dir: &PathBuf) {
         if input
             .file_name()
             .and_then(|n| n.to_str())
-            .map_or(false, |n| n.starts_with("._"))
+            .is_some_and(|n| n.starts_with("._"))
         {
             continue;
         }

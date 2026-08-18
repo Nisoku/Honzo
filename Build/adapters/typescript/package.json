@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "format": "prettier --write .",
     "make-pretty": "prettier --write .",
     "typecheck": "node --eval \"const p=require('./package.json'); if(!p.types||!String(p.types).endsWith('.d.ts')){process.exit(1)}\"",
     "test": "NODE_OPTIONS=--experimental-vm-modules npx jest --no-cache",

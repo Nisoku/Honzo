@@ -192,7 +192,7 @@ inline bool HonzoBuilderHandle::finalize() {
     return result;
 }
 
-inline diplomat::span<const uint8_t> HonzoBuilderHandle::get_result() const {
+inline diplomat::span<const uint8_t> HonzoBuilderHandle::get_result() const DIPLOMAT_LIFETIME_BOUND {
     auto result = diplomat::capi::HonzoBuilderHandle_get_result(this->AsFFI());
     return diplomat::span<const uint8_t>(result.data, result.len);
 }

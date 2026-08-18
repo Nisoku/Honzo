@@ -1,6 +1,6 @@
 use std::collections::HashMap;
-use std::path::Path;
 use std::fs;
+use std::path::Path;
 
 use regex::Regex;
 
@@ -28,7 +28,9 @@ pub fn from_markdown_file(path: &Path) -> Result<Vec<u8>, ConvertError> {
     let (config, body) = extract_frontmatter(&content);
     let chapters = split_chapters(body);
     if chapters.is_empty() {
-        return Err(ConvertError::MdParseError("No content found in markdown file".into()));
+        return Err(ConvertError::MdParseError(
+            "No content found in markdown file".into(),
+        ));
     }
 
     build_honzo(project_dir, config, &chapters)
@@ -36,7 +38,10 @@ pub fn from_markdown_file(path: &Path) -> Result<Vec<u8>, ConvertError> {
 
 pub fn from_markdown_dir(path: &Path) -> Result<Vec<u8>, ConvertError> {
     if !path.is_dir() {
-        return Err(ConvertError::IoError(format!("{:?} is not a directory", path)));
+        return Err(ConvertError::IoError(format!(
+            "{:?} is not a directory",
+            path
+        )));
     }
 
     let config = read_dir_config(path);
@@ -44,20 +49,25 @@ pub fn from_markdown_dir(path: &Path) -> Result<Vec<u8>, ConvertError> {
     let mut md_files: Vec<_> = fs::read_dir(path)
         .map_err(|e| ConvertError::IoError(e.to_string()))?
         .filter_map(|e| e.ok())
-        .filter(|e| e.path().extension().map_or(false, |ext| ext == "md" || ext == "markdown"))
+        .filter(|e| {
+            e.path()
+                .extension()
+                .is_some_and(|ext| ext == "md" || ext == "markdown")
+        })
         .collect();
     md_files.sort_by_key(|e| e.file_name());
 
     if md_files.is_empty() {
-        return Err(ConvertError::MdParseError(
-            format!("No .md files found in {:?}", path),
-        ));
+        return Err(ConvertError::MdParseError(format!(
+            "No .md files found in {:?}",
+            path
+        )));
     }
 
     let mut chapters: Vec<(Option<String>, String)> = Vec::new();
     for entry in &md_files {
-        let content = fs::read_to_string(entry.path())
-            .map_err(|e| ConvertError::IoError(e.to_string()))?;
+        let content =
+            fs::read_to_string(entry.path()).map_err(|e| ConvertError::IoError(e.to_string()))?;
         let (file_config, body) = extract_frontmatter(&content);
         let file_chapters = split_chapters(body);
 
@@ -65,9 +75,13 @@ pub fn from_markdown_dir(path: &Path) -> Result<Vec<u8>, ConvertError> {
             for (i, (title, chap_content)) in file_chapters.into_iter().enumerate() {
                 let effective_title = title.or_else(|| {
                     if i == 0 {
-                        file_config.as_ref().and_then(|c| c.title.clone())
+                        file_config
+                            .as_ref()
+                            .and_then(|c| c.title.clone())
                             .or_else(|| {
-                                entry.path().file_stem()
+                                entry
+                                    .path()
+                                    .file_stem()
                                     .map(|s| s.to_string_lossy().to_string())
                             })
                     } else {
@@ -77,9 +91,15 @@ pub fn from_markdown_dir(path: &Path) -> Result<Vec<u8>, ConvertError> {
                 chapters.push((effective_title, chap_content));
             }
         } else {
-            let title = file_config.as_ref().and_then(|c| c.title.clone())
-                .or_else(|| entry.path().file_stem()
-                    .map(|s| s.to_string_lossy().to_string()));
+            let title = file_config
+                .as_ref()
+                .and_then(|c| c.title.clone())
+                .or_else(|| {
+                    entry
+                        .path()
+                        .file_stem()
+                        .map(|s| s.to_string_lossy().to_string())
+                });
             chapters.push((title, content));
         }
     }
@@ -108,7 +128,8 @@ fn extract_frontmatter(content: &str) -> (Option<MdProjectConfig>, &str) {
 
 fn read_dir_config(dir: &Path) -> Option<MdProjectConfig> {
     let json_path = dir.join("honzo.json");
-    fs::read_to_string(json_path).ok()
+    fs::read_to_string(json_path)
+        .ok()
         .and_then(|s| serde_json::from_str(&s).ok())
 }
 
@@ -179,9 +200,7 @@ fn split_by_rules(body: &str) -> Vec<(Option<String>, String)> {
 
 fn extract_image_refs(md: &str) -> Vec<String> {
     let re = Regex::new(r"!\[([^\]]*)\]\(([^)]+)\)").unwrap();
-    re.captures_iter(md)
-        .map(|c| c[2].to_string())
-        .collect()
+    re.captures_iter(md).map(|c| c[2].to_string()).collect()
 }
 
 fn build_honzo(
@@ -189,10 +208,11 @@ fn build_honzo(
     config: Option<MdProjectConfig>,
     chapters: &[(Option<String>, String)],
 ) -> Result<Vec<u8>, ConvertError> {
-    let lang = config.as_ref().and_then(|c| c.language.as_deref()).unwrap_or("en");
-    let mut builder = HonzoBuilder::new()
-        .set_auto_sidx(true)
-        .set_language(lang);
+    let lang = config
+        .as_ref()
+        .and_then(|c| c.language.as_deref())
+        .unwrap_or("en");
+    let mut builder = HonzoBuilder::new().set_auto_sidx(true).set_language(lang);
 
     let mut img_path_to_chunk: HashMap<String, u32> = HashMap::new();
     let mut chunk_id: u32 = 0;
@@ -202,16 +222,28 @@ fn build_honzo(
         let cover_full = project_dir.join(cover_path);
         if let Ok(data) = fs::read(&cover_full) {
             builder = builder.add_chunk(
-                *b"COVR", &data, Compression::None, MarkupType::Markdown,
-                CoverType::Front, None, None, None,
+                *b"COVR",
+                &data,
+                Compression::None,
+                MarkupType::Markdown,
+                CoverType::Front,
+                None,
+                None,
+                None,
             );
             img_path_to_chunk.insert(normalize_path(cover_path), chunk_id);
             chunk_id += 1;
 
             if let Ok(covt) = generate_covt(&data) {
                 builder = builder.add_chunk(
-                    *b"COVT", &covt, Compression::None, MarkupType::Markdown,
-                    CoverType::Front, None, None, None,
+                    *b"COVT",
+                    &covt,
+                    Compression::None,
+                    MarkupType::Markdown,
+                    CoverType::Front,
+                    None,
+                    None,
+                    None,
                 );
                 chunk_id += 1;
             }
@@ -235,8 +267,14 @@ fn build_honzo(
         if let Ok(data) = fs::read(&img_full) {
             img_path_to_chunk.insert(normalize_path(img_path), chunk_id);
             builder = builder.add_chunk(
-                *b"IMG_", &data, Compression::None, MarkupType::Markdown,
-                CoverType::Front, None, None, None,
+                *b"IMG_",
+                &data,
+                Compression::None,
+                MarkupType::Markdown,
+                CoverType::Front,
+                None,
+                None,
+                None,
             );
             chunk_id += 1;
         }
@@ -246,8 +284,14 @@ fn build_honzo(
     for (title, chap_content) in chapters {
         let rewritten = rewrite_md_image_refs(chap_content, &img_path_to_chunk);
         builder = builder.add_chunk(
-            *b"CHAP", rewritten.as_bytes(), Compression::None, MarkupType::Markdown,
-            CoverType::Front, title.as_deref(), None, None,
+            *b"CHAP",
+            rewritten.as_bytes(),
+            Compression::None,
+            MarkupType::Markdown,
+            CoverType::Front,
+            title.as_deref(),
+            None,
+            None,
         );
     }
 
@@ -261,7 +305,8 @@ fn build_honzo(
         })
     });
 
-    let mut authors: Vec<String> = config.as_ref()
+    let mut authors: Vec<String> = config
+        .as_ref()
         .and_then(|c| c.authors.clone())
         .unwrap_or_default();
     if authors.is_empty() {
@@ -320,7 +365,10 @@ fn rewrite_md_image_refs(md: &str, img_map: &HashMap<String, u32>) -> String {
             if alt.is_empty() {
                 format!("<ref type=\"image\" chunk=\"{}\"/>", chunk_id)
             } else {
-                format!("<ref type=\"image\" chunk=\"{}\" alt=\"{}\"/>", chunk_id, alt)
+                format!(
+                    "<ref type=\"image\" chunk=\"{}\" alt=\"{}\"/>",
+                    chunk_id, alt
+                )
             }
         } else {
             caps[0].to_string()

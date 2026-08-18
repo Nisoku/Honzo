@@ -1,20 +1,36 @@
 import { esc, direction } from "./state.js";
 
 export function collectMeta() {
-  const title = document.getElementById("mf_title")?.value?.trim() || "Untitled";
+  const title =
+    document.getElementById("mf_title")?.value?.trim() || "Untitled";
   const authors = (document.getElementById("mf_authors")?.value?.trim() || "")
-    .split(",").map((s) => s.trim()).filter(Boolean);
-  const language = document.getElementById("mf_language")?.value?.trim() || "en";
-  const publisher = document.getElementById("mf_publisher")?.value?.trim() || undefined;
-  const description = document.getElementById("mf_description")?.value?.trim() || undefined;
-  const subtitle = document.getElementById("mf_subtitle")?.value?.trim() || undefined;
-  const edition = document.getElementById("mf_edition")?.value?.trim() || undefined;
-  const sourceUrl = document.getElementById("mf_source_url")?.value?.trim() || undefined;
-  const license = document.getElementById("mf_license")?.value?.trim() || undefined;
-  const origTitle = document.getElementById("mf_original_title")?.value?.trim() || undefined;
-  const origLang = document.getElementById("mf_original_lang")?.value?.trim() || undefined;
-  const origAuthors = (document.getElementById("mf_original_authors")?.value?.trim() || "")
-    .split(",").map((s) => s.trim()).filter(Boolean);
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const language =
+    document.getElementById("mf_language")?.value?.trim() || "en";
+  const publisher =
+    document.getElementById("mf_publisher")?.value?.trim() || undefined;
+  const description =
+    document.getElementById("mf_description")?.value?.trim() || undefined;
+  const subtitle =
+    document.getElementById("mf_subtitle")?.value?.trim() || undefined;
+  const edition =
+    document.getElementById("mf_edition")?.value?.trim() || undefined;
+  const sourceUrl =
+    document.getElementById("mf_source_url")?.value?.trim() || undefined;
+  const license =
+    document.getElementById("mf_license")?.value?.trim() || undefined;
+  const origTitle =
+    document.getElementById("mf_original_title")?.value?.trim() || undefined;
+  const origLang =
+    document.getElementById("mf_original_lang")?.value?.trim() || undefined;
+  const origAuthors = (
+    document.getElementById("mf_original_authors")?.value?.trim() || ""
+  )
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
   const wc = document.getElementById("mf_word_count")?.value?.trim();
   const rt = document.getElementById("mf_reading_time")?.value?.trim();
   const wordCount = wc ? parseInt(wc, 10) : undefined;
@@ -23,7 +39,9 @@ export function collectMeta() {
 
   const meta = {
     title: { [language === "en" ? "en" : language]: title },
-    language, direction, authors,
+    language,
+    direction,
+    authors,
     ...(publisher && { publisher }),
     ...(description && { description: { [language]: description } }),
     ...(subtitle && { subtitle: { [language]: subtitle } }),
@@ -33,15 +51,22 @@ export function collectMeta() {
     ...(origTitle && { original_title: origTitle }),
     ...(origLang && { original_lang: origLang }),
     ...(origAuthors.length > 0 && { original_authors: origAuthors }),
-    ...(wordCount !== undefined && !isNaN(wordCount) && { word_count: wordCount }),
-    ...(readingTime !== undefined && !isNaN(readingTime) && { reading_time_mins: readingTime }),
+    ...(wordCount !== undefined &&
+      !isNaN(wordCount) && { word_count: wordCount }),
+    ...(readingTime !== undefined &&
+      !isNaN(readingTime) && { reading_time_mins: readingTime }),
   };
 
   const seriesTitle = document.getElementById("mf_series_title")?.value?.trim();
   if (seriesTitle) {
-    const seriesPos = document.getElementById("mf_series_pos")?.value?.trim() || "";
+    const seriesPos =
+      document.getElementById("mf_series_pos")?.value?.trim() || "";
     const seriesArc = document.getElementById("mf_series_arc")?.value?.trim();
-    meta.series = { title: seriesTitle, position: seriesPos, ...(seriesArc && { arc: seriesArc }) };
+    meta.series = {
+      title: seriesTitle,
+      position: seriesPos,
+      ...(seriesArc && { arc: seriesArc }),
+    };
   }
 
   const idEls = document.querySelectorAll("#idList > .maker-id-row");
@@ -53,7 +78,9 @@ export function collectMeta() {
   }
   if (ids.length > 0) meta.identifiers = ids;
 
-  const contribEls = document.querySelectorAll("#contributorList > .maker-contrib-row");
+  const contribEls = document.querySelectorAll(
+    "#contributorList > .maker-contrib-row",
+  );
   const contributors = [];
   for (const el of contribEls) {
     const name = el.querySelector(".contrib-name")?.value?.trim();
@@ -75,7 +102,9 @@ export function collectTags(id) {
   if (!container) return [];
   const items = [];
   for (const span of container.querySelectorAll(".tag")) {
-    const text = span.querySelector(".tag-text")?.textContent?.trim() || span.textContent.replace("\u00d7", "").trim();
+    const text =
+      span.querySelector(".tag-text")?.textContent?.trim() ||
+      span.textContent.replace("\u00d7", "").trim();
     if (text) items.push(text);
   }
   return items;
@@ -111,8 +140,10 @@ export function addTag(id) {
   if (value) {
     const container = document.getElementById(`tags_${id}`);
     if (container) {
-      container.insertAdjacentHTML("beforeend",
-        `<span class="tag"><span class="tag-text">${esc(value)}</span> <span class="tag-remove" data-tag-id="${id}" data-tag-value="${esc(value)}">\u00d7</span></span>`);
+      container.insertAdjacentHTML(
+        "beforeend",
+        `<span class="tag"><span class="tag-text">${esc(value)}</span> <span class="tag-remove" data-tag-id="${id}" data-tag-value="${esc(value)}">\u00d7</span></span>`,
+      );
     }
     input.value = "";
   }

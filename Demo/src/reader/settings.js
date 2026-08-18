@@ -1,5 +1,13 @@
 import { icon } from "../icons.js";
-import { fontFamily, fontSize, gapless, layoutMode, pageZoom, textAlign, theme } from "./state.js";
+import {
+  fontFamily,
+  fontSize,
+  gapless,
+  layoutMode,
+  pageZoom,
+  textAlign,
+  theme,
+} from "./state.js";
 import { setMangaZoom } from "./book.js";
 
 const THEMES = {
@@ -236,7 +244,8 @@ export function renderSettings(container) {
   const zoomReset = container.querySelector('[data-action="zoomReset"]');
   const zoomValue = document.getElementById("zoomValue");
   function updateZoomDisplay() {
-    if (zoomValue) zoomValue.textContent = `${Math.round(pageZoom.get() * 100)}%`;
+    if (zoomValue)
+      zoomValue.textContent = `${Math.round(pageZoom.get() * 100)}%`;
   }
   if (zoomIn) {
     zoomIn.addEventListener("click", () => {

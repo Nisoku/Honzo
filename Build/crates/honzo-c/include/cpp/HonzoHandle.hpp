@@ -162,18 +162,18 @@ inline bool HonzoHandle::has_sync() const {
     return result;
 }
 
-inline diplomat::span<const uint8_t> HonzoHandle::get_extra() const {
+inline diplomat::span<const uint8_t> HonzoHandle::get_extra() const DIPLOMAT_LIFETIME_BOUND {
     auto result = diplomat::capi::HonzoHandle_get_extra(this->AsFFI());
     return diplomat::span<const uint8_t>(result.data, result.len);
 }
 
-inline std::optional<diplomat::span<const uint8_t>> HonzoHandle::get_chunk(uint32_t index) {
+inline std::optional<diplomat::span<const uint8_t>> HonzoHandle::get_chunk(uint32_t index) DIPLOMAT_LIFETIME_BOUND {
     auto result = diplomat::capi::HonzoHandle_get_chunk(this->AsFFI(),
         index);
     return result.is_ok ? std::optional<diplomat::span<const uint8_t>>(diplomat::span<const uint8_t>(result.ok.data, result.ok.len)) : std::nullopt;
 }
 
-inline diplomat::span<const uint8_t> HonzoHandle::get_meta() const {
+inline diplomat::span<const uint8_t> HonzoHandle::get_meta() const DIPLOMAT_LIFETIME_BOUND {
     auto result = diplomat::capi::HonzoHandle_get_meta(this->AsFFI());
     return diplomat::span<const uint8_t>(result.data, result.len);
 }

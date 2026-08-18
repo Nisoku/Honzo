@@ -1,4 +1,3 @@
-import { resolve } from "path";
 import { defineConfig } from "vite";
 import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
@@ -63,10 +62,10 @@ export default defineConfig({
     target: "esnext",
     rollupOptions: {
       input: {
-        main: resolve(__dirname, "index.html"),
-        convert: resolve(__dirname, "convert.html"),
-        inspect: resolve(__dirname, "inspect.html"),
-        maker: resolve(__dirname, "maker.html"),
+        main: `${import.meta.dirname}/index.html`,
+        convert: `${import.meta.dirname}/convert.html`,
+        inspect: `${import.meta.dirname}/inspect.html`,
+        maker: `${import.meta.dirname}/maker.html`,
       },
     },
   },

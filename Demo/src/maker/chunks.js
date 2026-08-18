@@ -1,11 +1,27 @@
-import { esc, formatSize, CHUNK_TYPES, chunks, chunkIdCounter, setChunkIdCounter, setChunks, chunksList, defaultCompression, showStatus } from "./state.js";
+import {
+  esc,
+  formatSize,
+  CHUNK_TYPES,
+  chunks,
+  chunkIdCounter,
+  setChunkIdCounter,
+  setChunks,
+  chunksList,
+  defaultCompression,
+  showStatus,
+} from "./state.js";
 import { markDirty } from "./saves.js";
 import { icon } from "../icons.js";
 
 export function createChunk(type, title) {
   const id = chunkIdCounter + 1;
   setChunkIdCounter(id);
-  const base = { id, type, title: title || type, compression: defaultCompression };
+  const base = {
+    id,
+    type,
+    title: title || type,
+    compression: defaultCompression,
+  };
   if (CHUNK_TYPES[type]?.markup) {
     base.content = "";
     base.contentType = "markdown";
@@ -34,7 +50,10 @@ export function createChunk(type, title) {
 export function addChunk(type) {
   const label = CHUNK_TYPES[type]?.label || type;
   const idx = chunks.length;
-  const arr = [...chunks, createChunk(type, `${label} ${idx === 0 ? 1 : idx + 1}`)];
+  const arr = [
+    ...chunks,
+    createChunk(type, `${label} ${idx === 0 ? 1 : idx + 1}`),
+  ];
   setChunks(arr);
   renderChunks();
 }
@@ -84,22 +103,34 @@ export function renderChunks() {
               <option value="0" ${ch.compression === 0 ? "selected" : ""}>None</option>
               <option value="1" ${ch.compression === 1 ? "selected" : ""}>LZ4</option>
             </select></label>
-            ${ch.type === "COVR" || ch.type === "IMG_" ? `
+            ${
+              ch.type === "COVR" || ch.type === "IMG_"
+                ? `
             <label>Cover Type: <select class="chunk-sel-cover" data-id="${ch.id}">
               <option value="0" ${ch.coverType === 0 ? "selected" : ""}>Front</option>
               <option value="1" ${ch.coverType === 1 ? "selected" : ""}>Back</option>
               <option value="2" ${ch.coverType === 2 ? "selected" : ""}>Full Spread</option>
-            </select></label>` : ""}
-            ${ch.type === "IMG_" || ch.type === "COVR" ? `
-            <label>Alt Text: <input type="text" class="chunk-input-alt" value="${esc(ch.altText || "")}" placeholder="Image description" data-id="${ch.id}" /></label>` : ""}
-            ${ch.type === "FONT" ? `
+            </select></label>`
+                : ""
+            }
+            ${
+              ch.type === "IMG_" || ch.type === "COVR"
+                ? `
+            <label>Alt Text: <input type="text" class="chunk-input-alt" value="${esc(ch.altText || "")}" placeholder="Image description" data-id="${ch.id}" /></label>`
+                : ""
+            }
+            ${
+              ch.type === "FONT"
+                ? `
             <label>Embedding: <select class="chunk-sel-embed" data-id="${ch.id}">
               <option value="0" ${ch.fontEmbedding === 0 ? "selected" : ""}>Allowed</option>
               <option value="1" ${ch.fontEmbedding === 1 ? "selected" : ""}>Print Only</option>
               <option value="2" ${ch.fontEmbedding === 2 ? "selected" : ""}>No Modify</option>
               <option value="3" ${ch.fontEmbedding === 3 ? "selected" : ""}>No Embed</option>
             </select></label>
-            <label>License URL: <input type="text" class="chunk-input-license" value="${esc(ch.fontLicenseUrl || "")}" placeholder="https://..." data-id="${ch.id}" /></label>` : ""}
+            <label>License URL: <input type="text" class="chunk-input-license" value="${esc(ch.fontLicenseUrl || "")}" placeholder="https://..." data-id="${ch.id}" /></label>`
+                : ""
+            }
           </div>
         </div>
       </div>`;
@@ -137,15 +168,19 @@ function renderChunkBody(ch, i) {
         <input type="text" class="chunk-title-input" value="${esc(ch.title)}" placeholder="${isCover ? "Cover title" : isFont ? "Font name" : "Image title"}" data-id="${ch.id}" />
       </div>
       <div class="chunk-file-area">
-        ${ch.fileData ? `
+        ${
+          ch.fileData
+            ? `
         <div class="chunk-file-preview">
           <span class="chunk-file-name">${esc(ch.fileName)} (${formatSize(ch.fileData.length)})</span>
           <button class="btn btn-secondary" data-action="remove-file" data-id="${ch.id}" style="font-size:0.8rem;padding:4px 10px;height:auto">Remove</button>
-        </div>` : `
+        </div>`
+            : `
         <div class="chunk-file-drop" data-id="${ch.id}">
           <span>Drop ${isCover ? "cover image" : isFont ? "font" : "image"} or click to browse</span>
           <input type="file" class="chunk-file-input" accept="${accept}" data-id="${ch.id}" />
-        </div>`}
+        </div>`
+        }
       </div>
     </div>`;
   }

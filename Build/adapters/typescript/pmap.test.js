@@ -80,9 +80,7 @@ describe('get_pmap from built files', () => {
 
 describe('get_pmap from fixture files', () => {
   it('reads PMAP from with_pmap fixture', () => {
-    const bytes = readFileSync(
-      resolve(__dirname, '../../../Tests/fixtures/with_pmap.hzo'),
-    );
+    const bytes = readFileSync(resolve(__dirname, '../../../Tests/fixtures/with_pmap.hzo'));
     const reader = open(bytes);
     const pmap = reader.get_pmap();
     expect(pmap.length).toBe(6);
@@ -90,9 +88,7 @@ describe('get_pmap from fixture files', () => {
   });
 
   it('returns empty PMAP from minimal fixture', () => {
-    const bytes = readFileSync(
-      resolve(__dirname, '../../../Tests/fixtures/minimal.hzo'),
-    );
+    const bytes = readFileSync(resolve(__dirname, '../../../Tests/fixtures/minimal.hzo'));
     const reader = open(bytes);
     expect(reader.get_pmap()).toEqual([]);
   });

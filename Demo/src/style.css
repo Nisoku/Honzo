@@ -206,7 +206,6 @@ body {
   color: inherit;
 }
 
-
 /* Footer */
 #app-footer {
   height: var(--footer-height);
@@ -302,7 +301,6 @@ body {
   font-variant-numeric: tabular-nums;
   min-width: 2em;
 }
-
 
 /* Overlay */
 .overlay {
@@ -430,7 +428,6 @@ body.page-scroll #app-header {
   grid-template-columns: 1fr;
   gap: 20px;
 }
-
 
 /* Page title */
 .page-title {
@@ -914,7 +911,6 @@ body.page-scroll #app-header {
 .tag-input button:hover {
   background: var(--accent-hover);
 }
-
 
 /* Powered by footer */
 .powered-by {

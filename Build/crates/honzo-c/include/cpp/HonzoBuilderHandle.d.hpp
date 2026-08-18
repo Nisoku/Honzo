@@ -55,7 +55,7 @@ public:
 
   inline bool finalize();
 
-  inline diplomat::span<const uint8_t> get_result() const;
+  inline diplomat::span<const uint8_t> get_result() const DIPLOMAT_LIFETIME_BOUND;
 
     inline const diplomat::capi::HonzoBuilderHandle* AsFFI() const;
     inline diplomat::capi::HonzoBuilderHandle* AsFFI();

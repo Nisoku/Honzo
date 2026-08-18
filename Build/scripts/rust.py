@@ -82,6 +82,7 @@ def main() -> None:
     elif cmd == "setup":
         code = 0
         code += run(["cargo", "install", "diplomat-tool"])
+        code += run(["cargo", "install", "wasm-pack"])
         code += run(["rustup", "target", "add", "wasm32-unknown-unknown", NO_STD_TARGET])
         sys.exit(code)
     else:

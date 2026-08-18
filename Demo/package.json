@@ -8,20 +8,27 @@
     "test": "npm run build",
     "build": "vite build",
     "preview": "vite preview",
-    "make-pretty": "prettier --write ."
+    "make-pretty": "prettier --write .",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@msgpack/msgpack": "^3.1.3",
     "@nisoku/sairin": "^0.1.2",
-    "lucide": "^1.18.0",
-    "marked": "^18.0.5",
-    "vite": "^8.0.16",
+    "lucide": "^1.31.0",
+    "marked": "^18.0.10",
+    "vite": "^8.2.1",
     "vite-plugin-top-level-await": "^1.6.0",
     "vite-plugin-wasm": "^3.6.0"
   },
   "devDependencies": {
-    "esbuild": "^0.28.1",
-    "prettier": "^3.8.4",
+    "@eslint/css": "^1.4.0",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^2.0.1",
+    "@eslint/markdown": "^8.0.3",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.8.1",
+    "globals": "^17.11.0",
+    "prettier": "^3.9.6",
     "vite-plugin-pwa": "^1.0.0"
   },
   "private": true,

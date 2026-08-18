@@ -57,6 +57,8 @@ def wasm() -> int:
     if shutil.which("wasm-pack") is None:
         print("[ERROR] wasm-pack is not installed.", flush=True)
         return 1
+    if WASM_OUT.exists():
+        shutil.rmtree(WASM_OUT)
     result = run_root(
         [
             "wasm-pack",

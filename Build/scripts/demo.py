@@ -40,12 +40,8 @@ def setup() -> int:
         print("[ERROR] Demo package.json not found.", flush=True)
         return 1
     if (DIR / "package-lock.json").exists():
-        result = run(["npm", "ci"])
-    else:
-        result = run(["npm", "install"])
-    if result != 0:
-        return result
-    return run_scripts([sys.executable, str(SCRIPTS / "typescript.py"), "wasm"])
+        return run(["npm", "ci"])
+    return run(["npm", "install"])
 
 
 def run_required_scripts(names: list[str]) -> int:

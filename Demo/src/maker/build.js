@@ -1,15 +1,30 @@
 import init, { honzo_build } from "../wasm/honzo_wasm.js";
-import { wasmReady, setWasmReady, showStatus, buildInfoText, formatSize, layoutMode, CHUNK_TYPES, chunks, pmapBody } from "./state.js";
+import {
+  wasmReady,
+  setWasmReady,
+  showStatus,
+  buildInfoText,
+  formatSize,
+  layoutMode,
+  CHUNK_TYPES,
+  chunks,
+  pmapBody,
+} from "./state.js";
 import { collectMeta } from "./meta.js";
 import { makerLog } from "../satori.js";
 import { download } from "../shared/download.js";
 
 export async function ensureWasm() {
-  if (!wasmReady) { await init(); setWasmReady(true); }
+  if (!wasmReady) {
+    await init();
+    setWasmReady(true);
+  }
 }
 
 function collectChunks() {
-  const cards = document.getElementById("chunksList").querySelectorAll(".chunk-card");
+  const cards = document
+    .getElementById("chunksList")
+    .querySelectorAll(".chunk-card");
   const result = [];
   for (const card of cards) {
     const id = parseInt(card.dataset.id, 10);
@@ -27,8 +42,10 @@ function collectChunks() {
     const licenseInput = card.querySelector(".chunk-input-license");
 
     const title = titleInput?.value?.trim() || ch.title;
-    const compression = compSelect ? parseInt(compSelect.value, 10) : (ch.compression || 0);
-    const contentType = typeSelect?.value || (ch.contentType || "markdown");
+    const compression = compSelect
+      ? parseInt(compSelect.value, 10)
+      : ch.compression || 0;
+    const contentType = typeSelect?.value || ch.contentType || "markdown";
 
     let data = null;
     let tag = ch.type;
@@ -56,20 +73,29 @@ function collectChunks() {
     } else if (tag === "FONT") {
       data = ch.fileData;
       if (!data) continue;
-      fontEmbedding = embedSelect ? parseInt(embedSelect.value, 10) : (ch.fontEmbedding ?? 0);
+      fontEmbedding = embedSelect
+        ? parseInt(embedSelect.value, 10)
+        : (ch.fontEmbedding ?? 0);
       fontLicenseUrl = licenseInput?.value?.trim() || ch.fontLicenseUrl || null;
     } else if (tag === "MATH") {
       let content = contentArea?.value || ch.content || "";
       data = new TextEncoder().encode(content);
       content_type_kind = 2;
-      content_type_value = mathSelect ? parseInt(mathSelect.value, 10) : (ch.mathType || 0);
+      content_type_value = mathSelect
+        ? parseInt(mathSelect.value, 10)
+        : ch.mathType || 0;
     } else {
       data = new TextEncoder().encode(title);
     }
 
     result.push({
-      tag, data, compression, content_type_kind, content_type_value,
-      cover_type: coverType, alt_text: altText,
+      tag,
+      data,
+      compression,
+      content_type_kind,
+      content_type_value,
+      cover_type: coverType,
+      alt_text: altText,
       font_embedding: fontEmbedding !== undefined ? fontEmbedding : null,
       font_license_url: fontLicenseUrl,
     });
@@ -151,9 +177,12 @@ export async function buildBook() {
 
     if (document.getElementById("flagDrm")?.checked) {
       const pkInput = document.getElementById("drmPublicKey")?.value?.trim();
-      const licenseUrl = document.getElementById("drmLicenseUrl")?.value?.trim() || null;
+      const licenseUrl =
+        document.getElementById("drmLicenseUrl")?.value?.trim() || null;
       const expiresVal = document.getElementById("drmExpires")?.value;
-      const expiresAt = expiresVal ? Math.floor(new Date(expiresVal + "T23:59:59Z").getTime() / 1000) : null;
+      const expiresAt = expiresVal
+        ? Math.floor(new Date(expiresVal + "T23:59:59Z").getTime() / 1000)
+        : null;
       if (pkInput) {
         try {
           const raw = Uint8Array.from(atob(pkInput), (c) => c.charCodeAt(0));
@@ -181,19 +210,27 @@ export async function buildBook() {
     for (const key of Object.keys(spec)) {
       const val = spec[key];
       const typeOf = typeof val;
-      const detail = val === null ? "null" :
-        val === undefined ? "undefined" :
-        Array.isArray(val) ? `array[${val.length}]` :
-        val instanceof Uint8Array ? `Uint8Array[${val.length}]` :
-        val instanceof Blob ? "Blob" :
-        typeOf === "object" ? `Object(${Object.keys(val).join(",")})` :
-        typeOf;
+      const detail =
+        val === null
+          ? "null"
+          : val === undefined
+            ? "undefined"
+            : Array.isArray(val)
+              ? `array[${val.length}]`
+              : val instanceof Uint8Array
+                ? `Uint8Array[${val.length}]`
+                : val instanceof Blob
+                  ? "Blob"
+                  : typeOf === "object"
+                    ? `Object(${Object.keys(val).join(",")})`
+                    : typeOf;
       makerLog.debug(`spec.${key} type`, { type: detail });
     }
 
     const result = honzo_build(spec);
     const slug = (meta.title?.[Object.keys(meta.title)[0]] || "untitled")
-      .replace(/[^a-zA-Z0-9_-]/g, "_").toLowerCase();
+      .replace(/[^a-zA-Z0-9_-]/g, "_")
+      .toLowerCase();
     download(result, `${slug}.hzo`);
 
     buildInfoText.set(
@@ -201,9 +238,15 @@ export async function buildBook() {
     );
     showStatus("success", `Built: ${slug}.hzo (${formatSize(result.length)})`);
   } catch (e) {
-    makerLog.error("Build failed", { error: e?.message || String(e), type: typeof e });
+    makerLog.error("Build failed", {
+      error: e?.message || String(e),
+      type: typeof e,
+    });
     if (e?.message?.includes("invalid type")) {
-      makerLog.error("Field type mismatch", { field: e.message.match(/'([^']+)'/)?.at(1) || "unknown", expected: e.message.match(/expected (\w+)/)?.at(1) || "unknown" });
+      makerLog.error("Field type mismatch", {
+        field: e.message.match(/'([^']+)'/)?.at(1) || "unknown",
+        expected: e.message.match(/expected (\w+)/)?.at(1) || "unknown",
+      });
     }
     showStatus("error", `Build failed: ${e?.message || String(e)}`);
   }

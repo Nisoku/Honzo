@@ -264,12 +264,9 @@ pub mod ffi {
             };
 
             let decompressed = if entry.flags & 0x01 != 0 {
-                if let Some(ref cek) = self.cek {
-                    let compressed = honzo_io::crypto::decrypt_chunk(raw, cek).ok()?;
-                    decompress(&compressed, comp, entry.size_raw).ok()?
-                } else {
-                    return None;
-                }
+                let cek = &self.cek?;
+                let compressed = honzo_io::crypto::decrypt_chunk(raw, cek).ok()?;
+                decompress(&compressed, comp, entry.size_raw).ok()?
             } else {
                 decompress(raw, comp, entry.size_raw).ok()?
             };
@@ -951,14 +948,12 @@ pub mod ffi {
         reader_version: u16,
         write: &mut diplomat_runtime::DiplomatWrite,
     ) -> Result<(), HonzoErrorCode> {
-
-
-
         let mut file = std::fs::File::open(path).map_err(|_| HonzoErrorCode::FileNotFound)?;
 
         // Read magic (4) + head (48) = 52 bytes
         let mut head = [0u8; 52];
-        file.read_exact(&mut head).map_err(|_| HonzoErrorCode::Truncated)?;
+        file.read_exact(&mut head)
+            .map_err(|_| HonzoErrorCode::Truncated)?;
 
         if &head[0..4] != b"HONO" {
             return Err(HonzoErrorCode::InvalidMagic);
@@ -969,7 +964,7 @@ pub mod ffi {
             return Err(HonzoErrorCode::ReaderVersionTooOld);
         }
 
-        let toc_size  = u64::from_le_bytes(head[16..24].try_into().unwrap());
+        let toc_size = u64::from_le_bytes(head[16..24].try_into().unwrap());
         let data_size = u64::from_le_bytes(head[24..32].try_into().unwrap());
         let extra_size = u64::from_le_bytes(head[32..40].try_into().unwrap());
         let meta_size = u64::from_le_bytes(head[40..48].try_into().unwrap());
@@ -986,12 +981,13 @@ pub mod ffi {
         file.read_exact(&mut meta_raw)
             .map_err(|_| HonzoErrorCode::Truncated)?;
 
-        let meta: HonzoMeta = rmp_serde::from_slice(&meta_raw)
-            .map_err(|_| HonzoErrorCode::Truncated)?;
-        let json = serde_json::to_string(&meta)
-            .map_err(|_| HonzoErrorCode::Unknown)?;
+        let meta: HonzoMeta =
+            rmp_serde::from_slice(&meta_raw).map_err(|_| HonzoErrorCode::Truncated)?;
+        let json = serde_json::to_string(&meta).map_err(|_| HonzoErrorCode::Unknown)?;
 
-        write.write_str(&json).map_err(|_| HonzoErrorCode::Unknown)?;
+        write
+            .write_str(&json)
+            .map_err(|_| HonzoErrorCode::Unknown)?;
         Ok(())
     }
 

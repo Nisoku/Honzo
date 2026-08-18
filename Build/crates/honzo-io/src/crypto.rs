@@ -29,13 +29,15 @@ pub fn random_bytes(len: usize) -> Result<Vec<u8>, HonzoError> {
 /// Returns [12-byte nonce || ciphertext || 16-byte tag].
 pub fn encrypt_chunk(data: &[u8], key: &[u8; 32]) -> Result<Vec<u8>, HonzoError> {
     let nonce_bytes = random_bytes(12)?;
-    let nonce = Nonce::from_slice(&nonce_bytes);
+    let nonce_arr = <[u8; 12]>::try_from(nonce_bytes.as_slice())
+        .map_err(|_| HonzoError::CryptoError("invalid nonce length"))?;
+    let nonce = Nonce::from(nonce_arr);
 
     let cipher =
         Aes256Gcm::new_from_slice(key).map_err(|_| HonzoError::CryptoError("invalid aes key"))?;
 
     let ciphertext = cipher
-        .encrypt(nonce, data)
+        .encrypt(&nonce, data)
         .map_err(|_| HonzoError::CryptoError("aes encryption failed"))?;
 
     let mut out = Vec::with_capacity(12 + ciphertext.len());
@@ -49,14 +51,16 @@ pub fn decrypt_chunk(data: &[u8], key: &[u8; 32]) -> Result<Vec<u8>, HonzoError>
     if data.len() < 12 + 16 {
         return Err(HonzoError::CryptoError("truncated encrypted data"));
     }
-    let nonce = Nonce::from_slice(&data[..12]);
+    let nonce_arr = <[u8; 12]>::try_from(&data[..12])
+        .map_err(|_| HonzoError::CryptoError("invalid nonce length"))?;
+    let nonce = Nonce::from(nonce_arr);
     let ciphertext = &data[12..];
 
     let cipher =
         Aes256Gcm::new_from_slice(key).map_err(|_| HonzoError::CryptoError("invalid aes key"))?;
 
     let plaintext = cipher
-        .decrypt(nonce, ciphertext)
+        .decrypt(&nonce, ciphertext)
         .map_err(|_| HonzoError::CryptoError("aes decryption failed"))?;
 
     Ok(plaintext)
