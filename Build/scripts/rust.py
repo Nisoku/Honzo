@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Rust workspace commands for Honzo."""
 
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -81,8 +82,10 @@ def main() -> None:
         sys.exit(run(CMDS[cmd]))
     elif cmd == "setup":
         code = 0
-        code += run(["cargo", "install", "diplomat-tool"])
-        code += run(["cargo", "install", "wasm-pack"])
+        if not shutil.which("diplomat-tool"):
+            code += run(["cargo", "install", "diplomat-tool"])
+        if not shutil.which("wasm-pack"):
+            code += run(["cargo", "install", "wasm-pack"])
         code += run(["rustup", "target", "add", "wasm32-unknown-unknown", NO_STD_TARGET])
         sys.exit(code)
     else:
