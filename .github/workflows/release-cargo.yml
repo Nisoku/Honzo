@@ -13,6 +13,19 @@ on:
         options:
           - 'true'
           - 'false'
+      packages:
+        description: 'Which crates to publish (for retrying individual packages)'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - 'all'
+          - 'honzo-core'
+          - 'honzo-chunks'
+          - 'honzo-io'
+          - 'honzo-convert'
+          - 'honzo-c'
+          - 'honzo-cli'
 
 jobs:
   publish:
@@ -21,6 +34,15 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    env:
+      # On a release event only, publish every crate.
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' || false }}
+      DO_CORE: ${{ github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'honzo-core' }}
+      DO_CHUNKS: ${{ github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'honzo-chunks' }}
+      DO_IO: ${{ github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'honzo-io' }}
+      DO_CONVERT: ${{ github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'honzo-convert' }}
+      DO_C: ${{ github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'honzo-c' }}
+      DO_CLI: ${{ github.event_name != 'workflow_dispatch' || inputs.packages == 'all' || inputs.packages == 'honzo-cli' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -32,34 +54,42 @@ jobs:
         uses: rust-lang/crates-io-auth-action@v1
 
       - name: Publish honzo-core
-        run: cargo publish -p honzo-core ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
+        if: env.DO_CORE == 'true'
+        run: cargo publish -p honzo-core ${{ env.DRY_RUN == 'true' && '--dry-run' || '' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
       - name: Publish honzo-chunks
-        run: cargo publish -p honzo-chunks ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
+        if: env.DO_CHUNKS == 'true'
+        run: cargo publish -p honzo-chunks ${{ env.DRY_RUN == 'true' && '--dry-run' || '' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
       - name: Publish honzo-io
-        run: cargo publish -p honzo-io ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
+        if: env.DO_IO == 'true'
+        run: cargo publish -p honzo-io ${{ env.DRY_RUN == 'true' && '--dry-run' || '' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
       - name: Publish honzo-convert
-        run: cargo publish -p honzo-convert ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
+        if: env.DO_CONVERT == 'true'
+        run: cargo publish -p honzo-convert ${{ env.DRY_RUN == 'true' && '--dry-run' || '' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
-      - name: Install diplomat-tool
-        run: cargo install diplomat-tool
+      - name: Build honzo-c (refresh bindings)
+        if: env.DO_C == 'true'
+        run: cargo build -p honzo-c
 
       - name: Publish honzo-c
-        run: cargo publish -p honzo-c ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
+        if: env.DO_C == 'true'
+        run: cargo publish -p honzo-c ${{ env.DRY_RUN == 'true' && '--dry-run' || '' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+          HONZO_GENERATE_BINDINGS: '0'
 
       - name: Publish honzo-cli
-        run: cargo publish -p honzo-cli ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
+        if: env.DO_CLI == 'true'
+        run: cargo publish -p honzo-cli ${{ env.DRY_RUN == 'true' && '--dry-run' || '' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}

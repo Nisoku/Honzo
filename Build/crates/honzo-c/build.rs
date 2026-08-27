@@ -1,6 +1,15 @@
 fn main() {
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is set by Cargo");
+
+    // Header generation is opt-out. Disable it with HONZO_GENERATE_BINDINGS=0
+    let generate = std::env::var("HONZO_GENERATE_BINDINGS")
+        .ok()
+        .map_or(true, |v| v != "0");
+    if !generate {
+        return;
+    }
+
     let entry = format!("{}/src/lib.rs", manifest_dir);
     let out_dir = format!("{}/include", manifest_dir);
     let cpp_out_dir = format!("{}/include/cpp", manifest_dir);
