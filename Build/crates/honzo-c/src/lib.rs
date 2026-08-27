@@ -994,7 +994,11 @@ pub mod ffi {
             .map_err(|_| HonzoErrorCode::Truncated)?;
 
         let meta_len = usize::try_from(meta_size).map_err(|_| HonzoErrorCode::Truncated)?;
-        let mut meta_raw = vec![0u8; meta_len];
+        let mut meta_raw = Vec::new();
+        meta_raw
+            .try_reserve_exact(meta_len)
+            .map_err(|_| HonzoErrorCode::Truncated)?;
+        meta_raw.resize(meta_len, 0u8);
         file.read_exact(&mut meta_raw)
             .map_err(|_| HonzoErrorCode::Truncated)?;
 

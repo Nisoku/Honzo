@@ -94,7 +94,10 @@ def main() -> None:
     elif cmd == "check":
         sys.exit(run_required_scripts(["lint", "typecheck", "test", "build"]))
     elif cmd == "test":
-        if not (WASM_OUT / "honzo_wasm_bg.wasm").exists():
+        if not (
+            (WASM_OUT / "honzo_wasm_bg.wasm").exists()
+            and (WASM_OUT / "honzo_wasm.js").exists()
+        ):
             print("[INFO] WASM build not found, building it before tests...", flush=True)
             code = wasm()
             if code != 0:

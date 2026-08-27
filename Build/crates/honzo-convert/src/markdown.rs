@@ -52,7 +52,7 @@ pub fn from_markdown_dir(path: &Path) -> Result<Vec<u8>, ConvertError> {
         .filter(|e| {
             e.path()
                 .extension()
-                .is_some_and(|ext| ext == "md" || ext == "markdown")
+                .is_some_and(|ext| ext.eq_ignore_ascii_case("md") || ext.eq_ignore_ascii_case("markdown"))
         })
         .collect();
     md_files.sort_by_key(|e| e.file_name());
@@ -385,6 +385,22 @@ fn build_honzo(
     builder.finalize().map_err(ConvertError::HonzoError)
 }
 
+/// Escape a string for safe inclusion inside a double-quoted XML attribute value.
+fn xml_escape(value: &str) -> String {
+    let mut out = String::with_capacity(value.len());
+    for c in value.chars() {
+        match c {
+            '&' => out.push_str("&amp;"),
+            '<' => out.push_str("&lt;"),
+            '>' => out.push_str("&gt;"),
+            '"' => out.push_str("&quot;"),
+            '\'' => out.push_str("&apos;"),
+            _ => out.push(c),
+        }
+    }
+    out
+}
+
 fn rewrite_md_image_refs(md: &str, img_map: &HashMap<String, u32>) -> String {
     let re = Regex::new(r"!\[([^\]]*)\]\(([^)]+)\)").expect("invalid image regex");
     re.replace_all(md, |caps: &regex::Captures| {
@@ -397,7 +413,8 @@ fn rewrite_md_image_refs(md: &str, img_map: &HashMap<String, u32>) -> String {
             } else {
                 format!(
                     "<ref type=\"image\" chunk=\"{}\" alt=\"{}\"/>",
-                    chunk_id, alt
+                    chunk_id,
+                    xml_escape(alt)
                 )
             }
         } else {

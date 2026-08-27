@@ -48,13 +48,19 @@ pub fn encode_jpeg(img: &DynamicImage, quality: u8) -> Result<Vec<u8>, HonzoErro
     Ok(out)
 }
 
-/// Walk provided parsed chapters' ASTs and collect a mapping of raw href/src -> alt text.
-/// The returned map contains the raw attribute values as keys; callers should resolve
-/// them against manifest/OPF paths as needed.
-pub fn collect_img_alts_from_parsed(parsed: &[ParsedChapter]) -> HashMap<String, String> {
-    let mut map: HashMap<String, String> = HashMap::new();
+/// A raw image reference collected from a chapter AST
+pub struct ImgAltRef {
+    raw_href: String,
+    base_href: String,
+    alt: String,
+}
 
-    fn walk(node: &AstNode, map: &mut HashMap<String, String>) {
+/// Walk provided parsed chapters' ASTs and collect every image reference along with
+/// the source chapter href and its alt text
+pub fn collect_img_alts_from_parsed(parsed: &[ParsedChapter]) -> Vec<ImgAltRef> {
+    let mut refs: Vec<ImgAltRef> = Vec::new();
+
+    fn walk(node: &AstNode, base_href: &str, refs: &mut Vec<ImgAltRef>) {
         if let AstNode::Element {
             tag,
             attrs,
@@ -65,25 +71,29 @@ pub fn collect_img_alts_from_parsed(parsed: &[ParsedChapter]) -> HashMap<String,
             if tag.eq_ignore_ascii_case("img") {
                 if let Some(src) = attrs.get("src").or_else(|| attrs.get("href")) {
                     let alt = attrs.get("alt").cloned().unwrap_or_default();
-                    map.entry(src.clone()).or_insert(alt);
+                    refs.push(ImgAltRef {
+                        raw_href: src.clone(),
+                        base_href: base_href.to_string(),
+                        alt,
+                    });
                 }
             }
             for c in children {
-                walk(c, map);
+                walk(c, base_href, refs);
             }
         }
     }
 
     for p in parsed.iter() {
         if let Some(ast) = &p.ast {
-            walk(ast, &mut map);
+            walk(ast, p.chapter_info.href.as_str(), &mut refs);
         }
     }
 
-    map
+    refs
 }
 
-// Collect image alts and resolve raw hrefs to canonical manifest/OPF paths
+// Collect image alts and resolve raw hrefs to canonical manifest/OPF paths.
 pub fn collect_and_resolve_img_alts_async<F>(
     parsed: &[ParsedChapter],
     valid_paths: &HashSet<String>,
@@ -92,18 +102,16 @@ pub fn collect_and_resolve_img_alts_async<F>(
 where
     F: Fn(),
 {
-    let raw_map = collect_img_alts_from_parsed(parsed);
-    let mut resolved: HashMap<String, String> = HashMap::with_capacity(raw_map.len());
+    let refs = collect_img_alts_from_parsed(parsed);
+    let mut resolved: HashMap<String, String> = HashMap::with_capacity(refs.len());
 
-    let base_href = parsed.first().map(|p| p.chapter_info.href.as_str());
-
-    for (raw_href, alt) in raw_map {
-        let key = resolve_alt_key(&raw_href, base_href, valid_paths);
+    for r in refs {
+        let key = resolve_alt_key(&r.raw_href, Some(r.base_href.as_str()), valid_paths);
         // Insert the resolved key first; the raw href is a distinct fallback key only when it
         // differs, so `alt` is cloned at most once.
-        resolved.entry(key.clone()).or_insert_with(|| alt.clone());
-        if raw_href != key {
-            resolved.entry(raw_href).or_insert(alt);
+        resolved.entry(key.clone()).or_insert_with(|| r.alt.clone());
+        if r.raw_href != key {
+            resolved.entry(r.raw_href).or_insert(r.alt);
         }
         on_resolved();
     }

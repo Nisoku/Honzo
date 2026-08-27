@@ -1,9 +1,6 @@
 # TODO
 
 - [ ] Web Converter freezes on larger files, make non-blocking
-- [ ] Fix Content Chunks expanding based on chunk count rather than showing a scrolling list
-- [ ] Migrate TypeScript adapter to modern Prettier config
-- [ ] Move TS adapter tests to tests/ folder (+ keys/)
 - [ ] implement pagination in web reader
 - [ ] add some more indicators to the CLI, for long operations
 

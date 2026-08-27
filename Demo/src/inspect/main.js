@@ -1,6 +1,6 @@
 import init, { HonzoWasm, honzo_build } from "../wasm/honzo_wasm.js";
 import { createIcons } from "lucide";
-import { icons } from "../icons.js";
+import { icons, icon } from "../icons.js";
 import { bindClass, bindEvent, bindText } from "@nisoku/sairin";
 import { derived, path, signal } from "@nisoku/sairin";
 import { esc } from "../shared/esc.js";
@@ -118,7 +118,7 @@ bindEvent(metaPanel, "click", (e) => {
       <div class="field" style="display:flex;gap:0.5rem;align-items:end">
         <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="" /></div>
         <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="" /></div>
-        <button class="btn btn-secondary" data-remove="inspect-id" style="padding:0.4rem 0.6rem;font-size:0.8rem">×</button>
+        <button class="btn btn-secondary" data-remove="inspect-id" style="padding:0.4rem 0.6rem;font-size:0.8rem">${icon("X", 14)}</button>
       </div>`,
       );
     }
@@ -135,7 +135,7 @@ bindEvent(metaPanel, "click", (e) => {
       if (container) {
         container.insertAdjacentHTML(
           "beforeend",
-          `<span class="tag"><span class="tag-text">${esc(value)}</span> <span class="tag-remove" data-tag-id="${id}">×</span></span>`,
+          `<span class="tag"><span class="tag-text">${esc(value)}</span> <span class="tag-remove" data-tag-id="${id}">${icon("X", 12)}</span></span>`,
         );
       }
       input.value = "";
@@ -371,7 +371,7 @@ function renderMeta() {
     <div class="field" style="display:flex;gap:0.5rem;align-items:end">
       <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="${esc(id.id_type || "")}" /></div>
       <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="${esc(id.value || "")}" /></div>
-      <button class="btn btn-secondary" data-remove="inspect-id" style="padding:0.4rem 0.6rem;font-size:0.8rem">×</button>
+      <button class="btn btn-secondary" data-remove="inspect-id" style="padding:0.4rem 0.6rem;font-size:0.8rem">${icon("X", 14)}</button>
     </div>`,
     )
     .join("");
@@ -422,7 +422,7 @@ function field(label, id, value, optional, type) {
 function tagField(label, id, values) {
   const items = Array.isArray(values) ? values : [];
   return `<div class="field"><label>${label}</label>
-    <div class="tag-list" id="tags_${id}">${items.map((t) => `<span class="tag"><span class="tag-text">${esc(t)}</span> <span class="tag-remove" data-tag-id="${id}">×</span></span>`).join("")}</div>
+    <div class="tag-list" id="tags_${id}">${items.map((t) => `<span class="tag"><span class="tag-text">${esc(t)}</span> <span class="tag-remove" data-tag-id="${id}">${icon("X", 12)}</span></span>`).join("")}</div>
     <div class="tag-input"><input type="text" id="new_${id}" placeholder="Add ${label.toLowerCase()}" />
     <button data-tag-add="${id}">Add</button></div>
   </div>`;
@@ -526,7 +526,7 @@ function collectTags(id) {
   for (const span of container.querySelectorAll(".tag")) {
     const text =
       span.querySelector(".tag-text")?.textContent?.trim() ||
-      span.textContent.replace("×", "").trim();
+      span.textContent.trim();
     if (text) items.push(text);
   }
   return items.length > 0 ? items : undefined;

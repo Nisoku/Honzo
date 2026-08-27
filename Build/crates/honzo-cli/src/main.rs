@@ -551,7 +551,7 @@ fn cmd_convert(input: &Path, out: &Path) {
 
     // Markdown file mode
     let ext = input.extension().and_then(|e| e.to_str()).unwrap_or("");
-    if ext == "md" || ext == "markdown" {
+    if ext.eq_ignore_ascii_case("md") || ext.eq_ignore_ascii_case("markdown") {
         eprintln!("Detected format: markdown (file)");
         let spinner = ProgressBar::new_spinner();
         spinner.set_style(
@@ -692,7 +692,7 @@ fn cmd_convert_batch(pattern: &str, out_dir: &Path) {
             .and_then(|e| e.to_str())
             .unwrap_or("")
             .to_ascii_lowercase();
-        let result = if ext == "md" || ext == "markdown" {
+        let result = if ext.eq_ignore_ascii_case("md") || ext.eq_ignore_ascii_case("markdown") {
             honzo_convert::from_markdown_file(input)
         } else {
             let data = match fs::read(input) {
