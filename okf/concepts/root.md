@@ -7,7 +7,7 @@ path: /
 updated: 2026-08-27
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-27T06:28:21.199Z"
+  generated_at: "2026-08-27T06:29:06.915Z"
 ---
 ---
 title: "Honzo"
