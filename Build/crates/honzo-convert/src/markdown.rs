@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use regex::Regex;
 
@@ -90,7 +90,7 @@ pub fn from_markdown_dir(path: &Path) -> Result<Vec<u8>, ConvertError> {
                 });
                 chapters.push((effective_title, chap_content));
             }
-        } else {
+        } else if !body.trim().is_empty() {
             let title = file_config
                 .as_ref()
                 .and_then(|c| c.title.clone())
@@ -100,11 +100,32 @@ pub fn from_markdown_dir(path: &Path) -> Result<Vec<u8>, ConvertError> {
                         .file_stem()
                         .map(|s| s.to_string_lossy().to_string())
                 });
-            chapters.push((title, content));
+            chapters.push((title, body.to_string()));
         }
     }
 
     build_honzo(path, config, &chapters)
+}
+
+fn safe_project_path(project_dir: &Path, rel: &str) -> Option<PathBuf> {
+    if rel.is_empty() {
+        return None;
+    }
+    let rel_path = Path::new(rel);
+    if rel_path.is_absolute() {
+        return None;
+    }
+    let mut out = project_dir.to_path_buf();
+    for component in rel_path.components() {
+        match component {
+            std::path::Component::Normal(_) => out.push(component),
+            std::path::Component::CurDir => {}
+            std::path::Component::ParentDir
+            | std::path::Component::RootDir
+            | std::path::Component::Prefix(_) => return None,
+        }
+    }
+    Some(out)
 }
 
 fn extract_frontmatter(content: &str) -> (Option<MdProjectConfig>, &str) {
@@ -139,7 +160,7 @@ fn split_chapters(body: &str) -> Vec<(Option<String>, String)> {
         return Vec::new();
     }
 
-    let has_h1 = Regex::new(r"(?m)^#(\s|$)")
+    let has_h1 = Regex::new(r"(?m)^#\s+(.+)")
         .expect("invalid heading regex")
         .is_match(body);
     if has_h1 {
@@ -162,6 +183,11 @@ fn split_by_headings(body: &str) -> Vec<(Option<String>, String)> {
             let section = body[last_start..m.start()].trim().to_string();
             if !section.is_empty() {
                 chapters.push((last_title.take(), section));
+            }
+        } else {
+            let preamble = body[last_start..m.start()].trim().to_string();
+            if !preamble.is_empty() {
+                chapters.push((None, preamble));
             }
         }
         seen_first = true;
@@ -219,27 +245,59 @@ fn build_honzo(
     let mut img_path_to_chunk: HashMap<String, u32> = HashMap::new();
     let mut chunk_id: u32 = 0;
 
-    // 1. Cover image
-    if let Some(ref cover_path) = config.as_ref().and_then(|c| c.cover.as_ref()) {
-        let cover_full = project_dir.join(cover_path);
-        if let Ok(data) = fs::read(&cover_full) {
-            builder = builder.add_chunk(
-                *b"COVR",
-                &data,
-                Compression::None,
-                MarkupType::Markdown,
-                CoverType::Front,
-                None,
-                None,
-                None,
-            );
-            img_path_to_chunk.insert(normalize_path(cover_path), chunk_id);
-            chunk_id += 1;
-
-            if let Ok(covt) = generate_covt(&data) {
+    // Cover image
+    if let Some(cover_path) = config.as_ref().and_then(|c| c.cover.as_ref()) {
+        if let Some(cover_full) = safe_project_path(project_dir, cover_path) {
+            if let Ok(data) = fs::read(&cover_full) {
                 builder = builder.add_chunk(
-                    *b"COVT",
-                    &covt,
+                    *b"COVR",
+                    &data,
+                    Compression::None,
+                    MarkupType::Markdown,
+                    CoverType::Front,
+                    None,
+                    None,
+                    None,
+                );
+                img_path_to_chunk.insert(normalize_path(cover_path), chunk_id);
+                chunk_id += 1;
+
+                if let Ok(covt) = generate_covt(&data) {
+                    builder = builder.add_chunk(
+                        *b"COVT",
+                        &covt,
+                        Compression::None,
+                        MarkupType::Markdown,
+                        CoverType::Front,
+                        None,
+                        None,
+                        None,
+                    );
+                    chunk_id += 1;
+                }
+            }
+        }
+    }
+
+    // Collect all unique image paths referenced across all chapters
+    let mut all_img_paths: Vec<String> = Vec::new();
+    for (_, chap_content) in chapters {
+        for p in extract_image_refs(chap_content) {
+            let normalized = normalize_path(&p);
+            if !all_img_paths.contains(&normalized) {
+                all_img_paths.push(normalized);
+            }
+        }
+    }
+
+    // Add image chunks
+    for img_path in &all_img_paths {
+        if let Some(img_full) = safe_project_path(project_dir, img_path) {
+            if let Ok(data) = fs::read(&img_full) {
+                img_path_to_chunk.insert(normalize_path(img_path), chunk_id);
+                builder = builder.add_chunk(
+                    *b"IMG_",
+                    &data,
                     Compression::None,
                     MarkupType::Markdown,
                     CoverType::Front,
@@ -252,37 +310,7 @@ fn build_honzo(
         }
     }
 
-    // 2. Collect all unique image paths referenced across all chapters
-    let mut all_img_paths: Vec<String> = Vec::new();
-    for (_, chap_content) in chapters {
-        for p in extract_image_refs(chap_content) {
-            let normalized = normalize_path(&p);
-            if !all_img_paths.contains(&normalized) {
-                all_img_paths.push(normalized);
-            }
-        }
-    }
-
-    // 3. Add image chunks
-    for img_path in &all_img_paths {
-        let img_full = project_dir.join(img_path);
-        if let Ok(data) = fs::read(&img_full) {
-            img_path_to_chunk.insert(normalize_path(img_path), chunk_id);
-            builder = builder.add_chunk(
-                *b"IMG_",
-                &data,
-                Compression::None,
-                MarkupType::Markdown,
-                CoverType::Front,
-                None,
-                None,
-                None,
-            );
-            chunk_id += 1;
-        }
-    }
-
-    // 4. Rewrite markdown image refs and add chapter chunks
+    // Rewrite markdown image refs and add chapter chunks
     for (title, chap_content) in chapters {
         let rewritten = rewrite_md_image_refs(chap_content, &img_path_to_chunk);
         builder = builder.add_chunk(
@@ -297,7 +325,7 @@ fn build_honzo(
         );
     }
 
-    // 5. Build metadata
+    // Build metadata
     let title_map = config.as_ref().and_then(|c| {
         c.title.clone().map(|t| {
             let mut m = HashMap::new();

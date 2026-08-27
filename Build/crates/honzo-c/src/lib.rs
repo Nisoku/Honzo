@@ -973,11 +973,28 @@ pub mod ffi {
             return Err(HonzoErrorCode::Truncated);
         }
 
-        let meta_offset: u64 = 52 + toc_size + data_size + extra_size;
+        let meta_offset = 52u64
+            .checked_add(toc_size)
+            .and_then(|v| v.checked_add(data_size))
+            .and_then(|v| v.checked_add(extra_size))
+            .ok_or(HonzoErrorCode::Truncated)?;
+
+        let file_len = file
+            .metadata()
+            .map_err(|_| HonzoErrorCode::Truncated)?
+            .len();
+        if meta_offset
+            .checked_add(meta_size)
+            .is_none_or(|end| end > file_len)
+        {
+            return Err(HonzoErrorCode::Truncated);
+        }
+
         file.seek(SeekFrom::Start(meta_offset))
             .map_err(|_| HonzoErrorCode::Truncated)?;
 
-        let mut meta_raw = vec![0u8; meta_size as usize];
+        let meta_len = usize::try_from(meta_size).map_err(|_| HonzoErrorCode::Truncated)?;
+        let mut meta_raw = vec![0u8; meta_len];
         file.read_exact(&mut meta_raw)
             .map_err(|_| HonzoErrorCode::Truncated)?;
 

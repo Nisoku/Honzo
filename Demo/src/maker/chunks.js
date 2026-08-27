@@ -153,7 +153,7 @@ function renderChunkBody(ch, i) {
           <option value="html" ${ch.contentType === "html" ? "selected" : ""}>HTML</option>
         </select>
       </div>
-      <textarea class="chunk-content" data-id="${esc(ch.id)}" placeholder="Write ${ch.contentType} content here..." rows="8">${esc(ch.content)}</textarea>
+      <textarea class="chunk-content" data-id="${esc(ch.id)}" placeholder="Write ${esc(ch.contentType)} content here..." rows="8">${esc(ch.content)}</textarea>
       <div class="chunk-toolbar">
         <button class="btn btn-xs chunk-pagebreak-btn" data-action="insert-pagebreak" data-id="${esc(ch.id)}" title="Insert page break marker">
           ${icon("FilePlus", 12)} Page Break

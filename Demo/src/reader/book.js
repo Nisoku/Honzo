@@ -25,6 +25,7 @@ import {
   getProgress,
   getCurrentBookId,
   getBookmarks,
+  addBookmark,
   removeBookmark,
   toggleSidebar,
 } from "./state.js";
@@ -981,8 +982,7 @@ export function nextPage() {
 export function addBookmarkCurrent() {
   const bookId = getCurrentBookId();
   if (!bookId || !hasBookLoaded()) return;
-  // eslint-disable-next-line no-unused-vars
-  const ch = chapters[currentChapterIndex];
+  addBookmark(bookId, currentChapterIndex, currentChunkId.value, "");
   if (elements.bookmarksContent) {
     renderBookmarks(elements.bookmarksContent, bookId, chapters);
   }

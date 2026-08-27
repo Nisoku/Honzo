@@ -616,7 +616,7 @@ fn cmd_convert(input: &Path, out: &Path) {
                 "Converted {} -> {} ({}, {})",
                 input.display(),
                 out.display(),
-                human_size(hzo.len() as u32),
+                human_size(hzo.len() as u64),
                 HumanDuration(start.elapsed())
             );
         }
@@ -657,6 +657,21 @@ fn cmd_convert_batch(pattern: &str, out_dir: &Path) {
         return;
     }
 
+    let mut seen_stems: std::collections::HashSet<String> = std::collections::HashSet::new();
+    for input in &files {
+        let stem = input
+            .file_stem()
+            .map(|s| s.to_string_lossy().to_string())
+            .unwrap_or_default();
+        if !seen_stems.insert(stem.clone()) {
+            eprintln!(
+                "Error: multiple inputs resolve to the same output '{}', aborting batch",
+                stem
+            );
+            std::process::exit(1);
+        }
+    }
+
     let total = files.len();
     let pb = ProgressBar::new(total as u64);
     pb.set_style(
@@ -672,22 +687,31 @@ fn cmd_convert_batch(pattern: &str, out_dir: &Path) {
     let errors = AtomicU32::new(0);
 
     files.par_iter().for_each(|input| {
-        let data = match fs::read(input) {
-            Ok(d) => d,
-            Err(e) => {
-                eprintln!("Error reading {}: {}", input.display(), e);
-                errors.fetch_add(1, Ordering::Relaxed);
-                pb.inc(1);
-                return;
+        let ext = input
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        let result = if ext == "md" || ext == "markdown" {
+            honzo_convert::from_markdown_file(input)
+        } else {
+            let data = match fs::read(input) {
+                Ok(d) => d,
+                Err(e) => {
+                    eprintln!("Error reading {}: {}", input.display(), e);
+                    errors.fetch_add(1, Ordering::Relaxed);
+                    pb.inc(1);
+                    return;
+                }
+            };
+
+            let detected = detect_format(&data);
+
+            match detected {
+                "epub" => honzo_convert::from_epub(&data),
+                "pdf" => honzo_convert::from_pdf(&data),
+                _ => honzo_convert::from_mobi(&data),
             }
-        };
-
-        let detected = detect_format(&data);
-
-        let result = match detected {
-            "epub" => honzo_convert::from_epub(&data),
-            "pdf" => honzo_convert::from_pdf(&data),
-            _ => honzo_convert::from_mobi(&data),
         };
 
         match result {
@@ -962,7 +986,7 @@ fn cmd_search(file: &Path, query: &str) {
     }
 }
 
-fn human_size(bytes: u32) -> String {
+fn human_size(bytes: u64) -> String {
     if bytes >= 1024 * 1024 {
         format!("{:.1} MB", bytes as f64 / (1024.0 * 1024.0))
     } else if bytes >= 1024 {
@@ -993,7 +1017,7 @@ fn cmd_tree(file: &Path) {
         head.version_major,
         head.version_minor,
         head.chunk_count,
-        human_size(total_size as u32),
+        human_size(total_size),
     );
 
     let has_extra = head.extra_size > 0;
@@ -1033,24 +1057,20 @@ fn cmd_tree(file: &Path) {
         format!("flags: {}", flag_line),
         format!("layout: {:?}", head.layout_mode()),
         format!("chunk_count: {}", head.chunk_count),
-        format!(
-            "TOC: {} ({} B)",
-            human_size(head.toc_size as u32),
-            head.toc_size
-        ),
+        format!("TOC: {} ({} B)", human_size(head.toc_size), head.toc_size),
         format!(
             "DATA: {} ({} B)",
-            human_size(head.data_size as u32),
+            human_size(head.data_size),
             head.data_size
         ),
         format!(
             "EXTRA: {} ({} B)",
-            human_size(head.extra_size as u32),
+            human_size(head.extra_size),
             head.extra_size
         ),
         format!(
             "META: {} ({} B)",
-            human_size(head.meta_size as u32),
+            human_size(head.meta_size),
             head.meta_size
         ),
     ];
@@ -1062,7 +1082,7 @@ fn cmd_tree(file: &Path) {
 
     // META
     let (conn, child) = tl(1, top_count);
-    println!("{conn} META ({})", human_size(head.meta_size as u32));
+    println!("{conn} META ({})", human_size(head.meta_size));
     if let Ok(meta_bytes) = p.meta_bytes() {
         if let Ok(meta) = rmp_serde::from_slice::<HonzoMeta>(meta_bytes) {
             let title_str = meta
@@ -1108,7 +1128,7 @@ fn cmd_tree(file: &Path) {
 
     // DATA
     let (conn, child) = tl(3, top_count);
-    println!("{conn} DATA ({})", human_size(head.data_size as u32));
+    println!("{conn} DATA ({})", human_size(head.data_size));
 
     // Group entries by tag type
     let mut groups: BTreeMap<&str, Vec<&TocEntry>> = BTreeMap::new();
@@ -1162,8 +1182,8 @@ fn cmd_tree(file: &Path) {
             let compressed = if entry.compression != honzo_core::Compression::None {
                 format!(
                     " [lz4: {}→{}]",
-                    human_size(entry.size_compressed),
-                    human_size(entry.size_raw)
+                    human_size(entry.size_compressed as u64),
+                    human_size(entry.size_raw as u64)
                 )
             } else {
                 String::new()
@@ -1183,7 +1203,7 @@ fn cmd_tree(file: &Path) {
     // EXTRA
     if has_extra {
         let (conn, _child) = tl(4, top_count);
-        println!("{conn} EXTRA ({})", human_size(head.extra_size as u32));
+        println!("{conn} EXTRA ({})", human_size(head.extra_size));
     }
 }
 
