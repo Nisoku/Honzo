@@ -7,7 +7,7 @@ path: /features/annotations/
 updated: 2026-08-27
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-27T06:26:13.312Z"
+  generated_at: "2026-08-27T06:28:21.191Z"
 ---
 ---
 title: "Annotations"
