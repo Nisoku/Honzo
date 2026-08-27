@@ -5,8 +5,7 @@
 use honzo_core::HonzoError;
 use image::{codecs::jpeg::JpegEncoder, DynamicImage, GenericImageView};
 use lexepub::core::chapter::{AstNode, ParsedChapter};
-use lexepub::LexEpub;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 pub const IMG_TAG: [u8; 4] = *b"IMG_";
 
@@ -84,33 +83,114 @@ pub fn collect_img_alts_from_parsed(parsed: &[ParsedChapter]) -> HashMap<String,
     map
 }
 
-// Collect image alts and normalize keys by resolving per-chapter hrefs. The resolver
-// behavior is: try to resolve raw chapter-relative hrefs to manifest/OPF paths; if
-// resolution succeeds use the resolved path as a key, otherwise keep the raw href.
-// (The async variant below performs resolution via `LexEpub`.)
-pub async fn collect_and_resolve_img_alts_async(
+// Collect image alts and resolve raw hrefs to canonical manifest/OPF paths
+pub fn collect_and_resolve_img_alts_async<F>(
     parsed: &[ParsedChapter],
-    epub: &mut LexEpub,
-) -> HashMap<String, String> {
+    valid_paths: &HashSet<String>,
+    on_resolved: &F,
+) -> HashMap<String, String>
+where
+    F: Fn(),
+{
     let raw_map = collect_img_alts_from_parsed(parsed);
-    let mut resolved: HashMap<String, String> = HashMap::new();
+    let mut resolved: HashMap<String, String> = HashMap::with_capacity(raw_map.len());
 
-    for (raw_href, alt) in raw_map.into_iter() {
-        let mut final_key = raw_href.clone();
-        for ci in 0..parsed.len() {
-            match epub.resolve_chapter_resource_path(ci, &raw_href).await {
-                Ok(p) => {
-                    final_key = p;
-                    break;
-                }
-                Err(_) => continue,
-            }
+    let base_href = parsed.first().map(|p| p.chapter_info.href.as_str());
+
+    for (raw_href, alt) in raw_map {
+        let key = resolve_alt_key(&raw_href, base_href, valid_paths);
+        // Insert the resolved key first; the raw href is a distinct fallback key only when it
+        // differs, so `alt` is cloned at most once.
+        resolved.entry(key.clone()).or_insert_with(|| alt.clone());
+        if raw_href != key {
+            resolved.entry(raw_href).or_insert(alt);
         }
-        // Insert both resolved key and the original raw href so callers can lookup
-        // by either form.
-        resolved.entry(final_key.clone()).or_insert(alt.clone());
-        resolved.entry(raw_href).or_insert(alt);
+        on_resolved();
     }
 
     resolved
+}
+
+fn is_external_href(href: &str) -> bool {
+    href.starts_with("http://")
+        || href.starts_with("https://")
+        || href.starts_with("mailto:")
+        || href.starts_with("data:")
+        || href.starts_with("blob:")
+        || href.starts_with('#')
+}
+
+/// Resolve a raw `img` src to a alt key using the manifest path set
+fn resolve_alt_key(
+    raw_href: &str,
+    base_href: Option<&str>,
+    valid_paths: &HashSet<String>,
+) -> String {
+    let trimmed = raw_href.trim();
+    if trimmed.is_empty() || is_external_href(trimmed) {
+        return raw_href.to_string();
+    }
+
+    let path_only = trimmed.split('#').next().unwrap_or(trimmed);
+    if !path_only.is_empty() {
+        let direct = normalize_internal_path(path_only);
+        if !direct.is_empty() && valid_paths.contains(&direct) {
+            return direct;
+        }
+        if let Some(base) = base_href {
+            let relative = resolve_href_against(base, trimmed);
+            if valid_paths.contains(&relative) {
+                return relative;
+            }
+        }
+    }
+
+    raw_href.to_string()
+}
+
+fn resolve_href_against(base_path: &str, href: &str) -> String {
+    if href.trim().is_empty() {
+        return base_path.to_string();
+    }
+    if is_external_href(href) {
+        return href.to_string();
+    }
+
+    let (path_part, fragment) = match href.split_once('#') {
+        Some((p, f)) => (p, Some(f)),
+        None => (href, None),
+    };
+
+    let joined = if path_part.starts_with('/') {
+        std::path::PathBuf::from(path_part.trim_start_matches('/'))
+    } else if path_part.is_empty() {
+        std::path::PathBuf::from(base_path)
+    } else {
+        let base_dir = std::path::Path::new(base_path)
+            .parent()
+            .unwrap_or_else(|| std::path::Path::new(""));
+        base_dir.join(path_part)
+    };
+
+    let mut normalized = normalize_internal_path(&joined.to_string_lossy());
+    if let Some(frag) = fragment {
+        normalized.push('#');
+        normalized.push_str(frag);
+    }
+    normalized
+}
+
+fn normalize_internal_path(path: &str) -> String {
+    let mut parts: Vec<&str> = Vec::new();
+    let normalized = path.replace('\\', "/");
+    for segment in normalized.split('/') {
+        match segment {
+            "" | "." => {}
+            ".." => {
+                parts.pop();
+            }
+            other => parts.push(other),
+        }
+    }
+    parts.join("/")
 }

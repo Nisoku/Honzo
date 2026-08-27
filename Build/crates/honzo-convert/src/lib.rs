@@ -156,7 +156,7 @@ async fn convert_epub_with_progress(
     let mut next_chunk_id: u32 = 0;
 
     // Extract image alt texts from parsed ASTs
-    progress.stage("Extracting alt-text");
+    progress.stage("Parsing chapters");
     let mut img_alt_map: std::collections::HashMap<String, String> =
         std::collections::HashMap::new();
     let mut parsed_chapters: Vec<lexepub::ParsedChapter> = Vec::new();
@@ -171,11 +171,19 @@ async fn convert_epub_with_progress(
         progress.advance();
     }
     if !parsed_chapters.is_empty() {
+        // resource paths the converter will actually embed
+        let mut valid_paths: std::collections::HashSet<String> = std::collections::HashSet::new();
+        for item in &manifest {
+            valid_paths.insert(item.href.clone());
+            valid_paths.insert(resolve(&item.href));
+        }
+
+        progress.stage("Extracting alt-text");
         img_alt_map = honzo_chunks::data::img::collect_and_resolve_img_alts_async(
             &parsed_chapters,
-            &mut epub,
-        )
-        .await;
+            &valid_paths,
+            &|| progress.advance(),
+        );
     }
 
     let mut img_path_to_chunk: HashMap<String, u32> = HashMap::new();
