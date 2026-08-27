@@ -7,7 +7,7 @@ path: /api/c/
 updated: 2026-08-27
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-27T06:14:08.687Z"
+  generated_at: "2026-08-27T06:26:13.304Z"
 ---
 ---
 title: "C API Reference"
@@ -28,7 +28,7 @@ HonzoHandle_destroy(handle);
 ```
 
 | Return                          | Meaning |
-| ------------------------------- | ------- |
+|---------------------------------|---------|
 | ::: tag "0" color:#22c55e       | Success |
 | ::: tag "nonzero" color:#ef4444 | Error   |
 
@@ -50,7 +50,7 @@ Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk
 ### HonzoFileReader lifecycle
 
 | Symbol                                  | Signature                                                                      | Returns                                        | Notes                |
-| --------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------- | -------------------- |
+|-----------------------------------------|--------------------------------------------------------------------------------|------------------------------------------------|----------------------|
 | `HonzoFileReader_open`                  | `DiplomatStringView path, uint16_t reader_version`                             | `HonzoFileReader_open_result`                  | Open from file path. |
 | `HonzoFileReader_open_with_private_key` | `DiplomatStringView path, uint16_t reader_version, DiplomatU8View private_key` | `HonzoFileReader_open_with_private_key_result` | Open with DRM key.   |
 | `HonzoFileReader_destroy`               | `HonzoFileReader* self`                                                        | `void`                                         | Free the reader.     |
@@ -58,7 +58,7 @@ Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk
 ### HonzoFileReader accessors
 
 | Symbol                                         | Signature                                     | Returns                                     | Notes                                                                                                                   |
-| ---------------------------------------------- | --------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+|------------------------------------------------|-----------------------------------------------|---------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
 | `HonzoFileReader_chunk_count`                  | `const HonzoFileReader* self`                 | `uint32_t`                                  | Number of chunks.                                                                                                       |
 | `HonzoFileReader_get_chunk_type`               | `const HonzoFileReader* self, uint32_t index` | `uint32_t`                                  | 4-byte chunk tag as native-endian u32 (e.g. `0x50414843` for `"CHAP"`). Returns 0 if index out of range.                |
 | `HonzoFileReader_get_chunk_content_type_kind`  | `const HonzoFileReader* self, uint32_t index` | `uint8_t`                                   | Content type kind: `1` = markup, `2` = math. Returns 0 if index out of range.                                           |
@@ -66,6 +66,25 @@ Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk
 | `HonzoFileReader_get_chunk_alt_text`           | `const HonzoFileReader* self, uint32_t index` | `HonzoFileReader_get_chunk_alt_text_result` | Human-readable label: chapter title for CHAP, alt text for IMG_, etc. Empty view if index out of range or no label.     |
 | `HonzoFileReader_get_chunk`                    | `HonzoFileReader* self, uint32_t index`       | `HonzoFileReader_get_chunk_result`          | Decompressed chunk data. Valid until next call to this function.                                                        |
 | `HonzoFileReader_get_meta`                     | `HonzoFileReader* self, DiplomatWrite* write` | `HonzoFileReader_get_meta_result`           | JSON metadata string.                                                                                                   |
+
+## Metadata extraction without parsing
+
+Extract the META block as JSON directly from a file on disk without loading
+chunks into memory. Returns `Ok(())` on success; on failure returns
+`HonzoErrorCode_FileNotFound`, `HonzoErrorCode_InvalidMagic`,
+`HonzoErrorCode_ReaderVersionTooOld`, or `HonzoErrorCode_Truncated`.
+
+| Symbol                       | Signature                                                                | Returns                             | Notes                 |
+|------------------------------|--------------------------------------------------------------------------|-------------------------------------|-----------------------|
+| `hzo_extract_meta_from_file` | `DiplomatStringView path, uint16_t reader_version, DiplomatWrite* write` | `hzo_extract_meta_from_file_result` | JSON metadata string. |
+
+```c
+hzo_extract_meta_from_file_result res =
+    hzo_extract_meta_from_file(book_path, 1, &write);
+if (res.is_ok) {
+    // write.buf contains the META block as JSON
+}
+```
 
 ## Image format detection
 
@@ -154,14 +173,14 @@ Parse a Honzo file from a byte buffer in memory.
 ### HonzoHandle lifecycle
 
 | Symbol                | Signature                                           | Returns        | Notes                                          |
-| --------------------- | --------------------------------------------------- | -------------- | ---------------------------------------------- |
+|-----------------------|-----------------------------------------------------|----------------|------------------------------------------------|
 | `HonzoHandle_parse`   | `const uint8_t* data, size_t len, uint32_t version` | `HonzoHandle*` | Parse from byte buffer. Returns NULL on error. |
 | `HonzoHandle_destroy` | `HonzoHandle* handle`                               | `void`         | Free the handle.                               |
 
 ## HonzoHandle accessors
 
 | Symbol                    | Signature                                                                  | Returns       | Notes                              |
-| ------------------------- | -------------------------------------------------------------------------- | ------------- | ---------------------------------- |
+|---------------------------|----------------------------------------------------------------------------|---------------|------------------------------------|
 | `HonzoHandle_chunk_count` | `const HonzoHandle*`                                                       | `uint32_t`    | Number of chunks.                  |
 | `HonzoHandle_head`        | `const HonzoHandle*, HonzoHead* out`                                       | `int32_t`     | 0 on success, nonzero on error.    |
 | `HonzoHandle_toc_entry`   | `const HonzoHandle*, uint32_t index, TocEntry* out`                        | `int32_t`     | 0 on success, nonzero on error.    |
@@ -174,7 +193,7 @@ Parse a Honzo file from a byte buffer in memory.
 ## HonzoErrorCode
 
 | Code                                     | Meaning                   |
-| ---------------------------------------- | ------------------------- |
+|------------------------------------------|---------------------------|
 | `HonzoErrorCode_Ok = 0`                  | Success                   |
 | `HonzoErrorCode_InvalidMagic = 1`        | Not a Honzo file          |
 | `HonzoErrorCode_ReaderVersionTooOld = 2` | Reader version too low    |

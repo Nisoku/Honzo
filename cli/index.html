@@ -104,11 +104,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mtb4na5q">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mtb4na5q">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mtb52spa">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mtb52spa">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mtb4na5q" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mtb4na5q" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mtb52spa" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mtb52spa" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Command-line tools for working with Honzo files">
@@ -124,13 +124,13 @@
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mtb4na5q" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mtb4na5q" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mtb4na5q" >
-<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mtb52spa" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mtb52spa" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mtb52spa" >
+<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mtb52spa" >
 
     
-      <link rel="stylesheet" href="../assets/css/theme.css?v=mtb4na5q">
+      <link rel="stylesheet" href="../assets/css/theme.css?v=mtb52spa">
     
     
   </head>
@@ -1585,7 +1585,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22CLI%20Reference%22%0Adescription%3A%20%22Command-line%20tools%20for%20working%20with%20Honzo%20files%22%0A---%0A%0AThe%20%60honzo%60%20CLI%20provides%20commands%20for%20creating%2C%20inspecting%2C%20converting%2C%20and%20managing%20Honzo%20files.%0A%0A%23%23%20Global%20usage%0A%0A%60%60%60bash%0Ahonzo-cli%20%3Ccommand%3E%20%5Boptions%5D%0A%60%60%60%0A%0A%7C%20Flag%20%20%20%20%20%20%20%20%7C%20Description%20%20%7C%0A%7C%20-----------%20%7C%20------------%20%7C%0A%7C%20%60--help%60%20%20%20%20%7C%20Show%20help%20%20%20%20%7C%0A%7C%20%60--version%60%20%7C%20Show%20version%20%7C%0A%0A%23%23%20Commands%0A%0A%3A%3A%3A%20card%20%22**honzo-cli%20make**%22%20icon%3Awrench%0ACreate%20a%20Honzo%20file%20from%20markdown%20source%20files.%0A%0A%60%60%60bash%0Ahonzo-cli%20make%20%3Coutput.hzo%3E%20%5C%0A%20%20--title%20%22Book%20Title%22%20%5C%0A%20%20--author%20%22Author%20Name%22%20%5C%0A%20%20--language%20%22en%22%20%5C%0A%20%20--chapters%20chapter1.md%20chapter2.md%20chapter3.md%0A%60%60%60%0A%0A%7C%20Option%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------------------%20%7C%20-------------------------------------------------------%20%7C%0A%7C%20%60--title%20%3Ctext%3E%60%20%20%20%20%20%20%20%20%7C%20Book%20title%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--author%20%3Ctext%3E%60%20%20%20%20%20%20%20%7C%20Book%20author%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--language%20%3Ccode%3E%60%20%20%20%20%20%7C%20Language%20(BCP%2047%2C%20default%3A%20%60en%60)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--chapters%20%3Cfiles...%3E%60%20%7C%20Markdown%20files%20(each%20becomes%20a%20chapter)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--cover%20%3Cimage%3E%60%20%20%20%20%20%20%20%7C%20Cover%20image%20file%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--layout%20%3Cmode%3E%60%20%20%20%20%20%20%20%7C%20%60reflowable%60%2C%20%60fixed%60%2C%20%60scroll%60%20(default%3A%20%60reflowable%60)%20%7C%0A%7C%20%60--compress%20%3Calgo%3E%60%20%20%20%20%20%7C%20%60none%60%2C%20%60lz4%60%20(default%3A%20%60lz4%60)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--output%2C%20-o%20%3Cfile%3E%60%20%20%20%7C%20Output%20file%20(default%3A%20first%20positional%20arg)%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20card%20%22**honzo-cli%20info**%22%20icon%3Ainfo%0ADisplay%20metadata%20and%20structure%20of%20a%20Honzo%20file.%0A%0A%60%60%60bash%0Ahonzo-cli%20info%20%3Cfile.hzo%3E%0A%60%60%60%0A%0AExample%20output%3A%0A%0A%60%60%60txt%0AHonzo%20File%3A%20book.hzo%0A%20%20Format%20version%3A%201%0A%20%20Chunk%20count%3A%20%20%20%206%0A%20%20Layout%20mode%3A%20%20%20%20reflowable%0A%0AMetadata%3A%0A%20%20Title%3A%20%20%20%20The%20Example%20Book%0A%20%20Creator%3A%20%20Author%20Name%0A%20%20Language%3A%20en%0A%0AChunks%3A%0A%20%20%5B0%5D%20CHAP%20%20size%3D4%2C198%20%20(lz4)%20-%20markdown%0A%20%20%5B1%5D%20IMG_%20%20size%3D24%2C576%0A%20%20%5B2%5D%20CHAP%20%20size%3D3%2C892%20%20(lz4)%20-%20markdown%0A%20%20%5B3%5D%20CSS_%20%20size%3D1%2C024%0A%20%20%5B4%5D%20CHAP%20%20size%3D5%2C103%20%20(lz4)%20-%20markdown%0A%20%20%5B5%5D%20META%20%20size%3D256%0A%60%60%60%0A%0A%7C%20Option%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------------%20%7C%20------------------------%20%7C%0A%7C%20%60--verbose%2C%20-v%60%20%7C%20Show%20detailed%20TOC%20fields%20%7C%0A%7C%20%60--json%60%20%20%20%20%20%20%20%20%7C%20Output%20as%20JSON%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20card%20%22**honzo-cli%20inspect**%22%20icon%3Asearch%0ALow-level%20dump%20of%20the%20file%20structure.%0A%0A%60%60%60bash%0Ahonzo-cli%20inspect%20%3Cfile.hzo%3E%0A%60%60%60%0A%0AShows%20HEAD%20fields%2C%20TOC%20entries%20(hex%20%2B%20decoded)%2C%20and%20section%20offsets.%0A%3A%3A%3A%0A%0A%3A%3A%3A%20card%20%22**honzo-cli%20convert**%22%20icon%3Agit-merge%0AConvert%20an%20existing%20ebook%20format%20to%20Honzo.%0A%0A%60%60%60bash%0Ahonzo-cli%20convert%20%3Cinput%3E%20%3Coutput.hzo%3E%0A%60%60%60%0A%0ASupported%20input%20formats%3A%0A%0A%7C%20Extension%20%7C%20Format%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------%20%7C%20--------------------%20%7C%0A%7C%20%60.epub%60%20%20%20%7C%20EPUB%202%2F3%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60.mobi%60%20%20%20%7C%20MOBI%20(Amazon%20Kindle)%20%7C%0A%7C%20%60.pdf%60%20%20%20%20%7C%20PDF%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%7C%20Option%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%7C%0A%7C%20-------------------%20%7C%20-----------------%20%7C%0A%7C%20%60--title%20%3Ctext%3E%60%20%20%20%20%7C%20Override%20title%20%20%20%20%7C%0A%7C%20%60--author%20%3Ctext%3E%60%20%20%20%7C%20Override%20author%20%20%20%7C%0A%7C%20%60--language%20%3Ccode%3E%60%20%7C%20Override%20language%20%7C%0A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20card%20%22**honzo-cli%20validate**%22%20icon%3Acheck-circle%0AValidate%20a%20Honzo%20file&#039;s%20structure%20and%20integrity.%0A%0A%60%60%60bash%0Ahonzo-cli%20validate%20%3Cfile.hzo%3E%0A%60%60%60%0A%0AChecks%3A%0A%0A-%20Magic%20bytes%20and%20format%20version%0A-%20Section%20offset%20consistency%0A-%20TOC%20entry%20integrity%0A-%20Chunk%20data%20reachability%0A-%20Compression%20round-trip%0A%0AReturns%20exit%20code%20%3A%3A%3A%20tag%20%220%22%20color%3A%2322c55e%20if%20valid%2C%20%3A%3A%3A%20tag%20%221%22%20color%3A%23ef4444%20otherwise.%0A%3A%3A%3A%0A%0A%23%23%20Exit%20codes%0A%0A%7C%20Code%20%7C%20Meaning%20%20%20%20%20%20%20%7C%0A%7C%20----%20%7C%20-------------%20%7C%0A%7C%20%600%60%20%20%7C%20Success%20%20%20%20%20%20%20%7C%0A%7C%20%601%60%20%20%7C%20General%20error%20%7C%0A%7C%20%602%60%20%20%7C%20Invalid%20input%20%7C%0A%7C%20%603%60%20%20%7C%20I%2FO%20error%20%20%20%20%20%7C%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22CLI%20Reference%22%0Adescription%3A%20%22Command-line%20tools%20for%20working%20with%20Honzo%20files%22%0A---%0A%0AThe%20%60honzo%60%20CLI%20provides%20commands%20for%20creating%2C%20inspecting%2C%20converting%2C%20and%20managing%20Honzo%20files.%0A%0A%23%23%20Global%20usage%0A%0A%60%60%60bash%0Ahonzo-cli%20%3Ccommand%3E%20%5Boptions%5D%0A%60%60%60%0A%0A%7C%20Flag%20%20%20%20%20%20%20%20%7C%20Description%20%20%7C%0A%7C-------------%7C--------------%7C%0A%7C%20%60--help%60%20%20%20%20%7C%20Show%20help%20%20%20%20%7C%0A%7C%20%60--version%60%20%7C%20Show%20version%20%7C%0A%0A%23%23%20Commands%0A%0A%3A%3A%3A%20card%20%22**honzo-cli%20make**%22%20icon%3Awrench%0ACreate%20a%20Honzo%20file%20from%20markdown%20source%20files.%0A%0A%60%60%60bash%0Ahonzo-cli%20make%20%3Coutput.hzo%3E%20%5C%0A%20%20--title%20%22Book%20Title%22%20%5C%0A%20%20--author%20%22Author%20Name%22%20%5C%0A%20%20--language%20%22en%22%20%5C%0A%20%20--chapters%20chapter1.md%20chapter2.md%20chapter3.md%0A%60%60%60%0A%0A%7C%20Option%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------------------%7C---------------------------------------------------------%7C%0A%7C%20%60--title%20%3Ctext%3E%60%20%20%20%20%20%20%20%20%7C%20Book%20title%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--author%20%3Ctext%3E%60%20%20%20%20%20%20%20%7C%20Book%20author%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--language%20%3Ccode%3E%60%20%20%20%20%20%7C%20Language%20(BCP%2047%2C%20default%3A%20%60en%60)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--chapters%20%3Cfiles...%3E%60%20%7C%20Markdown%20files%20(each%20becomes%20a%20chapter)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--cover%20%3Cimage%3E%60%20%20%20%20%20%20%20%7C%20Cover%20image%20file%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--layout%20%3Cmode%3E%60%20%20%20%20%20%20%20%7C%20%60reflowable%60%2C%20%60fixed%60%2C%20%60scroll%60%20(default%3A%20%60reflowable%60)%20%7C%0A%7C%20%60--compress%20%3Calgo%3E%60%20%20%20%20%20%7C%20%60none%60%2C%20%60lz4%60%20(default%3A%20%60lz4%60)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60--output%2C%20-o%20%3Cfile%3E%60%20%20%20%7C%20Output%20file%20(default%3A%20first%20positional%20arg)%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20card%20%22**honzo-cli%20info**%22%20icon%3Ainfo%0ADisplay%20metadata%20and%20structure%20of%20a%20Honzo%20file.%0A%0A%60%60%60bash%0Ahonzo-cli%20info%20%3Cfile.hzo%3E%0A%60%60%60%0A%0AExample%20output%3A%0A%0A%60%60%60txt%0AHonzo%20File%3A%20book.hzo%0A%20%20Format%20version%3A%201%0A%20%20Chunk%20count%3A%20%20%20%206%0A%20%20Layout%20mode%3A%20%20%20%20reflowable%0A%0AMetadata%3A%0A%20%20Title%3A%20%20%20%20The%20Example%20Book%0A%20%20Creator%3A%20%20Author%20Name%0A%20%20Language%3A%20en%0A%0AChunks%3A%0A%20%20%5B0%5D%20CHAP%20%20size%3D4%2C198%20%20(lz4)%20-%20markdown%0A%20%20%5B1%5D%20IMG_%20%20size%3D24%2C576%0A%20%20%5B2%5D%20CHAP%20%20size%3D3%2C892%20%20(lz4)%20-%20markdown%0A%20%20%5B3%5D%20CSS_%20%20size%3D1%2C024%0A%20%20%5B4%5D%20CHAP%20%20size%3D5%2C103%20%20(lz4)%20-%20markdown%0A%20%20%5B5%5D%20META%20%20size%3D256%0A%60%60%60%0A%0A%7C%20Option%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-----------------%7C--------------------------%7C%0A%7C%20%60--verbose%2C%20-v%60%20%7C%20Show%20detailed%20TOC%20fields%20%7C%0A%7C%20%60--json%60%20%20%20%20%20%20%20%20%7C%20Output%20as%20JSON%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20card%20%22**honzo-cli%20inspect**%22%20icon%3Asearch%0ALow-level%20dump%20of%20the%20file%20structure.%0A%0A%60%60%60bash%0Ahonzo-cli%20inspect%20%3Cfile.hzo%3E%0A%60%60%60%0A%0AShows%20HEAD%20fields%2C%20TOC%20entries%20(hex%20%2B%20decoded)%2C%20and%20section%20offsets.%0A%3A%3A%3A%0A%0A%3A%3A%3A%20card%20%22**honzo-cli%20convert**%22%20icon%3Agit-merge%0AConvert%20an%20existing%20ebook%20format%20to%20Honzo.%0A%0A%60%60%60bash%0Ahonzo-cli%20convert%20%3Cinput%3E%20%3Coutput.hzo%3E%0A%60%60%60%0A%0ASupported%20input%20formats%3A%0A%0A%7C%20Extension%20%20%20%20%20%20%20%20%20%7C%20Format%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------------%7C------------------------------------%7C%0A%7C%20%60.epub%60%20%20%20%20%20%20%20%20%20%20%20%7C%20EPUB%202%2F3%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60.mobi%60%20%20%20%20%20%20%20%20%20%20%20%7C%20MOBI%20(Amazon%20Kindle)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60.pdf%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20PDF%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60.md%60%2F%60.markdown%60%20%7C%20Markdown%20file%20or%20directory%20project%20%7C%0A%0AThe%20format%20is%20chosen%20by%20the%20input%20extension%2C%20case-insensitively.%20Markdown%20accepts%20either%20a%20single%20%60.md%60%20file%20or%20a%20directory%20containing%20a%20%60honzo.json%60%20project%20config%20plus%20one%20or%20more%20%60.md%60%20files.%0A%0A%7C%20Option%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%7C%0A%7C---------------------%7C-------------------%7C%0A%7C%20%60--title%20%3Ctext%3E%60%20%20%20%20%7C%20Override%20title%20%20%20%20%7C%0A%7C%20%60--author%20%3Ctext%3E%60%20%20%20%7C%20Override%20author%20%20%20%7C%0A%7C%20%60--language%20%3Ccode%3E%60%20%7C%20Override%20language%20%7C%0A%0A%3A%3A%3A%0A%0A%3A%3A%3A%20card%20%22**honzo-cli%20validate**%22%20icon%3Acheck-circle%0AValidate%20a%20Honzo%20file&#039;s%20structure%20and%20integrity.%0A%0A%60%60%60bash%0Ahonzo-cli%20validate%20%3Cfile.hzo%3E%0A%60%60%60%0A%0AChecks%3A%0A%0A-%20Magic%20bytes%20and%20format%20version%0A-%20Section%20offset%20consistency%0A-%20TOC%20entry%20integrity%0A-%20Chunk%20data%20reachability%0A-%20Compression%20round-trip%0A%0AReturns%20exit%20code%20%3A%3A%3A%20tag%20%220%22%20color%3A%2322c55e%20if%20valid%2C%20%3A%3A%3A%20tag%20%221%22%20color%3A%23ef4444%20otherwise.%0A%3A%3A%3A%0A%0A%23%23%20Exit%20codes%0A%0A%7C%20Code%20%7C%20Meaning%20%20%20%20%20%20%20%7C%0A%7C------%7C---------------%7C%0A%7C%20%600%60%20%20%7C%20Success%20%20%20%20%20%20%20%7C%0A%7C%20%601%60%20%20%7C%20General%20error%20%7C%0A%7C%20%602%60%20%20%7C%20Invalid%20input%20%7C%0A%7C%20%603%60%20%20%7C%20I%2FO%20error%20%20%20%20%20%7C%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1855,9 +1855,14 @@ Chunks<span class="hljs-operator">:</span>
 <td><code>.pdf</code></td>
 <td>PDF</td>
 </tr>
+<tr>
+<td><code>.md</code>/<code>.markdown</code></td>
+<td>Markdown file or directory project</td>
+</tr>
 </tbody>
 </table>
-</div><div class="table-wrapper"><table>
+</div><p>The format is chosen by the input extension, case-insensitively. Markdown accepts either a single <code>.md</code> file or a directory containing a <code>honzo.json</code> project config plus one or more <code>.md</code> files.</p>
+<div class="table-wrapper"><table>
 <thead>
 <tr>
 <th>Option</th>
@@ -2034,13 +2039,13 @@ Chunks<span class="hljs-operator">:</span>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1787810890000">
+                <span class="git-last-updated" data-timestamp="1787811627000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1787810890000"></span>
+                  <span class="git-time" data-timestamp="1787811627000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -2053,10 +2058,10 @@ Chunks<span class="hljs-operator">:</span>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Add hzo_extract_meta_from_file, markdown converter CLI, and update dependencies (#66)">Add hzo_extract_meta_from_file, markd...</div>
+                            <div class="git-commit-message" title="Some final changes">Some final changes</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1787810890000"></span>
+                              <span class="git-commit-date" data-timestamp="1787811627000"></span>
                             </div>
                           </div>
                         </li>
@@ -2149,14 +2154,14 @@ Chunks<span class="hljs-operator">:</span>
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=mtb4na5q"></script>
+      <script src="../assets/js/docmd-main.js?v=mtb52spa"></script>
       
-      <script src="../assets/js/docmd-git.js?v=mtb4na5q"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=mtb4na5q" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=mtb4na5q" ></script>
-<script src="../assets/js/docmd-search.js?v=mtb4na5q" ></script>
-<script src="../assets/js/docmd-git.js?v=mtb4na5q" ></script>
-<script src="../assets/js/docmd-ai.js?v=mtb4na5q" ></script>
+      <script src="../assets/js/docmd-git.js?v=mtb52spa"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=mtb52spa" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=mtb52spa" ></script>
+<script src="../assets/js/docmd-search.js?v=mtb52spa" ></script>
+<script src="../assets/js/docmd-git.js?v=mtb52spa" ></script>
+<script src="../assets/js/docmd-ai.js?v=mtb52spa" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
