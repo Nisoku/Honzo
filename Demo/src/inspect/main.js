@@ -4,6 +4,7 @@ import { icons, icon } from "../icons.js";
 import { bindClass, bindEvent, bindText } from "@nisoku/sairin";
 import { derived, path, signal } from "@nisoku/sairin";
 import { esc } from "../shared/esc.js";
+import { field, setStr } from "./meta.js";
 import { formatSize } from "../shared/format.js";
 import { download } from "../shared/download.js";
 
@@ -118,7 +119,7 @@ bindEvent(metaPanel, "click", (e) => {
       <div class="field" style="display:flex;gap:0.5rem;align-items:end">
         <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="" /></div>
         <div style="flex:2"><label>Value</label><input type="text" class="id-value" value="" /></div>
-        <button class="btn btn-secondary" data-remove="inspect-id" style="padding:0.4rem 0.6rem;font-size:0.8rem">${icon("X", 14)}</button>
+        <button class="btn btn-secondary" data-remove="inspect-id" aria-label="Remove identifier" style="padding:0.4rem 0.6rem;font-size:0.8rem">${icon("X", 14, 2, { "aria-hidden": "true" })}</button>
       </div>`,
       );
     }
@@ -190,7 +191,7 @@ async function loadFile(file) {
 
     tocData.set(reader.get_toc());
     metaData.set(meta);
-    originalMeta.set(JSON.parse(JSON.stringify(meta)));
+    originalMeta.set(structuredClone(meta));
     extraData.set(extra);
     chunksData.set(chunks);
 
@@ -402,23 +403,6 @@ function renderMeta() {
   metaFields.innerHTML = html;
 }
 
-function field(label, id, value, optional, type) {
-  const v = value !== null && value !== undefined ? value : "";
-  const displayVal =
-    v instanceof Map
-      ? v.values().next().value || ""
-      : typeof v === "object" && v !== null
-        ? Object.values(v)[0] || ""
-        : String(v);
-  const input =
-    type === "textarea"
-      ? `<textarea id="mf_${id}">${esc(displayVal)}</textarea>`
-      : type === "csv"
-        ? `<input type="text" id="mf_${id}" value="${esc(Array.isArray(v) ? v.join(", ") : displayVal)}" />`
-        : `<input type="${type}" id="mf_${id}" value="${esc(displayVal)}" />`;
-  return `<div class="field"><label for="mf_${id}">${label}${optional ? "" : " *"}</label>${input}</div>`;
-}
-
 function tagField(label, id, values) {
   const items = Array.isArray(values) ? values : [];
   return `<div class="field"><label>${label}</label>
@@ -444,20 +428,20 @@ function renderExtra() {
 }
 
 function collectMeta() {
-  const meta = JSON.parse(JSON.stringify(originalMeta.get()));
-  setStr(meta, "title", document.getElementById("mf_title")?.value);
-  setStr(meta, "subtitle", document.getElementById("mf_subtitle")?.value);
+  const meta = structuredClone(originalMeta.get());
+  setLocalized(meta, "title", "title");
+  setLocalized(meta, "subtitle", "subtitle");
   const authors = document.getElementById("mf_authors")?.value || "";
   meta.authors = authors
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
   meta.language = document.getElementById("mf_language")?.value || "en";
-  setStr(meta, "publisher", document.getElementById("mf_publisher")?.value);
-  setStr(meta, "description", document.getElementById("mf_description")?.value);
-  setStr(meta, "source_url", document.getElementById("mf_source_url")?.value);
-  setStr(meta, "license", document.getElementById("mf_license")?.value);
-  setStr(meta, "edition", document.getElementById("mf_edition")?.value);
+  setLocalized(meta, "publisher", "publisher");
+  setLocalized(meta, "description", "description");
+  setLocalized(meta, "source_url", "source_url");
+  setLocalized(meta, "license", "license");
+  setLocalized(meta, "edition", "edition");
   setNum(meta, "word_count", document.getElementById("mf_word_count")?.value);
   setNum(
     meta,
@@ -490,26 +474,6 @@ function collectMeta() {
   return meta;
 }
 
-function setStr(obj, field, val) {
-  if (!val || !val.trim()) {
-    delete obj[field];
-    return;
-  }
-  const v = val.trim();
-  if (
-    obj[field] &&
-    typeof obj[field] === "object" &&
-    !Array.isArray(obj[field])
-  ) {
-    obj[field] = { ...obj[field] };
-    const keys = Object.keys(obj[field]);
-    if (keys.length > 0) obj[field][keys[0]] = v;
-    else obj[field] = { en: v };
-  } else {
-    obj[field] = v;
-  }
-}
-
 function setNum(obj, field, val) {
   const n = parseInt(val, 10);
   if (isNaN(n)) {
@@ -517,6 +481,43 @@ function setNum(obj, field, val) {
     return;
   }
   obj[field] = n;
+}
+
+// Persist an edited localized field back into `meta`, preserving every locale.
+// The primary locale is read from `mf_<id>` and any secondary locales from
+// `mf_<id>__<locale>`; non-localized values fall back to `setStr`.
+function setLocalized(meta, fieldName, id) {
+  const primary = document.getElementById(`mf_${id}`)?.value?.trim();
+  const original = originalMeta.get()?.[fieldName];
+  const isLocalized =
+    original instanceof Map ||
+    (original && typeof original === "object" && !Array.isArray(original));
+  if (!isLocalized) {
+    setStr(meta, fieldName, primary);
+    return;
+  }
+  const locales =
+    original instanceof Map ? [...original.keys()] : Object.keys(original);
+  const others = {};
+  for (const loc of locales.slice(1)) {
+    const v = document.getElementById(`mf_${id}__${loc}`)?.value?.trim();
+    if (v) others[loc] = v;
+  }
+  if (!primary && Object.keys(others).length === 0) {
+    delete meta[fieldName];
+    return;
+  }
+  if (original instanceof Map) {
+    const m = new Map();
+    if (primary) m.set(locales[0], primary);
+    for (const [k, val] of Object.entries(others)) m.set(k, val);
+    meta[fieldName] = m;
+  } else {
+    const o = {};
+    if (primary) o[locales[0]] = primary;
+    Object.assign(o, others);
+    meta[fieldName] = o;
+  }
 }
 
 function collectTags(id) {

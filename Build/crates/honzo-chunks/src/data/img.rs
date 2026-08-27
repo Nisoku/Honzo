@@ -146,7 +146,7 @@ fn resolve_alt_key(
             return direct;
         }
         if let Some(base) = base_href {
-            let relative = resolve_href_against(base, trimmed);
+            let relative = resolve_href_against(base, path_only);
             if valid_paths.contains(&relative) {
                 return relative;
             }

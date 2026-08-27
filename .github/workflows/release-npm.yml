@@ -17,6 +17,7 @@ on:
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
+    environment: release
     permissions:
       id-token: write
       contents: read
@@ -45,9 +46,7 @@ jobs:
         working-directory: Build/adapters/typescript
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" == "true" ]; then
-            npm publish --access public --dry-run
+            npm publish --access public --provenance --dry-run
           else
-            npm publish --access public
+            npm publish --access public --provenance
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}

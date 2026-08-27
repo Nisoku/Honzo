@@ -125,6 +125,15 @@ fn safe_project_path(project_dir: &Path, rel: &str) -> Option<PathBuf> {
             | std::path::Component::Prefix(_) => return None,
         }
     }
+
+    // Reject any existing candidate that escapes the project root via symlinks.
+    let canonical_root = project_dir.canonicalize().ok()?;
+    if out.exists() {
+        let canonical = out.canonicalize().ok()?;
+        if !canonical.starts_with(&canonical_root) {
+            return None;
+        }
+    }
     Some(out)
 }
 
