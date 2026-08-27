@@ -8,8 +8,8 @@ let _honzo = null;
 
 export async function initHonzo() {
   if (_honzo) return _honzo;
-  const wasmBytes = readFileSync(resolve(__dirname, 'wasm/honzo_wasm_bg.wasm'));
-  _honzo = await import('./wasm/honzo_wasm.js');
+  const wasmBytes = readFileSync(resolve(__dirname, '../wasm/honzo_wasm_bg.wasm'));
+  _honzo = await import('../wasm/honzo_wasm.js');
   _honzo.initSync({ module: wasmBytes });
   return _honzo;
 }
