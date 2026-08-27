@@ -23,7 +23,7 @@ for (uint32_t i = 0; i < n; i++) {
 ```
 
 | Return                          | Meaning |
-|---------------------------------|---------|
+| ------------------------------- | ------- |
 | ::: tag "0" color:#22c55e       | Success |
 | ::: tag "nonzero" color:#ef4444 | Error   |
 
@@ -47,7 +47,7 @@ Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk
 Include: `#include <cpp/HonzoFileReader.hpp>`
 
 | Method                                     | Signature                                                                   | Returns                                                              | Notes               |
-|--------------------------------------------|-----------------------------------------------------------------------------|----------------------------------------------------------------------|---------------------|
+| ------------------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------- |
 | `open`                                     | `static (std::string_view path, uint16_t reader_version)`                   | `diplomat::result<std::unique_ptr<HonzoFileReader>, HonzoErrorCode>` | Static factory.     |
 | `open_with_private_key`                    | `static (std::string_view path, uint16_t version, span<const uint8_t> key)` | `diplomat::result<std::unique_ptr<HonzoFileReader>, HonzoErrorCode>` | Open with DRM key.  |
 | `~HonzoFileReader` (via `operator delete`) |                                                                             |                                                                      | Closes the file FD. |
@@ -55,7 +55,7 @@ Include: `#include <cpp/HonzoFileReader.hpp>`
 ### HonzoFileReader accessors
 
 | Method                         | Signature                | Returns                                         | Notes                                                                                       |
-|--------------------------------|--------------------------|-------------------------------------------------|---------------------------------------------------------------------------------------------|
+| ------------------------------ | ------------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `chunk_count`                  | `() const`               | `uint32_t`                                      | Number of chunks.                                                                           |
 | `get_chunk_type`               | `(uint32_t index) const` | `uint32_t`                                      | 4-byte tag as native-endian u32 (e.g. `0x50414843` for `"CHAP"`). 0 if OOB.                 |
 | `get_chunk_content_type_kind`  | `(uint32_t index) const` | `uint8_t`                                       | 1 = markup, 2 = math. 0 if OOB.                                                             |
@@ -75,7 +75,7 @@ Parse a Honzo file from a byte buffer in memory. Returns `nullptr` (via `std::un
 Include: `#include <cpp/HonzoHandle.hpp>`
 
 | Method                   | Signature                                                                      | Returns                        | Notes                       |
-|--------------------------|--------------------------------------------------------------------------------|--------------------------------|-----------------------------|
+| ------------------------ | ------------------------------------------------------------------------------ | ------------------------------ | --------------------------- |
 | `parse`                  | `static (span<const uint8_t> data, uint16_t reader_version)`                   | `std::unique_ptr<HonzoHandle>` | Returns `nullptr` on error. |
 | `parse_with_private_key` | `static (span<const uint8_t> data, uint16_t version, span<const uint8_t> key)` | `std::unique_ptr<HonzoHandle>` | Parse with DRM key.         |
 | `~HonzoHandle`           |                                                                                |                                | Frees the handle.           |
@@ -83,7 +83,7 @@ Include: `#include <cpp/HonzoHandle.hpp>`
 ### HonzoHandle accessors
 
 | Method               | Signature          | Returns                                         | Notes                            |
-|----------------------|--------------------|-------------------------------------------------|----------------------------------|
+| -------------------- | ------------------ | ----------------------------------------------- | -------------------------------- |
 | `chunk_count`        | `() const`         | `uint32_t`                                      | Number of chunks.                |
 | `version_major`      | `() const`         | `uint8_t`                                       | File format major version.       |
 | `version_minor`      | `() const`         | `uint8_t`                                       | File format minor version.       |
@@ -120,7 +120,7 @@ Construct Honzo files programmatically. Add chunks, set metadata, configure DRM,
 Include: `#include <cpp/HonzoBuilderHandle.hpp>`
 
 | Method                | Signature   | Returns                               | Notes                    |
-|-----------------------|-------------|---------------------------------------|--------------------------|
+| --------------------- | ----------- | ------------------------------------- | ------------------------ |
 | `new_`                | `static ()` | `std::unique_ptr<HonzoBuilderHandle>` | Create empty builder.    |
 | `finalize`            | `()`        | `bool`                                | Finalize the file.       |
 | `get_result`          | `() const`  | `diplomat::span<const uint8_t>`       | Finalized Honzo bytes.   |
@@ -129,7 +129,7 @@ Include: `#include <cpp/HonzoBuilderHandle.hpp>`
 ### HonzoBuilderHandle setters
 
 | Method                   | Signature                                                                                                                 | Returns | Notes                                     |
-|--------------------------|---------------------------------------------------------------------------------------------------------------------------|---------|-------------------------------------------|
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------- |
 | `add_chunk`              | `(tag, data, compression, content_type_kind, content_type_value, cover_type, alt_text, font_embedding, font_license_url)` | `bool`  | Add a data chunk.                         |
 | `set_language`           | `(std::string_view lang)`                                                                                                 | `bool`  | Set book language (ISO 639-1).            |
 | `set_auto_sidx`          | `(bool enable)`                                                                                                           | `bool`  | Auto-generate SIDX on finalize.           |
@@ -178,7 +178,7 @@ Owned (non-opaque) C++ struct, safe to copy.
 Include: `#include <cpp/HonzoErrorCode.hpp>`
 
 | Value                                     | Meaning                   |
-|-------------------------------------------|---------------------------|
+| ----------------------------------------- | ------------------------- |
 | `HonzoErrorCode::Ok = 0`                  | Success                   |
 | `HonzoErrorCode::InvalidMagic = 1`        | Not a Honzo file          |
 | `HonzoErrorCode::ReaderVersionTooOld = 2` | Reader version too low    |
@@ -199,7 +199,7 @@ Include: `#include <cpp/HonzoErrorCode.hpp>`
 Include: `#include <cpp/free_functions.hpp>`
 
 | Function                | Signature                                        | Returns                                         | Notes                               |
-|-------------------------|--------------------------------------------------|-------------------------------------------------|-------------------------------------|
+| ----------------------- | ------------------------------------------------ | ----------------------------------------------- | ----------------------------------- |
 | `guess_image_mime`      | `(span<const uint8_t> bytes)`                    | `diplomat::result<std::string, HonzoErrorCode>` | Detect image format from raw bytes. |
 | `guess_font_format`     | `(span<const uint8_t> bytes)`                    | `diplomat::result<std::string, HonzoErrorCode>` | Detect font format.                 |
 | `latex_to_mathml`       | `(span<const uint8_t> bytes)`                    | `diplomat::result<std::string, HonzoErrorCode>` | Convert LaTeX to MathML.            |

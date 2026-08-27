@@ -12,7 +12,7 @@ Each TOC entry carries a 4-byte ASCII type tag. This page documents every tag an
 The book's chapter content. The data is either Markdown or HTML text. The `markup_type` field in the TOC entry determines which format.
 
 | TOC field     | Description                                                        |
-|---------------|--------------------------------------------------------------------|
+| ------------- | ------------------------------------------------------------------ |
 | `markup_type` | ::: tag "0" color:#22c55e Markdown, ::: tag "1" color:#3b82f6 HTML |
 | `compression` | Typically ::: tag "1" color:#22c55e (LZ4) for text chapters        |
 | `language`    | BCP 47 index for chapter language                                  |
@@ -32,7 +32,7 @@ The trailing underscore distinguishes this tag from IMG-related variant tags.
 An inline image referenced from chapter content.
 
 | TOC field      | Description                                                 |
-|----------------|-------------------------------------------------------------|
+| -------------- | ----------------------------------------------------------- |
 | `compression`  | Typically ::: tag "0" (none) for already compressed formats |
 | `content_type` | Image format hint for JPEG, PNG, or WebP                    |
 
@@ -49,7 +49,7 @@ The content type is validated by magic bytes on read. Supported formats include 
 A CSS stylesheet for rendering chapter content.
 
 | TOC field     | Description                          |
-|---------------|--------------------------------------|
+| ------------- | ------------------------------------ |
 | `compression` | Typically ::: tag "1" (LZ4) for text |
 
 ```text
@@ -65,7 +65,7 @@ The CSS is parsed and validated with `cssparser` on write.
 An embedded font file.
 
 | TOC field              | Description                           |
-|------------------------|---------------------------------------|
+| ---------------------- | ------------------------------------- |
 | `font_embedding`       | Embedding mode such as subset or full |
 | `font_license_url_len` | Length of embedded license URL        |
 | `compression`          | Typically ::: tag "0" (none)          |
@@ -77,7 +77,7 @@ Font data: raw font bytes in WOFF2, TTF, or OTF format
 The font format is detected by magic bytes:
 
 | Magic bytes                  | Format                |
-|------------------------------|-----------------------|
+| ---------------------------- | --------------------- |
 | `wOF2` or `\x00\x01\x00\x00` | WOFF2                 |
 | `OTTO`                       | OTF with CFF outlines |
 | `\x00\x01\x00\x00`           | TTF                   |
@@ -92,7 +92,7 @@ The font license URL is a UTF-8 string stored as a variable-length field followi
 The full-size book cover image.
 
 | TOC field     | Description                                                                 |
-|---------------|-----------------------------------------------------------------------------|
+| ------------- | --------------------------------------------------------------------------- |
 | `cover_type`  | ::: tag "1" color:#22c55e front cover, ::: tag "2" color:#3b82f6 back cover |
 | `compression` | Typically ::: tag "0" (none)                                                |
 
@@ -107,7 +107,7 @@ Cover data: raw image bytes in JPEG, PNG, or WebP format
 An optional downsized version of COVR for quick previews in listing views or ebook reader shelves.
 
 | TOC field     | Description                                                                 |
-|---------------|-----------------------------------------------------------------------------|
+| ------------- | --------------------------------------------------------------------------- |
 | `cover_type`  | ::: tag "1" color:#22c55e front cover, ::: tag "2" color:#3b82f6 back cover |
 | `compression` | Typically ::: tag "0" (none)                                                |
 
@@ -163,7 +163,7 @@ See the [Search Index feature](../features/search) for usage details.
 A math equation embedded in the book.
 
 | TOC field      | Description                                           |
-|----------------|-------------------------------------------------------|
+| -------------- | ----------------------------------------------------- |
 | `content_type` | Math format: ::: tag "0" LaTeX, ::: tag "1" AsciiMath |
 
 ```text

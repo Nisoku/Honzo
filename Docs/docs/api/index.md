@@ -41,7 +41,7 @@ FFI friendly single header binding for read only access.
 ## Surface comparison
 
 | Feature          | Rust                        | C++                         | WASM/TS                     | C                           |
-|------------------|-----------------------------|-----------------------------|-----------------------------|-----------------------------|
+| ---------------- | --------------------------- | --------------------------- | --------------------------- | --------------------------- |
 | Parse & inspect  | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e |
 | Builder          | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  |
 | Streaming reader | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  | ::: tag "Yes" color:#22c55e |
@@ -55,7 +55,7 @@ FFI friendly single header binding for read only access.
 All APIs are built on the same Rust workspace:
 
 | Crate           | Description                          | Depends On                                                |
-|-----------------|--------------------------------------|-----------------------------------------------------------|
+| --------------- | ------------------------------------ | --------------------------------------------------------- |
 | `honzo-core`    | no_std wire-format types + parser    | None                                                      |
 | `honzo-chunks`  | Chunk semantics (SIDX, COVT, extras) | `honzo-core`                                              |
 | `honzo-io`      | Builder, reader, stream, compression | `honzo-core`, `honzo-chunks`                              |

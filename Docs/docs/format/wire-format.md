@@ -7,19 +7,19 @@ description: "The binary layout of HEAD, TOC, DATA, EXTRA, and META"
 
 The first 4 bytes of HEAD are always the ASCII bytes `HONO` (`0x484F4F4E`). Any file that does not start with these bytes is not a Honzo file.
 
-Offset | Size | Field              | Description
--------|------|--------------------|------------------------------------------------------------
-0      | 4    | magic              | `"HONO"` magic bytes
-4      | 4    | format_version     | Format version, currently `1`
-8      | 2    | chunk_count        | Number of TOC entries
-10     | 1    | layout_mode        | `0` for reflowable, `1` for fixed, `2` for scroll
-11     | 1    | flags              | Bit flags where bit 0 indicates has_extra
-12     | 8    | data_offset        | Byte offset from file start to DATA section
-20     | 8    | extra_offset       | Byte offset from file start to EXTRA section. Zero if none.
-28     | 8    | meta_offset        | Byte offset from file start to META section
-36     | 4    | meta_size          | Size of META section in bytes
-40     | 4    | chunk_table_offset | Byte offset of TOC within the file, relative to DATA start
-44     | 4    | reserved           | Reserved for future use, zero padded
+| Offset | Size | Field              | Description                                                 |
+|--------|------|--------------------|-------------------------------------------------------------|
+| 0      | 4    | magic              | `"HONO"` magic bytes                                        |
+| 4      | 4    | format_version     | Format version, currently `1`                               |
+| 8      | 2    | chunk_count        | Number of TOC entries                                       |
+| 10     | 1    | layout_mode        | `0` for reflowable, `1` for fixed, `2` for scroll           |
+| 11     | 1    | flags              | Bit flags where bit 0 indicates has_extra                   |
+| 12     | 8    | data_offset        | Byte offset from file start to DATA section                 |
+| 20     | 8    | extra_offset       | Byte offset from file start to EXTRA section. Zero if none. |
+| 28     | 8    | meta_offset        | Byte offset from file start to META section                 |
+| 36     | 4    | meta_size          | Size of META section in bytes                               |
+| 40     | 4    | chunk_table_offset | Byte offset of TOC within the file, relative to DATA start  |
+| 44     | 4    | reserved           | Reserved for future use, zero padded                        |
 
 All offsets are absolute from the start of the file.
 
@@ -27,23 +27,27 @@ All offsets are absolute from the start of the file.
 
 Each TOC entry is exactly 32 bytes:
 
-Offset | Size | Field                | Description
--------|------|----------------------|-----------------------------------------------------------------------------------
-0      | 1    | chunk_id[0]          | First byte of the 4-byte chunk type tag
-1      | 1    | chunk_id[1]          | Second byte
-2      | 1    | chunk_id[2]          | Third byte
-3      | 1    | chunk_id[3]          | Fourth byte, for example `CHAP` or `IMG_`
-4      | 1    | content_type         | Content type kind
-5      | 1    | compression          | `0` for none, `1` for lz4
-6      | 1    | markup_type          | `0` for markdown, `1` for html, applies to CHAP chunks
-7      | 1    | cover_type           | `0` for none, `1` for front, `2` for back, applies to COVR or COVT
-8      | 2    | language             | BCP 47 language tag index
-10     | 2    | font_embedding       | Font embedding mode, applies to FONT chunks
-12     | 2    | font_license_url_len | Length of font license URL, zero if none
-14     | 2    | reserved             | Reserved, zero padded
-16     | 8    | offset               | Byte offset within DATA section
-24     | 4    | size                 | Size of chunk data in bytes. Represents compressed size if compression is nonzero.
-28     | 4    | orig_size            | Original uncompressed size. Zero if same as size.
+| Offset | Size | Field | Description |
+|--------|------|-------|-------------|
+<!-- eslint-disable-next-line markdown/no-missing-label-refs -->
+| 0      | 1    | chunk_id[0]          | First byte of the 4-byte chunk type tag                                            |
+<!-- eslint-disable-next-line markdown/no-missing-label-refs -->
+| 1      | 1    | chunk_id[1]          | Second byte                                                                        |
+<!-- eslint-disable-next-line markdown/no-missing-label-refs -->
+| 2      | 1    | chunk_id[2]          | Third byte                                                                         |
+<!-- eslint-disable-next-line markdown/no-missing-label-refs -->
+| 3      | 1    | chunk_id[3]          | Fourth byte, for example `CHAP` or `IMG_`                                          |
+| 4      | 1    | content_type         | Content type kind                                                                  |
+| 5      | 1    | compression          | `0` for none, `1` for lz4                                                          |
+| 6      | 1    | markup_type          | `0` for markdown, `1` for html, applies to CHAP chunks                             |
+| 7      | 1    | cover_type           | `0` for none, `1` for front, `2` for back, applies to COVR or COVT                 |
+| 8      | 2    | language             | BCP 47 language tag index                                                          |
+| 10     | 2    | font_embedding       | Font embedding mode, applies to FONT chunks                                        |
+| 12     | 2    | font_license_url_len | Length of font license URL, zero if none                                           |
+| 14     | 2    | reserved             | Reserved, zero padded                                                              |
+| 16     | 8    | offset               | Byte offset within DATA section                                                    |
+| 24     | 4    | size                 | Size of chunk data in bytes. Represents compressed size if compression is nonzero. |
+| 28     | 4    | orig_size            | Original uncompressed size. Zero if same as size.                                  |
 
 ### Offset and Size Rules
 
@@ -84,6 +88,7 @@ After the entry array, each entry's data resides at `extra_offset + entry.offset
 ### Standard Namespaces
 
 <!-- markdownlint-disable MD055 -->
+
 | Namespace         | Purpose                                       |
 |-------------------|-----------------------------------------------|
 | `org.nisoku.anno` | Annotations stored as MessagePack             |

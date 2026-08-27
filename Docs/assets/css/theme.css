@@ -83,18 +83,30 @@
 }
 
 .sidebar .nav-item.active {
-  background: linear-gradient(135deg, var(--ruby-primary) 0%, var(--ruby-accent) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--ruby-primary) 0%,
+    var(--ruby-accent) 100%
+  ) !important;
   color: white !important;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--ruby-primary) 0%, var(--ruby-accent) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--ruby-primary) 0%,
+    var(--ruby-accent) 100%
+  ) !important;
   border-color: var(--ruby-primary) !important;
   color: white !important;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--ruby-primary-dark) 0%, var(--ruby-primary) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--ruby-primary-dark) 0%,
+    var(--ruby-primary) 100%
+  ) !important;
 }
 
 a {
@@ -157,14 +169,22 @@ th {
   border-radius: 0.5rem;
   font-weight: 600;
   text-decoration: none;
-  background: linear-gradient(135deg, var(--ruby-primary) 0%, var(--ruby-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--ruby-primary) 0%,
+    var(--ruby-accent) 100%
+  );
   border: 1px solid var(--ruby-primary);
   color: white !important;
   transition: background 0.2s ease;
 }
 
 .docmd-button:hover {
-  background: linear-gradient(135deg, var(--ruby-primary-dark) 0%, var(--ruby-primary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--ruby-primary-dark) 0%,
+    var(--ruby-primary) 100%
+  );
   color: white !important;
 }
 

@@ -12,7 +12,7 @@ honzo-cli <command> [options]
 ```
 
 | Flag        | Description  |
-|-------------|--------------|
+| ----------- | ------------ |
 | `--help`    | Show help    |
 | `--version` | Show version |
 
@@ -30,7 +30,7 @@ honzo-cli make <output.hzo> \
 ```
 
 | Option                  | Description                                             |
-|-------------------------|---------------------------------------------------------|
+| ----------------------- | ------------------------------------------------------- |
 | `--title <text>`        | Book title                                              |
 | `--author <text>`       | Book author                                             |
 | `--language <code>`     | Language (BCP 47, default: `en`)                        |
@@ -72,7 +72,7 @@ Chunks:
 ```
 
 | Option          | Description              |
-|-----------------|--------------------------|
+| --------------- | ------------------------ |
 | `--verbose, -v` | Show detailed TOC fields |
 | `--json`        | Output as JSON           |
 
@@ -98,13 +98,13 @@ honzo-cli convert <input> <output.hzo>
 Supported input formats:
 
 | Extension | Format               |
-|-----------|----------------------|
+| --------- | -------------------- |
 | `.epub`   | EPUB 2/3             |
 | `.mobi`   | MOBI (Amazon Kindle) |
 | `.pdf`    | PDF                  |
 
 | Option              | Description       |
-|---------------------|-------------------|
+| ------------------- | ----------------- |
 | `--title <text>`    | Override title    |
 | `--author <text>`   | Override author   |
 | `--language <code>` | Override language |
@@ -132,7 +132,7 @@ Returns exit code ::: tag "0" color:#22c55e if valid, ::: tag "1" color:#ef4444 
 ## Exit codes
 
 | Code | Meaning       |
-|------|---------------|
+| ---- | ------------- |
 | `0`  | Success       |
 | `1`  | General error |
 | `2`  | Invalid input |

@@ -59,7 +59,7 @@ honzo-cli make book.hzo --chapters ch1.md ch2.md \
 ## Searching
 
 ```typescript
-import { createReader } from '@nisoku/honzo';
+import { createReader } from "@nisoku/honzo";
 
 const reader = await createReader(buf);
 const sidx = reader.getSearchIndex();
@@ -71,7 +71,7 @@ for (const hit of results) {
   const text = new TextDecoder().decode(chunk);
   const context = text.substring(
     Math.max(0, hit.position - 40),
-    hit.position + 40
+    hit.position + 40,
   );
   console.log(`Chapter ${hit.chunk}: ...${context}...`);
 }

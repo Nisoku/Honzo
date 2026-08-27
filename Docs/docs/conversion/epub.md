@@ -26,7 +26,7 @@ EPUB conversion is the most complete conversion path in Honzo. It handles EPUB 2
 ## Metadata mapping
 
 | EPUB field                        | Honzo META field                           |
-|-----------------------------------|--------------------------------------------|
+| --------------------------------- | ------------------------------------------ |
 | `dc:title`                        | `title` (multi-language if multiple)       |
 | `dc:creator`                      | `creator`                                  |
 | `dc:language`                     | `language`                                 |

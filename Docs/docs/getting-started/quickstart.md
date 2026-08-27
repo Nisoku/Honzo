@@ -129,20 +129,20 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "TypeScript"
 
    ```typescript
-   import { createReader } from '@nisoku/honzo';
+   import { createReader } from "@nisoku/honzo";
 
-   const response = await fetch('my_book.hzo');
+   const response = await fetch("my_book.hzo");
    const buf = new Uint8Array(await response.arrayBuffer());
    const reader = await createReader(buf);
 
    const meta = reader.getMeta();
-   console.log('Title:', meta.title?.en);
-   console.log('Chapters:', reader.chunkCount);
+   console.log("Title:", meta.title?.en);
+   console.log("Chapters:", reader.chunkCount);
 
    for (let i = 0; i < reader.chunkCount; i++) {
      const chunk = reader.readChunk(i);
      const text = new TextDecoder().decode(chunk);
-     console.log('Chapter:', text.substring(0, 100));
+     console.log("Chapter:", text.substring(0, 100));
    }
    ```
 
