@@ -1,6 +1,6 @@
 {
   "name": "@nisoku/honzo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Honzo ebook format reader and writer",
   "type": "module",
   "scripts": {
