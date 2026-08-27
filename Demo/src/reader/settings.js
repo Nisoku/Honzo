@@ -206,6 +206,9 @@ export function renderSettings(container) {
   container.querySelectorAll(".settings-options").forEach((group) => {
     group.addEventListener("click", (e) => {
       const btn = e.target.closest(".setting-option");
+      const gg = document.getElementById("gaplessGroup");
+      const zg = document.getElementById("zoomGroup");
+
       if (!btn || btn.disabled) return;
       const setting = group.dataset.setting;
       const value = btn.dataset.value;
@@ -227,9 +230,7 @@ export function renderSettings(container) {
           break;
         case "layoutMode":
           layoutMode.set(value);
-          const gg = document.getElementById("gaplessGroup");
           if (gg) gg.style.display = value === "manga" ? "block" : "none";
-          const zg = document.getElementById("zoomGroup");
           if (zg) zg.style.display = value === "manga" ? "block" : "none";
           break;
         case "textAlign":

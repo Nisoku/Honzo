@@ -4,11 +4,8 @@ import { icons } from "../icons.js";
 import {
   chunks,
   setChunks,
-  layoutMode,
   setLayoutMode,
-  defaultCompression,
   setDefaultCompression,
-  direction,
   setDirection,
   chunksList,
   pmapBody,
@@ -72,7 +69,9 @@ function initMaker() {
       showStatus("success", "Restored auto-saved project");
       restored = true;
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error("Error restoring auto-saved project:", e);
+  }
 
   if (!restored) {
     setChunks([createChunk("CHAP", "Chapter 1")]);

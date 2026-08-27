@@ -65,7 +65,9 @@ function loadSetting(key, defaultVal) {
 function saveSetting(key, val) {
   try {
     localStorage.setItem("honzo_" + key, JSON.stringify(val));
-  } catch {}
+  } catch {
+    console.error("Failed to save setting", key);
+  }
 }
 
 export const theme = signal(
@@ -121,7 +123,9 @@ function loadProgress(bookId) {
 function saveProgress(bookId, data) {
   try {
     localStorage.setItem("honzo_progress_" + bookId, JSON.stringify(data));
-  } catch {}
+  } catch {
+    console.error("Failed to save progress for book", bookId);
+  }
 }
 
 export function getProgress(bookId) {
@@ -139,7 +143,9 @@ export function setProgress(bookId, chapterIndex, chunkId) {
 export function clearProgress(bookId) {
   try {
     localStorage.removeItem("honzo_progress_" + bookId);
-  } catch {}
+  } catch {
+    console.error("Failed to clear progress for book", bookId);
+  }
 }
 
 function loadBookmarks(bookId) {
@@ -153,7 +159,9 @@ function loadBookmarks(bookId) {
 function saveBookmarks(bookId, marks) {
   try {
     localStorage.setItem("honzo_bookmarks_" + bookId, JSON.stringify(marks));
-  } catch {}
+  } catch {
+    console.error("Failed to save bookmarks for book", bookId);
+  }
 }
 
 export function getBookmarks(bookId) {

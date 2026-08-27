@@ -84,6 +84,7 @@ export function updateChunkField(id, field, value) {
 export function renderChunks() {
   chunksList.innerHTML = chunks
     .map((ch, i) => {
+      // eslint-disable-next-line no-unused-vars
       const t = CHUNK_TYPES[ch.type] || { label: ch.type };
       return `<div class="chunk-card" draggable="true" data-idx="${esc(i)}" data-id="${esc(ch.id)}">
         <div class="chunk-header">
@@ -139,6 +140,7 @@ export function renderChunks() {
   markDirty();
 }
 
+// eslint-disable-next-line no-unused-vars
 function renderChunkBody(ch, i) {
   const t = CHUNK_TYPES[ch.type];
   if (!t) return "";

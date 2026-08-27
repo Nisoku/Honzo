@@ -47,6 +47,7 @@ function collectChunks() {
       : ch.compression || 0;
     const contentType = typeSelect?.value || ch.contentType || "markdown";
 
+    // eslint-disable-next-line no-useless-assignment
     let data = null;
     let tag = ch.type;
     let content_type_kind = 1;

@@ -139,7 +139,9 @@ fn split_chapters(body: &str) -> Vec<(Option<String>, String)> {
         return Vec::new();
     }
 
-    let has_h1 = Regex::new(r"(?m)^#(\s|$)").unwrap().is_match(body);
+    let has_h1 = Regex::new(r"(?m)^#(\s|$)")
+        .expect("invalid heading regex")
+        .is_match(body);
     if has_h1 {
         split_by_headings(body)
     } else {
@@ -148,14 +150,14 @@ fn split_chapters(body: &str) -> Vec<(Option<String>, String)> {
 }
 
 fn split_by_headings(body: &str) -> Vec<(Option<String>, String)> {
-    let re = Regex::new(r"(?m)^#\s+(.+)$").unwrap();
+    let re = Regex::new(r"(?m)^#\s+(.+)$").expect("invalid heading regex");
     let mut chapters = Vec::new();
     let mut last_title: Option<String> = None;
     let mut last_start = 0usize;
     let mut seen_first = false;
 
     for cap in re.captures_iter(body) {
-        let m = cap.get(0).unwrap();
+        let m = cap.get(0).expect("capture group 0 missing");
         if seen_first {
             let section = body[last_start..m.start()].trim().to_string();
             if !section.is_empty() {
@@ -178,7 +180,7 @@ fn split_by_headings(body: &str) -> Vec<(Option<String>, String)> {
 }
 
 fn split_by_rules(body: &str) -> Vec<(Option<String>, String)> {
-    let re = Regex::new(r"(?m)^-{3,}\s*$").unwrap();
+    let re = Regex::new(r"(?m)^-{3,}\s*$").expect("invalid rule regex");
     let mut chapters = Vec::new();
     let mut last_end = 0usize;
 
@@ -199,7 +201,7 @@ fn split_by_rules(body: &str) -> Vec<(Option<String>, String)> {
 }
 
 fn extract_image_refs(md: &str) -> Vec<String> {
-    let re = Regex::new(r"!\[([^\]]*)\]\(([^)]+)\)").unwrap();
+    let re = Regex::new(r"!\[([^\]]*)\]\(([^)]+)\)").expect("invalid image regex");
     re.captures_iter(md).map(|c| c[2].to_string()).collect()
 }
 
@@ -349,14 +351,14 @@ fn build_honzo(
         reading_time_mins: Some(compute_reading_time(word_count)),
         ..Default::default()
     };
-    let meta_bytes = rmp_serde::to_vec(&meta).unwrap();
+    let meta_bytes = rmp_serde::to_vec(&meta).map_err(|e| ConvertError::IoError(e.to_string()))?;
     builder = builder.set_meta(&meta_bytes);
 
     builder.finalize().map_err(ConvertError::HonzoError)
 }
 
 fn rewrite_md_image_refs(md: &str, img_map: &HashMap<String, u32>) -> String {
-    let re = Regex::new(r"!\[([^\]]*)\]\(([^)]+)\)").unwrap();
+    let re = Regex::new(r"!\[([^\]]*)\]\(([^)]+)\)").expect("invalid image regex");
     re.replace_all(md, |caps: &regex::Captures| {
         let alt = &caps[1];
         let path = &caps[2];

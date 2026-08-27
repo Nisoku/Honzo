@@ -31,7 +31,8 @@ function parseMathML(s) {
   return div ? document.importNode(div.firstChild, true) : null;
 }
 
-function fallback(block, raw, _err) {
+// eslint-disable-next-line no-unused-vars
+function fallback(block, raw, err) {
   const pre = document.createElement("pre");
   pre.className = "math-latex";
   pre.textContent = raw;

@@ -25,7 +25,6 @@ import {
   getProgress,
   getCurrentBookId,
   getBookmarks,
-  addBookmark,
   removeBookmark,
   toggleSidebar,
 } from "./state.js";
@@ -271,6 +270,7 @@ export async function openBookFromEntry(entry) {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
 async function loadBook(data, fileName) {
   await ensureWasmReady();
   if (!elements.viewer || !elements.tocContent) {
@@ -538,8 +538,6 @@ function updateMangaPageInfo() {
 function getMangaCurrentPage() {
   if (!elements.viewer || !mangaPages.length) return 0;
   const pages = elements.viewer.querySelectorAll(".manga-page");
-  const viewCenter =
-    elements.viewer.scrollTop + elements.viewer.clientHeight / 2;
   let closest = 0;
   let closestDist = Infinity;
   pages.forEach((p, i) => {
@@ -983,8 +981,8 @@ export function nextPage() {
 export function addBookmarkCurrent() {
   const bookId = getCurrentBookId();
   if (!bookId || !hasBookLoaded()) return;
+  // eslint-disable-next-line no-unused-vars
   const ch = chapters[currentChapterIndex];
-  const marks = addBookmark(bookId, currentChapterIndex, ch.chunk_id, "");
   if (elements.bookmarksContent) {
     renderBookmarks(elements.bookmarksContent, bookId, chapters);
   }

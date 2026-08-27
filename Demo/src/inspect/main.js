@@ -231,6 +231,7 @@ function renderFileInfo() {
 
   const layout = reader.layout_mode_name();
   const comp = reader.compression_name();
+  // eslint-disable-next-line no-unused-vars
   const badge = (on, label) =>
     `<span class="flag-badge ${on ? "on" : "off"}">${on ? "Yes" : "No"}</span>`;
 
@@ -365,6 +366,7 @@ function renderMeta() {
   const ids = meta.identifiers || [];
   html += ids
     .map(
+      // eslint-disable-next-line no-unused-vars
       (id, i) => `
     <div class="field" style="display:flex;gap:0.5rem;align-items:end">
       <div style="flex:1"><label>Type</label><input type="text" class="id-type" value="${esc(id.id_type || "")}" /></div>

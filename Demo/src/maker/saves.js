@@ -17,7 +17,7 @@ import {
 import { renderChunks } from "./chunks.js";
 import { renderPmap } from "./pmap.js";
 import { collectTags, addIdentifierRow, addContributorRow } from "./meta.js";
-import { icon, icons } from "../icons.js";
+import { icons } from "../icons.js";
 import { createIcons } from "lucide";
 
 const SAVES_KEY = "honzo_maker_saves";
@@ -33,7 +33,9 @@ setInterval(() => {
     _autoSaveDirty = false;
     try {
       localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(serializeState()));
-    } catch (e) {}
+    } catch (e) {
+      console.error("Error saving auto-saved project:", e);
+    }
   }
 }, 2000);
 
@@ -327,7 +329,9 @@ export function renderSaves() {
         <button class="btn btn-secondary maker-save-delete-btn" data-save-action="delete-autosave">Delete</button>
       </div>`;
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error("Error rendering auto-saved project:", e);
+  }
 
   const saves = getSaves();
   const names = Object.keys(saves);
