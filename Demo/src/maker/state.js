@@ -4,7 +4,9 @@ export { esc } from "../shared/esc.js";
 export { formatSize } from "../shared/format.js";
 
 export let wasmReady = false;
-export function setWasmReady(v) { wasmReady = v; }
+export function setWasmReady(v) {
+  wasmReady = v;
+}
 export const statusVisible = signal(path("maker", "statusVisible"), false);
 export const statusKind = signal(path("maker", "statusKind"), "");
 export const statusMessage = signal(path("maker", "statusMessage"), "");
@@ -23,14 +25,30 @@ export let pmapEntries = [];
 export let dragSrcIdx = null;
 export let idCounter = 0;
 
-export function setLayoutMode(v) { layoutMode = v; }
-export function setDefaultCompression(v) { defaultCompression = v; }
-export function setDirection(v) { direction = v; }
-export function setChunks(v) { chunks = v; }
-export function setChunkIdCounter(v) { chunkIdCounter = v; }
-export function setPmapEntries(v) { pmapEntries = v; }
-export function setDragSrcIdx(v) { dragSrcIdx = v; }
-export function setIdCounter(v) { idCounter = v; }
+export function setLayoutMode(v) {
+  layoutMode = v;
+}
+export function setDefaultCompression(v) {
+  defaultCompression = v;
+}
+export function setDirection(v) {
+  direction = v;
+}
+export function setChunks(v) {
+  chunks = v;
+}
+export function setChunkIdCounter(v) {
+  chunkIdCounter = v;
+}
+export function setPmapEntries(v) {
+  pmapEntries = v;
+}
+export function setDragSrcIdx(v) {
+  dragSrcIdx = v;
+}
+export function setIdCounter(v) {
+  idCounter = v;
+}
 
 export const CHUNK_TYPES = {
   CHAP: { label: "Chapter", icon: "\u{1F4C4}", markup: true },
@@ -65,6 +83,8 @@ export function showStatus(kind, msg) {
   statusKind.set(kind);
   statusMessage.set(msg);
   if (kind === "success" || kind === "loading") {
-    setTimeout(() => { if (statusKind.get() === kind) statusVisible.set(false); }, 5000);
+    setTimeout(() => {
+      if (statusKind.get() === kind) statusVisible.set(false);
+    }, 5000);
   }
 }

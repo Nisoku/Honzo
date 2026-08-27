@@ -58,7 +58,7 @@ std::fs::write("book.hzo", hzo).unwrap();
 ### EPUB
 
 | Source        | Honzo target              | Details                                         |
-|---------------|---------------------------|-------------------------------------------------|
+| ------------- | ------------------------- | ----------------------------------------------- |
 | OPF metadata  | META section              | Title, creator, language, identifiers, subjects |
 | NCX / nav     | CHAP chunks + TOC         | Chapter splitting follows the EPUB spine        |
 | XHTML content | CHAP chunks (HTML)        | Full HTML preserved, including in-line images   |
@@ -71,7 +71,7 @@ std::fs::write("book.hzo", hzo).unwrap();
 ### MOBI
 
 | Source       | Honzo target       | Details                 |
-|--------------|--------------------|-------------------------|
+| ------------ | ------------------ | ----------------------- |
 | Metadata     | META section       | Title, author, language |
 | Text content | CHAP chunks (HTML) | Basic HTML conversion   |
 | Images       | IMG_ chunks        | Embedded images         |
@@ -79,7 +79,7 @@ std::fs::write("book.hzo", hzo).unwrap();
 ### PDF
 
 | Source         | Honzo target           | Details                           |
-|----------------|------------------------|-----------------------------------|
+| -------------- | ---------------------- | --------------------------------- |
 | Extracted text | CHAP chunks (Markdown) | Text flow, no layout preservation |
 | Page breaks    | Chapter splitting      | One PDF page per chapter          |
 
@@ -98,11 +98,11 @@ Explicit EPUB pagebreak patterns are also detected:
 
 ```html
 <!-- These are all recognized -->
-<span epub:type="pagebreak" id="pg42" title="42"/>
-<span class="pagebreak" id="page-42"/>
+<span epub:type="pagebreak" id="pg42" title="42" />
+<span class="pagebreak" id="page-42" />
 <a id="page42" class="pagebreak"></a>
-<hr class="pagebreak"/>
-<div class="pagebreak" title="42"/>
+<hr class="pagebreak" />
+<div class="pagebreak" title="42" />
 ```
 
 :::

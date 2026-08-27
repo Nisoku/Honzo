@@ -60,11 +60,11 @@ public:
 
   inline bool has_sync() const;
 
-  inline diplomat::span<const uint8_t> get_extra() const;
+  inline diplomat::span<const uint8_t> get_extra() const DIPLOMAT_LIFETIME_BOUND;
 
-  inline std::optional<diplomat::span<const uint8_t>> get_chunk(uint32_t index);
+  inline std::optional<diplomat::span<const uint8_t>> get_chunk(uint32_t index) DIPLOMAT_LIFETIME_BOUND;
 
-  inline diplomat::span<const uint8_t> get_meta() const;
+  inline diplomat::span<const uint8_t> get_meta() const DIPLOMAT_LIFETIME_BOUND;
 
   inline diplomat::result<std::string, HonzoErrorCode> get_meta_parsed() const;
   template<typename W>

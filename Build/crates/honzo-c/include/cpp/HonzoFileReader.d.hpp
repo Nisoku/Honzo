@@ -46,7 +46,7 @@ public:
    * Returns `None` when `index` is out of range or the entry has
    * no label.
    */
-  inline std::optional<std::string_view> get_chunk_alt_text(uint32_t index) const;
+  inline std::optional<std::string_view> get_chunk_alt_text(uint32_t index) const DIPLOMAT_LIFETIME_BOUND;
 
   /**
    * Returns the decompressed data for chunk `index`.
@@ -55,7 +55,7 @@ public:
    * until the next call to `get_chunk` on the same reader. C/C++ callers
    * must copy the data if they need it to outlive a subsequent call.
    */
-  inline std::optional<diplomat::span<const uint8_t>> get_chunk(uint32_t index);
+  inline std::optional<diplomat::span<const uint8_t>> get_chunk(uint32_t index) DIPLOMAT_LIFETIME_BOUND;
 
   inline diplomat::result<std::string, HonzoErrorCode> get_meta();
   template<typename W>

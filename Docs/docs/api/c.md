@@ -17,7 +17,7 @@ HonzoHandle_destroy(handle);
 ```
 
 | Return                          | Meaning |
-|---------------------------------|---------|
+| ------------------------------- | ------- |
 | ::: tag "0" color:#22c55e       | Success |
 | ::: tag "nonzero" color:#ef4444 | Error   |
 
@@ -39,7 +39,7 @@ Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk
 ### HonzoFileReader lifecycle
 
 | Symbol                                  | Signature                                                                      | Returns                                        | Notes                |
-|-----------------------------------------|--------------------------------------------------------------------------------|------------------------------------------------|----------------------|
+| --------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------- | -------------------- |
 | `HonzoFileReader_open`                  | `DiplomatStringView path, uint16_t reader_version`                             | `HonzoFileReader_open_result`                  | Open from file path. |
 | `HonzoFileReader_open_with_private_key` | `DiplomatStringView path, uint16_t reader_version, DiplomatU8View private_key` | `HonzoFileReader_open_with_private_key_result` | Open with DRM key.   |
 | `HonzoFileReader_destroy`               | `HonzoFileReader* self`                                                        | `void`                                         | Free the reader.     |
@@ -47,7 +47,7 @@ Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk
 ### HonzoFileReader accessors
 
 | Symbol                                         | Signature                                     | Returns                                     | Notes                                                                                                                   |
-|------------------------------------------------|-----------------------------------------------|---------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| ---------------------------------------------- | --------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `HonzoFileReader_chunk_count`                  | `const HonzoFileReader* self`                 | `uint32_t`                                  | Number of chunks.                                                                                                       |
 | `HonzoFileReader_get_chunk_type`               | `const HonzoFileReader* self, uint32_t index` | `uint32_t`                                  | 4-byte chunk tag as native-endian u32 (e.g. `0x50414843` for `"CHAP"`). Returns 0 if index out of range.                |
 | `HonzoFileReader_get_chunk_content_type_kind`  | `const HonzoFileReader* self, uint32_t index` | `uint8_t`                                   | Content type kind: `1` = markup, `2` = math. Returns 0 if index out of range.                                           |
@@ -143,14 +143,14 @@ Parse a Honzo file from a byte buffer in memory.
 ### HonzoHandle lifecycle
 
 | Symbol                | Signature                                           | Returns        | Notes                                          |
-|-----------------------|-----------------------------------------------------|----------------|------------------------------------------------|
+| --------------------- | --------------------------------------------------- | -------------- | ---------------------------------------------- |
 | `HonzoHandle_parse`   | `const uint8_t* data, size_t len, uint32_t version` | `HonzoHandle*` | Parse from byte buffer. Returns NULL on error. |
 | `HonzoHandle_destroy` | `HonzoHandle* handle`                               | `void`         | Free the handle.                               |
 
 ## HonzoHandle accessors
 
 | Symbol                    | Signature                                                                  | Returns       | Notes                              |
-|---------------------------|----------------------------------------------------------------------------|---------------|------------------------------------|
+| ------------------------- | -------------------------------------------------------------------------- | ------------- | ---------------------------------- |
 | `HonzoHandle_chunk_count` | `const HonzoHandle*`                                                       | `uint32_t`    | Number of chunks.                  |
 | `HonzoHandle_head`        | `const HonzoHandle*, HonzoHead* out`                                       | `int32_t`     | 0 on success, nonzero on error.    |
 | `HonzoHandle_toc_entry`   | `const HonzoHandle*, uint32_t index, TocEntry* out`                        | `int32_t`     | 0 on success, nonzero on error.    |
@@ -163,7 +163,7 @@ Parse a Honzo file from a byte buffer in memory.
 ## HonzoErrorCode
 
 | Code                                     | Meaning                   |
-|------------------------------------------|---------------------------|
+| ---------------------------------------- | ------------------------- |
 | `HonzoErrorCode_Ok = 0`                  | Success                   |
 | `HonzoErrorCode_InvalidMagic = 1`        | Not a Honzo file          |
 | `HonzoErrorCode_ReaderVersionTooOld = 2` | Reader version too low    |

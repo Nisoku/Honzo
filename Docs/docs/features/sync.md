@@ -58,7 +58,7 @@ Stored as a MessagePack map in the EXTRA entry:
 ### Cue fields
 
 | Field      | Type  | Description                           |
-|------------|-------|---------------------------------------|
+| ---------- | ----- | ------------------------------------- |
 | `chunk`    | `int` | TOC index of the chunk                |
 | `position` | `int` | Byte offset within decompressed chunk |
 | `time_ms`  | `int` | Timestamp in milliseconds             |
@@ -66,7 +66,7 @@ Stored as a MessagePack map in the EXTRA entry:
 ### Track types
 
 | Type        | Description                   |
-|-------------|-------------------------------|
+| ----------- | ----------------------------- |
 | `audio`     | Text-to-audio synchronization |
 | `video`     | Text-to-video synchronization |
 | `animation` | Animation cue points          |
@@ -91,7 +91,7 @@ let data = doc.encode().unwrap();
 ### Helper functions
 
 | Function                                                      | Description                     |
-|---------------------------------------------------------------|---------------------------------|
+| ------------------------------------------------------------- | ------------------------------- |
 | `create_audio_cue(chunk, position, time_ms)`                  | Create an audio sync cue        |
 | `create_video_cue(chunk, position, time_ms)`                  | Create a video sync cue         |
 | `create_page_cue(chunk, position, page_number)`               | Create a page sync cue          |

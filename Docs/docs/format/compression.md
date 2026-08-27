@@ -8,7 +8,7 @@ Honzo applies compression at the chunk level. Each TOC entry selects its own com
 ## Compression Codes
 
 | Code | Algorithm | Typical Use                            |
-|------|-----------|----------------------------------------|
+| ---- | --------- | -------------------------------------- |
 | 0    | None      | Images, fonts, already compressed data |
 | 1    | LZ4       | Chapter text, CSS, metadata            |
 
@@ -19,7 +19,7 @@ Honzo applies compression at the chunk level. Each TOC entry selects its own com
 Typical compression ratios for chapter text:
 
 | Content                   | Uncompressed | Compressed with LZ4 | Ratio      |
-|---------------------------|--------------|---------------------|------------|
+| ------------------------- | ------------ | ------------------- | ---------- |
 | Short chapter around 2KB  | 2,048        | About 1,000         | Around 50% |
 | Novel chapter around 10KB | 10,240       | About 4,600         | Around 45% |
 | CSS file around 50KB      | 51,200       | About 15,000        | Around 29% |
@@ -39,7 +39,7 @@ Do not compress fonts. WOFF2 is already compressed. TTF and OTF may see modest g
 Each TOC entry tracks two sizes:
 
 | Field       | What It Holds                                                                                |
-|-------------|----------------------------------------------------------------------------------------------|
+| ----------- | -------------------------------------------------------------------------------------------- |
 | `size`      | Stored size. This is the compressed size or the uncompressed size if no compression applies. |
 | `orig_size` | Original uncompressed size. Zero if same as `size`.                                          |
 

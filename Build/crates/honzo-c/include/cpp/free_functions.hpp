@@ -23,6 +23,9 @@ namespace capi {
     typedef struct diplomat_external_guess_image_mime_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} diplomat_external_guess_image_mime_result;
     diplomat_external_guess_image_mime_result diplomat_external_guess_image_mime(diplomat::capi::DiplomatU8View bytes, diplomat::capi::DiplomatWrite* write);
 
+    typedef struct diplomat_external_hzo_extract_meta_from_file_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} diplomat_external_hzo_extract_meta_from_file_result;
+    diplomat_external_hzo_extract_meta_from_file_result diplomat_external_hzo_extract_meta_from_file(diplomat::capi::DiplomatStringView path, uint16_t reader_version, diplomat::capi::DiplomatWrite* write);
+
     typedef struct diplomat_external_latex_to_mathml_result {union { diplomat::capi::HonzoErrorCode err;}; bool is_ok;} diplomat_external_latex_to_mathml_result;
     diplomat_external_latex_to_mathml_result diplomat_external_latex_to_mathml(diplomat::capi::DiplomatU8View bytes, diplomat::capi::DiplomatWrite* write);
 
@@ -68,6 +71,28 @@ inline diplomat::result<std::monostate, HonzoErrorCode> guess_image_mime_write(d
     auto result = diplomat::capi::diplomat_external_guess_image_mime({bytes.data(), bytes.size()},
         &write);
     return result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err)));
+}
+inline diplomat::result<diplomat::result<std::string, HonzoErrorCode>, diplomat::Utf8Error> hzo_extract_meta_from_file(std::string_view path, uint16_t reader_version) {
+    if (!diplomat::capi::diplomat_is_str(path.data(), path.size())) {
+    return diplomat::Err<diplomat::Utf8Error>();
+  }
+    std::string output;
+    diplomat::capi::DiplomatWrite write = diplomat::WriteFromString(output);
+    auto result = diplomat::capi::diplomat_external_hzo_extract_meta_from_file({path.data(), path.size()},
+        reader_version,
+        &write);
+    return diplomat::Ok<diplomat::result<std::string, HonzoErrorCode>>(result.is_ok ? diplomat::result<std::string, HonzoErrorCode>(diplomat::Ok<std::string>(std::move(output))) : diplomat::result<std::string, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err))));
+}
+template<typename W>
+inline diplomat::result<diplomat::result<std::monostate, HonzoErrorCode>, diplomat::Utf8Error> hzo_extract_meta_from_file_write(std::string_view path, uint16_t reader_version, W& writeable) {
+    if (!diplomat::capi::diplomat_is_str(path.data(), path.size())) {
+    return diplomat::Err<diplomat::Utf8Error>();
+  }
+    diplomat::capi::DiplomatWrite write = diplomat::WriteTrait<W>::Construct(writeable);
+    auto result = diplomat::capi::diplomat_external_hzo_extract_meta_from_file({path.data(), path.size()},
+        reader_version,
+        &write);
+    return diplomat::Ok<diplomat::result<std::monostate, HonzoErrorCode>>(result.is_ok ? diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Ok<std::monostate>()) : diplomat::result<std::monostate, HonzoErrorCode>(diplomat::Err<HonzoErrorCode>(HonzoErrorCode::FromFFI(result.err))));
 }
 inline diplomat::result<std::string, HonzoErrorCode> latex_to_mathml(diplomat::span<const uint8_t> bytes) {
     std::string output;

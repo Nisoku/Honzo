@@ -15,6 +15,9 @@ on:
       - '**/Cargo.toml'
       - '**/Cargo.lock'
 
+permissions:
+  contents: read
+
 jobs:
   audit:
     name: Security Audit

@@ -98,9 +98,7 @@
           <option value="/Honzo/demo/hzo/with_sidx.hzo">
             With Search Index
           </option>
-          <option value="/Honzo/demo/hzo/with_pmap.hzo">
-            With Page Map
-          </option>
+          <option value="/Honzo/demo/hzo/with_pmap.hzo">With Page Map</option>
           <option value="/Honzo/demo/hzo/compressed_lz4.hzo">
             LZ4 Compressed
           </option>
@@ -238,6 +236,9 @@
     <!-- Overlay -->
     <div class="overlay" id="overlay"></div>
 
+    <!-- Toast -->
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
     <!-- Loading -->
     <div class="message" id="loading-message">
       <div class="spinner"></div>
@@ -257,7 +258,9 @@
     <input type="file" id="file-input" accept=".hzo" hidden />
 
     <footer class="powered-by">
-      Powered by <a href="https://nisoku.org/Sairin/">Sairin</a><span class="sep">·</span><a href="https://nisoku.org/Satori/docs/">Satori</a>
+      Powered by <a href="https://nisoku.org/Sairin/">Sairin</a
+      ><span class="sep">·</span
+      ><a href="https://nisoku.org/Satori/docs/">Satori</a>
     </footer>
 
     <script type="module" src="./src/reader/main.js"></script>

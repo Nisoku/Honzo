@@ -1,5 +1,13 @@
 import { icon } from "../icons.js";
-import { fontFamily, fontSize, gapless, layoutMode, pageZoom, textAlign, theme } from "./state.js";
+import {
+  fontFamily,
+  fontSize,
+  gapless,
+  layoutMode,
+  pageZoom,
+  textAlign,
+  theme,
+} from "./state.js";
 import { setMangaZoom } from "./book.js";
 
 const THEMES = {
@@ -198,6 +206,9 @@ export function renderSettings(container) {
   container.querySelectorAll(".settings-options").forEach((group) => {
     group.addEventListener("click", (e) => {
       const btn = e.target.closest(".setting-option");
+      const gg = document.getElementById("gaplessGroup");
+      const zg = document.getElementById("zoomGroup");
+
       if (!btn || btn.disabled) return;
       const setting = group.dataset.setting;
       const value = btn.dataset.value;
@@ -219,9 +230,7 @@ export function renderSettings(container) {
           break;
         case "layoutMode":
           layoutMode.set(value);
-          const gg = document.getElementById("gaplessGroup");
           if (gg) gg.style.display = value === "manga" ? "block" : "none";
-          const zg = document.getElementById("zoomGroup");
           if (zg) zg.style.display = value === "manga" ? "block" : "none";
           break;
         case "textAlign":
@@ -236,7 +245,8 @@ export function renderSettings(container) {
   const zoomReset = container.querySelector('[data-action="zoomReset"]');
   const zoomValue = document.getElementById("zoomValue");
   function updateZoomDisplay() {
-    if (zoomValue) zoomValue.textContent = `${Math.round(pageZoom.get() * 100)}%`;
+    if (zoomValue)
+      zoomValue.textContent = `${Math.round(pageZoom.get() * 100)}%`;
   }
   if (zoomIn) {
     zoomIn.addEventListener("click", () => {

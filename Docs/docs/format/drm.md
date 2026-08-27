@@ -106,7 +106,7 @@ let hzo = HonzoBuilder::new()
 ## Supported Algorithms
 
 | Component          | Algorithm   |
-|--------------------|-------------|
+| ------------------ | ----------- |
 | Content encryption | AES-256-GCM |
 | Key agreement      | X25519 ECDH |
 | Key derivation     | HKDF-SHA256 |

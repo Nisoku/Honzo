@@ -9,6 +9,8 @@
 
 The "ideal" ebook format.
 
+<img src="Docs/assets/images/main.png" alt="Honzo Reader Demo" width="500">
+
 Honzo is a binary ebook format designed for simplicity, performance, and portability. Zero-copy parsing, pull-based streaming, per-chunk compression, and portable annotations that travel with the file.
 
 ## Features

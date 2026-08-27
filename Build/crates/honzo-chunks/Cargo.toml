@@ -16,12 +16,21 @@ image = ["dep:image"]
 honzo-core = { path = "../honzo-core", version = "0.1" }
 
 lz4_flex = "0.14.0"
-image = { version = "0.25.10", default-features = false, features = ["png", "jpeg", "gif", "bmp", "tiff", "webp", "ico", "pnm"], optional = true }
+image = { version = "0.25.10", default-features = false, features = [
+    "png",
+    "jpeg",
+    "gif",
+    "bmp",
+    "tiff",
+    "webp",
+    "ico",
+    "pnm",
+], optional = true }
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
 cssparser = "0.37"
 pulldown-latex = "0.8"
-quick-xml = "0.41"
+quick-xml = "0.42.0"
 rust-stemmers = "1"
 lexepub = "0.1"
 

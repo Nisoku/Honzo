@@ -90,13 +90,13 @@ inline uint8_t HonzoFileReader::get_chunk_content_type_value(uint32_t index) con
     return result;
 }
 
-inline std::optional<std::string_view> HonzoFileReader::get_chunk_alt_text(uint32_t index) const {
+inline std::optional<std::string_view> HonzoFileReader::get_chunk_alt_text(uint32_t index) const DIPLOMAT_LIFETIME_BOUND {
     auto result = diplomat::capi::HonzoFileReader_get_chunk_alt_text(this->AsFFI(),
         index);
     return result.is_ok ? std::optional<std::string_view>(std::string_view(result.ok.data, result.ok.len)) : std::nullopt;
 }
 
-inline std::optional<diplomat::span<const uint8_t>> HonzoFileReader::get_chunk(uint32_t index) {
+inline std::optional<diplomat::span<const uint8_t>> HonzoFileReader::get_chunk(uint32_t index) DIPLOMAT_LIFETIME_BOUND {
     auto result = diplomat::capi::HonzoFileReader_get_chunk(this->AsFFI(),
         index);
     return result.is_ok ? std::optional<diplomat::span<const uint8_t>>(diplomat::span<const uint8_t>(result.ok.data, result.ok.len)) : std::nullopt;

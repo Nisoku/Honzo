@@ -4,7 +4,7 @@ import init, {
   HonzoWasm,
   normalize_search_term as normalizeSearchTerm,
 } from "../wasm/honzo_wasm.js";
-import { showLoading, hideLoading, showError } from "./ui.js";
+import { showLoading, hideLoading, showError, showToast } from "./ui.js";
 import {
   bookTitle,
   chapterLabel,
@@ -271,6 +271,7 @@ export async function openBookFromEntry(entry) {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
 async function loadBook(data, fileName) {
   await ensureWasmReady();
   if (!elements.viewer || !elements.tocContent) {
@@ -401,9 +402,18 @@ async function loadBook(data, fileName) {
 }
 
 export function unloadBook() {
-  if (window._layoutSub) { window._layoutSub(); window._layoutSub = null; }
-  if (window._gaplessSub) { window._gaplessSub(); window._gaplessSub = null; }
-  if (window._zoomSub) { window._zoomSub(); window._zoomSub = null; }
+  if (window._layoutSub) {
+    window._layoutSub();
+    window._layoutSub = null;
+  }
+  if (window._gaplessSub) {
+    window._gaplessSub();
+    window._gaplessSub = null;
+  }
+  if (window._zoomSub) {
+    window._zoomSub();
+    window._zoomSub = null;
+  }
   if (window._mangaScrollHandler && elements.viewer) {
     elements.viewer.removeEventListener("scroll", window._mangaScrollHandler);
     window._mangaScrollHandler = null;
@@ -441,7 +451,8 @@ function renderManga() {
       page.appendChild(img);
     } else if (chunkType === "CHAP" || chunkType === "NOTE") {
       const raw = new TextDecoder().decode(data);
-      const isHtml = entry.content_type_kind === 1 && entry.content_type_value === 1;
+      const isHtml =
+        entry.content_type_kind === 1 && entry.content_type_value === 1;
       const content = isHtml ? sanitizeHtml(raw) : renderMarkdown(raw);
       const body = document.createElement("div");
       body.className = "manga-text chapter-body";
@@ -450,7 +461,7 @@ function renderManga() {
     } else if (chunkType === "MATH") {
       const mathDiv = document.createElement("div");
       mathDiv.className = "manga-math";
-      renderMath(mathDiv, data, entry.content_type_value, reader);
+      renderMath(mathDiv, data, entry.content_type_value);
       page.appendChild(mathDiv);
     } else {
       const label = document.createElement("p");
@@ -474,7 +485,9 @@ function renderManga() {
   window._mangaScrollHandler = () => {
     updateMangaPageInfo();
   };
-  elements.viewer.addEventListener("scroll", window._mangaScrollHandler, { passive: true });
+  elements.viewer.addEventListener("scroll", window._mangaScrollHandler, {
+    passive: true,
+  });
 
   setMangaZoom(pageZoom.get());
   updateMangaPageInfo();
@@ -483,7 +496,9 @@ function renderManga() {
 function scrollToMangaPage(index) {
   if (!elements.viewer || !mangaPages.length) return;
   const clamped = Math.max(0, Math.min(index, mangaPages.length - 1));
-  const page = elements.viewer.querySelector(`.manga-page[data-chunk-index="${clamped}"]`);
+  const page = elements.viewer.querySelector(
+    `.manga-page[data-chunk-index="${clamped}"]`,
+  );
   if (page) {
     page.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -524,7 +539,6 @@ function updateMangaPageInfo() {
 function getMangaCurrentPage() {
   if (!elements.viewer || !mangaPages.length) return 0;
   const pages = elements.viewer.querySelectorAll(".manga-page");
-  const viewCenter = elements.viewer.scrollTop + elements.viewer.clientHeight / 2;
   let closest = 0;
   let closestDist = Infinity;
   pages.forEach((p, i) => {
@@ -547,7 +561,9 @@ function generateMangaToc() {
     const item = document.createElement("div");
     item.className = `toc-item${isCurrent ? " active" : ""}`;
     const label = `${entry.chunk_type} #${entry.chunk_id}${entry.chunk_type === "CHAP" || entry.chunk_type === "IMG_" ? "" : ""}`;
-    const sizeInfo = entry.size_raw ? `${(entry.size_raw / 1024).toFixed(0)} KB` : "";
+    const sizeInfo = entry.size_raw
+      ? `${(entry.size_raw / 1024).toFixed(0)} KB`
+      : "";
     item.innerHTML = `<span class="toc-label">${esc(label)}</span>${sizeInfo ? `<span class="toc-size">${esc(sizeInfo)}</span>` : ""}`;
     item.addEventListener("click", () => {
       scrollToMangaPage(i);
@@ -584,7 +600,7 @@ function renderCurrentChapter(scrollToAnchor) {
     img.src = url;
     container.appendChild(img);
   } else if (isMath) {
-    renderMath(container, data, chapter.content_type_value, reader);
+    renderMath(container, data, chapter.content_type_value);
   } else if (
     chapter.chunk_type === "SIDX" ||
     chapter.chunk_type === "CSS_" ||
@@ -679,20 +695,109 @@ export function goToChapter(index, anchor) {
 
 function sanitizeHtml(html) {
   const allowedTags = [
-    "p", "div", "span", "h1", "h2", "h3", "h4", "h5", "h6",
-    "ul", "ol", "li", "dl", "dt", "dd",
-    "table", "thead", "tbody", "tr", "th", "td",
-    "blockquote", "pre", "code", "br", "hr", "em", "strong", "i", "b", "u", "s", "sub", "sup",
-    "img", "a", "figure", "figcaption", "section", "article", "header", "main", "aside",
-    "ref", "math", "mi", "mo", "mn", "msup", "msub", "mfrac", "msqrt", "mroot", "mstyle",
-    "mrow", "mspace", "mtext", "munder", "mover", "munderover", "msubsup", "mmultiscripts",
-    "mprescripts", "none", "mtable", "mtr", "mtd", "mphantom", "mfenced", "menclose",
-    "merror", "mpadded", "maction", "mlabeledtr", "maligngroup", "malignmark", "msline",
+    "p",
+    "div",
+    "span",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "ul",
+    "ol",
+    "li",
+    "dl",
+    "dt",
+    "dd",
+    "table",
+    "thead",
+    "tbody",
+    "tr",
+    "th",
+    "td",
+    "blockquote",
+    "pre",
+    "code",
+    "br",
+    "hr",
+    "em",
+    "strong",
+    "i",
+    "b",
+    "u",
+    "s",
+    "sub",
+    "sup",
+    "img",
+    "a",
+    "figure",
+    "figcaption",
+    "section",
+    "article",
+    "header",
+    "main",
+    "aside",
+    "ref",
+    "math",
+    "mi",
+    "mo",
+    "mn",
+    "msup",
+    "msub",
+    "mfrac",
+    "msqrt",
+    "mroot",
+    "mstyle",
+    "mrow",
+    "mspace",
+    "mtext",
+    "munder",
+    "mover",
+    "munderover",
+    "msubsup",
+    "mmultiscripts",
+    "mprescripts",
+    "none",
+    "mtable",
+    "mtr",
+    "mtd",
+    "mphantom",
+    "mfenced",
+    "menclose",
+    "merror",
+    "mpadded",
+    "maction",
+    "mlabeledtr",
+    "maligngroup",
+    "malignmark",
+    "msline",
   ];
   const allowedAttrs = [
-    "href", "src", "alt", "title", "class", "id", "name", "target", "rel",
-    "width", "height", "type", "chunk", "anchor", "xmlns", "display", "alttext",
-    "rowspan", "columnspan", "linethickness", "lspace", "voffset", "scriptlevel", "displaystyle",
+    "href",
+    "src",
+    "alt",
+    "title",
+    "class",
+    "id",
+    "name",
+    "target",
+    "rel",
+    "width",
+    "height",
+    "type",
+    "chunk",
+    "anchor",
+    "xmlns",
+    "display",
+    "alttext",
+    "rowspan",
+    "columnspan",
+    "linethickness",
+    "lspace",
+    "voffset",
+    "scriptlevel",
+    "displaystyle",
   ];
   const doc = new DOMParser().parseFromString(html, "text/html");
   const walk = (node) => {
@@ -844,10 +949,16 @@ export function prevPage() {
   if (!hasBookLoaded()) return;
   if (layoutMode.get() === "manga") {
     if (!elements.viewer) return;
-    elements.viewer.scrollBy({ top: -elements.viewer.clientHeight, behavior: "smooth" });
+    elements.viewer.scrollBy({
+      top: -elements.viewer.clientHeight,
+      behavior: "smooth",
+    });
     return;
   }
-  if (currentChapterIndex <= 0) return;
+  if (currentChapterIndex <= 0) {
+    showToast("First page");
+    return;
+  }
   goToChapter(currentChapterIndex - 1);
 }
 
@@ -855,18 +966,23 @@ export function nextPage() {
   if (!hasBookLoaded()) return;
   if (layoutMode.get() === "manga") {
     if (!elements.viewer) return;
-    elements.viewer.scrollBy({ top: elements.viewer.clientHeight, behavior: "smooth" });
+    elements.viewer.scrollBy({
+      top: elements.viewer.clientHeight,
+      behavior: "smooth",
+    });
     return;
   }
-  if (currentChapterIndex >= chapters.length - 1) return;
+  if (currentChapterIndex >= chapters.length - 1) {
+    showToast("Last page");
+    return;
+  }
   goToChapter(currentChapterIndex + 1);
 }
 
 export function addBookmarkCurrent() {
   const bookId = getCurrentBookId();
   if (!bookId || !hasBookLoaded()) return;
-  const ch = chapters[currentChapterIndex];
-  const marks = addBookmark(bookId, currentChapterIndex, ch.chunk_id, "");
+  addBookmark(bookId, currentChapterIndex, currentChunkId.value, "");
   if (elements.bookmarksContent) {
     renderBookmarks(elements.bookmarksContent, bookId, chapters);
   }
@@ -949,7 +1065,7 @@ function guessMime(bytes) {
 export function setMangaZoom(zoom) {
   if (!elements.viewer) return;
   elements.viewer.querySelectorAll(".manga-page img").forEach((img) => {
-    img.style.width = (zoom * 100) + "%";
+    img.style.width = zoom * 100 + "%";
   });
 }
 

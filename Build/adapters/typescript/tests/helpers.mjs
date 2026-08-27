@@ -8,8 +8,8 @@ let _honzo = null;
 
 export async function initHonzo() {
   if (_honzo) return _honzo;
-  const wasmBytes = readFileSync(resolve(__dirname, 'wasm/honzo_wasm_bg.wasm'));
-  _honzo = await import('./wasm/honzo_wasm.js');
+  const wasmBytes = readFileSync(resolve(__dirname, '../wasm/honzo_wasm_bg.wasm'));
+  _honzo = await import('../wasm/honzo_wasm.js');
   _honzo.initSync({ module: wasmBytes });
   return _honzo;
 }
@@ -146,7 +146,17 @@ export function buildExtraEntry(namespace, body) {
   return u8toArray(concat([nsBytes, lenBuf, new Uint8Array(body)]));
 }
 
-export function buildHonzo({ meta, chunks, annotations, syncCues, extra, flags, layout, drm, pmapEntries }) {
+export function buildHonzo({
+  meta,
+  chunks,
+  annotations,
+  syncCues,
+  extra,
+  flags,
+  layout,
+  drm,
+  pmapEntries,
+}) {
   const honzo = getHonzo();
   return honzo.honzo_build({
     chunks: chunks || [],

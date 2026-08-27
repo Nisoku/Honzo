@@ -32,7 +32,7 @@ Annotations are stored as a MessagePack map:
 ### Annotation types
 
 | Type        | Description                                 |
-|-------------|---------------------------------------------|
+| ----------- | ------------------------------------------- |
 | `highlight` | Text highlight with start/end byte offsets  |
 | `bookmark`  | Position bookmark (page or location marker) |
 | `note`      | A note attached to a specific position      |
@@ -42,7 +42,7 @@ Annotations are stored as a MessagePack map:
 ### Fields
 
 | Field      | Type      | Description                           |
-|------------|-----------|---------------------------------------|
+| ---------- | --------- | ------------------------------------- |
 | `id`       | `string`  | UUID                                  |
 | `type`     | `string`  | Annotation type                       |
 | `chunk`    | `int`     | TOC index of the annotated chunk      |

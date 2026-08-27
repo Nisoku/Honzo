@@ -17,7 +17,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: release
     permissions:
+      id-token: write
       contents: read
     steps:
       - uses: actions/checkout@v4
@@ -25,25 +27,29 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Authenticate with crates.io
+        id: auth
+        uses: rust-lang/crates-io-auth-action@v1
+
       - name: Publish honzo-core
         run: cargo publish -p honzo-core ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
       - name: Publish honzo-chunks
         run: cargo publish -p honzo-chunks ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
       - name: Publish honzo-io
         run: cargo publish -p honzo-io ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
       - name: Publish honzo-convert
         run: cargo publish -p honzo-convert ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
       - name: Install diplomat-tool
         run: cargo install diplomat-tool
@@ -51,9 +57,9 @@ jobs:
       - name: Publish honzo-c
         run: cargo publish -p honzo-c ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
       - name: Publish honzo-cli
         run: cargo publish -p honzo-cli ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' && '--dry-run' || '' }}
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}

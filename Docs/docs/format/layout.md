@@ -8,7 +8,7 @@ Honzo supports three layout modes. The mode is set in the HEAD `layout_mode` fie
 ## Modes
 
 | Code | Mode       | Description                                                                    |
-|------|------------|--------------------------------------------------------------------------------|
+| ---- | ---------- | ------------------------------------------------------------------------------ |
 | 0    | Reflowable | Content wraps to fit the viewport. This is the typical ebook experience.       |
 | 1    | Fixed      | Content uses fixed coordinates. This resembles a PDF.                          |
 | 2    | Scroll     | Content appears as one continuous scrollable flow. This works like a web page. |
@@ -57,7 +57,7 @@ match p.head().layout_mode {
 ```
 
 ```typescript
-import { createReader } from '@nisoku/honzo';
+import { createReader } from "@nisoku/honzo";
 const reader = await createReader(buf);
 // reader.layoutMode: 0 = reflowable, 1 = fixed, 2 = scroll
 ```

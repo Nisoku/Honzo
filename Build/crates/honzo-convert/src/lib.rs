@@ -8,11 +8,13 @@ use honzo_io::{
     build_sidx, compute_reading_time, generate_covt, new_uuid, Compression, CoverType,
     HonzoBuilder, HonzoMeta, Identifier, LayoutMode, MarkupType, PmapEntry,
 };
+mod markdown;
 mod mobi;
 mod pagebreaks;
 mod pdf;
 mod refs;
 
+pub use markdown::{from_markdown_dir, from_markdown_file};
 pub use pagebreaks::{detect_pagebreaks, estimate_pagebreaks};
 use refs::{normalize_path, rewrite_html_to_ref, rewrite_links_to_ref};
 
@@ -21,6 +23,7 @@ pub enum ConvertError {
     UnsupportedFormat,
     MissingSpine,
     MissingMetadata,
+    MdParseError(String),
     IoError(String),
     HonzoError(honzo_io::HonzoError),
 }
@@ -37,8 +40,32 @@ impl From<lexepub::LexEpubError> for ConvertError {
     }
 }
 
+/// Progress callback for long-running conversions.
+pub trait ConvertProgress: Send + Sync {
+    /// Called when the conversion enters a new stage.
+    fn stage(&self, name: &str);
+    /// Called after each unit of work within a stage (e.g., per chapter).
+    fn advance(&self);
+}
+
+/// No-op progress implementation for callers that don't need reporting.
+impl ConvertProgress for () {
+    fn stage(&self, _: &str) {}
+    fn advance(&self) {}
+}
+
 pub fn from_epub(bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
-    futures::executor::block_on(convert_epub(Bytes::copy_from_slice(bytes)))
+    from_epub_with_progress(bytes, &())
+}
+
+pub fn from_epub_with_progress(
+    bytes: &[u8],
+    progress: &dyn ConvertProgress,
+) -> Result<Vec<u8>, ConvertError> {
+    futures::executor::block_on(convert_epub_with_progress(
+        Bytes::copy_from_slice(bytes),
+        progress,
+    ))
 }
 
 pub fn from_mobi(_bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
@@ -49,7 +76,11 @@ pub fn from_pdf(_bytes: &[u8]) -> Result<Vec<u8>, ConvertError> {
     pdf::convert_pdf(_bytes)
 }
 
-async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
+async fn convert_epub_with_progress(
+    data: Bytes,
+    progress: &dyn ConvertProgress,
+) -> Result<Vec<u8>, ConvertError> {
+    progress.stage("Parsing EPUB");
     let mut epub = LexEpub::from_bytes(data).await?;
 
     let meta = epub.get_metadata().await?;
@@ -125,6 +156,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
     let mut next_chunk_id: u32 = 0;
 
     // Extract image alt texts from parsed ASTs
+    progress.stage("Parsing chapters");
     let mut img_alt_map: std::collections::HashMap<String, String> =
         std::collections::HashMap::new();
     let mut parsed_chapters: Vec<lexepub::ParsedChapter> = Vec::new();
@@ -136,18 +168,28 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                 parsed_chapters.push(parsed);
             }
         }
+        progress.advance();
     }
     if !parsed_chapters.is_empty() {
+        // resource paths the converter will actually embed
+        let mut valid_paths: std::collections::HashSet<String> = std::collections::HashSet::new();
+        for item in &manifest {
+            valid_paths.insert(item.href.clone());
+            valid_paths.insert(resolve(&item.href));
+        }
+
+        progress.stage("Extracting alt-text");
         img_alt_map = honzo_chunks::data::img::collect_and_resolve_img_alts_async(
             &parsed_chapters,
-            &mut epub,
-        )
-        .await;
+            &valid_paths,
+            &|| progress.advance(),
+        );
     }
 
     let mut img_path_to_chunk: HashMap<String, u32> = HashMap::new();
 
     // Cover image
+    progress.stage("Extracting cover");
     if let Some(ref cid) = opf.cover_id {
         if let Some(item) = manifest.iter().find(|m| m.id == *cid) {
             let path = resolve(&item.href);
@@ -181,6 +223,8 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         }
     }
 
+    // Non-cover images
+    progress.stage("Extracting images");
     for item in &manifest {
         if item.media_type.starts_with("image/")
             && Some(item.id.as_str()) != opf.cover_id.as_deref()
@@ -220,8 +264,11 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                 next_chunk_id += 1;
             }
         }
+        progress.advance();
     }
 
+    // CSS resources
+    progress.stage("Extracting resources");
     for item in &manifest {
         if item.media_type == "text/css" {
             let path = resolve(&item.href);
@@ -263,8 +310,11 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
                 next_chunk_id += 1;
             }
         }
+        progress.advance();
     }
 
+    // Build spine path -> chunk ID map for cross-chapter link rewriting
+    progress.stage("Processing chapters");
     let mut chapter_texts: Vec<String> = Vec::new();
     let mut chapter_chunk_ids: Vec<u32> = Vec::new();
     let mut all_pmap_entries: Vec<(u32, u32, u32)> = Vec::new(); // (page_num, chunk_id, byte_offset)
@@ -337,6 +387,7 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
             None,
         );
         next_chunk_id += 1;
+        progress.advance();
     }
 
     if chapter_chunk_ids.len() != chapter_texts.len() {
@@ -368,6 +419,8 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         }
     }
 
+    // Build search index
+    progress.stage("Building index");
     let sidx_refs: Vec<(u32, &str)> = chapter_chunk_ids
         .iter()
         .zip(chapter_texts.iter())
@@ -389,6 +442,8 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         builder = builder.set_flags(0x20);
     }
 
+    // Finalize
+    progress.stage("Finalizing");
     let mut title_map = HashMap::new();
     if let Some(ref t) = title {
         title_map.insert(language.clone(), t.clone());
@@ -416,7 +471,8 @@ async fn convert_epub(data: Bytes) -> Result<Vec<u8>, ConvertError> {
         reading_time_mins: Some(compute_reading_time(word_count)),
         ..Default::default()
     };
-    let meta_bytes = rmp_serde::to_vec(&honzo_meta).unwrap();
+    let meta_bytes =
+        rmp_serde::to_vec(&honzo_meta).map_err(|e| ConvertError::IoError(e.to_string()))?;
     builder = builder.set_meta(&meta_bytes);
 
     builder.finalize().map_err(Into::into)

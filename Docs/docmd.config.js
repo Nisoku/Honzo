@@ -9,7 +9,7 @@ export default {
     enableModeToggle: true,
     positionMode: "top",
     codeHighlight: true,
-    customCss: ['/assets/css/theme.css'],
+    customCss: ["/assets/css/theme.css"],
     copyWidgets: {
       enabled: true,
       raw: true,
@@ -19,7 +19,8 @@ export default {
   layout: {
     footer: {
       style: "complete",
-      description: "A binary ebook format for simplicity, performance, and portability.",
+      description:
+        "A binary ebook format for simplicity, performance, and portability.",
       branding: true,
       columns: [
         {
@@ -35,7 +36,10 @@ export default {
           links: [
             { text: "GitHub", url: "https://github.com/Nisoku/Honzo" },
             { text: "Issues", url: "https://github.com/Nisoku/Honzo/issues" },
-            { text: "Discussions", url: "https://github.com/Nisoku/Honzo/discussions" },
+            {
+              text: "Discussions",
+              url: "https://github.com/Nisoku/Honzo/discussions",
+            },
           ],
         },
       ],
@@ -75,9 +79,21 @@ export default {
       icon: "rocket",
       collapsible: false,
       children: [
-        { title: "Quick Start", path: "/getting-started/quickstart", icon: "play" },
-        { title: "Installation", path: "/getting-started/installation", icon: "download" },
-        { title: "Core Concepts", path: "/getting-started/concepts", icon: "book" },
+        {
+          title: "Quick Start",
+          path: "/getting-started/quickstart",
+          icon: "play",
+        },
+        {
+          title: "Installation",
+          path: "/getting-started/installation",
+          icon: "download",
+        },
+        {
+          title: "Core Concepts",
+          path: "/getting-started/concepts",
+          icon: "book",
+        },
       ],
     },
     {
@@ -116,7 +132,11 @@ export default {
       path: "/features/",
       collapsible: false,
       children: [
-        { title: "Annotations", path: "/features/annotations", icon: "pen-tool" },
+        {
+          title: "Annotations",
+          path: "/features/annotations",
+          icon: "pen-tool",
+        },
         { title: "Search Index", path: "/features/search", icon: "search" },
         { title: "Sync Tracks", path: "/features/sync", icon: "clock" },
         { title: "Streaming", path: "/features/streaming", icon: "wind" },
@@ -140,9 +160,24 @@ export default {
       collapsible: false,
       children: [
         { title: "Reader", path: "/demo/", icon: "book", external: true },
-        { title: "Maker", path: "/demo/maker.html", icon: "wrench", external: true },
-        { title: "Inspect", path: "/demo/inspect.html", icon: "search", external: true },
-        { title: "Convert", path: "/demo/convert.html", icon: "git-merge", external: true },
+        {
+          title: "Maker",
+          path: "/demo/maker.html",
+          icon: "wrench",
+          external: true,
+        },
+        {
+          title: "Inspect",
+          path: "/demo/inspect.html",
+          icon: "search",
+          external: true,
+        },
+        {
+          title: "Convert",
+          path: "/demo/convert.html",
+          icon: "git-merge",
+          external: true,
+        },
       ],
     },
     {
@@ -152,7 +187,11 @@ export default {
       collapsible: false,
       children: [
         { title: "Building", path: "/contributing/building", icon: "network" },
-        { title: "Architecture", path: "/contributing/architecture", icon: "git-commit" },
+        {
+          title: "Architecture",
+          path: "/contributing/architecture",
+          icon: "git-commit",
+        },
       ],
     },
     {
@@ -162,7 +201,8 @@ export default {
       external: true,
     },
   ],
-  footer: "Built with [docmd](https://docmd.io). [View on GitHub](https://github.com/Nisoku/Honzo).",
+  footer:
+    "Built with [docmd](https://docmd.io). [View on GitHub](https://github.com/Nisoku/Honzo).",
   editLink: {
     enabled: true,
     baseUrl: "https://github.com/Nisoku/Honzo/edit/main/",

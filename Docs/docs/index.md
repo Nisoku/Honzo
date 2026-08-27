@@ -6,6 +6,7 @@ description: "A binary ebook format designed for simplicity, performance, and po
 ::: hero layout:split glow:true
 
 <!-- markdownlint-disable MD025 -->
+
 # Honzo
 
 A binary ebook format for simplicity, performance, and portability.
@@ -16,6 +17,7 @@ A binary ebook format for simplicity, performance, and portability.
 
 ::: button "Quick Start" ./getting-started/quickstart.md icon:play
 <!--markdownlint-disable MD034-->
+
 ::: button "GitHub" external:https://github.com/Nisoku/Honzo icon:github
 
 == side
@@ -87,9 +89,9 @@ for entry in p.toc_entries() {
 == tab "TypeScript"
 
 ```typescript
-import { createReader } from '@nisoku/honzo';
+import { createReader } from "@nisoku/honzo";
 
-const response = await fetch('book.hzo');
+const response = await fetch("book.hzo");
 const buf = new Uint8Array(await response.arrayBuffer());
 const reader = await createReader(buf);
 

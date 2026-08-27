@@ -1,10 +1,15 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs;
-use std::io::Read;
-use std::path::PathBuf;
+use std::io::{self, Read};
+use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::Mutex;
+use std::time::Instant;
 
 use clap::{Parser, Subcommand};
 use honzo_io::*;
+use indicatif::{HumanDuration, ProgressBar, ProgressStyle};
+use rayon::prelude::*;
 
 #[derive(Parser)]
 #[command(name = "honzo", about = "Honzo ebook format tool")]
@@ -64,21 +69,60 @@ enum Commands {
     Tree { file: PathBuf },
 }
 
-fn read_file(path: &PathBuf) -> Vec<u8> {
-    let mut f = fs::File::open(path).unwrap_or_else(|e| {
-        eprintln!("Error: cannot open {}: {}", path.display(), e);
-        std::process::exit(1);
-    });
+fn read_file(path: &Path) -> io::Result<Vec<u8>> {
+    let mut f = fs::File::open(path)?;
     let mut buf = Vec::new();
-    f.read_to_end(&mut buf).unwrap_or_else(|e| {
-        eprintln!("Error: cannot read {}: {}", path.display(), e);
-        std::process::exit(1);
-    });
-    buf
+    f.read_to_end(&mut buf)?;
+    Ok(buf)
 }
 
-fn cmd_info(file: &PathBuf) {
-    let data = read_file(file);
+fn read_file_or_exit(path: &Path) -> Vec<u8> {
+    read_file(path).unwrap_or_else(|e| {
+        eprintln!("Error: cannot read {}: {}", path.display(), e);
+        std::process::exit(1);
+    })
+}
+
+struct ProgressTracker {
+    pb: ProgressBar,
+    stage_name: Mutex<String>,
+    stage_total: AtomicU32,
+    stage_done: AtomicU32,
+}
+
+impl ProgressTracker {
+    fn new(pb: ProgressBar) -> Self {
+        Self {
+            pb,
+            stage_name: Mutex::new(String::new()),
+            stage_total: AtomicU32::new(0),
+            stage_done: AtomicU32::new(0),
+        }
+    }
+}
+
+impl honzo_convert::ConvertProgress for ProgressTracker {
+    fn stage(&self, name: &str) {
+        *self.stage_name.lock().expect("progress lock poisoned") = name.to_string();
+        self.stage_done.store(0, Ordering::Relaxed);
+        self.stage_total.store(0, Ordering::Relaxed);
+        self.pb.set_message(format!("{}...", name));
+    }
+
+    fn advance(&self) {
+        self.stage_done.fetch_add(1, Ordering::Relaxed);
+        let done = self.stage_done.load(Ordering::Relaxed);
+        self.pb.set_message(format!(
+            "{}... ({})",
+            self.stage_name.lock().expect("progress lock poisoned"),
+            done
+        ));
+        self.pb.inc(1);
+    }
+}
+
+fn cmd_info(file: &Path) {
+    let data = read_file_or_exit(file);
     let p = honzo_core::HonzoParser::new(&data, 1).unwrap_or_else(|e| {
         eprintln!("Parse error: {:?}", e);
         std::process::exit(1);
@@ -138,8 +182,8 @@ fn cmd_info(file: &PathBuf) {
     }
 }
 
-fn cmd_inspect(file: &PathBuf, json: bool) {
-    let data = read_file(file);
+fn cmd_inspect(file: &Path, json: bool) {
+    let data = read_file_or_exit(file);
     let p = honzo_core::HonzoParser::new(&data, 1).unwrap_or_else(|e| {
         eprintln!("Parse error: {:?}", e);
         std::process::exit(1);
@@ -274,14 +318,17 @@ fn cmd_inspect(file: &PathBuf, json: bool) {
     };
 
     if json {
-        println!("{}", serde_json::to_string_pretty(&dump).unwrap());
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&dump).expect("failed to serialize dump")
+        );
     } else {
         println!("{:#?}", dump);
     }
 }
 
-fn cmd_extract(file: &PathBuf, chunk_id: u32, out: &PathBuf) {
-    let data = read_file(file);
+fn cmd_extract(file: &Path, chunk_id: u32, out: &Path) {
+    let data = read_file_or_exit(file);
     let p = honzo_core::HonzoParser::new(&data, 1).unwrap_or_else(|e| {
         eprintln!("Parse error: {:?}", e);
         std::process::exit(1);
@@ -317,8 +364,8 @@ fn cmd_extract(file: &PathBuf, chunk_id: u32, out: &PathBuf) {
     );
 }
 
-fn cmd_extract_all(file: &PathBuf, out_dir: &PathBuf) {
-    let data = read_file(file);
+fn cmd_extract_all(file: &Path, out_dir: &Path) {
+    let data = read_file_or_exit(file);
     let p = honzo_core::HonzoParser::new(&data, 1).unwrap_or_else(|e| {
         eprintln!("Parse error: {:?}", e);
         std::process::exit(1);
@@ -357,8 +404,8 @@ fn cmd_extract_all(file: &PathBuf, out_dir: &PathBuf) {
     }
 }
 
-fn cmd_build(spec: &PathBuf, out: &PathBuf) {
-    let spec_data = read_file(spec);
+fn cmd_build(spec: &Path, out: &Path) {
+    let spec_data = read_file_or_exit(spec);
     let spec: serde_json::Value = serde_json::from_slice(&spec_data).unwrap_or_else(|e| {
         eprintln!("Error parsing spec JSON: {}", e);
         std::process::exit(1);
@@ -467,17 +514,97 @@ fn detect_format(data: &[u8]) -> &'static str {
     }
 }
 
-fn cmd_convert(input: &PathBuf, out: &PathBuf) {
-    let data = read_file(input);
+fn cmd_convert(input: &Path, out: &Path) {
+    // Directory mode: convert markdown project
+    if input.is_dir() {
+        eprintln!("Detected format: markdown (directory)");
+        let spinner = ProgressBar::new_spinner();
+        spinner.set_style(
+            ProgressStyle::with_template("{spinner:.green} {msg}")
+                .expect("invalid progress template")
+                .tick_chars("⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"),
+        );
+        spinner.set_message("Converting...");
+        spinner.enable_steady_tick(std::time::Duration::from_millis(80));
+        let result = honzo_convert::from_markdown_dir(input);
+        spinner.finish_and_clear();
+        match result {
+            Ok(hzo) => {
+                fs::write(out, &hzo).unwrap_or_else(|e| {
+                    eprintln!("Error writing {}: {}", out.display(), e);
+                    std::process::exit(1);
+                });
+                println!(
+                    "Converted {} -> {} ({} bytes)",
+                    input.display(),
+                    out.display(),
+                    hzo.len()
+                );
+            }
+            Err(e) => {
+                eprintln!("Conversion failed: {:?}", e);
+                std::process::exit(1);
+            }
+        }
+        return;
+    }
 
+    // Markdown file mode
+    let ext = input.extension().and_then(|e| e.to_str()).unwrap_or("");
+    if ext.eq_ignore_ascii_case("md") || ext.eq_ignore_ascii_case("markdown") {
+        eprintln!("Detected format: markdown (file)");
+        let spinner = ProgressBar::new_spinner();
+        spinner.set_style(
+            ProgressStyle::with_template("{spinner:.green} {msg}")
+                .expect("invalid progress template")
+                .tick_chars("⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"),
+        );
+        spinner.set_message("Converting...");
+        spinner.enable_steady_tick(std::time::Duration::from_millis(80));
+        let result = honzo_convert::from_markdown_file(input);
+        spinner.finish_and_clear();
+        match result {
+            Ok(hzo) => {
+                fs::write(out, &hzo).unwrap_or_else(|e| {
+                    eprintln!("Error writing {}: {}", out.display(), e);
+                    std::process::exit(1);
+                });
+                println!(
+                    "Converted {} -> {} ({} bytes)",
+                    input.display(),
+                    out.display(),
+                    hzo.len()
+                );
+            }
+            Err(e) => {
+                eprintln!("Conversion failed: {:?}", e);
+                std::process::exit(1);
+            }
+        }
+        return;
+    }
+
+    // Existing magic-byte detection for epub/mobi/pdf
+    let data = read_file_or_exit(input);
     let detected = detect_format(&data);
     eprintln!("Detected format: {}", detected);
 
+    let start = Instant::now();
+    let pb = ProgressBar::new(0);
+    pb.set_style(
+        ProgressStyle::with_template("{spinner:.green} {msg}")
+            .expect("invalid progress template")
+            .tick_chars("⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"),
+    );
+    pb.enable_steady_tick(std::time::Duration::from_millis(80));
+    let tracker = ProgressTracker::new(pb.clone());
+
     let result = match detected {
-        "epub" => honzo_convert::from_epub(&data),
+        "epub" => honzo_convert::from_epub_with_progress(&data, &tracker),
         "pdf" => honzo_convert::from_pdf(&data),
         _ => honzo_convert::from_mobi(&data),
     };
+    pb.finish_and_clear();
 
     match result {
         Ok(hzo) => {
@@ -486,10 +613,11 @@ fn cmd_convert(input: &PathBuf, out: &PathBuf) {
                 std::process::exit(1);
             });
             println!(
-                "Converted {} -> {} ({} bytes)",
+                "Converted {} -> {} ({}, {})",
                 input.display(),
                 out.display(),
-                hzo.len()
+                human_size(hzo.len() as u64),
+                HumanDuration(start.elapsed())
             );
         }
         Err(e) => {
@@ -499,10 +627,7 @@ fn cmd_convert(input: &PathBuf, out: &PathBuf) {
     }
 }
 
-fn cmd_convert_batch(pattern: &str, out_dir: &PathBuf) {
-    let mut count = 0u32;
-    let mut errors = 0u32;
-
+fn cmd_convert_batch(pattern: &str, out_dir: &Path) {
     fs::create_dir_all(out_dir).unwrap_or_else(|e| {
         eprintln!(
             "Error creating output directory {}: {}",
@@ -512,44 +637,81 @@ fn cmd_convert_batch(pattern: &str, out_dir: &PathBuf) {
         std::process::exit(1);
     });
 
-    for entry in glob::glob(pattern).unwrap_or_else(|e| {
-        eprintln!("Error parsing pattern '{}': {}", pattern, e);
-        std::process::exit(1);
-    }) {
-        let input = match entry {
-            Ok(path) => path,
-            Err(e) => {
-                eprintln!("Error accessing path: {}", e);
-                errors += 1;
-                continue;
-            }
-        };
+    let files: Vec<PathBuf> = glob::glob(pattern)
+        .unwrap_or_else(|e| {
+            eprintln!("Error parsing pattern '{}': {}", pattern, e);
+            std::process::exit(1);
+        })
+        .filter_map(|entry| entry.ok())
+        .filter(|path| path.is_file())
+        .filter(|path| {
+            !path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .is_some_and(|n| n.starts_with("._"))
+        })
+        .collect();
 
-        if !input.is_file() {
-            continue;
+    if files.is_empty() {
+        eprintln!("No files matched pattern '{}'", pattern);
+        return;
+    }
+
+    let mut seen_stems: std::collections::HashSet<String> = std::collections::HashSet::new();
+    for input in &files {
+        let stem = input
+            .file_stem()
+            .map(|s| s.to_string_lossy().to_string())
+            .unwrap_or_default();
+        if !seen_stems.insert(stem.clone()) {
+            eprintln!(
+                "Error: multiple inputs resolve to the same output '{}', aborting batch",
+                stem
+            );
+            std::process::exit(1);
         }
+    }
 
-        let data = match fs::read(&input) {
-            Ok(d) => d,
-            Err(e) => {
-                eprintln!("Error reading {}: {}", input.display(), e);
-                errors += 1;
-                continue;
+    let total = files.len();
+    let pb = ProgressBar::new(total as u64);
+    pb.set_style(
+        ProgressStyle::with_template(
+            "{spinner:.green} [{bar:30}] {pos}/{len} files ({elapsed_precise})",
+        )
+        .expect("invalid progress template")
+        .progress_chars("=> "),
+    );
+    pb.enable_steady_tick(std::time::Duration::from_millis(80));
+
+    let start = Instant::now();
+    let errors = AtomicU32::new(0);
+
+    files.par_iter().for_each(|input| {
+        let ext = input
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        let result = if ext.eq_ignore_ascii_case("md") || ext.eq_ignore_ascii_case("markdown") {
+            honzo_convert::from_markdown_file(input)
+        } else {
+            let data = match fs::read(input) {
+                Ok(d) => d,
+                Err(e) => {
+                    eprintln!("Error reading {}: {}", input.display(), e);
+                    errors.fetch_add(1, Ordering::Relaxed);
+                    pb.inc(1);
+                    return;
+                }
+            };
+
+            let detected = detect_format(&data);
+
+            match detected {
+                "epub" => honzo_convert::from_epub(&data),
+                "pdf" => honzo_convert::from_pdf(&data),
+                _ => honzo_convert::from_mobi(&data),
             }
-        };
-
-        let detected = detect_format(&data);
-        eprintln!(
-            "[{}] Detected: {} ({} bytes)",
-            input.display(),
-            detected,
-            data.len()
-        );
-
-        let result = match detected {
-            "epub" => honzo_convert::from_epub(&data),
-            "pdf" => honzo_convert::from_pdf(&data),
-            _ => honzo_convert::from_mobi(&data),
         };
 
         match result {
@@ -557,42 +719,41 @@ fn cmd_convert_batch(pattern: &str, out_dir: &PathBuf) {
                 let mut out_name = input.file_stem().unwrap_or_default().to_os_string();
                 out_name.push(".hzo");
                 let out_path = out_dir.join(out_name);
-                if fs::write(&out_path, &hzo).is_err() {
-                    eprintln!("Error writing {}", out_path.display());
-                    errors += 1;
-                    continue;
+                if let Err(e) = fs::write(&out_path, &hzo) {
+                    eprintln!("Error writing {}: {}", out_path.display(), e);
+                    errors.fetch_add(1, Ordering::Relaxed);
                 }
-                println!(
-                    "  Converted {} -> {} ({} bytes)",
-                    input.display(),
-                    out_path.display(),
-                    hzo.len()
-                );
-                count += 1;
             }
             Err(e) => {
-                eprintln!(
-                    "  Conversion failed (detected format: {}): {:?}",
-                    detected, e
-                );
-                errors += 1;
+                eprintln!("  Conversion failed {}: {:?}", input.display(), e);
+                errors.fetch_add(1, Ordering::Relaxed);
             }
         }
-    }
+        pb.inc(1);
+    });
 
-    if errors > 0 {
+    pb.finish_and_clear();
+    let err_count = errors.load(Ordering::Relaxed);
+    let converted = total as u32 - err_count;
+    if err_count > 0 {
         eprintln!(
-            "Batch convert finished: {} converted, {} errors",
-            count, errors
+            "Batch convert finished: {} converted, {} errors ({})",
+            converted,
+            err_count,
+            HumanDuration(start.elapsed())
         );
         std::process::exit(1);
     } else {
-        println!("Batch convert finished: {} converted", count);
+        println!(
+            "Batch convert finished: {} converted ({})",
+            converted,
+            HumanDuration(start.elapsed())
+        );
     }
 }
 
-fn cmd_validate(file: &PathBuf) {
-    let data = read_file(file);
+fn cmd_validate(file: &Path) {
+    let data = read_file_or_exit(file);
     let p = match honzo_core::HonzoParser::new(&data, 1) {
         Ok(p) => p,
         Err(e) => {
@@ -686,8 +847,8 @@ fn extract_excerpt(text: &str, byte_offset: u32, context: usize) -> String {
     )
 }
 
-fn cmd_search(file: &PathBuf, query: &str) {
-    let data = read_file(file);
+fn cmd_search(file: &Path, query: &str) {
+    let data = read_file_or_exit(file);
     let p = honzo_core::HonzoParser::new(&data, 1).unwrap_or_else(|e| {
         eprintln!("Parse error: {:?}", e);
         std::process::exit(1);
@@ -705,7 +866,7 @@ fn cmd_search(file: &PathBuf, query: &str) {
         .map(|m| m.language)
         .unwrap_or_else(|| "en".to_string());
 
-    let sidx_entry = p.find_chunk(b"SIDX").unwrap();
+    let sidx_entry = p.find_chunk(b"SIDX").expect("SIDX chunk not found");
     let raw = p.chunk_bytes(&sidx_entry).unwrap_or_else(|e| {
         eprintln!("Error reading SIDX: {:?}", e);
         std::process::exit(1);
@@ -825,7 +986,7 @@ fn cmd_search(file: &PathBuf, query: &str) {
     }
 }
 
-fn human_size(bytes: u32) -> String {
+fn human_size(bytes: u64) -> String {
     if bytes >= 1024 * 1024 {
         format!("{:.1} MB", bytes as f64 / (1024.0 * 1024.0))
     } else if bytes >= 1024 {
@@ -835,8 +996,8 @@ fn human_size(bytes: u32) -> String {
     }
 }
 
-fn cmd_tree(file: &PathBuf) {
-    let data = read_file(file);
+fn cmd_tree(file: &Path) {
+    let data = read_file_or_exit(file);
     let p = honzo_core::HonzoParser::new(&data, 1).unwrap_or_else(|e| {
         eprintln!("Parse error: {:?}", e);
         std::process::exit(1);
@@ -856,7 +1017,7 @@ fn cmd_tree(file: &PathBuf) {
         head.version_major,
         head.version_minor,
         head.chunk_count,
-        human_size(total_size as u32),
+        human_size(total_size),
     );
 
     let has_extra = head.extra_size > 0;
@@ -896,24 +1057,20 @@ fn cmd_tree(file: &PathBuf) {
         format!("flags: {}", flag_line),
         format!("layout: {:?}", head.layout_mode()),
         format!("chunk_count: {}", head.chunk_count),
-        format!(
-            "TOC: {} ({} B)",
-            human_size(head.toc_size as u32),
-            head.toc_size
-        ),
+        format!("TOC: {} ({} B)", human_size(head.toc_size), head.toc_size),
         format!(
             "DATA: {} ({} B)",
-            human_size(head.data_size as u32),
+            human_size(head.data_size),
             head.data_size
         ),
         format!(
             "EXTRA: {} ({} B)",
-            human_size(head.extra_size as u32),
+            human_size(head.extra_size),
             head.extra_size
         ),
         format!(
             "META: {} ({} B)",
-            human_size(head.meta_size as u32),
+            human_size(head.meta_size),
             head.meta_size
         ),
     ];
@@ -925,7 +1082,7 @@ fn cmd_tree(file: &PathBuf) {
 
     // META
     let (conn, child) = tl(1, top_count);
-    println!("{conn} META ({})", human_size(head.meta_size as u32));
+    println!("{conn} META ({})", human_size(head.meta_size));
     if let Ok(meta_bytes) = p.meta_bytes() {
         if let Ok(meta) = rmp_serde::from_slice::<HonzoMeta>(meta_bytes) {
             let title_str = meta
@@ -971,7 +1128,7 @@ fn cmd_tree(file: &PathBuf) {
 
     // DATA
     let (conn, child) = tl(3, top_count);
-    println!("{conn} DATA ({})", human_size(head.data_size as u32));
+    println!("{conn} DATA ({})", human_size(head.data_size));
 
     // Group entries by tag type
     let mut groups: BTreeMap<&str, Vec<&TocEntry>> = BTreeMap::new();
@@ -1025,8 +1182,8 @@ fn cmd_tree(file: &PathBuf) {
             let compressed = if entry.compression != honzo_core::Compression::None {
                 format!(
                     " [lz4: {}→{}]",
-                    human_size(entry.size_compressed),
-                    human_size(entry.size_raw)
+                    human_size(entry.size_compressed as u64),
+                    human_size(entry.size_raw as u64)
                 )
             } else {
                 String::new()
@@ -1046,7 +1203,7 @@ fn cmd_tree(file: &PathBuf) {
     // EXTRA
     if has_extra {
         let (conn, _child) = tl(4, top_count);
-        println!("{conn} EXTRA ({})", human_size(head.extra_size as u32));
+        println!("{conn} EXTRA ({})", human_size(head.extra_size));
     }
 }
 

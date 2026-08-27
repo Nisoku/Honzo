@@ -19,3 +19,12 @@ export function hideError() {
   const el = document.getElementById("error-message");
   if (el) el.classList.remove("show");
 }
+
+export function showToast(message, duration = 1500) {
+  const el = document.getElementById("toast");
+  if (!el) return;
+  el.textContent = message;
+  el.classList.add("show");
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove("show"), duration);
+}

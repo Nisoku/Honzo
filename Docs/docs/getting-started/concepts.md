@@ -82,7 +82,7 @@ The streaming API (`HonzoStream`) reads and decompresses one chapter at a time. 
 Each TOC entry picks its compression independently:
 
 | Code | Algorithm | Use Case                               |
-|------|-----------|----------------------------------------|
+| ---- | --------- | -------------------------------------- |
 | 0    | None      | Images, fonts, already compressed data |
 | 1    | LZ4       | Chapter text, CSS, metadata            |
 
@@ -105,7 +105,7 @@ No bytes in DATA need rewriting. The same strategy powers MP4 and other streamin
 ## Chunk Types
 
 | Tag    | Type       | Description                              |
-|--------|------------|------------------------------------------|
+| ------ | ---------- | ---------------------------------------- |
 | `CHAP` | Chapter    | Book chapter content in Markdown or HTML |
 | `IMG_` | Image      | Inline image as JPEG, PNG, or WebP       |
 | `CSS_` | Stylesheet | CSS for chapter rendering                |
@@ -123,7 +123,7 @@ See [Chunk Types](../format/chunk-types) for the full reference.
 EXTRA entries use reverse domain namespacing for extensibility:
 
 | Namespace         | Purpose                                                       |
-|-------------------|---------------------------------------------------------------|
+| ----------------- | ------------------------------------------------------------- |
 | `org.nisoku.anno` | Portable annotations such as highlights, bookmarks, and notes |
 | `org.nisoku.drm`  | AES-256-GCM encryption envelope                               |
 | `org.nisoku.sync` | Audio, video, and text synchronization tracks                 |

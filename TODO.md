@@ -1,5 +1,9 @@
 # TODO
 
+- [ ] Web Converter freezes on larger files, make non-blocking
+- [ ] implement pagination in web reader
+- [ ] add some more indicators to the CLI, for long operations
+
 ## Comic/Manga/etc Support
 
 - [ ] CBZ converter

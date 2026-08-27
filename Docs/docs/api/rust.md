@@ -12,7 +12,7 @@ The Rust API is the primary surface for Honzo. It is organized across two crates
 :::
 
 | Symbol                 | Signature                                      | Returns         | Notes                                      |
-|------------------------|------------------------------------------------|-----------------|--------------------------------------------|
+| ---------------------- | ---------------------------------------------- | --------------- | ------------------------------------------ |
 | `HonzoParser::new`     | `pub fn new(data: &[u8], version: u32)`        | `Result<Self>`  | Parse HEAD from byte slice. No alloc.      |
 | `parser.head`          | `pub fn head(&self) -> &HonzoHead`             | `&HonzoHead`    | Pointer-cast to HEAD struct.               |
 | `parser.toc_entries`   | `pub fn toc_entries(&self) -> &[TocEntry]`     | `&[TocEntry]`   | Pointer-cast to TOC array.                 |
@@ -28,7 +28,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### Main types
 
 | Type          | Purpose                                        |
-|---------------|------------------------------------------------|
+| ------------- | ---------------------------------------------- |
 | `HonzoParser` | Zero-copy parser (re-exported from honzo-core) |
 | `HonzoStream` | Pull-based streaming reader                    |
 | `HonzoReader` | Reader with DRM decryption support             |
@@ -38,7 +38,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### Reader API
 
 | Symbol                | Signature                                    | Returns           | Notes                                                 |
-|-----------------------|----------------------------------------------|-------------------|-------------------------------------------------------|
+| --------------------- | -------------------------------------------- | ----------------- | ----------------------------------------------------- |
 | `HonzoReader::new`    | `pub fn new(data: &[u8], version: u32)`      | `Self`            | Create reader.                                        |
 | `reader.with_drm_key` | `pub fn with_drm_key(self, key: &[u8; 32])`  | `Self`            | Set X25519 private key for DRM.                       |
 | `reader.parse`        | `pub fn parse(&mut self)`                    | `Result<()>`      | Parse file structure and unwrap DRM envelope.         |
@@ -49,7 +49,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### Stream API
 
 | Symbol                | Signature                                   | Returns               | Notes                         |
-|-----------------------|---------------------------------------------|-----------------------|-------------------------------|
+| --------------------- | ------------------------------------------- | --------------------- | ----------------------------- |
 | `HonzoStream::open`   | `pub fn open(file: File, version: u32)`     | `Result<Self>`        | Open from std::fs::File.      |
 | `stream.with_drm_key` | `pub fn with_drm_key(self, key: &[u8; 32])` | `Self`                | Enable DRM decryption.        |
 | `stream.head`         | `pub fn head(&self) -> &HonzoHead`          | `&HonzoHead`          | File header.                  |
@@ -59,7 +59,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### Builder API
 
 | Symbol                 | Signature                                                                                       | Returns           | Notes                       |
-|------------------------|-------------------------------------------------------------------------------------------------|-------------------|-----------------------------|
+| ---------------------- | ----------------------------------------------------------------------------------------------- | ----------------- | --------------------------- |
 | `Builder::new`         | `pub fn new()`                                                                                  | `Self`            | New builder.                |
 | `builder.meta_title`   | `pub fn meta_title(self, lang, title)`                                                          | `Self`            | Set localized title.        |
 | `builder.meta_creator` | `pub fn meta_creator(self, lang, creator)`                                                      | `Self`            | Set localized creator.      |
@@ -71,7 +71,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### Crypto API
 
 | Symbol            | Signature                                  | Returns           | Notes                        |
-|-------------------|--------------------------------------------|-------------------|------------------------------|
+| ----------------- | ------------------------------------------ | ----------------- | ---------------------------- |
 | `generate_cek`    | `pub fn generate_cek()`                    | `[u8; 32]`        | Random 256-bit CEK.          |
 | `generate_nonce`  | `pub fn generate_nonce()`                  | `[u8; 12]`        | Random 12-byte nonce.        |
 | `encrypt_content` | `pub fn encrypt_content(data, key)`        | `Result<Vec<u8>>` | AES-256-GCM encrypt.         |
@@ -82,7 +82,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### DrmConfig API
 
 | Symbol                  | Signature                                 | Returns | Notes                                 |
-|-------------------------|-------------------------------------------|---------|---------------------------------------|
+| ----------------------- | ----------------------------------------- | ------- | ------------------------------------- |
 | `DrmConfig::new`        | `pub fn new()`                            | `Self`  | New DRM config.                       |
 | `config.encrypt_chunks` | `pub fn encrypt_chunks(self, indices)`    | `Self`  | Chunk IDs to encrypt.                 |
 | `config.add_recipient`  | `pub fn add_recipient(self, pub_key, id)` | `Self`  | Add a recipient by X25519 public key. |
@@ -94,7 +94,7 @@ Full featured crate with Builder, streaming reader, and compression.
 All fallible operations return `Result<T, HonzoError>`. Error variants include:
 
 | Variant                                  | Meaning                                               |
-|------------------------------------------|-------------------------------------------------------|
+| ---------------------------------------- | ----------------------------------------------------- |
 | ::: tag "InvalidMagic" color:#ef4444     | Not a Honzo file                                      |
 | ::: tag "InvalidVersion" color:#ef4444   | Unsupported format version                            |
 | ::: tag "InvalidChecksum" color:#ef4444  | Integrity check failed                                |

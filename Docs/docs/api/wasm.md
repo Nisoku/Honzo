@@ -25,13 +25,13 @@ npm install @nisoku/honzo
 ## createReader
 
 | Symbol         | Signature                                | Returns                | Notes               |
-|----------------|------------------------------------------|------------------------|---------------------|
+| -------------- | ---------------------------------------- | ---------------------- | ------------------- |
 | `createReader` | `(buffer: Uint8Array, version?: number)` | `Promise<HonzoReader>` | Parse a Honzo file. |
 
 ## HonzoReader
 
 | Symbol                 | Signature                  | Returns      | Notes                                     |
-|------------------------|----------------------------|--------------|-------------------------------------------|
+| ---------------------- | -------------------------- | ------------ | ----------------------------------------- |
 | `reader.chunkCount`    | `get`                      | `number`     | Number of chunks.                         |
 | `reader.layoutMode`    | `get`                      | `number`     | `0`=reflowable, `1`=fixed, `2`=scroll.    |
 | `reader.formatVersion` | `get`                      | `number`     | Format version.                           |
@@ -44,7 +44,7 @@ npm install @nisoku/honzo
 ## HonzoMeta
 
 | Field            | Type                                  | Description                |
-|------------------|---------------------------------------|----------------------------|
+| ---------------- | ------------------------------------- | -------------------------- |
 | `title`          | `Record<string, string> \| undefined` | Localized title map.       |
 | `creator`        | `Record<string, string> \| undefined` | Localized creator map.     |
 | `language`       | `string \| undefined`                 | Primary language (BCP 47). |
@@ -60,7 +60,7 @@ npm install @nisoku/honzo
 ## TocEntry
 
 | Field         | Type     | Description                             |
-|---------------|----------|-----------------------------------------|
+| ------------- | -------- | --------------------------------------- |
 | `chunkType`   | `string` | 4-byte type tag (e.g., `"CHAP"`).       |
 | `compression` | `number` | `0`=none, `1`=lz4.                      |
 | `markupType`  | `number` | `0`=markdown, `1`=html.                 |
@@ -70,13 +70,13 @@ npm install @nisoku/honzo
 ## buildHonzo
 
 | Symbol       | Signature               | Returns               | Notes                           |
-|--------------|-------------------------|-----------------------|---------------------------------|
+| ------------ | ----------------------- | --------------------- | ------------------------------- |
 | `buildHonzo` | `(config: BuildConfig)` | `Promise<Uint8Array>` | Build a Honzo file from config. |
 
 ### BuildConfig
 
 | Field        | Type                     | Default     | Description            |
-|--------------|--------------------------|-------------|------------------------|
+| ------------ | ------------------------ | ----------- | ---------------------- |
 | `chunks`     | `ChunkInput[]`           | required    | Array of chunk inputs. |
 | `meta`       | `Partial<HonzoMeta>`     | `{}`        | Book metadata.         |
 | `layoutMode` | `number`                 | `0`         | Layout mode.           |
@@ -85,7 +85,7 @@ npm install @nisoku/honzo
 ### ChunkInput
 
 | Field         | Type         | Description                  |
-|---------------|--------------|------------------------------|
+| ------------- | ------------ | ---------------------------- |
 | `type`        | `string`     | 4-byte type tag.             |
 | `data`        | `Uint8Array` | Chunk content.               |
 | `compression` | `number`     | `0`=none, `1`=lz4.           |
@@ -95,7 +95,7 @@ npm install @nisoku/honzo
 ### DrmConfig
 
 | Field             | Type          | Description                 |
-|-------------------|---------------|-----------------------------|
+| ----------------- | ------------- | --------------------------- |
 | `encryptedChunks` | `number[]`    | TOC indices to encrypt.     |
 | `recipients`      | `Recipient[]` | Authorized recipients.      |
 | `licenseUrl?`     | `string`      | Optional license URL.       |
@@ -104,7 +104,7 @@ npm install @nisoku/honzo
 ### Recipient
 
 | Field       | Type         | Description                   |
-|-------------|--------------|-------------------------------|
+| ----------- | ------------ | ----------------------------- |
 | `publicKey` | `Uint8Array` | X25519 public key (32 bytes). |
 | `id`        | `string`     | Recipient identifier.         |
 
@@ -113,7 +113,7 @@ npm install @nisoku/honzo
 Async functions throw `HonzoError` with a `code` property:
 
 | Code                                     | Meaning                    |
-|------------------------------------------|----------------------------|
+| ---------------------------------------- | -------------------------- |
 | ::: tag "InvalidMagic" color:#ef4444     | Not a Honzo file           |
 | ::: tag "InvalidVersion" color:#ef4444   | Unsupported format version |
 | ::: tag "DrmError" color:#ef4444         | DRM-related failure        |
@@ -122,19 +122,24 @@ Async functions throw `HonzoError` with a `code` property:
 ## Example
 
 ```typescript
-import { createReader, buildHonzo } from '@nisoku/honzo';
+import { createReader, buildHonzo } from "@nisoku/honzo";
 
 // Read
-const response = await fetch('book.hzo');
+const response = await fetch("book.hzo");
 const buf = new Uint8Array(await response.arrayBuffer());
 const reader = await createReader(buf);
 console.log(reader.chunkCount, reader.getMeta().title?.en);
 
 // Build
 const hzo = await buildHonzo({
-  meta: { title: { en: 'My Book' } },
+  meta: { title: { en: "My Book" } },
   chunks: [
-    { type: 'CHAP', data: new TextEncoder().encode('# Hello'), compression: 1, markupType: 0 },
+    {
+      type: "CHAP",
+      data: new TextEncoder().encode("# Hello"),
+      compression: 1,
+      markupType: 0,
+    },
   ],
 });
 ```
