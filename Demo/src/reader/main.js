@@ -163,6 +163,7 @@ hasBook.subscribe(() => updateSidebar(hasBook.get()));
 textAlign.subscribe(() => {
   document.body.setAttribute("data-text-align", textAlign.get());
 });
+document.body.setAttribute("data-text-align", textAlign.get());
 
 createIcons({ icons });
 

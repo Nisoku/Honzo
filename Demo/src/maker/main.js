@@ -209,6 +209,14 @@ bindEvent(chunksList, "click", (e) => {
   }
 });
 
+// Click-to-browse on drop zone
+bindEvent(chunksList, "click", (e) => {
+  const drop = e.target.closest(".chunk-file-drop");
+  if (!drop) return;
+  const input = drop.querySelector(".chunk-file-input");
+  if (input) input.click();
+});
+
 // File input for binary chunks
 bindEvent(chunksList, "change", (e) => {
   const input = e.target.closest(".chunk-file-input");

@@ -5,6 +5,7 @@
 - [ ] Migrate TypeScript adapter to modern Prettier config
 - [ ] Move TS adapter tests to tests/ folder (+ keys/)
 - [ ] implement pagination in web reader
+- [ ] add some more indicators to the CLI, for long operations
 
 ## Comic/Manga/etc Support
 

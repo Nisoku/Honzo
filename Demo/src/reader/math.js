@@ -1,10 +1,12 @@
-export function renderMath(container, data, contentType, reader) {
+import { render_math } from "../wasm/honzo_wasm.js";
+
+export function renderMath(container, data, contentType) {
   const raw = new TextDecoder().decode(data);
   const block = document.createElement("div");
   block.className = "math-block";
 
   try {
-    const mathml = reader.render_math(data, contentType);
+    const mathml = render_math(data, contentType);
     const el = parseMathML(mathml);
     if (el) {
       block.appendChild(el);

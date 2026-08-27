@@ -403,7 +403,11 @@ function renderMeta() {
 function field(label, id, value, optional, type) {
   const v = value !== null && value !== undefined ? value : "";
   const displayVal =
-    typeof v === "object" && v !== null ? Object.values(v)[0] || "" : String(v);
+    v instanceof Map
+      ? v.values().next().value || ""
+      : typeof v === "object" && v !== null
+        ? Object.values(v)[0] || ""
+        : String(v);
   const input =
     type === "textarea"
       ? `<textarea id="mf_${id}">${esc(displayVal)}</textarea>`

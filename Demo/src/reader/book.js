@@ -4,7 +4,7 @@ import init, {
   HonzoWasm,
   normalize_search_term as normalizeSearchTerm,
 } from "../wasm/honzo_wasm.js";
-import { showLoading, hideLoading, showError } from "./ui.js";
+import { showLoading, hideLoading, showError, showToast } from "./ui.js";
 import {
   bookTitle,
   chapterLabel,
@@ -460,7 +460,7 @@ function renderManga() {
     } else if (chunkType === "MATH") {
       const mathDiv = document.createElement("div");
       mathDiv.className = "manga-math";
-      renderMath(mathDiv, data, entry.content_type_value, reader);
+      renderMath(mathDiv, data, entry.content_type_value);
       page.appendChild(mathDiv);
     } else {
       const label = document.createElement("p");
@@ -601,7 +601,7 @@ function renderCurrentChapter(scrollToAnchor) {
     img.src = url;
     container.appendChild(img);
   } else if (isMath) {
-    renderMath(container, data, chapter.content_type_value, reader);
+    renderMath(container, data, chapter.content_type_value);
   } else if (
     chapter.chunk_type === "SIDX" ||
     chapter.chunk_type === "CSS_" ||
@@ -956,7 +956,10 @@ export function prevPage() {
     });
     return;
   }
-  if (currentChapterIndex <= 0) return;
+  if (currentChapterIndex <= 0) {
+    showToast("First page");
+    return;
+  }
   goToChapter(currentChapterIndex - 1);
 }
 
@@ -970,7 +973,10 @@ export function nextPage() {
     });
     return;
   }
-  if (currentChapterIndex >= chapters.length - 1) return;
+  if (currentChapterIndex >= chapters.length - 1) {
+    showToast("Last page");
+    return;
+  }
   goToChapter(currentChapterIndex + 1);
 }
 
