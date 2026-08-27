@@ -1,0 +1,168 @@
+{
+  "tree": [
+    {
+      "title": "Api",
+      "path": "api",
+      "children": [
+        {
+          "title": "C",
+          "path": "api/c.md"
+        },
+        {
+          "title": "Cpp",
+          "path": "api/cpp.md"
+        },
+        {
+          "title": "Index",
+          "path": "api/index.md"
+        },
+        {
+          "title": "Rust",
+          "path": "api/rust.md"
+        },
+        {
+          "title": "Wasm",
+          "path": "api/wasm.md"
+        }
+      ]
+    },
+    {
+      "title": "Cli",
+      "path": "cli",
+      "children": [
+        {
+          "title": "Index",
+          "path": "cli/index.md"
+        }
+      ]
+    },
+    {
+      "title": "Contributing",
+      "path": "contributing",
+      "children": [
+        {
+          "title": "Architecture",
+          "path": "contributing/architecture.md"
+        },
+        {
+          "title": "Building",
+          "path": "contributing/building.md"
+        },
+        {
+          "title": "Index",
+          "path": "contributing/index.md"
+        }
+      ]
+    },
+    {
+      "title": "Conversion",
+      "path": "conversion",
+      "children": [
+        {
+          "title": "Epub",
+          "path": "conversion/epub.md"
+        },
+        {
+          "title": "Index",
+          "path": "conversion/index.md"
+        },
+        {
+          "title": "Mobi",
+          "path": "conversion/mobi.md"
+        },
+        {
+          "title": "Pdf",
+          "path": "conversion/pdf.md"
+        }
+      ]
+    },
+    {
+      "title": "Demo Docs",
+      "path": "demo-docs",
+      "children": [
+        {
+          "title": "Index",
+          "path": "demo-docs/index.md"
+        }
+      ]
+    },
+    {
+      "title": "Features",
+      "path": "features",
+      "children": [
+        {
+          "title": "Annotations",
+          "path": "features/annotations.md"
+        },
+        {
+          "title": "Index",
+          "path": "features/index.md"
+        },
+        {
+          "title": "Search",
+          "path": "features/search.md"
+        },
+        {
+          "title": "Streaming",
+          "path": "features/streaming.md"
+        },
+        {
+          "title": "Sync",
+          "path": "features/sync.md"
+        }
+      ]
+    },
+    {
+      "title": "Format",
+      "path": "format",
+      "children": [
+        {
+          "title": "Chunk Types",
+          "path": "format/chunk-types.md"
+        },
+        {
+          "title": "Compression",
+          "path": "format/compression.md"
+        },
+        {
+          "title": "Drm",
+          "path": "format/drm.md"
+        },
+        {
+          "title": "Index",
+          "path": "format/index.md"
+        },
+        {
+          "title": "Layout",
+          "path": "format/layout.md"
+        },
+        {
+          "title": "Wire Format",
+          "path": "format/wire-format.md"
+        }
+      ]
+    },
+    {
+      "title": "Getting Started",
+      "path": "getting-started",
+      "children": [
+        {
+          "title": "Concepts",
+          "path": "getting-started/concepts.md"
+        },
+        {
+          "title": "Installation",
+          "path": "getting-started/installation.md"
+        },
+        {
+          "title": "Quickstart",
+          "path": "getting-started/quickstart.md"
+        }
+      ]
+    },
+    {
+      "title": "Index",
+      "path": "index.md"
+    }
+  ]
+}

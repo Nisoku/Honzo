@@ -10,8 +10,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.5.x">
+    <meta name="generator" content="docmd v0.9.4">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/Honzo/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/Honzo/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
     <script>/**
  * --------------------------------------------------------------------
  * docmd : the zero-config documentation engine.
@@ -29,9 +44,27 @@
 (function () {
   try {
     // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
     var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
 
     if (theme === 'system') {
       theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -65,32 +98,17 @@
         visibility: hidden;
       }
     </style>
-    
-    <script>
-      var root = "../../";
-      if (root && !root.endsWith('/')) root += '/';
-      if (root === '') root = './';
-      window.DOCMD_ROOT = root;
-
-      var siteRoot = "../../";
-      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
-      if (siteRoot === '') siteRoot = './';
-      window.DOCMD_SITE_ROOT = siteRoot;
-
-      window.DOCMD_APPEARANCE = "system";
-      window.DOCMD_VERSION_ROOT = "/";
-      window.DOCMD_BASE = "/";
-      window.DOCMD_LOCALE = "";
-      window.DOCMD_DEFAULT_LOCALE = "";
-    </script>
     <title>
       Sync Tracks : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=msy44anm">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=msy44anm" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=msy44anm" id="hljs-dark" disabled>
+
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mtb4na5q">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mtb4na5q">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mtb4na5q" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mtb4na5q" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Audio, video, and animation synchronization via org.nisoku.sync">
@@ -105,75 +123,33 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=msy44anm" >
+
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mtb4na5q" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=msy44anm">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mtb4na5q">
     
-    <script>/**
- * --------------------------------------------------------------------
- * docmd : the zero-config documentation engine.
- *
- * @package     @docmd/core (and ecosystem)
- * @website     https://docmd.io
- * @repository  https://github.com/docmd-io/docmd
- * @license     MIT
- * @copyright   Copyright (c) 2025-present docmd.io
- *
- * [docmd-source] - Please do not remove this header.
- * --------------------------------------------------------------------
- */
-
-(function () {
-  try {
-    // 1. Determine Theme
-    var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
-
-    if (theme === 'system') {
-      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    // 2. Apply to Root
-    document.documentElement.setAttribute('data-theme', theme);
-
-    // 3. Highlight.js Toggle Strategy
-    var lightLink = document.getElementById('hljs-light');
-    var darkLink = document.getElementById('hljs-dark');
-
-    if (lightLink && darkLink) {
-      if (theme === 'dark') {
-        lightLink.disabled = true;
-        darkLink.disabled = false;
-      } else {
-        lightLink.disabled = false;
-        darkLink.disabled = true;
-      }
-    }
-
-    document.documentElement.style.visibility = "visible";
-  } catch (e) {
-    document.documentElement.style.visibility = "visible";
-    console.error('Theme init failed', e);
-  }
-})();</script>
+    
   </head>
   <body
     class="sidebar-collapsible"
     data-default-collapsed="false"
     data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/features/sync.md">
 
-    <a href="#main-content" class="skip-link">skipToContent</a>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
 
     
     
       <aside class="sidebar">
         <div class="sidebar-header">
           
-            <h1><a href="../../">
+<h1><a href="../../">
                 Honzo
               </a></h1>
           
@@ -206,7 +182,7 @@
         </div>
         
 
-<nav class="sidebar-nav" aria-label="mainNavigation">
+<nav class="sidebar-nav" aria-label="Main Navigation">
   <ul>
     
       <li class="" >
@@ -1489,11 +1465,12 @@
       <div class="main-content-wrapper">
         
         
+        
           <header class="page-header">
             <div class="header-left">
               
                 <button id="sidebar-toggle-button" class="sidebar-toggle-button"
-                  aria-label="toggleSidebar">
+                  aria-label="Toggle Sidebar">
                   
 <svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-left"
@@ -1525,7 +1502,7 @@
 
 <div class="docmd-options-menu">
     
-    <button class="docmd-search-trigger" aria-label="search">
+    <button class="docmd-search-trigger" aria-label="Search">
         
 <svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-search"
@@ -1543,7 +1520,7 @@
   <circle cx="11" cy="11" r="8" />
 </svg>
 
-        <span class="search-label">search</span>
+        <span class="search-label">Search</span>
         <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
     </button>
     
@@ -1553,7 +1530,7 @@
     
 
     
-    <button class="theme-toggle-button" aria-label="toggleTheme">
+    <button class="theme-toggle-button" aria-label="Toggle theme">
         
 <svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-sun"
@@ -1608,7 +1585,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Sync%20Tracks%22%0Adescription%3A%20%22Audio%2C%20video%2C%20and%20animation%20synchronization%20via%20org.nisoku.sync%22%0A---%0A%0AThe%20%60org.nisoku.sync%60%20EXTRA%20namespace%20stores%20synchronization%20tracks%20that%20map%20text%20positions%20to%20media%20timestamps.%20Use%20this%20for%20read-along%2C%20audio%20books%2C%20karaoke%2C%20video%20captions%2C%20or%20page%20turn%20sync.%0A%0A%23%23%20Sync%20model%0A%0AEach%20sync%20track%20is%20a%20collection%20of%20cues%20that%20map%20a%20chunk%20position%20to%20a%20timestamp%3A%0A%0A%60%60%60mermaid%0Atimeline%0A%20%20%20%20title%20English%20Narration%0A%20%20%20%200ms%20%3A%20chunk%200%2C%20position%200%0A%20%20%20%201500ms%20%3A%20chunk%200%2C%20position%2042%0A%20%20%20%203200ms%20%3A%20chunk%200%2C%20position%20105%0A%60%60%60%0A%0A%23%23%20Data%20format%0A%0AStored%20as%20a%20MessagePack%20map%20in%20the%20EXTRA%20entry%3A%0A%0A%60%60%60python%0A%7B%0A%20%20%22version%22%3A%201%2C%0A%20%20%22tracks%22%3A%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22id%22%3A%20%22track-narration-en%22%2C%0A%20%20%20%20%20%20%22type%22%3A%20%22audio%22%2C%0A%20%20%20%20%20%20%22media%22%3A%20%22narration_en.mp3%22%2C%0A%20%20%20%20%20%20%22media_duration_ms%22%3A%20360000%2C%0A%20%20%20%20%20%20%22cues%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%22chunk%22%3A%200%2C%0A%20%20%20%20%20%20%20%20%20%20%22position%22%3A%200%2C%0A%20%20%20%20%20%20%20%20%20%20%22time_ms%22%3A%200%0A%20%20%20%20%20%20%20%20%7D%2C%0A%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%22chunk%22%3A%200%2C%0A%20%20%20%20%20%20%20%20%20%20%22position%22%3A%2042%2C%0A%20%20%20%20%20%20%20%20%20%20%22time_ms%22%3A%201500%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%22metadata%22%3A%20%7B%0A%20%20%20%20%20%20%20%20%22narrator%22%3A%20%22Jane%20Doe%22%2C%0A%20%20%20%20%20%20%20%20%22language%22%3A%20%22en%22%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%5D%2C%0A%20%20%22metadata%22%3A%20%7B%0A%20%20%20%20%22created%22%3A%20%222025-01-15T10%3A30%3A00Z%22%2C%0A%20%20%20%20%22modified%22%3A%20%222025-01-15T10%3A30%3A00Z%22%0A%20%20%7D%0A%7D%0A%60%60%60%0A%0A%23%23%23%20Cue%20fields%0A%0A%7C%20Field%20%20%20%20%20%20%7C%20Type%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------------%7C-------%7C---------------------------------------%7C%0A%7C%20%60chunk%60%20%20%20%20%7C%20%60int%60%20%7C%20TOC%20index%20of%20the%20chunk%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60position%60%20%7C%20%60int%60%20%7C%20Byte%20offset%20within%20decompressed%20chunk%20%7C%0A%7C%20%60time_ms%60%20%20%7C%20%60int%60%20%7C%20Timestamp%20in%20milliseconds%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%23%20Track%20types%0A%0A%7C%20Type%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------%7C-------------------------------%7C%0A%7C%20%60audio%60%20%20%20%20%20%7C%20Text-to-audio%20synchronization%20%7C%0A%7C%20%60video%60%20%20%20%20%20%7C%20Text-to-video%20synchronization%20%7C%0A%7C%20%60animation%60%20%7C%20Animation%20cue%20points%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60page%60%20%20%20%20%20%20%7C%20Page%20turn%20synchronization%20%20%20%20%20%7C%0A%0A%23%23%20Usage%0A%0A%60%60%60rust%0Ause%20honzo_chunks%3A%3Async%3A%3A%7BSyncDocument%2C%20SyncTrack%2C%20SyncCue%7D%3B%0A%0Alet%20mut%20doc%20%3D%20SyncDocument%3A%3Anew()%3B%0Alet%20mut%20track%20%3D%20SyncTrack%3A%3Anew(%22narration-en%22%2C%20SyncType%3A%3AAudio)%3B%0A%0Atrack.add_cue(SyncCue%3A%3Anew(0%2C%200%2C%200))%3B%0Atrack.add_cue(SyncCue%3A%3Anew(0%2C%2042%2C%201500))%3B%0Atrack.add_cue(SyncCue%3A%3Anew(0%2C%20105%2C%203200))%3B%0A%0Adoc.add_track(track)%3B%0Alet%20data%20%3D%20doc.encode().unwrap()%3B%0A%60%60%60%0A%0A%23%23%23%20Helper%20functions%0A%0A%7C%20Function%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C---------------------------------------------------------------%7C---------------------------------%7C%0A%7C%20%60create_audio_cue(chunk%2C%20position%2C%20time_ms)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Create%20an%20audio%20sync%20cue%20%20%20%20%20%20%20%20%7C%0A%7C%20%60create_video_cue(chunk%2C%20position%2C%20time_ms)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Create%20a%20video%20sync%20cue%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60create_page_cue(chunk%2C%20position%2C%20page_number)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Create%20a%20page%20sync%20cue%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60create_media_segment(chunk%2C%20position%2C%20time_ms%2C%20duration_ms)%60%20%7C%20Create%20a%20segment%20with%20duration%20%20%7C%0A%7C%20%60filter_cues_by_type(tracks%2C%20type)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Filter%20cues%20by%20sync%20type%20%20%20%20%20%20%20%20%7C%0A%7C%20%60find_nearest_cue(track%2C%20timestamp)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Find%20cue%20closest%20to%20a%20timestamp%20%7C%0A%7C%20%60merge_tracks(tracks...)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Merge%20multiple%20sync%20track%20sets%20%20%7C%0A%7C%20%60sort_cues_by_time(track)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Sort%20cues%20by%20timestamp%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20Design%20notes%0A%0APositions%20reference%20decompressed%20byte%20offsets.%20This%20approach%20matches%20the%20annotation%20system.%0A%0AMultiple%20tracks%20allow%20multiple%20languages%20or%20narrators.%0A%0AThe%20media%20file%20is%20referenced%20by%20identifier.%20The%20consuming%20application%20resolves%20the%20actual%20media.%0A%0ATimestamps%20in%20milliseconds%20give%20approximately%201ms%20precision.%20This%20suffices%20for%20audio%20and%20video%20synchronization.%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Sync%20Tracks%22%0Adescription%3A%20%22Audio%2C%20video%2C%20and%20animation%20synchronization%20via%20org.nisoku.sync%22%0A---%0A%0AThe%20%60org.nisoku.sync%60%20EXTRA%20namespace%20stores%20synchronization%20tracks%20that%20map%20text%20positions%20to%20media%20timestamps.%20Use%20this%20for%20read-along%2C%20audio%20books%2C%20karaoke%2C%20video%20captions%2C%20or%20page%20turn%20sync.%0A%0A%23%23%20Sync%20model%0A%0AEach%20sync%20track%20is%20a%20collection%20of%20cues%20that%20map%20a%20chunk%20position%20to%20a%20timestamp%3A%0A%0A%60%60%60mermaid%0Atimeline%0A%20%20%20%20title%20English%20Narration%0A%20%20%20%200ms%20%3A%20chunk%200%2C%20position%200%0A%20%20%20%201500ms%20%3A%20chunk%200%2C%20position%2042%0A%20%20%20%203200ms%20%3A%20chunk%200%2C%20position%20105%0A%60%60%60%0A%0A%23%23%20Data%20format%0A%0AStored%20as%20a%20MessagePack%20map%20in%20the%20EXTRA%20entry%3A%0A%0A%60%60%60python%0A%7B%0A%20%20%22version%22%3A%201%2C%0A%20%20%22tracks%22%3A%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22id%22%3A%20%22track-narration-en%22%2C%0A%20%20%20%20%20%20%22type%22%3A%20%22audio%22%2C%0A%20%20%20%20%20%20%22media%22%3A%20%22narration_en.mp3%22%2C%0A%20%20%20%20%20%20%22media_duration_ms%22%3A%20360000%2C%0A%20%20%20%20%20%20%22cues%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%22chunk%22%3A%200%2C%0A%20%20%20%20%20%20%20%20%20%20%22position%22%3A%200%2C%0A%20%20%20%20%20%20%20%20%20%20%22time_ms%22%3A%200%0A%20%20%20%20%20%20%20%20%7D%2C%0A%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%22chunk%22%3A%200%2C%0A%20%20%20%20%20%20%20%20%20%20%22position%22%3A%2042%2C%0A%20%20%20%20%20%20%20%20%20%20%22time_ms%22%3A%201500%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%22metadata%22%3A%20%7B%0A%20%20%20%20%20%20%20%20%22narrator%22%3A%20%22Jane%20Doe%22%2C%0A%20%20%20%20%20%20%20%20%22language%22%3A%20%22en%22%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%5D%2C%0A%20%20%22metadata%22%3A%20%7B%0A%20%20%20%20%22created%22%3A%20%222025-01-15T10%3A30%3A00Z%22%2C%0A%20%20%20%20%22modified%22%3A%20%222025-01-15T10%3A30%3A00Z%22%0A%20%20%7D%0A%7D%0A%60%60%60%0A%0A%23%23%23%20Cue%20fields%0A%0A%7C%20Field%20%20%20%20%20%20%7C%20Type%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----------%20%7C%20-----%20%7C%20-------------------------------------%20%7C%0A%7C%20%60chunk%60%20%20%20%20%7C%20%60int%60%20%7C%20TOC%20index%20of%20the%20chunk%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60position%60%20%7C%20%60int%60%20%7C%20Byte%20offset%20within%20decompressed%20chunk%20%7C%0A%7C%20%60time_ms%60%20%20%7C%20%60int%60%20%7C%20Timestamp%20in%20milliseconds%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%23%20Track%20types%0A%0A%7C%20Type%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------%20%7C%20-----------------------------%20%7C%0A%7C%20%60audio%60%20%20%20%20%20%7C%20Text-to-audio%20synchronization%20%7C%0A%7C%20%60video%60%20%20%20%20%20%7C%20Text-to-video%20synchronization%20%7C%0A%7C%20%60animation%60%20%7C%20Animation%20cue%20points%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60page%60%20%20%20%20%20%20%7C%20Page%20turn%20synchronization%20%20%20%20%20%7C%0A%0A%23%23%20Usage%0A%0A%60%60%60rust%0Ause%20honzo_chunks%3A%3Async%3A%3A%7BSyncDocument%2C%20SyncTrack%2C%20SyncCue%7D%3B%0A%0Alet%20mut%20doc%20%3D%20SyncDocument%3A%3Anew()%3B%0Alet%20mut%20track%20%3D%20SyncTrack%3A%3Anew(%22narration-en%22%2C%20SyncType%3A%3AAudio)%3B%0A%0Atrack.add_cue(SyncCue%3A%3Anew(0%2C%200%2C%200))%3B%0Atrack.add_cue(SyncCue%3A%3Anew(0%2C%2042%2C%201500))%3B%0Atrack.add_cue(SyncCue%3A%3Anew(0%2C%20105%2C%203200))%3B%0A%0Adoc.add_track(track)%3B%0Alet%20data%20%3D%20doc.encode().unwrap()%3B%0A%60%60%60%0A%0A%23%23%23%20Helper%20functions%0A%0A%7C%20Function%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-------------------------------------------------------------%20%7C%20-------------------------------%20%7C%0A%7C%20%60create_audio_cue(chunk%2C%20position%2C%20time_ms)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Create%20an%20audio%20sync%20cue%20%20%20%20%20%20%20%20%7C%0A%7C%20%60create_video_cue(chunk%2C%20position%2C%20time_ms)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Create%20a%20video%20sync%20cue%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60create_page_cue(chunk%2C%20position%2C%20page_number)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Create%20a%20page%20sync%20cue%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60create_media_segment(chunk%2C%20position%2C%20time_ms%2C%20duration_ms)%60%20%7C%20Create%20a%20segment%20with%20duration%20%20%7C%0A%7C%20%60filter_cues_by_type(tracks%2C%20type)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Filter%20cues%20by%20sync%20type%20%20%20%20%20%20%20%20%7C%0A%7C%20%60find_nearest_cue(track%2C%20timestamp)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Find%20cue%20closest%20to%20a%20timestamp%20%7C%0A%7C%20%60merge_tracks(tracks...)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Merge%20multiple%20sync%20track%20sets%20%20%7C%0A%7C%20%60sort_cues_by_time(track)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Sort%20cues%20by%20timestamp%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20Design%20notes%0A%0APositions%20reference%20decompressed%20byte%20offsets.%20This%20approach%20matches%20the%20annotation%20system.%0A%0AMultiple%20tracks%20allow%20multiple%20languages%20or%20narrators.%0A%0AThe%20media%20file%20is%20referenced%20by%20identifier.%20The%20consuming%20application%20resolves%20the%20actual%20media.%0A%0ATimestamps%20in%20milliseconds%20give%20approximately%201ms%20precision.%20This%20suffices%20for%20audio%20and%20video%20synchronization.%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1652,7 +1629,7 @@
                   
                     <div class="docmd-copy-widgets">
                       
-                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-copy"
@@ -1673,7 +1650,7 @@
                         </button>
                       
                       
-                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-message-square"
@@ -1690,7 +1667,7 @@
   <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
 </svg>
 </span>
-                          <span class="docmd-btn-text">copyContext</span>
+                          <span class="docmd-btn-text">Copy Context</span>
                         </button>
                       
                     </div>
@@ -1708,35 +1685,35 @@
 </div>
 <h2 id="data-format" class="docmd-heading"><a href="#data-format" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Data format</h2>
 <p>Stored as a MessagePack map in the EXTRA entry:</p>
-<pre class="hljs"><code>{
-  <span class="hljs-string">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>,
-  <span class="hljs-string">&quot;tracks&quot;</span><span class="hljs-punctuation">:</span> [
+<pre class="hljs"><code class="language-python">{
+  <span class="hljs-string">&quot;version&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">1</span>,
+  <span class="hljs-string">&quot;tracks&quot;</span><span class="hljs-operator">:</span> [
     {
-      <span class="hljs-string">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;track-narration-en&quot;</span>,
-      <span class="hljs-string">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;audio&quot;</span>,
-      <span class="hljs-string">&quot;media&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;narration_en.mp3&quot;</span>,
-      <span class="hljs-string">&quot;media_duration_ms&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">360000</span>,
-      <span class="hljs-string">&quot;cues&quot;</span><span class="hljs-punctuation">:</span> [
+      <span class="hljs-string">&quot;id&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;track-narration-en&quot;</span>,
+      <span class="hljs-string">&quot;type&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;audio&quot;</span>,
+      <span class="hljs-string">&quot;media&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;narration_en.mp3&quot;</span>,
+      <span class="hljs-string">&quot;media_duration_ms&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">360000</span>,
+      <span class="hljs-string">&quot;cues&quot;</span><span class="hljs-operator">:</span> [
         {
-          <span class="hljs-string">&quot;chunk&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span>,
-          <span class="hljs-string">&quot;position&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span>,
-          <span class="hljs-string">&quot;time_ms&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span>
+          <span class="hljs-string">&quot;chunk&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">0</span>,
+          <span class="hljs-string">&quot;position&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">0</span>,
+          <span class="hljs-string">&quot;time_ms&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">0</span>
         },
         {
-          <span class="hljs-string">&quot;chunk&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span>,
-          <span class="hljs-string">&quot;position&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">42</span>,
-          <span class="hljs-string">&quot;time_ms&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1500</span>
+          <span class="hljs-string">&quot;chunk&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">0</span>,
+          <span class="hljs-string">&quot;position&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">42</span>,
+          <span class="hljs-string">&quot;time_ms&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">1500</span>
         }
       ],
-      <span class="hljs-string">&quot;metadata&quot;</span><span class="hljs-punctuation">:</span> {
-        <span class="hljs-string">&quot;narrator&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Jane Doe&quot;</span>,
-        <span class="hljs-string">&quot;language&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;en&quot;</span>
+      <span class="hljs-string">&quot;metadata&quot;</span><span class="hljs-operator">:</span> {
+        <span class="hljs-string">&quot;narrator&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;Jane Doe&quot;</span>,
+        <span class="hljs-string">&quot;language&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;en&quot;</span>
       }
     }
   ],
-  <span class="hljs-string">&quot;metadata&quot;</span><span class="hljs-punctuation">:</span> {
-    <span class="hljs-string">&quot;created&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-01-15T10:30:00Z&quot;</span>,
-    <span class="hljs-string">&quot;modified&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-01-15T10:30:00Z&quot;</span>
+  <span class="hljs-string">&quot;metadata&quot;</span><span class="hljs-operator">:</span> {
+    <span class="hljs-string">&quot;created&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;2025-01-15T10:30:00Z&quot;</span>,
+    <span class="hljs-string">&quot;modified&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;2025-01-15T10:30:00Z&quot;</span>
   }
 }
 </code></pre>
@@ -1795,17 +1772,17 @@
 </tbody>
 </table>
 </div><h2 id="usage" class="docmd-heading"><a href="#usage" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Usage</h2>
-<pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_chunks<span class="hljs-punctuation">::</span>sync<span class="hljs-punctuation">::</span>{SyncDocument, SyncTrack, SyncCue};
+<pre class="hljs"><code class="language-rust"><span class="hljs-keyword">use</span> honzo_chunks<span class="hljs-operator">::</span>sync<span class="hljs-operator">::</span>{SyncDocument, SyncTrack, SyncCue};
 
-<span class="hljs-keyword">let</span> <span class="hljs-keyword">mut</span> doc <span class="hljs-punctuation">=</span> SyncDocument<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>();
-<span class="hljs-keyword">let</span> <span class="hljs-keyword">mut</span> track <span class="hljs-punctuation">=</span> SyncTrack<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>(<span class="hljs-string">&quot;narration-en&quot;</span>, SyncType<span class="hljs-punctuation">::</span>Audio);
+<span class="hljs-keyword">let</span> <span class="hljs-keyword">mut</span> doc <span class="hljs-operator">=</span> SyncDocument<span class="hljs-operator">::</span><span class="hljs-keyword">new</span>();
+<span class="hljs-keyword">let</span> <span class="hljs-keyword">mut</span> track <span class="hljs-operator">=</span> SyncTrack<span class="hljs-operator">::</span><span class="hljs-keyword">new</span>(<span class="hljs-string">&quot;narration-en&quot;</span>, SyncType<span class="hljs-operator">::</span>Audio);
 
-track.<span class="hljs-title function_">add_cue</span>(SyncCue<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>));
-track.<span class="hljs-title function_">add_cue</span>(SyncCue<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>(<span class="hljs-number">0</span>, <span class="hljs-number">42</span>, <span class="hljs-number">1500</span>));
-track.<span class="hljs-title function_">add_cue</span>(SyncCue<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>(<span class="hljs-number">0</span>, <span class="hljs-number">105</span>, <span class="hljs-number">3200</span>));
+track.<span class="hljs-title function_">add_cue</span>(SyncCue<span class="hljs-operator">::</span><span class="hljs-keyword">new</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>));
+track.<span class="hljs-title function_">add_cue</span>(SyncCue<span class="hljs-operator">::</span><span class="hljs-keyword">new</span>(<span class="hljs-number">0</span>, <span class="hljs-number">42</span>, <span class="hljs-number">1500</span>));
+track.<span class="hljs-title function_">add_cue</span>(SyncCue<span class="hljs-operator">::</span><span class="hljs-keyword">new</span>(<span class="hljs-number">0</span>, <span class="hljs-number">105</span>, <span class="hljs-number">3200</span>));
 
 doc.<span class="hljs-title function_">add_track</span>(track);
-<span class="hljs-keyword">let</span> data <span class="hljs-punctuation">=</span> doc.<span class="hljs-title function_">encode</span>().<span class="hljs-title function_">unwrap</span>();
+<span class="hljs-keyword">let</span> data <span class="hljs-operator">=</span> doc.<span class="hljs-title function_">encode</span>().<span class="hljs-title function_">unwrap</span>();
 </code></pre>
 <h3 id="usage-helper-functions" class="docmd-heading"><a href="#usage-helper-functions" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Helper functions</h3>
 <div class="table-wrapper"><table>
@@ -1877,14 +1854,14 @@ doc.<span class="hljs-title function_">add_track</span>(track);
   <path d="M19 12H5" />
 </svg>
 
-                        <span><small>previous</small><strong>
+                        <span><small>Previous</small><strong>
                             Search Index
                           </strong></span>
                       </a>
                     
                     
                       <a href="../../features/streaming/" class="next-page">
-                        <span><small>next</small>
+                        <span><small>Next</small>
                           <strong>
                             Streaming
                           </strong></span>
@@ -1910,12 +1887,13 @@ doc.<span class="hljs-title function_">add_track</span>(track);
                   </div>
                 
               </div>
+              
               <div class="toc-sidebar">
                 
 
 
   <div class="toc-container">
-    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
 <svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-down"
   xmlns="http://www.w3.org/2000/svg"
@@ -1965,33 +1943,34 @@ doc.<span class="hljs-title function_">add_track</span>(track);
   </div>
 
               </div>
+              
             </div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1787023392000">
+                <span class="git-last-updated" data-timestamp="1787810890000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1787023392000"></span>
+                  <span class="git-time" data-timestamp="1787810890000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
                     <ul class="git-commit-list">
                       
                         <li class="git-commit-item">
-                          <div class="git-commit-avatar" title="dependabot[bot]">
+                          <div class="git-commit-avatar" title="NellowTCS">
                             
-                              <img src="https://www.gravatar.com/avatar/48ea49be76d0c68403a7f3df87e3487d?d=mp&amp;s=64" alt="dependabot[bot]">
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Bump brace-expansion (#65)">Bump brace-expansion (#65)</div>
+                            <div class="git-commit-message" title="Add hzo_extract_meta_from_file, markdown converter CLI, and update dependencies (#66)">Add hzo_extract_meta_from_file, markd...</div>
                             <div class="git-commit-meta">
-                              <span class="git-commit-author">dependabot[bot]</span>
-                              <span class="git-commit-date" data-timestamp="1787023392000"></span>
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1787810890000"></span>
                             </div>
                           </div>
                         </li>
@@ -2046,11 +2025,11 @@ doc.<span class="hljs-title function_">add_track</span>(track);
                 <span class="footer-column-title">Resources</span>
                 <ul>
                   
-                    <li><a href="../../getting-started/quickstart/" >Getting Started</a></li>
+                    <li><a href="getting-started/quickstart/" >Getting Started</a></li>
                   
-                    <li><a href="../../format/" >Format Spec</a></li>
+                    <li><a href="format/" >Format Spec</a></li>
                   
-                    <li><a href="../../cli/" >CLI Commands</a></li>
+                    <li><a href="cli/" >CLI Commands</a></li>
                   
                 </ul>
               </div>
@@ -2075,7 +2054,7 @@ doc.<span class="hljs-title function_">add_track</span>(track);
         <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/Nisoku/Honzo">View on GitHub</a>.</div>
         
           <div class="branding-footer">
-            builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
           </div>
         
       </div>
@@ -2084,20 +2063,23 @@ doc.<span class="hljs-title function_">add_track</span>(track);
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=msy44anm"></script>
+      <script src="../../assets/js/docmd-main.js?v=mtb4na5q"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=msy44anm"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=msy44anm" ></script>
-<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=msy44anm" ></script>
-<script src="../../assets/js/init-mermaid.js?v=msy44anm" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=msy44anm" type="module"></script>
+      <script src="../../assets/js/docmd-git.js?v=mtb4na5q"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-search.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-git.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-ai.js?v=mtb4na5q" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
        data-search-placeholder="Search documentation..."
        data-search-no-results="No results found."
        data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
        data-search-initial="Type to start searching..."
        data-search-navigate="to navigate"
        data-search-escape="to close">
@@ -2165,6 +2147,9 @@ doc.<span class="hljs-title function_">add_track</span>(track);
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/Nisoku/Honzo/edit/main/","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"Honzo","siteBase":"/Honzo/","siteUrl":"https://nisoku.org/Honzo","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Getting Started","icon":"rocket","collapsible":false,"children":[{"title":"Quick Start","path":"/getting-started/quickstart/","icon":"play"},{"title":"Installation","path":"/getting-started/installation/","icon":"download"},{"title":"Core Concepts","path":"/getting-started/concepts/","icon":"book"}]},{"title":"Format Specification","icon":"file-text","path":"/format/","collapsible":false,"children":[{"title":"Wire Format","path":"/format/wire-format/","icon":"binary"},{"title":"Chunk Types","path":"/format/chunk-types/","icon":"package"},{"title":"Compression","path":"/format/compression/","icon":"zap"},{"title":"DRM & Encryption","path":"/format/drm/","icon":"lock"},{"title":"Layout Modes","path":"/format/layout/","icon":"columns"}]},{"title":"API Reference","icon":"code","path":"/api/","collapsible":false,"children":[{"title":"Rust","path":"/api/rust/","icon":"box"},{"title":"WASM / TypeScript","path":"/api/wasm/","icon":"cpu"},{"title":"C","path":"/api/c/","icon":"terminal"}]},{"title":"CLI Reference","icon":"terminal","path":"/cli/","collapsible":false},{"title":"Features","icon":"star","path":"/features/","collapsible":false,"children":[{"title":"Annotations","path":"/features/annotations/","icon":"pen-tool"},{"title":"Search Index","path":"/features/search/","icon":"search"},{"title":"Sync Tracks","path":"/features/sync/","icon":"clock"},{"title":"Streaming","path":"/features/streaming/","icon":"wind"}]},{"title":"Conversion","icon":"git-merge","path":"/conversion/","collapsible":false,"children":[{"title":"EPUB","path":"/conversion/epub/","icon":"book"},{"title":"MOBI","path":"/conversion/mobi/","icon":"book-open"},{"title":"PDF","path":"/conversion/pdf/","icon":"file-text"}]},{"title":"Demo Apps","icon":"eye","path":"/demo-docs/","collapsible":false,"children":[{"title":"Reader","path":"/demo/","icon":"book","external":true},{"title":"Maker","path":"/demo/maker/","icon":"wrench","external":true},{"title":"Inspect","path":"/demo/inspect/","icon":"search","external":true},{"title":"Convert","path":"/demo/convert/","icon":"git-merge","external":true}]},{"title":"Contributing","icon":"heart","path":"/contributing/","collapsible":false,"children":[{"title":"Building","path":"/contributing/building/","icon":"network"},{"title":"Architecture","path":"/contributing/architecture/","icon":"git-commit"}]},{"title":"GitHub","path":"https://github.com/Nisoku/Honzo","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":true},"isWorkspace":false,"workspaceProjects":[]};</script>
+      
+      
       
   </body>
 </html>

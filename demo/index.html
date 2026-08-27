@@ -26,11 +26,11 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=Merriweather:wght@300;400;700&family=IBM+Plex+Serif:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <script type="module" crossorigin src="/Honzo/demo/assets/main-N1VGypLw.js"></script>
-    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/honzo_wasm-uBj0Yqo7.js">
-    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/satori-O_Q_IFtY.js">
-    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/esc-Bzx7pNv8.js">
-    <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/honzo_wasm-DokVk88q.css">
+    <script type="module" crossorigin src="/Honzo/demo/assets/main-CJKZ4DyZ.js"></script>
+    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/honzo_wasm-BixQLJEI.js">
+    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/satori-BOADu6cw.js">
+    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/esc-By3oFyRa.js">
+    <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/honzo_wasm-CP08f4hw.css">
     <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/main-DcYJobQh.css">
   <link rel="manifest" href="/Honzo/demo/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Honzo/demo/registerSW.js"></script></head>
   <body>
@@ -102,9 +102,7 @@
           <option value="/Honzo/demo/hzo/with_sidx.hzo">
             With Search Index
           </option>
-          <option value="/Honzo/demo/hzo/with_pmap.hzo">
-            With Page Map
-          </option>
+          <option value="/Honzo/demo/hzo/with_pmap.hzo">With Page Map</option>
           <option value="/Honzo/demo/hzo/compressed_lz4.hzo">
             LZ4 Compressed
           </option>
@@ -242,6 +240,9 @@
     <!-- Overlay -->
     <div class="overlay" id="overlay"></div>
 
+    <!-- Toast -->
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
     <!-- Loading -->
     <div class="message" id="loading-message">
       <div class="spinner"></div>
@@ -261,7 +262,9 @@
     <input type="file" id="file-input" accept=".hzo" hidden />
 
     <footer class="powered-by">
-      Powered by <a href="https://nisoku.org/Sairin/">Sairin</a><span class="sep">·</span><a href="https://nisoku.org/Satori/docs/">Satori</a>
+      Powered by <a href="https://nisoku.org/Sairin/">Sairin</a
+      ><span class="sep">·</span
+      ><a href="https://nisoku.org/Satori/docs/">Satori</a>
     </footer>
 
   </body>

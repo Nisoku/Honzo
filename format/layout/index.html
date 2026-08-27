@@ -10,8 +10,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.5.x">
+    <meta name="generator" content="docmd v0.9.4">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/Honzo/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/Honzo/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
     <script>/**
  * --------------------------------------------------------------------
  * docmd : the zero-config documentation engine.
@@ -29,9 +44,27 @@
 (function () {
   try {
     // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
     var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
 
     if (theme === 'system') {
       theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -65,32 +98,17 @@
         visibility: hidden;
       }
     </style>
-    
-    <script>
-      var root = "../../";
-      if (root && !root.endsWith('/')) root += '/';
-      if (root === '') root = './';
-      window.DOCMD_ROOT = root;
-
-      var siteRoot = "../../";
-      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
-      if (siteRoot === '') siteRoot = './';
-      window.DOCMD_SITE_ROOT = siteRoot;
-
-      window.DOCMD_APPEARANCE = "system";
-      window.DOCMD_VERSION_ROOT = "/";
-      window.DOCMD_BASE = "/";
-      window.DOCMD_LOCALE = "";
-      window.DOCMD_DEFAULT_LOCALE = "";
-    </script>
     <title>
       Layout Modes : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=msy44anm">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=msy44anm" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=msy44anm" id="hljs-dark" disabled>
+
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mtb4na5q">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mtb4na5q">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mtb4na5q" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mtb4na5q" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Reflowable, fixed, and scroll layout modes in Honzo">
@@ -105,75 +123,33 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=msy44anm" >
+
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mtb4na5q" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=msy44anm">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mtb4na5q">
     
-    <script>/**
- * --------------------------------------------------------------------
- * docmd : the zero-config documentation engine.
- *
- * @package     @docmd/core (and ecosystem)
- * @website     https://docmd.io
- * @repository  https://github.com/docmd-io/docmd
- * @license     MIT
- * @copyright   Copyright (c) 2025-present docmd.io
- *
- * [docmd-source] - Please do not remove this header.
- * --------------------------------------------------------------------
- */
-
-(function () {
-  try {
-    // 1. Determine Theme
-    var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
-
-    if (theme === 'system') {
-      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    // 2. Apply to Root
-    document.documentElement.setAttribute('data-theme', theme);
-
-    // 3. Highlight.js Toggle Strategy
-    var lightLink = document.getElementById('hljs-light');
-    var darkLink = document.getElementById('hljs-dark');
-
-    if (lightLink && darkLink) {
-      if (theme === 'dark') {
-        lightLink.disabled = true;
-        darkLink.disabled = false;
-      } else {
-        lightLink.disabled = false;
-        darkLink.disabled = true;
-      }
-    }
-
-    document.documentElement.style.visibility = "visible";
-  } catch (e) {
-    document.documentElement.style.visibility = "visible";
-    console.error('Theme init failed', e);
-  }
-})();</script>
+    
   </head>
   <body
     class="sidebar-collapsible"
     data-default-collapsed="false"
     data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/format/layout.md">
 
-    <a href="#main-content" class="skip-link">skipToContent</a>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
 
     
     
       <aside class="sidebar">
         <div class="sidebar-header">
           
-            <h1><a href="../../">
+<h1><a href="../../">
                 Honzo
               </a></h1>
           
@@ -206,7 +182,7 @@
         </div>
         
 
-<nav class="sidebar-nav" aria-label="mainNavigation">
+<nav class="sidebar-nav" aria-label="Main Navigation">
   <ul>
     
       <li class="" >
@@ -1489,11 +1465,12 @@
       <div class="main-content-wrapper">
         
         
+        
           <header class="page-header">
             <div class="header-left">
               
                 <button id="sidebar-toggle-button" class="sidebar-toggle-button"
-                  aria-label="toggleSidebar">
+                  aria-label="Toggle Sidebar">
                   
 <svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-left"
@@ -1525,7 +1502,7 @@
 
 <div class="docmd-options-menu">
     
-    <button class="docmd-search-trigger" aria-label="search">
+    <button class="docmd-search-trigger" aria-label="Search">
         
 <svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-search"
@@ -1543,7 +1520,7 @@
   <circle cx="11" cy="11" r="8" />
 </svg>
 
-        <span class="search-label">search</span>
+        <span class="search-label">Search</span>
         <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
     </button>
     
@@ -1553,7 +1530,7 @@
     
 
     
-    <button class="theme-toggle-button" aria-label="toggleTheme">
+    <button class="theme-toggle-button" aria-label="Toggle theme">
         
 <svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-sun"
@@ -1608,7 +1585,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Layout%20Modes%22%0Adescription%3A%20%22Reflowable%2C%20fixed%2C%20and%20scroll%20layout%20modes%20in%20Honzo%22%0A---%0A%0AHonzo%20supports%20three%20layout%20modes.%20The%20mode%20is%20set%20in%20the%20HEAD%20%60layout_mode%60%20field%20and%20applies%20to%20the%20entire%20file.%0A%0A%23%23%20Modes%0A%0A%7C%20Code%20%7C%20Mode%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------%7C------------%7C--------------------------------------------------------------------------------%7C%0A%7C%200%20%20%20%20%7C%20Reflowable%20%7C%20Content%20wraps%20to%20fit%20the%20viewport.%20This%20is%20the%20typical%20ebook%20experience.%20%20%20%20%20%20%20%7C%0A%7C%201%20%20%20%20%7C%20Fixed%20%20%20%20%20%20%7C%20Content%20uses%20fixed%20coordinates.%20This%20resembles%20a%20PDF.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%202%20%20%20%20%7C%20Scroll%20%20%20%20%20%7C%20Content%20appears%20as%20one%20continuous%20scrollable%20flow.%20This%20works%20like%20a%20web%20page.%20%7C%0A%0A%23%23%20Reflowable%20(0)%0A%0AThis%20is%20the%20default.%20Text%20reflows%20to%20fit%20the%20reader&#039;s%20screen%20size%2C%20font%20preference%2C%20and%20orientation.%0A%0A-%20Chapters%20render%20one%20at%20a%20time.%0A-%20The%20reader%20can%20change%20text%20size%20and%20font.%0A-%20Images%20scale%20to%20fit%20the%20viewport.%0A-%20The%20reader%20application%20handles%20pagination.%0A%0AUse%20this%20for%20novels%2C%20text%20heavy%20books%2C%20and%20anything%20that%20should%20adapt%20to%20the%20device.%0A%0A%23%23%20Fixed%20(1)%0A%0AContent%20uses%20fixed%20positions%20and%20sizes%2C%20typically%20measured%20in%20pixels.%20Each%20chapter%20corresponds%20to%20a%20page%20with%20known%20dimensions.%0A%0A-%20All%20content%20has%20absolute%20positions.%0A-%20Font%20size%20and%20layout%20cannot%20change.%0A-%20The%20reader%20application%20renders%20each%20chapter%20as%20is.%0A-%20This%20mode%20works%20for%20comics%2C%20children&#039;s%20books%2C%20and%20textbooks%20with%20complex%20layouts.%0A%0A%23%23%20Scroll%20(2)%0A%0AAll%20chapters%20combine%20into%20a%20single%20scrollable%20view.%0A%0A-%20No%20page%20breaks%20appear%20between%20chapters.%0A-%20The%20reader%20application%20typically%20shows%20a%20continuous%20scroll.%0A-%20This%20mode%20works%20for%20long%20form%20articles%2C%20documentation%2C%20and%20web%20first%20content.%0A-%20Search%20and%20annotation%20span%20all%20chapters%20seamlessly.%0A%0A%23%23%20Reading%20Layout%20Modes%0A%0A%60%60%60rust%0Ause%20honzo_core%3A%3AHonzoParser%3B%0A%0Alet%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0Amatch%20p.head().layout_mode%20%7B%0A%20%20%20%200%20%3D%3E%20println!(%22Reflowable%22)%2C%0A%20%20%20%201%20%3D%3E%20println!(%22Fixed%20layout%22)%2C%0A%20%20%20%202%20%3D%3E%20println!(%22Scroll%22)%2C%0A%20%20%20%20_%20%3D%3E%20println!(%22Unknown%20mode%22)%2C%0A%7D%0A%60%60%60%0A%0A%60%60%60typescript%0Aimport%20%7B%20createReader%20%7D%20from%20&#039;%40nisoku%2Fhonzo&#039;%3B%0Aconst%20reader%20%3D%20await%20createReader(buf)%3B%0A%2F%2F%20reader.layoutMode%3A%200%20%3D%20reflowable%2C%201%20%3D%20fixed%2C%202%20%3D%20scroll%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Chunk%20Types%22%20.%2Fchunk-types.md%20icon%3Apackage%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Layout%20Modes%22%0Adescription%3A%20%22Reflowable%2C%20fixed%2C%20and%20scroll%20layout%20modes%20in%20Honzo%22%0A---%0A%0AHonzo%20supports%20three%20layout%20modes.%20The%20mode%20is%20set%20in%20the%20HEAD%20%60layout_mode%60%20field%20and%20applies%20to%20the%20entire%20file.%0A%0A%23%23%20Modes%0A%0A%7C%20Code%20%7C%20Mode%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----%20%7C%20----------%20%7C%20------------------------------------------------------------------------------%20%7C%0A%7C%200%20%20%20%20%7C%20Reflowable%20%7C%20Content%20wraps%20to%20fit%20the%20viewport.%20This%20is%20the%20typical%20ebook%20experience.%20%20%20%20%20%20%20%7C%0A%7C%201%20%20%20%20%7C%20Fixed%20%20%20%20%20%20%7C%20Content%20uses%20fixed%20coordinates.%20This%20resembles%20a%20PDF.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%202%20%20%20%20%7C%20Scroll%20%20%20%20%20%7C%20Content%20appears%20as%20one%20continuous%20scrollable%20flow.%20This%20works%20like%20a%20web%20page.%20%7C%0A%0A%23%23%20Reflowable%20(0)%0A%0AThis%20is%20the%20default.%20Text%20reflows%20to%20fit%20the%20reader&#039;s%20screen%20size%2C%20font%20preference%2C%20and%20orientation.%0A%0A-%20Chapters%20render%20one%20at%20a%20time.%0A-%20The%20reader%20can%20change%20text%20size%20and%20font.%0A-%20Images%20scale%20to%20fit%20the%20viewport.%0A-%20The%20reader%20application%20handles%20pagination.%0A%0AUse%20this%20for%20novels%2C%20text%20heavy%20books%2C%20and%20anything%20that%20should%20adapt%20to%20the%20device.%0A%0A%23%23%20Fixed%20(1)%0A%0AContent%20uses%20fixed%20positions%20and%20sizes%2C%20typically%20measured%20in%20pixels.%20Each%20chapter%20corresponds%20to%20a%20page%20with%20known%20dimensions.%0A%0A-%20All%20content%20has%20absolute%20positions.%0A-%20Font%20size%20and%20layout%20cannot%20change.%0A-%20The%20reader%20application%20renders%20each%20chapter%20as%20is.%0A-%20This%20mode%20works%20for%20comics%2C%20children&#039;s%20books%2C%20and%20textbooks%20with%20complex%20layouts.%0A%0A%23%23%20Scroll%20(2)%0A%0AAll%20chapters%20combine%20into%20a%20single%20scrollable%20view.%0A%0A-%20No%20page%20breaks%20appear%20between%20chapters.%0A-%20The%20reader%20application%20typically%20shows%20a%20continuous%20scroll.%0A-%20This%20mode%20works%20for%20long%20form%20articles%2C%20documentation%2C%20and%20web%20first%20content.%0A-%20Search%20and%20annotation%20span%20all%20chapters%20seamlessly.%0A%0A%23%23%20Reading%20Layout%20Modes%0A%0A%60%60%60rust%0Ause%20honzo_core%3A%3AHonzoParser%3B%0A%0Alet%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0Amatch%20p.head().layout_mode%20%7B%0A%20%20%20%200%20%3D%3E%20println!(%22Reflowable%22)%2C%0A%20%20%20%201%20%3D%3E%20println!(%22Fixed%20layout%22)%2C%0A%20%20%20%202%20%3D%3E%20println!(%22Scroll%22)%2C%0A%20%20%20%20_%20%3D%3E%20println!(%22Unknown%20mode%22)%2C%0A%7D%0A%60%60%60%0A%0A%60%60%60typescript%0Aimport%20%7B%20createReader%20%7D%20from%20%22%40nisoku%2Fhonzo%22%3B%0Aconst%20reader%20%3D%20await%20createReader(buf)%3B%0A%2F%2F%20reader.layoutMode%3A%200%20%3D%20reflowable%2C%201%20%3D%20fixed%2C%202%20%3D%20scroll%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Chunk%20Types%22%20.%2Fchunk-types.md%20icon%3Apackage%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1652,7 +1629,7 @@
                   
                     <div class="docmd-copy-widgets">
                       
-                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-copy"
@@ -1673,7 +1650,7 @@
                         </button>
                       
                       
-                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-message-square"
@@ -1690,7 +1667,7 @@
   <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
 </svg>
 </span>
-                          <span class="docmd-btn-text">copyContext</span>
+                          <span class="docmd-btn-text">Copy Context</span>
                         </button>
                       
                     </div>
@@ -1751,18 +1728,18 @@
 <li>Search and annotation span all chapters seamlessly.</li>
 </ul>
 <h2 id="reading-layout-modes" class="docmd-heading"><a href="#reading-layout-modes" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Reading Layout Modes</h2>
-<pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_core<span class="hljs-punctuation">::</span>HonzoParser;
+<pre class="hljs"><code class="language-rust"><span class="hljs-keyword">use</span> honzo_core<span class="hljs-operator">::</span>HonzoParser;
 
-<span class="hljs-keyword">let</span> p <span class="hljs-punctuation">=</span> HonzoParser<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>(<span class="hljs-punctuation">&amp;</span>data, <span class="hljs-number">1</span>).<span class="hljs-title function_">unwrap</span>();
+<span class="hljs-keyword">let</span> p <span class="hljs-operator">=</span> HonzoParser<span class="hljs-operator">::</span><span class="hljs-keyword">new</span>(<span class="hljs-operator">&amp;</span>data, <span class="hljs-number">1</span>).<span class="hljs-title function_">unwrap</span>();
 <span class="hljs-keyword">match</span> p.<span class="hljs-title function_">head</span>().<span class="hljs-attr">layout_mode</span> {
-    <span class="hljs-number">0</span> <span class="hljs-punctuation">=&gt;</span> println<span class="hljs-punctuation">!</span>(<span class="hljs-string">&quot;Reflowable&quot;</span>),
-    <span class="hljs-number">1</span> <span class="hljs-punctuation">=&gt;</span> println<span class="hljs-punctuation">!</span>(<span class="hljs-string">&quot;Fixed layout&quot;</span>),
-    <span class="hljs-number">2</span> <span class="hljs-punctuation">=&gt;</span> println<span class="hljs-punctuation">!</span>(<span class="hljs-string">&quot;Scroll&quot;</span>),
-    _ <span class="hljs-punctuation">=&gt;</span> println<span class="hljs-punctuation">!</span>(<span class="hljs-string">&quot;Unknown mode&quot;</span>),
+    <span class="hljs-number">0</span> <span class="hljs-operator">=&gt;</span> println<span class="hljs-operator">!</span>(<span class="hljs-string">&quot;Reflowable&quot;</span>),
+    <span class="hljs-number">1</span> <span class="hljs-operator">=&gt;</span> println<span class="hljs-operator">!</span>(<span class="hljs-string">&quot;Fixed layout&quot;</span>),
+    <span class="hljs-number">2</span> <span class="hljs-operator">=&gt;</span> println<span class="hljs-operator">!</span>(<span class="hljs-string">&quot;Scroll&quot;</span>),
+    _ <span class="hljs-operator">=&gt;</span> println<span class="hljs-operator">!</span>(<span class="hljs-string">&quot;Unknown mode&quot;</span>),
 }
 </code></pre>
-<pre class="hljs"><code><span class="hljs-keyword">import</span> { createReader } <span class="hljs-keyword">from</span> <span class="hljs-string">&#039;@nisoku/honzo&#039;</span>;
-<span class="hljs-keyword">const</span> reader <span class="hljs-punctuation">=</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">createReader</span>(buf);
+<pre class="hljs"><code class="language-typescript"><span class="hljs-keyword">import</span> { createReader } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@nisoku/honzo&quot;</span>;
+<span class="hljs-keyword">const</span> reader <span class="hljs-operator">=</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">createReader</span>(buf);
 <span class="hljs-comment">// reader.layoutMode: 0 = reflowable, 1 = fixed, 2 = scroll</span>
 </code></pre>
 <h2 id="next-steps" class="docmd-heading"><a href="#next-steps" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Next Steps</h2>
@@ -1832,14 +1809,14 @@ Chunk Types</a></div>
   <path d="M19 12H5" />
 </svg>
 
-                        <span><small>previous</small><strong>
+                        <span><small>Previous</small><strong>
                             DRM &amp; Encryption
                           </strong></span>
                       </a>
                     
                     
                       <a href="../../api/" class="next-page">
-                        <span><small>next</small>
+                        <span><small>Next</small>
                           <strong>
                             API Reference
                           </strong></span>
@@ -1865,12 +1842,13 @@ Chunk Types</a></div>
                   </div>
                 
               </div>
+              
               <div class="toc-sidebar">
                 
 
 
   <div class="toc-container">
-    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
 <svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-down"
   xmlns="http://www.w3.org/2000/svg"
@@ -1916,33 +1894,34 @@ Chunk Types</a></div>
   </div>
 
               </div>
+              
             </div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1787023392000">
+                <span class="git-last-updated" data-timestamp="1787810890000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1787023392000"></span>
+                  <span class="git-time" data-timestamp="1787810890000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
                     <ul class="git-commit-list">
                       
                         <li class="git-commit-item">
-                          <div class="git-commit-avatar" title="dependabot[bot]">
+                          <div class="git-commit-avatar" title="NellowTCS">
                             
-                              <img src="https://www.gravatar.com/avatar/48ea49be76d0c68403a7f3df87e3487d?d=mp&amp;s=64" alt="dependabot[bot]">
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Bump brace-expansion (#65)">Bump brace-expansion (#65)</div>
+                            <div class="git-commit-message" title="Add hzo_extract_meta_from_file, markdown converter CLI, and update dependencies (#66)">Add hzo_extract_meta_from_file, markd...</div>
                             <div class="git-commit-meta">
-                              <span class="git-commit-author">dependabot[bot]</span>
-                              <span class="git-commit-date" data-timestamp="1787023392000"></span>
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1787810890000"></span>
                             </div>
                           </div>
                         </li>
@@ -1997,11 +1976,11 @@ Chunk Types</a></div>
                 <span class="footer-column-title">Resources</span>
                 <ul>
                   
-                    <li><a href="../../getting-started/quickstart/" >Getting Started</a></li>
+                    <li><a href="getting-started/quickstart/" >Getting Started</a></li>
                   
-                    <li><a href="../../format/" >Format Spec</a></li>
+                    <li><a href="format/" >Format Spec</a></li>
                   
-                    <li><a href="../../cli/" >CLI Commands</a></li>
+                    <li><a href="cli/" >CLI Commands</a></li>
                   
                 </ul>
               </div>
@@ -2026,7 +2005,7 @@ Chunk Types</a></div>
         <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/Nisoku/Honzo">View on GitHub</a>.</div>
         
           <div class="branding-footer">
-            builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
           </div>
         
       </div>
@@ -2035,20 +2014,22 @@ Chunk Types</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=msy44anm"></script>
+      <script src="../../assets/js/docmd-main.js?v=mtb4na5q"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=msy44anm"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=msy44anm" ></script>
-<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=msy44anm" ></script>
-<script src="../../assets/js/init-mermaid.js?v=msy44anm" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=msy44anm" type="module"></script>
+      <script src="../../assets/js/docmd-git.js?v=mtb4na5q"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-search.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-git.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-ai.js?v=mtb4na5q" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
        data-search-placeholder="Search documentation..."
        data-search-no-results="No results found."
        data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
        data-search-initial="Type to start searching..."
        data-search-navigate="to navigate"
        data-search-escape="to close">
@@ -2116,6 +2097,9 @@ Chunk Types</a></div>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/Nisoku/Honzo/edit/main/","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"Honzo","siteBase":"/Honzo/","siteUrl":"https://nisoku.org/Honzo","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Getting Started","icon":"rocket","collapsible":false,"children":[{"title":"Quick Start","path":"/getting-started/quickstart/","icon":"play"},{"title":"Installation","path":"/getting-started/installation/","icon":"download"},{"title":"Core Concepts","path":"/getting-started/concepts/","icon":"book"}]},{"title":"Format Specification","icon":"file-text","path":"/format/","collapsible":false,"children":[{"title":"Wire Format","path":"/format/wire-format/","icon":"binary"},{"title":"Chunk Types","path":"/format/chunk-types/","icon":"package"},{"title":"Compression","path":"/format/compression/","icon":"zap"},{"title":"DRM & Encryption","path":"/format/drm/","icon":"lock"},{"title":"Layout Modes","path":"/format/layout/","icon":"columns"}]},{"title":"API Reference","icon":"code","path":"/api/","collapsible":false,"children":[{"title":"Rust","path":"/api/rust/","icon":"box"},{"title":"WASM / TypeScript","path":"/api/wasm/","icon":"cpu"},{"title":"C","path":"/api/c/","icon":"terminal"}]},{"title":"CLI Reference","icon":"terminal","path":"/cli/","collapsible":false},{"title":"Features","icon":"star","path":"/features/","collapsible":false,"children":[{"title":"Annotations","path":"/features/annotations/","icon":"pen-tool"},{"title":"Search Index","path":"/features/search/","icon":"search"},{"title":"Sync Tracks","path":"/features/sync/","icon":"clock"},{"title":"Streaming","path":"/features/streaming/","icon":"wind"}]},{"title":"Conversion","icon":"git-merge","path":"/conversion/","collapsible":false,"children":[{"title":"EPUB","path":"/conversion/epub/","icon":"book"},{"title":"MOBI","path":"/conversion/mobi/","icon":"book-open"},{"title":"PDF","path":"/conversion/pdf/","icon":"file-text"}]},{"title":"Demo Apps","icon":"eye","path":"/demo-docs/","collapsible":false,"children":[{"title":"Reader","path":"/demo/","icon":"book","external":true},{"title":"Maker","path":"/demo/maker/","icon":"wrench","external":true},{"title":"Inspect","path":"/demo/inspect/","icon":"search","external":true},{"title":"Convert","path":"/demo/convert/","icon":"git-merge","external":true}]},{"title":"Contributing","icon":"heart","path":"/contributing/","collapsible":false,"children":[{"title":"Building","path":"/contributing/building/","icon":"network"},{"title":"Architecture","path":"/contributing/architecture/","icon":"git-commit"}]},{"title":"GitHub","path":"https://github.com/Nisoku/Honzo","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":true},"isWorkspace":false,"workspaceProjects":[]};</script>
+      
+      
       
   </body>
 </html>

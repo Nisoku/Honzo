@@ -10,8 +10,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.5.x">
+    <meta name="generator" content="docmd v0.9.4">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/Honzo/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/Honzo/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
     <script>/**
  * --------------------------------------------------------------------
  * docmd : the zero-config documentation engine.
@@ -29,9 +44,27 @@
 (function () {
   try {
     // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
     var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
 
     if (theme === 'system') {
       theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -65,32 +98,17 @@
         visibility: hidden;
       }
     </style>
-    
-    <script>
-      var root = "../../";
-      if (root && !root.endsWith('/')) root += '/';
-      if (root === '') root = './';
-      window.DOCMD_ROOT = root;
-
-      var siteRoot = "../../";
-      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
-      if (siteRoot === '') siteRoot = './';
-      window.DOCMD_SITE_ROOT = siteRoot;
-
-      window.DOCMD_APPEARANCE = "system";
-      window.DOCMD_VERSION_ROOT = "/";
-      window.DOCMD_BASE = "/";
-      window.DOCMD_LOCALE = "";
-      window.DOCMD_DEFAULT_LOCALE = "";
-    </script>
     <title>
       Rust API Reference : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=msy44anm">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=msy44anm" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=msy44anm" id="hljs-dark" disabled>
+
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mtb4na5q">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mtb4na5q">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mtb4na5q" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mtb4na5q" id="hljs-dark" disabled>
     
     
 <meta name="description" content="The Rust API for parsing, building, and streaming Honzo files">
@@ -105,75 +123,33 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=msy44anm" >
+
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mtb4na5q" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=msy44anm">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mtb4na5q">
     
-    <script>/**
- * --------------------------------------------------------------------
- * docmd : the zero-config documentation engine.
- *
- * @package     @docmd/core (and ecosystem)
- * @website     https://docmd.io
- * @repository  https://github.com/docmd-io/docmd
- * @license     MIT
- * @copyright   Copyright (c) 2025-present docmd.io
- *
- * [docmd-source] - Please do not remove this header.
- * --------------------------------------------------------------------
- */
-
-(function () {
-  try {
-    // 1. Determine Theme
-    var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
-
-    if (theme === 'system') {
-      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    // 2. Apply to Root
-    document.documentElement.setAttribute('data-theme', theme);
-
-    // 3. Highlight.js Toggle Strategy
-    var lightLink = document.getElementById('hljs-light');
-    var darkLink = document.getElementById('hljs-dark');
-
-    if (lightLink && darkLink) {
-      if (theme === 'dark') {
-        lightLink.disabled = true;
-        darkLink.disabled = false;
-      } else {
-        lightLink.disabled = false;
-        darkLink.disabled = true;
-      }
-    }
-
-    document.documentElement.style.visibility = "visible";
-  } catch (e) {
-    document.documentElement.style.visibility = "visible";
-    console.error('Theme init failed', e);
-  }
-})();</script>
+    
   </head>
   <body
     class="sidebar-collapsible"
     data-default-collapsed="false"
     data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/api/rust.md">
 
-    <a href="#main-content" class="skip-link">skipToContent</a>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
 
     
     
       <aside class="sidebar">
         <div class="sidebar-header">
           
-            <h1><a href="../../">
+<h1><a href="../../">
                 Honzo
               </a></h1>
           
@@ -206,7 +182,7 @@
         </div>
         
 
-<nav class="sidebar-nav" aria-label="mainNavigation">
+<nav class="sidebar-nav" aria-label="Main Navigation">
   <ul>
     
       <li class="" >
@@ -1489,11 +1465,12 @@
       <div class="main-content-wrapper">
         
         
+        
           <header class="page-header">
             <div class="header-left">
               
                 <button id="sidebar-toggle-button" class="sidebar-toggle-button"
-                  aria-label="toggleSidebar">
+                  aria-label="Toggle Sidebar">
                   
 <svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-left"
@@ -1525,7 +1502,7 @@
 
 <div class="docmd-options-menu">
     
-    <button class="docmd-search-trigger" aria-label="search">
+    <button class="docmd-search-trigger" aria-label="Search">
         
 <svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-search"
@@ -1543,7 +1520,7 @@
   <circle cx="11" cy="11" r="8" />
 </svg>
 
-        <span class="search-label">search</span>
+        <span class="search-label">Search</span>
         <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
     </button>
     
@@ -1553,7 +1530,7 @@
     
 
     
-    <button class="theme-toggle-button" aria-label="toggleTheme">
+    <button class="theme-toggle-button" aria-label="Toggle theme">
         
 <svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-sun"
@@ -1608,7 +1585,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Rust%20API%20Reference%22%0Adescription%3A%20%22The%20Rust%20API%20for%20parsing%2C%20building%2C%20and%20streaming%20Honzo%20files%22%0A---%0A%0AThe%20Rust%20API%20is%20the%20primary%20surface%20for%20Honzo.%20It%20is%20organized%20across%20two%20crates.%20Use%20%60honzo-core%60%20for%20no_std%20parsing.%20Use%20%60honzo-io%60%20for%20everything%20else.%0A%0A%23%23%20honzo-core%20(no_std)%0A%0A%3A%3A%3A%20callout%20tip%20%22Zero-dependency%22%0A%60honzo-core%60%20has%20no%20dependencies.%20Use%20it%20in%20embedded%20contexts%2C%20kernels%2C%20and%20audit-critical%20paths%20where%20you%20cannot%20allocate.%0A%3A%3A%3A%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------------------------%7C------------------------------------------------%7C-----------------%7C--------------------------------------------%7C%0A%7C%20%60HonzoParser%3A%3Anew%60%20%20%20%20%20%7C%20%60pub%20fn%20new(data%3A%20%26%5Bu8%5D%2C%20version%3A%20u32)%60%20%20%20%20%20%20%20%20%7C%20%60Result%3CSelf%3E%60%20%20%7C%20Parse%20HEAD%20from%20byte%20slice.%20No%20alloc.%20%20%20%20%20%20%7C%0A%7C%20%60parser.head%60%20%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20head(%26self)%20-%3E%20%26HonzoHead%60%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%26HonzoHead%60%20%20%20%20%7C%20Pointer-cast%20to%20HEAD%20struct.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60parser.toc_entries%60%20%20%20%7C%20%60pub%20fn%20toc_entries(%26self)%20-%3E%20%26%5BTocEntry%5D%60%20%20%20%20%20%7C%20%60%26%5BTocEntry%5D%60%20%20%20%7C%20Pointer-cast%20to%20TOC%20array.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60parser.read_chunk%60%20%20%20%20%7C%20%60pub%20fn%20read_chunk(%26self%2C%20entry%3A%20%26TocEntry)%60%20%20%20%7C%20%60Result%3C%26%5Bu8%5D%3E%60%20%7C%20Returns%20raw%20chunk%20bytes.%20No%20decompression.%20%7C%0A%7C%20%60parser.extra_entries%60%20%7C%20%60pub%20fn%20extra_entries(%26self)%20-%3E%20%26%5BExtraEntry%5D%60%20%7C%20%60%26%5BExtraEntry%5D%60%20%7C%20EXTRA%20entry%20references.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60parser.read_extra%60%20%20%20%20%7C%20%60pub%20fn%20read_extra(%26self%2C%20entry%3A%20%26ExtraEntry)%60%20%7C%20%60Result%3C%26%5Bu8%5D%3E%60%20%7C%20Raw%20extra%20entry%20bytes.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60parser.meta%60%20%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20meta(%26self)%20-%3E%20%26%5Bu8%5D%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%26%5Bu8%5D%60%20%20%20%20%20%20%20%20%20%7C%20Raw%20META%20bytes%20(MessagePack).%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20honzo-io%0A%0AFull%20featured%20crate%20with%20Builder%2C%20streaming%20reader%2C%20and%20compression.%0A%0A%23%23%23%20Main%20types%0A%0A%7C%20Type%20%20%20%20%20%20%20%20%20%20%7C%20Purpose%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C---------------%7C------------------------------------------------%7C%0A%7C%20%60HonzoParser%60%20%7C%20Zero-copy%20parser%20(re-exported%20from%20honzo-core)%20%7C%0A%7C%20%60HonzoStream%60%20%7C%20Pull-based%20streaming%20reader%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoReader%60%20%7C%20Reader%20with%20DRM%20decryption%20support%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60Builder%60%20%20%20%20%20%7C%20Programmatic%20file%20builder%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60DrmConfig%60%20%20%20%7C%20DRM%20configuration%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%23%20Reader%20API%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-----------------------%7C----------------------------------------------%7C-------------------%7C-------------------------------------------------------%7C%0A%7C%20%60HonzoReader%3A%3Anew%60%20%20%20%20%7C%20%60pub%20fn%20new(data%3A%20%26%5Bu8%5D%2C%20version%3A%20u32)%60%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Create%20reader.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.with_drm_key%60%20%7C%20%60pub%20fn%20with_drm_key(self%2C%20key%3A%20%26%5Bu8%3B%2032%5D)%60%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Set%20X25519%20private%20key%20for%20DRM.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.parse%60%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20parse(%26mut%20self)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Result%3C()%3E%60%20%20%20%20%20%20%7C%20Parse%20file%20structure%20and%20unwrap%20DRM%20envelope.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.head%60%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20head(%26self)%20-%3E%20%26HonzoHead%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%26HonzoHead%60%20%20%20%20%20%20%7C%20File%20header.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.toc_entries%60%20%20%7C%20%60pub%20fn%20toc_entries(%26self)%20-%3E%20%26%5BTocEntry%5D%60%20%20%20%7C%20%60%26%5BTocEntry%5D%60%20%20%20%20%20%7C%20Table%20of%20contents.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.read_chunk%60%20%20%20%7C%20%60pub%20fn%20read_chunk(%26self%2C%20entry%3A%20%26TocEntry)%60%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20Read%20and%20decompress%20a%20chunk.%20Decrypts%20if%20DRM%20key%20set.%20%7C%0A%0A%23%23%23%20Stream%20API%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-----------------------%7C---------------------------------------------%7C-----------------------%7C-------------------------------%7C%0A%7C%20%60HonzoStream%3A%3Aopen%60%20%20%20%7C%20%60pub%20fn%20open(file%3A%20File%2C%20version%3A%20u32)%60%20%20%20%20%20%7C%20%60Result%3CSelf%3E%60%20%20%20%20%20%20%20%20%7C%20Open%20from%20std%3A%3Afs%3A%3AFile.%20%20%20%20%20%20%7C%0A%7C%20%60stream.with_drm_key%60%20%7C%20%60pub%20fn%20with_drm_key(self%2C%20key%3A%20%26%5Bu8%3B%2032%5D)%60%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Enable%20DRM%20decryption.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60stream.head%60%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20head(%26self)%20-%3E%20%26HonzoHead%60%20%20%20%20%20%20%20%20%20%20%7C%20%60%26HonzoHead%60%20%20%20%20%20%20%20%20%20%20%7C%20File%20header.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60stream.chapters%60%20%20%20%20%20%7C%20%60pub%20fn%20chapters(%26mut%20self)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60ChapterIter%60%20%20%20%20%20%20%20%20%20%7C%20Iterator%20over%20chapter%20chunks.%20%7C%0A%7C%20%60stream.chunk%60%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20chunk(%26mut%20self%2C%20idx%3A%20usize)%60%20%20%20%20%20%20%20%7C%20%60Result%3CChapterData%3E%60%20%7C%20Read%20specific%20chunk%20by%20index.%20%7C%0A%0A%23%23%23%20Builder%20API%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------------------------%7C-------------------------------------------------------------------------------------------------%7C-------------------%7C-----------------------------%7C%0A%7C%20%60Builder%3A%3Anew%60%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20new()%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20New%20builder.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60builder.meta_title%60%20%20%20%7C%20%60pub%20fn%20meta_title(self%2C%20lang%2C%20title)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Set%20localized%20title.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60builder.meta_creator%60%20%7C%20%60pub%20fn%20meta_creator(self%2C%20lang%2C%20creator)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Set%20localized%20creator.%20%20%20%20%20%20%7C%0A%7C%20%60builder.add_chapter%60%20%20%7C%20%60pub%20fn%20add_chapter(self%2C%20content%2C%20compression%2C%20markup)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Add%20a%20chapter%20chunk.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60builder.add_chunk%60%20%20%20%20%7C%20%60pub%20fn%20add_chunk(self%2C%20tag%2C%20data%2C%20compression%2C%20markup%2C%20cover%2C%20lang%2C%20font_embed%2C%20font_license)%60%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Add%20any%20chunk%20type.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60builder.with_drm%60%20%20%20%20%20%7C%20%60pub%20fn%20with_drm(self%2C%20config%3A%20DrmConfig)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Enable%20DRM%20encryption.%20%20%20%20%20%20%7C%0A%7C%20%60builder.finalize%60%20%20%20%20%20%7C%20%60pub%20fn%20finalize(self)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20Build%20the%20Honzo%20file%20bytes.%20%7C%0A%0A%23%23%23%20Crypto%20API%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------------%7C--------------------------------------------%7C-------------------%7C------------------------------%7C%0A%7C%20%60generate_cek%60%20%20%20%20%7C%20%60pub%20fn%20generate_cek()%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%5Bu8%3B%2032%5D%60%20%20%20%20%20%20%20%20%7C%20Random%20256-bit%20CEK.%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60generate_nonce%60%20%20%7C%20%60pub%20fn%20generate_nonce()%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%5Bu8%3B%2012%5D%60%20%20%20%20%20%20%20%20%7C%20Random%2012-byte%20nonce.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60encrypt_content%60%20%7C%20%60pub%20fn%20encrypt_content(data%2C%20key)%60%20%20%20%20%20%20%20%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20AES-256-GCM%20encrypt.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60decrypt_content%60%20%7C%20%60pub%20fn%20decrypt_content(data%2C%20key)%60%20%20%20%20%20%20%20%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20AES-256-GCM%20decrypt.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60wrap_cek%60%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20wrap_cek(cek%2C%20recipient_pub)%60%20%20%20%20%20%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20Wrap%20CEK%20for%20recipient.%20%20%20%20%20%20%7C%0A%7C%20%60unwrap_cek%60%20%20%20%20%20%20%7C%20%60pub%20fn%20unwrap_cek(envelope%2C%20private_key)%60%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20Unwrap%20CEK%20with%20private%20key.%20%7C%0A%0A%23%23%23%20DrmConfig%20API%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------------------%7C-------------------------------------------%7C---------%7C---------------------------------------%7C%0A%7C%20%60DrmConfig%3A%3Anew%60%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20new()%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%7C%20New%20DRM%20config.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60config.encrypt_chunks%60%20%7C%20%60pub%20fn%20encrypt_chunks(self%2C%20indices)%60%20%20%20%20%7C%20%60Self%60%20%20%7C%20Chunk%20IDs%20to%20encrypt.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60config.add_recipient%60%20%20%7C%20%60pub%20fn%20add_recipient(self%2C%20pub_key%2C%20id)%60%20%7C%20%60Self%60%20%20%7C%20Add%20a%20recipient%20by%20X25519%20public%20key.%20%7C%0A%7C%20%60config.expiry%60%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20expiry(self%2C%20expiry)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%7C%20Optional%20expiry%20timestamp.%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60config.license_url%60%20%20%20%20%7C%20%60pub%20fn%20license_url(self%2C%20url)%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%7C%20Optional%20license%20URL.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20Error%20model%0A%0AAll%20fallible%20operations%20return%20%60Result%3CT%2C%20HonzoError%3E%60.%20Error%20variants%20include%3A%0A%0A%7C%20Variant%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Meaning%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------------------------------------------%7C-------------------------------------------------------%7C%0A%7C%20%3A%3A%3A%20tag%20%22InvalidMagic%22%20color%3A%23ef4444%20%20%20%20%20%7C%20Not%20a%20Honzo%20file%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22InvalidVersion%22%20color%3A%23ef4444%20%20%20%7C%20Unsupported%20format%20version%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22InvalidChecksum%22%20color%3A%23ef4444%20%20%7C%20Integrity%20check%20failed%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22CompressionError%22%20color%3A%23ef4444%20%7C%20LZ4%20decompression%20failure%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22DrmError%22%20color%3A%23ef4444%20%20%20%20%20%20%20%20%20%7C%20DRM-related%20failure.%20No%20key%2C%20bad%20envelope%2C%20and%20so%20on.%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22CryptoError%22%20color%3A%23ef4444%20%20%20%20%20%20%7C%20Encryption%20or%20decryption%20failure%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20Related%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22WASM%20%2F%20TypeScript%20API%22%20.%2Fwasm.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22C%20API%22%20.%2Fc.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20..%2Fformat%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Rust%20API%20Reference%22%0Adescription%3A%20%22The%20Rust%20API%20for%20parsing%2C%20building%2C%20and%20streaming%20Honzo%20files%22%0A---%0A%0AThe%20Rust%20API%20is%20the%20primary%20surface%20for%20Honzo.%20It%20is%20organized%20across%20two%20crates.%20Use%20%60honzo-core%60%20for%20no_std%20parsing.%20Use%20%60honzo-io%60%20for%20everything%20else.%0A%0A%23%23%20honzo-core%20(no_std)%0A%0A%3A%3A%3A%20callout%20tip%20%22Zero-dependency%22%0A%60honzo-core%60%20has%20no%20dependencies.%20Use%20it%20in%20embedded%20contexts%2C%20kernels%2C%20and%20audit-critical%20paths%20where%20you%20cannot%20allocate.%0A%3A%3A%3A%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----------------------%20%7C%20----------------------------------------------%20%7C%20---------------%20%7C%20------------------------------------------%20%7C%0A%7C%20%60HonzoParser%3A%3Anew%60%20%20%20%20%20%7C%20%60pub%20fn%20new(data%3A%20%26%5Bu8%5D%2C%20version%3A%20u32)%60%20%20%20%20%20%20%20%20%7C%20%60Result%3CSelf%3E%60%20%20%7C%20Parse%20HEAD%20from%20byte%20slice.%20No%20alloc.%20%20%20%20%20%20%7C%0A%7C%20%60parser.head%60%20%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20head(%26self)%20-%3E%20%26HonzoHead%60%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%26HonzoHead%60%20%20%20%20%7C%20Pointer-cast%20to%20HEAD%20struct.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60parser.toc_entries%60%20%20%20%7C%20%60pub%20fn%20toc_entries(%26self)%20-%3E%20%26%5BTocEntry%5D%60%20%20%20%20%20%7C%20%60%26%5BTocEntry%5D%60%20%20%20%7C%20Pointer-cast%20to%20TOC%20array.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60parser.read_chunk%60%20%20%20%20%7C%20%60pub%20fn%20read_chunk(%26self%2C%20entry%3A%20%26TocEntry)%60%20%20%20%7C%20%60Result%3C%26%5Bu8%5D%3E%60%20%7C%20Returns%20raw%20chunk%20bytes.%20No%20decompression.%20%7C%0A%7C%20%60parser.extra_entries%60%20%7C%20%60pub%20fn%20extra_entries(%26self)%20-%3E%20%26%5BExtraEntry%5D%60%20%7C%20%60%26%5BExtraEntry%5D%60%20%7C%20EXTRA%20entry%20references.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60parser.read_extra%60%20%20%20%20%7C%20%60pub%20fn%20read_extra(%26self%2C%20entry%3A%20%26ExtraEntry)%60%20%7C%20%60Result%3C%26%5Bu8%5D%3E%60%20%7C%20Raw%20extra%20entry%20bytes.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60parser.meta%60%20%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20meta(%26self)%20-%3E%20%26%5Bu8%5D%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%26%5Bu8%5D%60%20%20%20%20%20%20%20%20%20%7C%20Raw%20META%20bytes%20(MessagePack).%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20honzo-io%0A%0AFull%20featured%20crate%20with%20Builder%2C%20streaming%20reader%2C%20and%20compression.%0A%0A%23%23%23%20Main%20types%0A%0A%7C%20Type%20%20%20%20%20%20%20%20%20%20%7C%20Purpose%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-------------%20%7C%20----------------------------------------------%20%7C%0A%7C%20%60HonzoParser%60%20%7C%20Zero-copy%20parser%20(re-exported%20from%20honzo-core)%20%7C%0A%7C%20%60HonzoStream%60%20%7C%20Pull-based%20streaming%20reader%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60HonzoReader%60%20%7C%20Reader%20with%20DRM%20decryption%20support%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60Builder%60%20%20%20%20%20%7C%20Programmatic%20file%20builder%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60DrmConfig%60%20%20%20%7C%20DRM%20configuration%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%23%20Reader%20API%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------------------%20%7C%20--------------------------------------------%20%7C%20-----------------%20%7C%20-----------------------------------------------------%20%7C%0A%7C%20%60HonzoReader%3A%3Anew%60%20%20%20%20%7C%20%60pub%20fn%20new(data%3A%20%26%5Bu8%5D%2C%20version%3A%20u32)%60%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Create%20reader.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.with_drm_key%60%20%7C%20%60pub%20fn%20with_drm_key(self%2C%20key%3A%20%26%5Bu8%3B%2032%5D)%60%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Set%20X25519%20private%20key%20for%20DRM.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.parse%60%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20parse(%26mut%20self)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Result%3C()%3E%60%20%20%20%20%20%20%7C%20Parse%20file%20structure%20and%20unwrap%20DRM%20envelope.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.head%60%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20head(%26self)%20-%3E%20%26HonzoHead%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%26HonzoHead%60%20%20%20%20%20%20%7C%20File%20header.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.toc_entries%60%20%20%7C%20%60pub%20fn%20toc_entries(%26self)%20-%3E%20%26%5BTocEntry%5D%60%20%20%20%7C%20%60%26%5BTocEntry%5D%60%20%20%20%20%20%7C%20Table%20of%20contents.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.read_chunk%60%20%20%20%7C%20%60pub%20fn%20read_chunk(%26self%2C%20entry%3A%20%26TocEntry)%60%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20Read%20and%20decompress%20a%20chunk.%20Decrypts%20if%20DRM%20key%20set.%20%7C%0A%0A%23%23%23%20Stream%20API%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------------------%20%7C%20-------------------------------------------%20%7C%20---------------------%20%7C%20-----------------------------%20%7C%0A%7C%20%60HonzoStream%3A%3Aopen%60%20%20%20%7C%20%60pub%20fn%20open(file%3A%20File%2C%20version%3A%20u32)%60%20%20%20%20%20%7C%20%60Result%3CSelf%3E%60%20%20%20%20%20%20%20%20%7C%20Open%20from%20std%3A%3Afs%3A%3AFile.%20%20%20%20%20%20%7C%0A%7C%20%60stream.with_drm_key%60%20%7C%20%60pub%20fn%20with_drm_key(self%2C%20key%3A%20%26%5Bu8%3B%2032%5D)%60%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Enable%20DRM%20decryption.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60stream.head%60%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20head(%26self)%20-%3E%20%26HonzoHead%60%20%20%20%20%20%20%20%20%20%20%7C%20%60%26HonzoHead%60%20%20%20%20%20%20%20%20%20%20%7C%20File%20header.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60stream.chapters%60%20%20%20%20%20%7C%20%60pub%20fn%20chapters(%26mut%20self)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60ChapterIter%60%20%20%20%20%20%20%20%20%20%7C%20Iterator%20over%20chapter%20chunks.%20%7C%0A%7C%20%60stream.chunk%60%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20chunk(%26mut%20self%2C%20idx%3A%20usize)%60%20%20%20%20%20%20%20%7C%20%60Result%3CChapterData%3E%60%20%7C%20Read%20specific%20chunk%20by%20index.%20%7C%0A%0A%23%23%23%20Builder%20API%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----------------------%20%7C%20-----------------------------------------------------------------------------------------------%20%7C%20-----------------%20%7C%20---------------------------%20%7C%0A%7C%20%60Builder%3A%3Anew%60%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20new()%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20New%20builder.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60builder.meta_title%60%20%20%20%7C%20%60pub%20fn%20meta_title(self%2C%20lang%2C%20title)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Set%20localized%20title.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60builder.meta_creator%60%20%7C%20%60pub%20fn%20meta_creator(self%2C%20lang%2C%20creator)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Set%20localized%20creator.%20%20%20%20%20%20%7C%0A%7C%20%60builder.add_chapter%60%20%20%7C%20%60pub%20fn%20add_chapter(self%2C%20content%2C%20compression%2C%20markup)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Add%20a%20chapter%20chunk.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60builder.add_chunk%60%20%20%20%20%7C%20%60pub%20fn%20add_chunk(self%2C%20tag%2C%20data%2C%20compression%2C%20markup%2C%20cover%2C%20lang%2C%20font_embed%2C%20font_license)%60%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Add%20any%20chunk%20type.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60builder.with_drm%60%20%20%20%20%20%7C%20%60pub%20fn%20with_drm(self%2C%20config%3A%20DrmConfig)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Enable%20DRM%20encryption.%20%20%20%20%20%20%7C%0A%7C%20%60builder.finalize%60%20%20%20%20%20%7C%20%60pub%20fn%20finalize(self)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20Build%20the%20Honzo%20file%20bytes.%20%7C%0A%0A%23%23%23%20Crypto%20API%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------------%20%7C%20------------------------------------------%20%7C%20-----------------%20%7C%20----------------------------%20%7C%0A%7C%20%60generate_cek%60%20%20%20%20%7C%20%60pub%20fn%20generate_cek()%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%5Bu8%3B%2032%5D%60%20%20%20%20%20%20%20%20%7C%20Random%20256-bit%20CEK.%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60generate_nonce%60%20%20%7C%20%60pub%20fn%20generate_nonce()%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%5Bu8%3B%2012%5D%60%20%20%20%20%20%20%20%20%7C%20Random%2012-byte%20nonce.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60encrypt_content%60%20%7C%20%60pub%20fn%20encrypt_content(data%2C%20key)%60%20%20%20%20%20%20%20%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20AES-256-GCM%20encrypt.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60decrypt_content%60%20%7C%20%60pub%20fn%20decrypt_content(data%2C%20key)%60%20%20%20%20%20%20%20%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20AES-256-GCM%20decrypt.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60wrap_cek%60%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20wrap_cek(cek%2C%20recipient_pub)%60%20%20%20%20%20%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20Wrap%20CEK%20for%20recipient.%20%20%20%20%20%20%7C%0A%7C%20%60unwrap_cek%60%20%20%20%20%20%20%7C%20%60pub%20fn%20unwrap_cek(envelope%2C%20private_key)%60%20%7C%20%60Result%3CVec%3Cu8%3E%3E%60%20%7C%20Unwrap%20CEK%20with%20private%20key.%20%7C%0A%0A%23%23%23%20DrmConfig%20API%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------------------%20%7C%20-----------------------------------------%20%7C%20-------%20%7C%20-------------------------------------%20%7C%0A%7C%20%60DrmConfig%3A%3Anew%60%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20new()%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%7C%20New%20DRM%20config.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60config.encrypt_chunks%60%20%7C%20%60pub%20fn%20encrypt_chunks(self%2C%20indices)%60%20%20%20%20%7C%20%60Self%60%20%20%7C%20Chunk%20IDs%20to%20encrypt.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60config.add_recipient%60%20%20%7C%20%60pub%20fn%20add_recipient(self%2C%20pub_key%2C%20id)%60%20%7C%20%60Self%60%20%20%7C%20Add%20a%20recipient%20by%20X25519%20public%20key.%20%7C%0A%7C%20%60config.expiry%60%20%20%20%20%20%20%20%20%20%7C%20%60pub%20fn%20expiry(self%2C%20expiry)%60%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%7C%20Optional%20expiry%20timestamp.%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60config.license_url%60%20%20%20%20%7C%20%60pub%20fn%20license_url(self%2C%20url)%60%20%20%20%20%20%20%20%20%20%20%20%7C%20%60Self%60%20%20%7C%20Optional%20license%20URL.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20Error%20model%0A%0AAll%20fallible%20operations%20return%20%60Result%3CT%2C%20HonzoError%3E%60.%20Error%20variants%20include%3A%0A%0A%7C%20Variant%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Meaning%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----------------------------------------%20%7C%20-----------------------------------------------------%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22InvalidMagic%22%20color%3A%23ef4444%20%20%20%20%20%7C%20Not%20a%20Honzo%20file%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22InvalidVersion%22%20color%3A%23ef4444%20%20%20%7C%20Unsupported%20format%20version%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22InvalidChecksum%22%20color%3A%23ef4444%20%20%7C%20Integrity%20check%20failed%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22CompressionError%22%20color%3A%23ef4444%20%7C%20LZ4%20decompression%20failure%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22DrmError%22%20color%3A%23ef4444%20%20%20%20%20%20%20%20%20%7C%20DRM-related%20failure.%20No%20key%2C%20bad%20envelope%2C%20and%20so%20on.%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22CryptoError%22%20color%3A%23ef4444%20%20%20%20%20%20%7C%20Encryption%20or%20decryption%20failure%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20Related%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22WASM%20%2F%20TypeScript%20API%22%20.%2Fwasm.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22C%20API%22%20.%2Fc.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20..%2Fformat%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1652,7 +1629,7 @@
                   
                     <div class="docmd-copy-widgets">
                       
-                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-copy"
@@ -1673,7 +1650,7 @@
                         </button>
                       
                       
-                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-message-square"
@@ -1690,7 +1667,7 @@
   <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
 </svg>
 </span>
-                          <span class="docmd-btn-text">copyContext</span>
+                          <span class="docmd-btn-text">Copy Context</span>
                         </button>
                       
                     </div>
@@ -2147,14 +2124,14 @@ Wire Format</a></div>
   <path d="M19 12H5" />
 </svg>
 
-                        <span><small>previous</small><strong>
+                        <span><small>Previous</small><strong>
                             API Reference
                           </strong></span>
                       </a>
                     
                     
                       <a href="../../api/wasm/" class="next-page">
-                        <span><small>next</small>
+                        <span><small>Next</small>
                           <strong>
                             WASM / TypeScript
                           </strong></span>
@@ -2180,12 +2157,13 @@ Wire Format</a></div>
                   </div>
                 
               </div>
+              
               <div class="toc-sidebar">
                 
 
 
   <div class="toc-container">
-    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
 <svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-down"
   xmlns="http://www.w3.org/2000/svg"
@@ -2247,33 +2225,34 @@ Wire Format</a></div>
   </div>
 
               </div>
+              
             </div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1787023392000">
+                <span class="git-last-updated" data-timestamp="1787810890000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1787023392000"></span>
+                  <span class="git-time" data-timestamp="1787810890000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
                     <ul class="git-commit-list">
                       
                         <li class="git-commit-item">
-                          <div class="git-commit-avatar" title="dependabot[bot]">
+                          <div class="git-commit-avatar" title="NellowTCS">
                             
-                              <img src="https://www.gravatar.com/avatar/48ea49be76d0c68403a7f3df87e3487d?d=mp&amp;s=64" alt="dependabot[bot]">
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Bump brace-expansion (#65)">Bump brace-expansion (#65)</div>
+                            <div class="git-commit-message" title="Add hzo_extract_meta_from_file, markdown converter CLI, and update dependencies (#66)">Add hzo_extract_meta_from_file, markd...</div>
                             <div class="git-commit-meta">
-                              <span class="git-commit-author">dependabot[bot]</span>
-                              <span class="git-commit-date" data-timestamp="1787023392000"></span>
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1787810890000"></span>
                             </div>
                           </div>
                         </li>
@@ -2328,11 +2307,11 @@ Wire Format</a></div>
                 <span class="footer-column-title">Resources</span>
                 <ul>
                   
-                    <li><a href="../../getting-started/quickstart/" >Getting Started</a></li>
+                    <li><a href="getting-started/quickstart/" >Getting Started</a></li>
                   
-                    <li><a href="../../format/" >Format Spec</a></li>
+                    <li><a href="format/" >Format Spec</a></li>
                   
-                    <li><a href="../../cli/" >CLI Commands</a></li>
+                    <li><a href="cli/" >CLI Commands</a></li>
                   
                 </ul>
               </div>
@@ -2357,7 +2336,7 @@ Wire Format</a></div>
         <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/Nisoku/Honzo">View on GitHub</a>.</div>
         
           <div class="branding-footer">
-            builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
           </div>
         
       </div>
@@ -2366,20 +2345,22 @@ Wire Format</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=msy44anm"></script>
+      <script src="../../assets/js/docmd-main.js?v=mtb4na5q"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=msy44anm"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=msy44anm" ></script>
-<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=msy44anm" ></script>
-<script src="../../assets/js/init-mermaid.js?v=msy44anm" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=msy44anm" type="module"></script>
+      <script src="../../assets/js/docmd-git.js?v=mtb4na5q"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-search.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-git.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-ai.js?v=mtb4na5q" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
        data-search-placeholder="Search documentation..."
        data-search-no-results="No results found."
        data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
        data-search-initial="Type to start searching..."
        data-search-navigate="to navigate"
        data-search-escape="to close">
@@ -2447,6 +2428,9 @@ Wire Format</a></div>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/Nisoku/Honzo/edit/main/","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"Honzo","siteBase":"/Honzo/","siteUrl":"https://nisoku.org/Honzo","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Getting Started","icon":"rocket","collapsible":false,"children":[{"title":"Quick Start","path":"/getting-started/quickstart/","icon":"play"},{"title":"Installation","path":"/getting-started/installation/","icon":"download"},{"title":"Core Concepts","path":"/getting-started/concepts/","icon":"book"}]},{"title":"Format Specification","icon":"file-text","path":"/format/","collapsible":false,"children":[{"title":"Wire Format","path":"/format/wire-format/","icon":"binary"},{"title":"Chunk Types","path":"/format/chunk-types/","icon":"package"},{"title":"Compression","path":"/format/compression/","icon":"zap"},{"title":"DRM & Encryption","path":"/format/drm/","icon":"lock"},{"title":"Layout Modes","path":"/format/layout/","icon":"columns"}]},{"title":"API Reference","icon":"code","path":"/api/","collapsible":false,"children":[{"title":"Rust","path":"/api/rust/","icon":"box"},{"title":"WASM / TypeScript","path":"/api/wasm/","icon":"cpu"},{"title":"C","path":"/api/c/","icon":"terminal"}]},{"title":"CLI Reference","icon":"terminal","path":"/cli/","collapsible":false},{"title":"Features","icon":"star","path":"/features/","collapsible":false,"children":[{"title":"Annotations","path":"/features/annotations/","icon":"pen-tool"},{"title":"Search Index","path":"/features/search/","icon":"search"},{"title":"Sync Tracks","path":"/features/sync/","icon":"clock"},{"title":"Streaming","path":"/features/streaming/","icon":"wind"}]},{"title":"Conversion","icon":"git-merge","path":"/conversion/","collapsible":false,"children":[{"title":"EPUB","path":"/conversion/epub/","icon":"book"},{"title":"MOBI","path":"/conversion/mobi/","icon":"book-open"},{"title":"PDF","path":"/conversion/pdf/","icon":"file-text"}]},{"title":"Demo Apps","icon":"eye","path":"/demo-docs/","collapsible":false,"children":[{"title":"Reader","path":"/demo/","icon":"book","external":true},{"title":"Maker","path":"/demo/maker/","icon":"wrench","external":true},{"title":"Inspect","path":"/demo/inspect/","icon":"search","external":true},{"title":"Convert","path":"/demo/convert/","icon":"git-merge","external":true}]},{"title":"Contributing","icon":"heart","path":"/contributing/","collapsible":false,"children":[{"title":"Building","path":"/contributing/building/","icon":"network"},{"title":"Architecture","path":"/contributing/architecture/","icon":"git-commit"}]},{"title":"GitHub","path":"https://github.com/Nisoku/Honzo","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":true},"isWorkspace":false,"workspaceProjects":[]};</script>
+      
+      
       
   </body>
 </html>

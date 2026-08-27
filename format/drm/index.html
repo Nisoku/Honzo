@@ -10,8 +10,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.5.x">
+    <meta name="generator" content="docmd v0.9.4">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/Honzo/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/Honzo/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
     <script>/**
  * --------------------------------------------------------------------
  * docmd : the zero-config documentation engine.
@@ -29,9 +44,27 @@
 (function () {
   try {
     // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
     var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
 
     if (theme === 'system') {
       theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -65,115 +98,58 @@
         visibility: hidden;
       }
     </style>
-    
-    <script>
-      var root = "../../";
-      if (root && !root.endsWith('/')) root += '/';
-      if (root === '') root = './';
-      window.DOCMD_ROOT = root;
-
-      var siteRoot = "../../";
-      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
-      if (siteRoot === '') siteRoot = './';
-      window.DOCMD_SITE_ROOT = siteRoot;
-
-      window.DOCMD_APPEARANCE = "system";
-      window.DOCMD_VERSION_ROOT = "/";
-      window.DOCMD_BASE = "/";
-      window.DOCMD_LOCALE = "";
-      window.DOCMD_DEFAULT_LOCALE = "";
-    </script>
     <title>
       DRM &amp; Encryption : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=msy44anm">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=msy44anm" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=msy44anm" id="hljs-dark" disabled>
+
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mtb4na5q">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mtb4na5q">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mtb4na5q" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mtb4na5q" id="hljs-dark" disabled>
     
     
 <meta name="description" content="AES-256-GCM content protection with ECDH key exchange">
 <link rel="canonical" href="https://nisoku.org/Honzo/format/drm/">
-<meta property="og:title" content="DRM & Encryption - Honzo">
+<meta property="og:title" content="DRM &amp; Encryption - Honzo">
 <meta property="og:description" content="AES-256-GCM content protection with ECDH key exchange">
 <meta property="og:url" content="https://nisoku.org/Honzo/format/drm/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="DRM & Encryption - Honzo">
+<meta name="twitter:title" content="DRM &amp; Encryption - Honzo">
 <meta name="twitter:description" content="AES-256-GCM content protection with ECDH key exchange">
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=msy44anm" >
+
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mtb4na5q" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=msy44anm">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mtb4na5q">
     
-    <script>/**
- * --------------------------------------------------------------------
- * docmd : the zero-config documentation engine.
- *
- * @package     @docmd/core (and ecosystem)
- * @website     https://docmd.io
- * @repository  https://github.com/docmd-io/docmd
- * @license     MIT
- * @copyright   Copyright (c) 2025-present docmd.io
- *
- * [docmd-source] - Please do not remove this header.
- * --------------------------------------------------------------------
- */
-
-(function () {
-  try {
-    // 1. Determine Theme
-    var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
-
-    if (theme === 'system') {
-      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    // 2. Apply to Root
-    document.documentElement.setAttribute('data-theme', theme);
-
-    // 3. Highlight.js Toggle Strategy
-    var lightLink = document.getElementById('hljs-light');
-    var darkLink = document.getElementById('hljs-dark');
-
-    if (lightLink && darkLink) {
-      if (theme === 'dark') {
-        lightLink.disabled = true;
-        darkLink.disabled = false;
-      } else {
-        lightLink.disabled = false;
-        darkLink.disabled = true;
-      }
-    }
-
-    document.documentElement.style.visibility = "visible";
-  } catch (e) {
-    document.documentElement.style.visibility = "visible";
-    console.error('Theme init failed', e);
-  }
-})();</script>
+    
   </head>
   <body
     class="sidebar-collapsible"
     data-default-collapsed="false"
     data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/format/drm.md">
 
-    <a href="#main-content" class="skip-link">skipToContent</a>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
 
     
     
       <aside class="sidebar">
         <div class="sidebar-header">
           
-            <h1><a href="../../">
+<h1><a href="../../">
                 Honzo
               </a></h1>
           
@@ -206,7 +182,7 @@
         </div>
         
 
-<nav class="sidebar-nav" aria-label="mainNavigation">
+<nav class="sidebar-nav" aria-label="Main Navigation">
   <ul>
     
       <li class="" >
@@ -1489,11 +1465,12 @@
       <div class="main-content-wrapper">
         
         
+        
           <header class="page-header">
             <div class="header-left">
               
                 <button id="sidebar-toggle-button" class="sidebar-toggle-button"
-                  aria-label="toggleSidebar">
+                  aria-label="Toggle Sidebar">
                   
 <svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-left"
@@ -1525,7 +1502,7 @@
 
 <div class="docmd-options-menu">
     
-    <button class="docmd-search-trigger" aria-label="search">
+    <button class="docmd-search-trigger" aria-label="Search">
         
 <svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-search"
@@ -1543,7 +1520,7 @@
   <circle cx="11" cy="11" r="8" />
 </svg>
 
-        <span class="search-label">search</span>
+        <span class="search-label">Search</span>
         <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
     </button>
     
@@ -1553,7 +1530,7 @@
     
 
     
-    <button class="theme-toggle-button" aria-label="toggleTheme">
+    <button class="theme-toggle-button" aria-label="Toggle theme">
         
 <svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-sun"
@@ -1608,7 +1585,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22DRM%20%26%20Encryption%22%0Adescription%3A%20%22AES-256-GCM%20content%20protection%20with%20ECDH%20key%20exchange%22%0A---%0A%0AHonzo%20supports%20content%20encryption%20via%20an%20EXTRA%20entry%20under%20the%20%60org.nisoku.drm%60%20namespace.%20The%20design%20separates%20content%20encryption%20from%20key%20management.%20Chapters%20are%20encrypted%20with%20a%20random%20content%20encryption%20key%20(CEK).%20The%20CEK%20is%20then%20wrapped%20for%20each%20authorized%20recipient.%0A%0A%23%23%20Model%0A%0A%60%60%60mermaid%0Aflowchart%20TB%0A%20%20%20%20CEK%5B%22Random%20CEK%3Cbr%2F%3EAES-256-GCM%20key%20(256%20bits)%22%5D%0A%20%20%20%20CEK%20--%3E%20Encrypt%5BEncrypts%20chunk%20data%5D%0A%20%20%20%20CEK%20--%3E%20Wrap%5BWrapped%20per%20recipient%5D%0A%0A%20%20%20%20Encrypt%20--%3E%20EncCHAP%5B%22Encrypted%20CHAP%22%5D%0A%20%20%20%20Encrypt%20--%3E%20EncIMG%5B%22Encrypted%20IMG_%22%5D%0A%20%20%20%20Encrypt%20--%3E%20More%5B%22...%22%5D%0A%0A%20%20%20%20Wrap%20--%3E%20KeyEnv%5B%22Key%20Envelope%3Cbr%2F%3Eper%20X25519%20pub%20key%22%5D%0A%60%60%60%0A%0A%23%23%20Key%20Envelope%0A%0AThe%20DRM%20envelope%20is%20a%20MessagePack%20map%20stored%20in%20the%20EXTRA%20entry%3A%0A%0A%60%60%60python%0A%7B%0A%20%20%22version%22%3A%201%2C%0A%20%20%22content_encryption_alg%22%3A%20%22AES-256-GCM%22%2C%0A%20%20%22key_wrapping_alg%22%3A%20%22ECDH-X25519-HKDF-SHA256%22%2C%0A%20%20%22license_url%22%3A%20%22https%3A%2F%2Fexample.com%2Flicense%2Fabc123%22%2C%0A%20%20%22expiry%22%3A%20%222026-01-01T00%3A00%3A00Z%22%2C%0A%20%20%22recipients%22%3A%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22ephemeral_pub%22%3A%20%22%3C32%20bytes%20base64%3E%22%2C%0A%20%20%20%20%20%20%22encrypted_cek%22%3A%20%22%3C48%20bytes%20base64%3E%22%2C%0A%20%20%20%20%20%20%22recipient_id%22%3A%20%22user%40example.com%22%0A%20%20%20%20%7D%0A%20%20%5D%0A%7D%0A%60%60%60%0A%0AEach%20recipient%20gets%20their%20own%20envelope%20entry.%20The%20CEK%20is%20wrapped%20using%20ECDH%20with%20X25519%3A%0A%0A%3A%3A%3A%20steps%0A%0A1.%20Generate%20an%20ephemeral%20X25519%20key%20pair.%0A2.%20Derive%20a%20shared%20secret%20from%20the%20ephemeral%20private%20key%20and%20the%20recipient&#039;s%20public%20key.%0A3.%20Use%20HKDF-SHA256%20to%20expand%20the%20shared%20secret%20into%20an%20AES-256-GCM%20wrapping%20key.%0A4.%20Encrypt%20the%20CEK%20with%20AES-256-GCM%20using%20the%20wrapping%20key%20and%20a%20random%20nonce.%0A5.%20Store%20the%20result%20as%20%60encrypted_cek%60%3A%20a%20concatenation%20of%20the%2032-byte%20ephemeral%20public%20key%2C%2012-byte%20nonce%2C%20encrypted%20CEK%2C%20and%2016-byte%20tag.%0A%0A%3A%3A%3A%0A%0A%23%23%20Reading%20Encrypted%20Files%0A%0A%60%60%60rust%0Ause%20honzo_io%3A%3AHonzoReader%3B%0A%0Alet%20private_key%3A%20%5Bu8%3B%2032%5D%20%3D%20load_private_key()%3B%0A%0Alet%20mut%20reader%20%3D%20HonzoReader%3A%3Anew(%26data%2C%201)%0A%20%20%20%20.with_drm_key(%26private_key)%3B%0Areader.parse().unwrap()%3B%0A%0Afor%20entry%20in%20reader.toc_entries()%20%7B%0A%20%20%20%20let%20chunk_data%20%3D%20reader.read_chunk(%26entry).unwrap()%3B%0A%7D%0A%60%60%60%0A%0AIf%20a%20DRM%20key%20is%20not%20provided%2C%20encrypted%20chunks%20cannot%20be%20read%3A%0A%0A%60%60%60rust%0Alet%20reader%20%3D%20HonzoReader%3A%3Anew(%26data%2C%201)%3B%0Areader.parse().unwrap()%3B%0A%0Amatch%20reader.read_chunk(%26entry)%20%7B%0A%20%20%20%20Err(e)%20if%20e.is_drm_error()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20println!(%22This%20chapter%20requires%20a%20DRM%20key%22)%3B%0A%20%20%20%20%7D%0A%20%20%20%20_%20%3D%3E%20%7B%7D%0A%7D%0A%60%60%60%0A%0A%23%23%20Building%20Encrypted%20Files%0A%0A%60%60%60rust%0Ause%20honzo_io%3A%3A%7BHonzoBuilder%2C%20DrmConfig%7D%3B%0A%0Alet%20drm%20%3D%20DrmConfig%3A%3Anew()%0A%20%20%20%20.encrypt_chunks(%26%5B0%2C%201%2C%202%5D)%0A%20%20%20%20.add_recipient(%26alice_pub_key%2C%20%22alice%40example.com%22)%0A%20%20%20%20.expiry(%222026-01-01T00%3A00%3A00Z%22)%0A%20%20%20%20.license_url(%22https%3A%2F%2Fexample.com%2Flicense%2Fabc123%22)%3B%0A%0Alet%20hzo%20%3D%20HonzoBuilder%3A%3Anew()%0A%20%20%20%20.with_drm(drm)%0A%20%20%20%20.add_chapter(%22Chapter%201%22%2C%20...)%0A%20%20%20%20.add_chapter(%22Chapter%202%22%2C%20...)%0A%20%20%20%20.add_chapter(%22Chapter%203%22%2C%20...)%0A%20%20%20%20.finalize()%0A%20%20%20%20.unwrap()%3B%0A%60%60%60%0A%0A%23%23%20Supported%20Algorithms%0A%0A%7C%20Component%20%20%20%20%20%20%20%20%20%20%7C%20Algorithm%20%20%20%7C%0A%7C--------------------%7C-------------%7C%0A%7C%20Content%20encryption%20%7C%20AES-256-GCM%20%7C%0A%7C%20Key%20agreement%20%20%20%20%20%20%7C%20X25519%20ECDH%20%7C%0A%7C%20Key%20derivation%20%20%20%20%20%7C%20HKDF-SHA256%20%7C%0A%7C%20Key%20wrapping%20%20%20%20%20%20%20%7C%20AES-256-GCM%20%7C%0A%7C%20Random%20generation%20%20%7C%20OS%20CSPRNG%20%20%20%7C%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Annotations%22%20..%2Ffeatures%2Fannotations.md%20icon%3Abookmark%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22DRM%20%26%20Encryption%22%0Adescription%3A%20%22AES-256-GCM%20content%20protection%20with%20ECDH%20key%20exchange%22%0A---%0A%0AHonzo%20supports%20content%20encryption%20via%20an%20EXTRA%20entry%20under%20the%20%60org.nisoku.drm%60%20namespace.%20The%20design%20separates%20content%20encryption%20from%20key%20management.%20Chapters%20are%20encrypted%20with%20a%20random%20content%20encryption%20key%20(CEK).%20The%20CEK%20is%20then%20wrapped%20for%20each%20authorized%20recipient.%0A%0A%23%23%20Model%0A%0A%60%60%60mermaid%0Aflowchart%20TB%0A%20%20%20%20CEK%5B%22Random%20CEK%3Cbr%2F%3EAES-256-GCM%20key%20(256%20bits)%22%5D%0A%20%20%20%20CEK%20--%3E%20Encrypt%5BEncrypts%20chunk%20data%5D%0A%20%20%20%20CEK%20--%3E%20Wrap%5BWrapped%20per%20recipient%5D%0A%0A%20%20%20%20Encrypt%20--%3E%20EncCHAP%5B%22Encrypted%20CHAP%22%5D%0A%20%20%20%20Encrypt%20--%3E%20EncIMG%5B%22Encrypted%20IMG_%22%5D%0A%20%20%20%20Encrypt%20--%3E%20More%5B%22...%22%5D%0A%0A%20%20%20%20Wrap%20--%3E%20KeyEnv%5B%22Key%20Envelope%3Cbr%2F%3Eper%20X25519%20pub%20key%22%5D%0A%60%60%60%0A%0A%23%23%20Key%20Envelope%0A%0AThe%20DRM%20envelope%20is%20a%20MessagePack%20map%20stored%20in%20the%20EXTRA%20entry%3A%0A%0A%60%60%60python%0A%7B%0A%20%20%22version%22%3A%201%2C%0A%20%20%22content_encryption_alg%22%3A%20%22AES-256-GCM%22%2C%0A%20%20%22key_wrapping_alg%22%3A%20%22ECDH-X25519-HKDF-SHA256%22%2C%0A%20%20%22license_url%22%3A%20%22https%3A%2F%2Fexample.com%2Flicense%2Fabc123%22%2C%0A%20%20%22expiry%22%3A%20%222026-01-01T00%3A00%3A00Z%22%2C%0A%20%20%22recipients%22%3A%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22ephemeral_pub%22%3A%20%22%3C32%20bytes%20base64%3E%22%2C%0A%20%20%20%20%20%20%22encrypted_cek%22%3A%20%22%3C48%20bytes%20base64%3E%22%2C%0A%20%20%20%20%20%20%22recipient_id%22%3A%20%22user%40example.com%22%0A%20%20%20%20%7D%0A%20%20%5D%0A%7D%0A%60%60%60%0A%0AEach%20recipient%20gets%20their%20own%20envelope%20entry.%20The%20CEK%20is%20wrapped%20using%20ECDH%20with%20X25519%3A%0A%0A%3A%3A%3A%20steps%0A%0A1.%20Generate%20an%20ephemeral%20X25519%20key%20pair.%0A2.%20Derive%20a%20shared%20secret%20from%20the%20ephemeral%20private%20key%20and%20the%20recipient&#039;s%20public%20key.%0A3.%20Use%20HKDF-SHA256%20to%20expand%20the%20shared%20secret%20into%20an%20AES-256-GCM%20wrapping%20key.%0A4.%20Encrypt%20the%20CEK%20with%20AES-256-GCM%20using%20the%20wrapping%20key%20and%20a%20random%20nonce.%0A5.%20Store%20the%20result%20as%20%60encrypted_cek%60%3A%20a%20concatenation%20of%20the%2032-byte%20ephemeral%20public%20key%2C%2012-byte%20nonce%2C%20encrypted%20CEK%2C%20and%2016-byte%20tag.%0A%0A%3A%3A%3A%0A%0A%23%23%20Reading%20Encrypted%20Files%0A%0A%60%60%60rust%0Ause%20honzo_io%3A%3AHonzoReader%3B%0A%0Alet%20private_key%3A%20%5Bu8%3B%2032%5D%20%3D%20load_private_key()%3B%0A%0Alet%20mut%20reader%20%3D%20HonzoReader%3A%3Anew(%26data%2C%201)%0A%20%20%20%20.with_drm_key(%26private_key)%3B%0Areader.parse().unwrap()%3B%0A%0Afor%20entry%20in%20reader.toc_entries()%20%7B%0A%20%20%20%20let%20chunk_data%20%3D%20reader.read_chunk(%26entry).unwrap()%3B%0A%7D%0A%60%60%60%0A%0AIf%20a%20DRM%20key%20is%20not%20provided%2C%20encrypted%20chunks%20cannot%20be%20read%3A%0A%0A%60%60%60rust%0Alet%20reader%20%3D%20HonzoReader%3A%3Anew(%26data%2C%201)%3B%0Areader.parse().unwrap()%3B%0A%0Amatch%20reader.read_chunk(%26entry)%20%7B%0A%20%20%20%20Err(e)%20if%20e.is_drm_error()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20println!(%22This%20chapter%20requires%20a%20DRM%20key%22)%3B%0A%20%20%20%20%7D%0A%20%20%20%20_%20%3D%3E%20%7B%7D%0A%7D%0A%60%60%60%0A%0A%23%23%20Building%20Encrypted%20Files%0A%0A%60%60%60rust%0Ause%20honzo_io%3A%3A%7BHonzoBuilder%2C%20DrmConfig%7D%3B%0A%0Alet%20drm%20%3D%20DrmConfig%3A%3Anew()%0A%20%20%20%20.encrypt_chunks(%26%5B0%2C%201%2C%202%5D)%0A%20%20%20%20.add_recipient(%26alice_pub_key%2C%20%22alice%40example.com%22)%0A%20%20%20%20.expiry(%222026-01-01T00%3A00%3A00Z%22)%0A%20%20%20%20.license_url(%22https%3A%2F%2Fexample.com%2Flicense%2Fabc123%22)%3B%0A%0Alet%20hzo%20%3D%20HonzoBuilder%3A%3Anew()%0A%20%20%20%20.with_drm(drm)%0A%20%20%20%20.add_chapter(%22Chapter%201%22%2C%20...)%0A%20%20%20%20.add_chapter(%22Chapter%202%22%2C%20...)%0A%20%20%20%20.add_chapter(%22Chapter%203%22%2C%20...)%0A%20%20%20%20.finalize()%0A%20%20%20%20.unwrap()%3B%0A%60%60%60%0A%0A%23%23%20Supported%20Algorithms%0A%0A%7C%20Component%20%20%20%20%20%20%20%20%20%20%7C%20Algorithm%20%20%20%7C%0A%7C%20------------------%20%7C%20-----------%20%7C%0A%7C%20Content%20encryption%20%7C%20AES-256-GCM%20%7C%0A%7C%20Key%20agreement%20%20%20%20%20%20%7C%20X25519%20ECDH%20%7C%0A%7C%20Key%20derivation%20%20%20%20%20%7C%20HKDF-SHA256%20%7C%0A%7C%20Key%20wrapping%20%20%20%20%20%20%20%7C%20AES-256-GCM%20%7C%0A%7C%20Random%20generation%20%20%7C%20OS%20CSPRNG%20%20%20%7C%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20.%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Annotations%22%20..%2Ffeatures%2Fannotations.md%20icon%3Abookmark%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1652,7 +1629,7 @@
                   
                     <div class="docmd-copy-widgets">
                       
-                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-copy"
@@ -1673,7 +1650,7 @@
                         </button>
                       
                       
-                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-message-square"
@@ -1690,7 +1667,7 @@
   <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
 </svg>
 </span>
-                          <span class="docmd-btn-text">copyContext</span>
+                          <span class="docmd-btn-text">Copy Context</span>
                         </button>
                       
                     </div>
@@ -1712,62 +1689,62 @@
 </div>
 <h2 id="key-envelope" class="docmd-heading"><a href="#key-envelope" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Key Envelope</h2>
 <p>The DRM envelope is a MessagePack map stored in the EXTRA entry:</p>
-<pre class="hljs"><code>{
-  <span class="hljs-string">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>,
-  <span class="hljs-string">&quot;content_encryption_alg&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;AES-256-GCM&quot;</span>,
-  <span class="hljs-string">&quot;key_wrapping_alg&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ECDH-X25519-HKDF-SHA256&quot;</span>,
-  <span class="hljs-string">&quot;license_url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;https://example.com/license/abc123&quot;</span>,
-  <span class="hljs-string">&quot;expiry&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-01-01T00:00:00Z&quot;</span>,
-  <span class="hljs-string">&quot;recipients&quot;</span><span class="hljs-punctuation">:</span> [
+<pre class="hljs"><code class="language-python">{
+  <span class="hljs-string">&quot;version&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">1</span>,
+  <span class="hljs-string">&quot;content_encryption_alg&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;AES-256-GCM&quot;</span>,
+  <span class="hljs-string">&quot;key_wrapping_alg&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;ECDH-X25519-HKDF-SHA256&quot;</span>,
+  <span class="hljs-string">&quot;license_url&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;https://example.com/license/abc123&quot;</span>,
+  <span class="hljs-string">&quot;expiry&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;2026-01-01T00:00:00Z&quot;</span>,
+  <span class="hljs-string">&quot;recipients&quot;</span><span class="hljs-operator">:</span> [
     {
-      <span class="hljs-string">&quot;ephemeral_pub&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;32 bytes base64&gt;&quot;</span>,
-      <span class="hljs-string">&quot;encrypted_cek&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;48 bytes base64&gt;&quot;</span>,
-      <span class="hljs-string">&quot;recipient_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;user@example.com&quot;</span>
+      <span class="hljs-string">&quot;ephemeral_pub&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;&lt;32 bytes base64&gt;&quot;</span>,
+      <span class="hljs-string">&quot;encrypted_cek&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;&lt;48 bytes base64&gt;&quot;</span>,
+      <span class="hljs-string">&quot;recipient_id&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;user@example.com&quot;</span>
     }
   ]
 }
 </code></pre>
 <p>Each recipient gets their own envelope entry. The CEK is wrapped using ECDH with X25519:</p>
-<div class="docmd-container steps steps-reset"><ol class="steps-list"><li class="step-item">Generate an ephemeral X25519 key pair.</li>
-<li class="step-item">Derive a shared secret from the ephemeral private key and the recipient’s public key.</li>
-<li class="step-item">Use HKDF-SHA256 to expand the shared secret into an AES-256-GCM wrapping key.</li>
-<li class="step-item">Encrypt the CEK with AES-256-GCM using the wrapping key and a random nonce.</li>
-<li class="step-item">Store the result as <code>encrypted_cek</code>: a concatenation of the 32-byte ephemeral public key, 12-byte nonce, encrypted CEK, and 16-byte tag.</li>
+<div class="docmd-container steps steps-reset"><ol class="steps-list"><li class="step-item" id="step-18"><a href="#step-18" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Generate an ephemeral X25519 key pair.</li>
+<li class="step-item" id="step-19"><a href="#step-19" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Derive a shared secret from the ephemeral private key and the recipient’s public key.</li>
+<li class="step-item" id="step-20"><a href="#step-20" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Use HKDF-SHA256 to expand the shared secret into an AES-256-GCM wrapping key.</li>
+<li class="step-item" id="step-21"><a href="#step-21" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Encrypt the CEK with AES-256-GCM using the wrapping key and a random nonce.</li>
+<li class="step-item" id="step-22"><a href="#step-22" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Store the result as <code>encrypted_cek</code>: a concatenation of the 32-byte ephemeral public key, 12-byte nonce, encrypted CEK, and 16-byte tag.</li>
 </ol>
 </div><h2 id="reading-encrypted-files" class="docmd-heading"><a href="#reading-encrypted-files" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Reading Encrypted Files</h2>
-<pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_io<span class="hljs-punctuation">::</span>HonzoReader;
+<pre class="hljs"><code class="language-rust"><span class="hljs-keyword">use</span> honzo_io<span class="hljs-operator">::</span>HonzoReader;
 
-<span class="hljs-keyword">let</span> private_key<span class="hljs-punctuation">:</span> [u8; <span class="hljs-number">32</span>] <span class="hljs-punctuation">=</span> <span class="hljs-title function_">load_private_key</span>();
+<span class="hljs-keyword">let</span> private_key<span class="hljs-operator">:</span> [u8; <span class="hljs-number">32</span>] <span class="hljs-operator">=</span> <span class="hljs-title function_">load_private_key</span>();
 
-<span class="hljs-keyword">let</span> <span class="hljs-keyword">mut</span> reader <span class="hljs-punctuation">=</span> HonzoReader<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>(<span class="hljs-punctuation">&amp;</span>data, <span class="hljs-number">1</span>)
-    .<span class="hljs-title function_">with_drm_key</span>(<span class="hljs-punctuation">&amp;</span>private_key);
+<span class="hljs-keyword">let</span> <span class="hljs-keyword">mut</span> reader <span class="hljs-operator">=</span> HonzoReader<span class="hljs-operator">::</span><span class="hljs-keyword">new</span>(<span class="hljs-operator">&amp;</span>data, <span class="hljs-number">1</span>)
+    .<span class="hljs-title function_">with_drm_key</span>(<span class="hljs-operator">&amp;</span>private_key);
 reader.<span class="hljs-title function_">parse</span>().<span class="hljs-title function_">unwrap</span>();
 
 <span class="hljs-keyword">for</span> entry <span class="hljs-keyword">in</span> reader.<span class="hljs-title function_">toc_entries</span>() {
-    <span class="hljs-keyword">let</span> chunk_data <span class="hljs-punctuation">=</span> reader.<span class="hljs-title function_">read_chunk</span>(<span class="hljs-punctuation">&amp;</span>entry).<span class="hljs-title function_">unwrap</span>();
+    <span class="hljs-keyword">let</span> chunk_data <span class="hljs-operator">=</span> reader.<span class="hljs-title function_">read_chunk</span>(<span class="hljs-operator">&amp;</span>entry).<span class="hljs-title function_">unwrap</span>();
 }
 </code></pre>
 <p>If a DRM key is not provided, encrypted chunks cannot be read:</p>
-<pre class="hljs"><code><span class="hljs-keyword">let</span> reader <span class="hljs-punctuation">=</span> HonzoReader<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>(<span class="hljs-punctuation">&amp;</span>data, <span class="hljs-number">1</span>);
+<pre class="hljs"><code class="language-rust"><span class="hljs-keyword">let</span> reader <span class="hljs-operator">=</span> HonzoReader<span class="hljs-operator">::</span><span class="hljs-keyword">new</span>(<span class="hljs-operator">&amp;</span>data, <span class="hljs-number">1</span>);
 reader.<span class="hljs-title function_">parse</span>().<span class="hljs-title function_">unwrap</span>();
 
-<span class="hljs-keyword">match</span> reader.<span class="hljs-title function_">read_chunk</span>(<span class="hljs-punctuation">&amp;</span>entry) {
-    <span class="hljs-title function_">Err</span>(e) <span class="hljs-keyword">if</span> e.<span class="hljs-title function_">is_drm_error</span>() <span class="hljs-punctuation">=&gt;</span> {
-        println<span class="hljs-punctuation">!</span>(<span class="hljs-string">&quot;This chapter requires a DRM key&quot;</span>);
+<span class="hljs-keyword">match</span> reader.<span class="hljs-title function_">read_chunk</span>(<span class="hljs-operator">&amp;</span>entry) {
+    <span class="hljs-title function_">Err</span>(e) <span class="hljs-keyword">if</span> e.<span class="hljs-title function_">is_drm_error</span>() <span class="hljs-operator">=&gt;</span> {
+        println<span class="hljs-operator">!</span>(<span class="hljs-string">&quot;This chapter requires a DRM key&quot;</span>);
     }
-    _ <span class="hljs-punctuation">=&gt;</span> {}
+    _ <span class="hljs-operator">=&gt;</span> {}
 }
 </code></pre>
 <h2 id="building-encrypted-files" class="docmd-heading"><a href="#building-encrypted-files" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Building Encrypted Files</h2>
-<pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_io<span class="hljs-punctuation">::</span>{HonzoBuilder, DrmConfig};
+<pre class="hljs"><code class="language-rust"><span class="hljs-keyword">use</span> honzo_io<span class="hljs-operator">::</span>{HonzoBuilder, DrmConfig};
 
-<span class="hljs-keyword">let</span> drm <span class="hljs-punctuation">=</span> DrmConfig<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>()
-    .<span class="hljs-title function_">encrypt_chunks</span>(<span class="hljs-punctuation">&amp;</span>[<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>])
-    .<span class="hljs-title function_">add_recipient</span>(<span class="hljs-punctuation">&amp;</span>alice_pub_key, <span class="hljs-string">&quot;alice@example.com&quot;</span>)
+<span class="hljs-keyword">let</span> drm <span class="hljs-operator">=</span> DrmConfig<span class="hljs-operator">::</span><span class="hljs-keyword">new</span>()
+    .<span class="hljs-title function_">encrypt_chunks</span>(<span class="hljs-operator">&amp;</span>[<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>])
+    .<span class="hljs-title function_">add_recipient</span>(<span class="hljs-operator">&amp;</span>alice_pub_key, <span class="hljs-string">&quot;alice@example.com&quot;</span>)
     .<span class="hljs-title function_">expiry</span>(<span class="hljs-string">&quot;2026-01-01T00:00:00Z&quot;</span>)
     .<span class="hljs-title function_">license_url</span>(<span class="hljs-string">&quot;https://example.com/license/abc123&quot;</span>);
 
-<span class="hljs-keyword">let</span> hzo <span class="hljs-punctuation">=</span> HonzoBuilder<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>()
+<span class="hljs-keyword">let</span> hzo <span class="hljs-operator">=</span> HonzoBuilder<span class="hljs-operator">::</span><span class="hljs-keyword">new</span>()
     .<span class="hljs-title function_">with_drm</span>(drm)
     .<span class="hljs-title function_">add_chapter</span>(<span class="hljs-string">&quot;Chapter 1&quot;</span>, ...)
     .<span class="hljs-title function_">add_chapter</span>(<span class="hljs-string">&quot;Chapter 2&quot;</span>, ...)
@@ -1870,14 +1847,14 @@ Annotations</a></div>
   <path d="M19 12H5" />
 </svg>
 
-                        <span><small>previous</small><strong>
+                        <span><small>Previous</small><strong>
                             Compression
                           </strong></span>
                       </a>
                     
                     
                       <a href="../../format/layout/" class="next-page">
-                        <span><small>next</small>
+                        <span><small>Next</small>
                           <strong>
                             Layout Modes
                           </strong></span>
@@ -1903,12 +1880,13 @@ Annotations</a></div>
                   </div>
                 
               </div>
+              
               <div class="toc-sidebar">
                 
 
 
   <div class="toc-container">
-    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
 <svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-down"
   xmlns="http://www.w3.org/2000/svg"
@@ -1954,33 +1932,34 @@ Annotations</a></div>
   </div>
 
               </div>
+              
             </div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1787023392000">
+                <span class="git-last-updated" data-timestamp="1787810890000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1787023392000"></span>
+                  <span class="git-time" data-timestamp="1787810890000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
                     <ul class="git-commit-list">
                       
                         <li class="git-commit-item">
-                          <div class="git-commit-avatar" title="dependabot[bot]">
+                          <div class="git-commit-avatar" title="NellowTCS">
                             
-                              <img src="https://www.gravatar.com/avatar/48ea49be76d0c68403a7f3df87e3487d?d=mp&amp;s=64" alt="dependabot[bot]">
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Bump brace-expansion (#65)">Bump brace-expansion (#65)</div>
+                            <div class="git-commit-message" title="Add hzo_extract_meta_from_file, markdown converter CLI, and update dependencies (#66)">Add hzo_extract_meta_from_file, markd...</div>
                             <div class="git-commit-meta">
-                              <span class="git-commit-author">dependabot[bot]</span>
-                              <span class="git-commit-date" data-timestamp="1787023392000"></span>
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1787810890000"></span>
                             </div>
                           </div>
                         </li>
@@ -2035,11 +2014,11 @@ Annotations</a></div>
                 <span class="footer-column-title">Resources</span>
                 <ul>
                   
-                    <li><a href="../../getting-started/quickstart/" >Getting Started</a></li>
+                    <li><a href="getting-started/quickstart/" >Getting Started</a></li>
                   
-                    <li><a href="../../format/" >Format Spec</a></li>
+                    <li><a href="format/" >Format Spec</a></li>
                   
-                    <li><a href="../../cli/" >CLI Commands</a></li>
+                    <li><a href="cli/" >CLI Commands</a></li>
                   
                 </ul>
               </div>
@@ -2064,7 +2043,7 @@ Annotations</a></div>
         <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/Nisoku/Honzo">View on GitHub</a>.</div>
         
           <div class="branding-footer">
-            builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
           </div>
         
       </div>
@@ -2073,20 +2052,23 @@ Annotations</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=msy44anm"></script>
+      <script src="../../assets/js/docmd-main.js?v=mtb4na5q"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=msy44anm"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=msy44anm" ></script>
-<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=msy44anm" ></script>
-<script src="../../assets/js/init-mermaid.js?v=msy44anm" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=msy44anm" type="module"></script>
+      <script src="../../assets/js/docmd-git.js?v=mtb4na5q"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-search.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/init-mermaid.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-git.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-ai.js?v=mtb4na5q" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
        data-search-placeholder="Search documentation..."
        data-search-no-results="No results found."
        data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
        data-search-initial="Type to start searching..."
        data-search-navigate="to navigate"
        data-search-escape="to close">
@@ -2154,6 +2136,9 @@ Annotations</a></div>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/Nisoku/Honzo/edit/main/","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"Honzo","siteBase":"/Honzo/","siteUrl":"https://nisoku.org/Honzo","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Getting Started","icon":"rocket","collapsible":false,"children":[{"title":"Quick Start","path":"/getting-started/quickstart/","icon":"play"},{"title":"Installation","path":"/getting-started/installation/","icon":"download"},{"title":"Core Concepts","path":"/getting-started/concepts/","icon":"book"}]},{"title":"Format Specification","icon":"file-text","path":"/format/","collapsible":false,"children":[{"title":"Wire Format","path":"/format/wire-format/","icon":"binary"},{"title":"Chunk Types","path":"/format/chunk-types/","icon":"package"},{"title":"Compression","path":"/format/compression/","icon":"zap"},{"title":"DRM & Encryption","path":"/format/drm/","icon":"lock"},{"title":"Layout Modes","path":"/format/layout/","icon":"columns"}]},{"title":"API Reference","icon":"code","path":"/api/","collapsible":false,"children":[{"title":"Rust","path":"/api/rust/","icon":"box"},{"title":"WASM / TypeScript","path":"/api/wasm/","icon":"cpu"},{"title":"C","path":"/api/c/","icon":"terminal"}]},{"title":"CLI Reference","icon":"terminal","path":"/cli/","collapsible":false},{"title":"Features","icon":"star","path":"/features/","collapsible":false,"children":[{"title":"Annotations","path":"/features/annotations/","icon":"pen-tool"},{"title":"Search Index","path":"/features/search/","icon":"search"},{"title":"Sync Tracks","path":"/features/sync/","icon":"clock"},{"title":"Streaming","path":"/features/streaming/","icon":"wind"}]},{"title":"Conversion","icon":"git-merge","path":"/conversion/","collapsible":false,"children":[{"title":"EPUB","path":"/conversion/epub/","icon":"book"},{"title":"MOBI","path":"/conversion/mobi/","icon":"book-open"},{"title":"PDF","path":"/conversion/pdf/","icon":"file-text"}]},{"title":"Demo Apps","icon":"eye","path":"/demo-docs/","collapsible":false,"children":[{"title":"Reader","path":"/demo/","icon":"book","external":true},{"title":"Maker","path":"/demo/maker/","icon":"wrench","external":true},{"title":"Inspect","path":"/demo/inspect/","icon":"search","external":true},{"title":"Convert","path":"/demo/convert/","icon":"git-merge","external":true}]},{"title":"Contributing","icon":"heart","path":"/contributing/","collapsible":false,"children":[{"title":"Building","path":"/contributing/building/","icon":"network"},{"title":"Architecture","path":"/contributing/architecture/","icon":"git-commit"}]},{"title":"GitHub","path":"https://github.com/Nisoku/Honzo","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":true},"isWorkspace":false,"workspaceProjects":[]};</script>
+      
+      
       
   </body>
 </html>

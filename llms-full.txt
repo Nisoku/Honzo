@@ -25,7 +25,7 @@ HonzoHandle_destroy(handle);
 ```
 
 | Return                          | Meaning |
-|---------------------------------|---------|
+| ------------------------------- | ------- |
 | ::: tag "0" color:#22c55e       | Success |
 | ::: tag "nonzero" color:#ef4444 | Error   |
 
@@ -47,7 +47,7 @@ Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk
 ### HonzoFileReader lifecycle
 
 | Symbol                                  | Signature                                                                      | Returns                                        | Notes                |
-|-----------------------------------------|--------------------------------------------------------------------------------|------------------------------------------------|----------------------|
+| --------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------- | -------------------- |
 | `HonzoFileReader_open`                  | `DiplomatStringView path, uint16_t reader_version`                             | `HonzoFileReader_open_result`                  | Open from file path. |
 | `HonzoFileReader_open_with_private_key` | `DiplomatStringView path, uint16_t reader_version, DiplomatU8View private_key` | `HonzoFileReader_open_with_private_key_result` | Open with DRM key.   |
 | `HonzoFileReader_destroy`               | `HonzoFileReader* self`                                                        | `void`                                         | Free the reader.     |
@@ -55,7 +55,7 @@ Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk
 ### HonzoFileReader accessors
 
 | Symbol                                         | Signature                                     | Returns                                     | Notes                                                                                                                   |
-|------------------------------------------------|-----------------------------------------------|---------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| ---------------------------------------------- | --------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `HonzoFileReader_chunk_count`                  | `const HonzoFileReader* self`                 | `uint32_t`                                  | Number of chunks.                                                                                                       |
 | `HonzoFileReader_get_chunk_type`               | `const HonzoFileReader* self, uint32_t index` | `uint32_t`                                  | 4-byte chunk tag as native-endian u32 (e.g. `0x50414843` for `"CHAP"`). Returns 0 if index out of range.                |
 | `HonzoFileReader_get_chunk_content_type_kind`  | `const HonzoFileReader* self, uint32_t index` | `uint8_t`                                   | Content type kind: `1` = markup, `2` = math. Returns 0 if index out of range.                                           |
@@ -151,14 +151,14 @@ Parse a Honzo file from a byte buffer in memory.
 ### HonzoHandle lifecycle
 
 | Symbol                | Signature                                           | Returns        | Notes                                          |
-|-----------------------|-----------------------------------------------------|----------------|------------------------------------------------|
+| --------------------- | --------------------------------------------------- | -------------- | ---------------------------------------------- |
 | `HonzoHandle_parse`   | `const uint8_t* data, size_t len, uint32_t version` | `HonzoHandle*` | Parse from byte buffer. Returns NULL on error. |
 | `HonzoHandle_destroy` | `HonzoHandle* handle`                               | `void`         | Free the handle.                               |
 
 ## HonzoHandle accessors
 
 | Symbol                    | Signature                                                                  | Returns       | Notes                              |
-|---------------------------|----------------------------------------------------------------------------|---------------|------------------------------------|
+| ------------------------- | -------------------------------------------------------------------------- | ------------- | ---------------------------------- |
 | `HonzoHandle_chunk_count` | `const HonzoHandle*`                                                       | `uint32_t`    | Number of chunks.                  |
 | `HonzoHandle_head`        | `const HonzoHandle*, HonzoHead* out`                                       | `int32_t`     | 0 on success, nonzero on error.    |
 | `HonzoHandle_toc_entry`   | `const HonzoHandle*, uint32_t index, TocEntry* out`                        | `int32_t`     | 0 on success, nonzero on error.    |
@@ -171,7 +171,7 @@ Parse a Honzo file from a byte buffer in memory.
 ## HonzoErrorCode
 
 | Code                                     | Meaning                   |
-|------------------------------------------|---------------------------|
+| ---------------------------------------- | ------------------------- |
 | `HonzoErrorCode_Ok = 0`                  | Success                   |
 | `HonzoErrorCode_InvalidMagic = 1`        | Not a Honzo file          |
 | `HonzoErrorCode_ReaderVersionTooOld = 2` | Reader version too low    |
@@ -312,7 +312,7 @@ for (uint32_t i = 0; i < n; i++) {
 ```
 
 | Return                          | Meaning |
-|---------------------------------|---------|
+| ------------------------------- | ------- |
 | ::: tag "0" color:#22c55e       | Success |
 | ::: tag "nonzero" color:#ef4444 | Error   |
 
@@ -336,7 +336,7 @@ Open a Honzo file from the filesystem and read chunks on demand. Each `get_chunk
 Include: `#include <cpp/HonzoFileReader.hpp>`
 
 | Method                                     | Signature                                                                   | Returns                                                              | Notes               |
-|--------------------------------------------|-----------------------------------------------------------------------------|----------------------------------------------------------------------|---------------------|
+| ------------------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------- |
 | `open`                                     | `static (std::string_view path, uint16_t reader_version)`                   | `diplomat::result<std::unique_ptr<HonzoFileReader>, HonzoErrorCode>` | Static factory.     |
 | `open_with_private_key`                    | `static (std::string_view path, uint16_t version, span<const uint8_t> key)` | `diplomat::result<std::unique_ptr<HonzoFileReader>, HonzoErrorCode>` | Open with DRM key.  |
 | `~HonzoFileReader` (via `operator delete`) |                                                                             |                                                                      | Closes the file FD. |
@@ -344,7 +344,7 @@ Include: `#include <cpp/HonzoFileReader.hpp>`
 ### HonzoFileReader accessors
 
 | Method                         | Signature                | Returns                                         | Notes                                                                                       |
-|--------------------------------|--------------------------|-------------------------------------------------|---------------------------------------------------------------------------------------------|
+| ------------------------------ | ------------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `chunk_count`                  | `() const`               | `uint32_t`                                      | Number of chunks.                                                                           |
 | `get_chunk_type`               | `(uint32_t index) const` | `uint32_t`                                      | 4-byte tag as native-endian u32 (e.g. `0x50414843` for `"CHAP"`). 0 if OOB.                 |
 | `get_chunk_content_type_kind`  | `(uint32_t index) const` | `uint8_t`                                       | 1 = markup, 2 = math. 0 if OOB.                                                             |
@@ -364,7 +364,7 @@ Parse a Honzo file from a byte buffer in memory. Returns `nullptr` (via `std::un
 Include: `#include <cpp/HonzoHandle.hpp>`
 
 | Method                   | Signature                                                                      | Returns                        | Notes                       |
-|--------------------------|--------------------------------------------------------------------------------|--------------------------------|-----------------------------|
+| ------------------------ | ------------------------------------------------------------------------------ | ------------------------------ | --------------------------- |
 | `parse`                  | `static (span<const uint8_t> data, uint16_t reader_version)`                   | `std::unique_ptr<HonzoHandle>` | Returns `nullptr` on error. |
 | `parse_with_private_key` | `static (span<const uint8_t> data, uint16_t version, span<const uint8_t> key)` | `std::unique_ptr<HonzoHandle>` | Parse with DRM key.         |
 | `~HonzoHandle`           |                                                                                |                                | Frees the handle.           |
@@ -372,7 +372,7 @@ Include: `#include <cpp/HonzoHandle.hpp>`
 ### HonzoHandle accessors
 
 | Method               | Signature          | Returns                                         | Notes                            |
-|----------------------|--------------------|-------------------------------------------------|----------------------------------|
+| -------------------- | ------------------ | ----------------------------------------------- | -------------------------------- |
 | `chunk_count`        | `() const`         | `uint32_t`                                      | Number of chunks.                |
 | `version_major`      | `() const`         | `uint8_t`                                       | File format major version.       |
 | `version_minor`      | `() const`         | `uint8_t`                                       | File format minor version.       |
@@ -409,7 +409,7 @@ Construct Honzo files programmatically. Add chunks, set metadata, configure DRM,
 Include: `#include <cpp/HonzoBuilderHandle.hpp>`
 
 | Method                | Signature   | Returns                               | Notes                    |
-|-----------------------|-------------|---------------------------------------|--------------------------|
+| --------------------- | ----------- | ------------------------------------- | ------------------------ |
 | `new_`                | `static ()` | `std::unique_ptr<HonzoBuilderHandle>` | Create empty builder.    |
 | `finalize`            | `()`        | `bool`                                | Finalize the file.       |
 | `get_result`          | `() const`  | `diplomat::span<const uint8_t>`       | Finalized Honzo bytes.   |
@@ -418,7 +418,7 @@ Include: `#include <cpp/HonzoBuilderHandle.hpp>`
 ### HonzoBuilderHandle setters
 
 | Method                   | Signature                                                                                                                 | Returns | Notes                                     |
-|--------------------------|---------------------------------------------------------------------------------------------------------------------------|---------|-------------------------------------------|
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------- |
 | `add_chunk`              | `(tag, data, compression, content_type_kind, content_type_value, cover_type, alt_text, font_embedding, font_license_url)` | `bool`  | Add a data chunk.                         |
 | `set_language`           | `(std::string_view lang)`                                                                                                 | `bool`  | Set book language (ISO 639-1).            |
 | `set_auto_sidx`          | `(bool enable)`                                                                                                           | `bool`  | Auto-generate SIDX on finalize.           |
@@ -467,7 +467,7 @@ Owned (non-opaque) C++ struct, safe to copy.
 Include: `#include <cpp/HonzoErrorCode.hpp>`
 
 | Value                                     | Meaning                   |
-|-------------------------------------------|---------------------------|
+| ----------------------------------------- | ------------------------- |
 | `HonzoErrorCode::Ok = 0`                  | Success                   |
 | `HonzoErrorCode::InvalidMagic = 1`        | Not a Honzo file          |
 | `HonzoErrorCode::ReaderVersionTooOld = 2` | Reader version too low    |
@@ -488,7 +488,7 @@ Include: `#include <cpp/HonzoErrorCode.hpp>`
 Include: `#include <cpp/free_functions.hpp>`
 
 | Function                | Signature                                        | Returns                                         | Notes                               |
-|-------------------------|--------------------------------------------------|-------------------------------------------------|-------------------------------------|
+| ----------------------- | ------------------------------------------------ | ----------------------------------------------- | ----------------------------------- |
 | `guess_image_mime`      | `(span<const uint8_t> bytes)`                    | `diplomat::result<std::string, HonzoErrorCode>` | Detect image format from raw bytes. |
 | `guess_font_format`     | `(span<const uint8_t> bytes)`                    | `diplomat::result<std::string, HonzoErrorCode>` | Detect font format.                 |
 | `latex_to_mathml`       | `(span<const uint8_t> bytes)`                    | `diplomat::result<std::string, HonzoErrorCode>` | Convert LaTeX to MathML.            |
@@ -637,7 +637,7 @@ FFI friendly single header binding for read only access.
 ## Surface comparison
 
 | Feature          | Rust                        | C++                         | WASM/TS                     | C                           |
-|------------------|-----------------------------|-----------------------------|-----------------------------|-----------------------------|
+| ---------------- | --------------------------- | --------------------------- | --------------------------- | --------------------------- |
 | Parse & inspect  | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e |
 | Builder          | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  |
 | Streaming reader | ::: tag "Yes" color:#22c55e | ::: tag "Yes" color:#22c55e | ::: tag "No" color:#ef4444  | ::: tag "Yes" color:#22c55e |
@@ -651,7 +651,7 @@ FFI friendly single header binding for read only access.
 All APIs are built on the same Rust workspace:
 
 | Crate           | Description                          | Depends On                                                |
-|-----------------|--------------------------------------|-----------------------------------------------------------|
+| --------------- | ------------------------------------ | --------------------------------------------------------- |
 | `honzo-core`    | no_std wire-format types + parser    | None                                                      |
 | `honzo-chunks`  | Chunk semantics (SIDX, COVT, extras) | `honzo-core`                                              |
 | `honzo-io`      | Builder, reader, stream, compression | `honzo-core`, `honzo-chunks`                              |
@@ -681,7 +681,7 @@ The Rust API is the primary surface for Honzo. It is organized across two crates
 :::
 
 | Symbol                 | Signature                                      | Returns         | Notes                                      |
-|------------------------|------------------------------------------------|-----------------|--------------------------------------------|
+| ---------------------- | ---------------------------------------------- | --------------- | ------------------------------------------ |
 | `HonzoParser::new`     | `pub fn new(data: &[u8], version: u32)`        | `Result<Self>`  | Parse HEAD from byte slice. No alloc.      |
 | `parser.head`          | `pub fn head(&self) -> &HonzoHead`             | `&HonzoHead`    | Pointer-cast to HEAD struct.               |
 | `parser.toc_entries`   | `pub fn toc_entries(&self) -> &[TocEntry]`     | `&[TocEntry]`   | Pointer-cast to TOC array.                 |
@@ -697,7 +697,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### Main types
 
 | Type          | Purpose                                        |
-|---------------|------------------------------------------------|
+| ------------- | ---------------------------------------------- |
 | `HonzoParser` | Zero-copy parser (re-exported from honzo-core) |
 | `HonzoStream` | Pull-based streaming reader                    |
 | `HonzoReader` | Reader with DRM decryption support             |
@@ -707,7 +707,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### Reader API
 
 | Symbol                | Signature                                    | Returns           | Notes                                                 |
-|-----------------------|----------------------------------------------|-------------------|-------------------------------------------------------|
+| --------------------- | -------------------------------------------- | ----------------- | ----------------------------------------------------- |
 | `HonzoReader::new`    | `pub fn new(data: &[u8], version: u32)`      | `Self`            | Create reader.                                        |
 | `reader.with_drm_key` | `pub fn with_drm_key(self, key: &[u8; 32])`  | `Self`            | Set X25519 private key for DRM.                       |
 | `reader.parse`        | `pub fn parse(&mut self)`                    | `Result<()>`      | Parse file structure and unwrap DRM envelope.         |
@@ -718,7 +718,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### Stream API
 
 | Symbol                | Signature                                   | Returns               | Notes                         |
-|-----------------------|---------------------------------------------|-----------------------|-------------------------------|
+| --------------------- | ------------------------------------------- | --------------------- | ----------------------------- |
 | `HonzoStream::open`   | `pub fn open(file: File, version: u32)`     | `Result<Self>`        | Open from std::fs::File.      |
 | `stream.with_drm_key` | `pub fn with_drm_key(self, key: &[u8; 32])` | `Self`                | Enable DRM decryption.        |
 | `stream.head`         | `pub fn head(&self) -> &HonzoHead`          | `&HonzoHead`          | File header.                  |
@@ -728,7 +728,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### Builder API
 
 | Symbol                 | Signature                                                                                       | Returns           | Notes                       |
-|------------------------|-------------------------------------------------------------------------------------------------|-------------------|-----------------------------|
+| ---------------------- | ----------------------------------------------------------------------------------------------- | ----------------- | --------------------------- |
 | `Builder::new`         | `pub fn new()`                                                                                  | `Self`            | New builder.                |
 | `builder.meta_title`   | `pub fn meta_title(self, lang, title)`                                                          | `Self`            | Set localized title.        |
 | `builder.meta_creator` | `pub fn meta_creator(self, lang, creator)`                                                      | `Self`            | Set localized creator.      |
@@ -740,7 +740,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### Crypto API
 
 | Symbol            | Signature                                  | Returns           | Notes                        |
-|-------------------|--------------------------------------------|-------------------|------------------------------|
+| ----------------- | ------------------------------------------ | ----------------- | ---------------------------- |
 | `generate_cek`    | `pub fn generate_cek()`                    | `[u8; 32]`        | Random 256-bit CEK.          |
 | `generate_nonce`  | `pub fn generate_nonce()`                  | `[u8; 12]`        | Random 12-byte nonce.        |
 | `encrypt_content` | `pub fn encrypt_content(data, key)`        | `Result<Vec<u8>>` | AES-256-GCM encrypt.         |
@@ -751,7 +751,7 @@ Full featured crate with Builder, streaming reader, and compression.
 ### DrmConfig API
 
 | Symbol                  | Signature                                 | Returns | Notes                                 |
-|-------------------------|-------------------------------------------|---------|---------------------------------------|
+| ----------------------- | ----------------------------------------- | ------- | ------------------------------------- |
 | `DrmConfig::new`        | `pub fn new()`                            | `Self`  | New DRM config.                       |
 | `config.encrypt_chunks` | `pub fn encrypt_chunks(self, indices)`    | `Self`  | Chunk IDs to encrypt.                 |
 | `config.add_recipient`  | `pub fn add_recipient(self, pub_key, id)` | `Self`  | Add a recipient by X25519 public key. |
@@ -763,7 +763,7 @@ Full featured crate with Builder, streaming reader, and compression.
 All fallible operations return `Result<T, HonzoError>`. Error variants include:
 
 | Variant                                  | Meaning                                               |
-|------------------------------------------|-------------------------------------------------------|
+| ---------------------------------------- | ----------------------------------------------------- |
 | ::: tag "InvalidMagic" color:#ef4444     | Not a Honzo file                                      |
 | ::: tag "InvalidVersion" color:#ef4444   | Unsupported format version                            |
 | ::: tag "InvalidChecksum" color:#ef4444  | Integrity check failed                                |
@@ -817,13 +817,13 @@ npm install @nisoku/honzo
 ## createReader
 
 | Symbol         | Signature                                | Returns                | Notes               |
-|----------------|------------------------------------------|------------------------|---------------------|
+| -------------- | ---------------------------------------- | ---------------------- | ------------------- |
 | `createReader` | `(buffer: Uint8Array, version?: number)` | `Promise<HonzoReader>` | Parse a Honzo file. |
 
 ## HonzoReader
 
 | Symbol                 | Signature                  | Returns      | Notes                                     |
-|------------------------|----------------------------|--------------|-------------------------------------------|
+| ---------------------- | -------------------------- | ------------ | ----------------------------------------- |
 | `reader.chunkCount`    | `get`                      | `number`     | Number of chunks.                         |
 | `reader.layoutMode`    | `get`                      | `number`     | `0`=reflowable, `1`=fixed, `2`=scroll.    |
 | `reader.formatVersion` | `get`                      | `number`     | Format version.                           |
@@ -836,7 +836,7 @@ npm install @nisoku/honzo
 ## HonzoMeta
 
 | Field            | Type                                  | Description                |
-|------------------|---------------------------------------|----------------------------|
+| ---------------- | ------------------------------------- | -------------------------- |
 | `title`          | `Record<string, string> \| undefined` | Localized title map.       |
 | `creator`        | `Record<string, string> \| undefined` | Localized creator map.     |
 | `language`       | `string \| undefined`                 | Primary language (BCP 47). |
@@ -852,7 +852,7 @@ npm install @nisoku/honzo
 ## TocEntry
 
 | Field         | Type     | Description                             |
-|---------------|----------|-----------------------------------------|
+| ------------- | -------- | --------------------------------------- |
 | `chunkType`   | `string` | 4-byte type tag (e.g., `"CHAP"`).       |
 | `compression` | `number` | `0`=none, `1`=lz4.                      |
 | `markupType`  | `number` | `0`=markdown, `1`=html.                 |
@@ -862,13 +862,13 @@ npm install @nisoku/honzo
 ## buildHonzo
 
 | Symbol       | Signature               | Returns               | Notes                           |
-|--------------|-------------------------|-----------------------|---------------------------------|
+| ------------ | ----------------------- | --------------------- | ------------------------------- |
 | `buildHonzo` | `(config: BuildConfig)` | `Promise<Uint8Array>` | Build a Honzo file from config. |
 
 ### BuildConfig
 
 | Field        | Type                     | Default     | Description            |
-|--------------|--------------------------|-------------|------------------------|
+| ------------ | ------------------------ | ----------- | ---------------------- |
 | `chunks`     | `ChunkInput[]`           | required    | Array of chunk inputs. |
 | `meta`       | `Partial<HonzoMeta>`     | `{}`        | Book metadata.         |
 | `layoutMode` | `number`                 | `0`         | Layout mode.           |
@@ -877,7 +877,7 @@ npm install @nisoku/honzo
 ### ChunkInput
 
 | Field         | Type         | Description                  |
-|---------------|--------------|------------------------------|
+| ------------- | ------------ | ---------------------------- |
 | `type`        | `string`     | 4-byte type tag.             |
 | `data`        | `Uint8Array` | Chunk content.               |
 | `compression` | `number`     | `0`=none, `1`=lz4.           |
@@ -887,7 +887,7 @@ npm install @nisoku/honzo
 ### DrmConfig
 
 | Field             | Type          | Description                 |
-|-------------------|---------------|-----------------------------|
+| ----------------- | ------------- | --------------------------- |
 | `encryptedChunks` | `number[]`    | TOC indices to encrypt.     |
 | `recipients`      | `Recipient[]` | Authorized recipients.      |
 | `licenseUrl?`     | `string`      | Optional license URL.       |
@@ -896,7 +896,7 @@ npm install @nisoku/honzo
 ### Recipient
 
 | Field       | Type         | Description                   |
-|-------------|--------------|-------------------------------|
+| ----------- | ------------ | ----------------------------- |
 | `publicKey` | `Uint8Array` | X25519 public key (32 bytes). |
 | `id`        | `string`     | Recipient identifier.         |
 
@@ -905,7 +905,7 @@ npm install @nisoku/honzo
 Async functions throw `HonzoError` with a `code` property:
 
 | Code                                     | Meaning                    |
-|------------------------------------------|----------------------------|
+| ---------------------------------------- | -------------------------- |
 | ::: tag "InvalidMagic" color:#ef4444     | Not a Honzo file           |
 | ::: tag "InvalidVersion" color:#ef4444   | Unsupported format version |
 | ::: tag "DrmError" color:#ef4444         | DRM-related failure        |
@@ -914,19 +914,24 @@ Async functions throw `HonzoError` with a `code` property:
 ## Example
 
 ```typescript
-import { createReader, buildHonzo } from '@nisoku/honzo';
+import { createReader, buildHonzo } from "@nisoku/honzo";
 
 // Read
-const response = await fetch('book.hzo');
+const response = await fetch("book.hzo");
 const buf = new Uint8Array(await response.arrayBuffer());
 const reader = await createReader(buf);
 console.log(reader.chunkCount, reader.getMeta().title?.en);
 
 // Build
 const hzo = await buildHonzo({
-  meta: { title: { en: 'My Book' } },
+  meta: { title: { en: "My Book" } },
   chunks: [
-    { type: 'CHAP', data: new TextEncoder().encode('# Hello'), compression: 1, markupType: 0 },
+    {
+      type: "CHAP",
+      data: new TextEncoder().encode("# Hello"),
+      compression: 1,
+      markupType: 0,
+    },
   ],
 });
 ```
@@ -964,7 +969,7 @@ honzo-cli <command> [options]
 ```
 
 | Flag        | Description  |
-|-------------|--------------|
+| ----------- | ------------ |
 | `--help`    | Show help    |
 | `--version` | Show version |
 
@@ -982,7 +987,7 @@ honzo-cli make <output.hzo> \
 ```
 
 | Option                  | Description                                             |
-|-------------------------|---------------------------------------------------------|
+| ----------------------- | ------------------------------------------------------- |
 | `--title <text>`        | Book title                                              |
 | `--author <text>`       | Book author                                             |
 | `--language <code>`     | Language (BCP 47, default: `en`)                        |
@@ -1024,7 +1029,7 @@ Chunks:
 ```
 
 | Option          | Description              |
-|-----------------|--------------------------|
+| --------------- | ------------------------ |
 | `--verbose, -v` | Show detailed TOC fields |
 | `--json`        | Output as JSON           |
 
@@ -1050,13 +1055,13 @@ honzo-cli convert <input> <output.hzo>
 Supported input formats:
 
 | Extension | Format               |
-|-----------|----------------------|
+| --------- | -------------------- |
 | `.epub`   | EPUB 2/3             |
 | `.mobi`   | MOBI (Amazon Kindle) |
 | `.pdf`    | PDF                  |
 
 | Option              | Description       |
-|---------------------|-------------------|
+| ------------------- | ----------------- |
 | `--title <text>`    | Override title    |
 | `--author <text>`   | Override author   |
 | `--language <code>` | Override language |
@@ -1084,7 +1089,7 @@ Returns exit code ::: tag "0" color:#22c55e if valid, ::: tag "1" color:#ef4444 
 ## Exit codes
 
 | Code | Meaning       |
-|------|---------------|
+| ---- | ------------- |
 | `0`  | Success       |
 | `1`  | General error |
 | `2`  | Invalid input |
@@ -1506,7 +1511,7 @@ EPUB conversion is the most complete conversion path in Honzo. It handles EPUB 2
 ## Metadata mapping
 
 | EPUB field                        | Honzo META field                           |
-|-----------------------------------|--------------------------------------------|
+| --------------------------------- | ------------------------------------------ |
 | `dc:title`                        | `title` (multi-language if multiple)       |
 | `dc:creator`                      | `creator`                                  |
 | `dc:language`                     | `language`                                 |
@@ -1666,7 +1671,7 @@ std::fs::write("book.hzo", hzo).unwrap();
 ### EPUB
 
 | Source        | Honzo target              | Details                                         |
-|---------------|---------------------------|-------------------------------------------------|
+| ------------- | ------------------------- | ----------------------------------------------- |
 | OPF metadata  | META section              | Title, creator, language, identifiers, subjects |
 | NCX / nav     | CHAP chunks + TOC         | Chapter splitting follows the EPUB spine        |
 | XHTML content | CHAP chunks (HTML)        | Full HTML preserved, including in-line images   |
@@ -1679,7 +1684,7 @@ std::fs::write("book.hzo", hzo).unwrap();
 ### MOBI
 
 | Source       | Honzo target       | Details                 |
-|--------------|--------------------|-------------------------|
+| ------------ | ------------------ | ----------------------- |
 | Metadata     | META section       | Title, author, language |
 | Text content | CHAP chunks (HTML) | Basic HTML conversion   |
 | Images       | IMG_ chunks        | Embedded images         |
@@ -1687,7 +1692,7 @@ std::fs::write("book.hzo", hzo).unwrap();
 ### PDF
 
 | Source         | Honzo target           | Details                           |
-|----------------|------------------------|-----------------------------------|
+| -------------- | ---------------------- | --------------------------------- |
 | Extracted text | CHAP chunks (Markdown) | Text flow, no layout preservation |
 | Page breaks    | Chapter splitting      | One PDF page per chapter          |
 
@@ -1706,11 +1711,11 @@ Explicit EPUB pagebreak patterns are also detected:
 
 ```html
 <!-- These are all recognized -->
-<span epub:type="pagebreak" id="pg42" title="42"/>
-<span class="pagebreak" id="page-42"/>
+<span epub:type="pagebreak" id="pg42" title="42" />
+<span class="pagebreak" id="page-42" />
 <a id="page42" class="pagebreak"></a>
-<hr class="pagebreak"/>
-<div class="pagebreak" title="42"/>
+<hr class="pagebreak" />
+<div class="pagebreak" title="42" />
 ```
 
 :::
@@ -2128,7 +2133,7 @@ Annotations are stored as a MessagePack map:
 ### Annotation types
 
 | Type        | Description                                 |
-|-------------|---------------------------------------------|
+| ----------- | ------------------------------------------- |
 | `highlight` | Text highlight with start/end byte offsets  |
 | `bookmark`  | Position bookmark (page or location marker) |
 | `note`      | A note attached to a specific position      |
@@ -2138,7 +2143,7 @@ Annotations are stored as a MessagePack map:
 ### Fields
 
 | Field      | Type      | Description                           |
-|------------|-----------|---------------------------------------|
+| ---------- | --------- | ------------------------------------- |
 | `id`       | `string`  | UUID                                  |
 | `type`     | `string`  | Annotation type                       |
 | `chunk`    | `int`     | TOC index of the annotated chunk      |
@@ -2321,7 +2326,7 @@ honzo-cli make book.hzo --chapters ch1.md ch2.md \
 ## Searching
 
 ```typescript
-import { createReader } from '@nisoku/honzo';
+import { createReader } from "@nisoku/honzo";
 
 const reader = await createReader(buf);
 const sidx = reader.getSearchIndex();
@@ -2333,7 +2338,7 @@ for (const hit of results) {
   const text = new TextDecoder().decode(chunk);
   const context = text.substring(
     Math.max(0, hit.position - 40),
-    hit.position + 40
+    hit.position + 40,
   );
   console.log(`Chapter ${hit.chunk}: ...${context}...`);
 }
@@ -2543,7 +2548,7 @@ Stored as a MessagePack map in the EXTRA entry:
 ### Cue fields
 
 | Field      | Type  | Description                           |
-|------------|-------|---------------------------------------|
+| ---------- | ----- | ------------------------------------- |
 | `chunk`    | `int` | TOC index of the chunk                |
 | `position` | `int` | Byte offset within decompressed chunk |
 | `time_ms`  | `int` | Timestamp in milliseconds             |
@@ -2551,7 +2556,7 @@ Stored as a MessagePack map in the EXTRA entry:
 ### Track types
 
 | Type        | Description                   |
-|-------------|-------------------------------|
+| ----------- | ----------------------------- |
 | `audio`     | Text-to-audio synchronization |
 | `video`     | Text-to-video synchronization |
 | `animation` | Animation cue points          |
@@ -2576,7 +2581,7 @@ let data = doc.encode().unwrap();
 ### Helper functions
 
 | Function                                                      | Description                     |
-|---------------------------------------------------------------|---------------------------------|
+| ------------------------------------------------------------- | ------------------------------- |
 | `create_audio_cue(chunk, position, time_ms)`                  | Create an audio sync cue        |
 | `create_video_cue(chunk, position, time_ms)`                  | Create a video sync cue         |
 | `create_page_cue(chunk, position, page_number)`               | Create a page sync cue          |
@@ -2615,7 +2620,7 @@ Each TOC entry carries a 4-byte ASCII type tag. This page documents every tag an
 The book's chapter content. The data is either Markdown or HTML text. The `markup_type` field in the TOC entry determines which format.
 
 | TOC field     | Description                                                        |
-|---------------|--------------------------------------------------------------------|
+| ------------- | ------------------------------------------------------------------ |
 | `markup_type` | ::: tag "0" color:#22c55e Markdown, ::: tag "1" color:#3b82f6 HTML |
 | `compression` | Typically ::: tag "1" color:#22c55e (LZ4) for text chapters        |
 | `language`    | BCP 47 index for chapter language                                  |
@@ -2635,7 +2640,7 @@ The trailing underscore distinguishes this tag from IMG-related variant tags.
 An inline image referenced from chapter content.
 
 | TOC field      | Description                                                 |
-|----------------|-------------------------------------------------------------|
+| -------------- | ----------------------------------------------------------- |
 | `compression`  | Typically ::: tag "0" (none) for already compressed formats |
 | `content_type` | Image format hint for JPEG, PNG, or WebP                    |
 
@@ -2652,7 +2657,7 @@ The content type is validated by magic bytes on read. Supported formats include 
 A CSS stylesheet for rendering chapter content.
 
 | TOC field     | Description                          |
-|---------------|--------------------------------------|
+| ------------- | ------------------------------------ |
 | `compression` | Typically ::: tag "1" (LZ4) for text |
 
 ```text
@@ -2668,7 +2673,7 @@ The CSS is parsed and validated with `cssparser` on write.
 An embedded font file.
 
 | TOC field              | Description                           |
-|------------------------|---------------------------------------|
+| ---------------------- | ------------------------------------- |
 | `font_embedding`       | Embedding mode such as subset or full |
 | `font_license_url_len` | Length of embedded license URL        |
 | `compression`          | Typically ::: tag "0" (none)          |
@@ -2680,7 +2685,7 @@ Font data: raw font bytes in WOFF2, TTF, or OTF format
 The font format is detected by magic bytes:
 
 | Magic bytes                  | Format                |
-|------------------------------|-----------------------|
+| ---------------------------- | --------------------- |
 | `wOF2` or `\x00\x01\x00\x00` | WOFF2                 |
 | `OTTO`                       | OTF with CFF outlines |
 | `\x00\x01\x00\x00`           | TTF                   |
@@ -2695,7 +2700,7 @@ The font license URL is a UTF-8 string stored as a variable-length field followi
 The full-size book cover image.
 
 | TOC field     | Description                                                                 |
-|---------------|-----------------------------------------------------------------------------|
+| ------------- | --------------------------------------------------------------------------- |
 | `cover_type`  | ::: tag "1" color:#22c55e front cover, ::: tag "2" color:#3b82f6 back cover |
 | `compression` | Typically ::: tag "0" (none)                                                |
 
@@ -2710,7 +2715,7 @@ Cover data: raw image bytes in JPEG, PNG, or WebP format
 An optional downsized version of COVR for quick previews in listing views or ebook reader shelves.
 
 | TOC field     | Description                                                                 |
-|---------------|-----------------------------------------------------------------------------|
+| ------------- | --------------------------------------------------------------------------- |
 | `cover_type`  | ::: tag "1" color:#22c55e front cover, ::: tag "2" color:#3b82f6 back cover |
 | `compression` | Typically ::: tag "0" (none)                                                |
 
@@ -2766,7 +2771,7 @@ See the [Search Index feature](../features/search) for usage details.
 A math equation embedded in the book.
 
 | TOC field      | Description                                           |
-|----------------|-------------------------------------------------------|
+| -------------- | ----------------------------------------------------- |
 | `content_type` | Math format: ::: tag "0" LaTeX, ::: tag "1" AsciiMath |
 
 ```text
@@ -2804,7 +2809,7 @@ Honzo applies compression at the chunk level. Each TOC entry selects its own com
 ## Compression Codes
 
 | Code | Algorithm | Typical Use                            |
-|------|-----------|----------------------------------------|
+| ---- | --------- | -------------------------------------- |
 | 0    | None      | Images, fonts, already compressed data |
 | 1    | LZ4       | Chapter text, CSS, metadata            |
 
@@ -2815,7 +2820,7 @@ Honzo applies compression at the chunk level. Each TOC entry selects its own com
 Typical compression ratios for chapter text:
 
 | Content                   | Uncompressed | Compressed with LZ4 | Ratio      |
-|---------------------------|--------------|---------------------|------------|
+| ------------------------- | ------------ | ------------------- | ---------- |
 | Short chapter around 2KB  | 2,048        | About 1,000         | Around 50% |
 | Novel chapter around 10KB | 10,240       | About 4,600         | Around 45% |
 | CSS file around 50KB      | 51,200       | About 15,000        | Around 29% |
@@ -2835,7 +2840,7 @@ Do not compress fonts. WOFF2 is already compressed. TTF and OTF may see modest g
 Each TOC entry tracks two sizes:
 
 | Field       | What It Holds                                                                                |
-|-------------|----------------------------------------------------------------------------------------------|
+| ----------- | -------------------------------------------------------------------------------------------- |
 | `size`      | Stored size. This is the compressed size or the uncompressed size if no compression applies. |
 | `orig_size` | Original uncompressed size. Zero if same as `size`.                                          |
 
@@ -2996,7 +3001,7 @@ let hzo = HonzoBuilder::new()
 ## Supported Algorithms
 
 | Component          | Algorithm   |
-|--------------------|-------------|
+| ------------------ | ----------- |
 | Content encryption | AES-256-GCM |
 | Key agreement      | X25519 ECDH |
 | Key derivation     | HKDF-SHA256 |
@@ -3104,7 +3109,7 @@ Honzo supports three layout modes. The mode is set in the HEAD `layout_mode` fie
 ## Modes
 
 | Code | Mode       | Description                                                                    |
-|------|------------|--------------------------------------------------------------------------------|
+| ---- | ---------- | ------------------------------------------------------------------------------ |
 | 0    | Reflowable | Content wraps to fit the viewport. This is the typical ebook experience.       |
 | 1    | Fixed      | Content uses fixed coordinates. This resembles a PDF.                          |
 | 2    | Scroll     | Content appears as one continuous scrollable flow. This works like a web page. |
@@ -3153,7 +3158,7 @@ match p.head().layout_mode {
 ```
 
 ```typescript
-import { createReader } from '@nisoku/honzo';
+import { createReader } from "@nisoku/honzo";
 const reader = await createReader(buf);
 // reader.layoutMode: 0 = reflowable, 1 = fixed, 2 = scroll
 ```
@@ -3183,19 +3188,19 @@ description: "The binary layout of HEAD, TOC, DATA, EXTRA, and META"
 
 The first 4 bytes of HEAD are always the ASCII bytes `HONO` (`0x484F4F4E`). Any file that does not start with these bytes is not a Honzo file.
 
-Offset | Size | Field              | Description
--------|------|--------------------|------------------------------------------------------------
-0      | 4    | magic              | `"HONO"` magic bytes
-4      | 4    | format_version     | Format version, currently `1`
-8      | 2    | chunk_count        | Number of TOC entries
-10     | 1    | layout_mode        | `0` for reflowable, `1` for fixed, `2` for scroll
-11     | 1    | flags              | Bit flags where bit 0 indicates has_extra
-12     | 8    | data_offset        | Byte offset from file start to DATA section
-20     | 8    | extra_offset       | Byte offset from file start to EXTRA section. Zero if none.
-28     | 8    | meta_offset        | Byte offset from file start to META section
-36     | 4    | meta_size          | Size of META section in bytes
-40     | 4    | chunk_table_offset | Byte offset of TOC within the file, relative to DATA start
-44     | 4    | reserved           | Reserved for future use, zero padded
+| Offset | Size | Field              | Description                                                 |
+|--------|------|--------------------|-------------------------------------------------------------|
+| 0      | 4    | magic              | `"HONO"` magic bytes                                        |
+| 4      | 4    | format_version     | Format version, currently `1`                               |
+| 8      | 2    | chunk_count        | Number of TOC entries                                       |
+| 10     | 1    | layout_mode        | `0` for reflowable, `1` for fixed, `2` for scroll           |
+| 11     | 1    | flags              | Bit flags where bit 0 indicates has_extra                   |
+| 12     | 8    | data_offset        | Byte offset from file start to DATA section                 |
+| 20     | 8    | extra_offset       | Byte offset from file start to EXTRA section. Zero if none. |
+| 28     | 8    | meta_offset        | Byte offset from file start to META section                 |
+| 36     | 4    | meta_size          | Size of META section in bytes                               |
+| 40     | 4    | chunk_table_offset | Byte offset of TOC within the file, relative to DATA start  |
+| 44     | 4    | reserved           | Reserved for future use, zero padded                        |
 
 All offsets are absolute from the start of the file.
 
@@ -3203,23 +3208,27 @@ All offsets are absolute from the start of the file.
 
 Each TOC entry is exactly 32 bytes:
 
-Offset | Size | Field                | Description
--------|------|----------------------|-----------------------------------------------------------------------------------
-0      | 1    | chunk_id[0]          | First byte of the 4-byte chunk type tag
-1      | 1    | chunk_id[1]          | Second byte
-2      | 1    | chunk_id[2]          | Third byte
-3      | 1    | chunk_id[3]          | Fourth byte, for example `CHAP` or `IMG_`
-4      | 1    | content_type         | Content type kind
-5      | 1    | compression          | `0` for none, `1` for lz4
-6      | 1    | markup_type          | `0` for markdown, `1` for html, applies to CHAP chunks
-7      | 1    | cover_type           | `0` for none, `1` for front, `2` for back, applies to COVR or COVT
-8      | 2    | language             | BCP 47 language tag index
-10     | 2    | font_embedding       | Font embedding mode, applies to FONT chunks
-12     | 2    | font_license_url_len | Length of font license URL, zero if none
-14     | 2    | reserved             | Reserved, zero padded
-16     | 8    | offset               | Byte offset within DATA section
-24     | 4    | size                 | Size of chunk data in bytes. Represents compressed size if compression is nonzero.
-28     | 4    | orig_size            | Original uncompressed size. Zero if same as size.
+| Offset | Size | Field | Description |
+|--------|------|-------|-------------|
+<!-- eslint-disable-next-line markdown/no-missing-label-refs -->
+| 0      | 1    | chunk_id[0]          | First byte of the 4-byte chunk type tag                                            |
+<!-- eslint-disable-next-line markdown/no-missing-label-refs -->
+| 1      | 1    | chunk_id[1]          | Second byte                                                                        |
+<!-- eslint-disable-next-line markdown/no-missing-label-refs -->
+| 2      | 1    | chunk_id[2]          | Third byte                                                                         |
+<!-- eslint-disable-next-line markdown/no-missing-label-refs -->
+| 3      | 1    | chunk_id[3]          | Fourth byte, for example `CHAP` or `IMG_`                                          |
+| 4      | 1    | content_type         | Content type kind                                                                  |
+| 5      | 1    | compression          | `0` for none, `1` for lz4                                                          |
+| 6      | 1    | markup_type          | `0` for markdown, `1` for html, applies to CHAP chunks                             |
+| 7      | 1    | cover_type           | `0` for none, `1` for front, `2` for back, applies to COVR or COVT                 |
+| 8      | 2    | language             | BCP 47 language tag index                                                          |
+| 10     | 2    | font_embedding       | Font embedding mode, applies to FONT chunks                                        |
+| 12     | 2    | font_license_url_len | Length of font license URL, zero if none                                           |
+| 14     | 2    | reserved             | Reserved, zero padded                                                              |
+| 16     | 8    | offset               | Byte offset within DATA section                                                    |
+| 24     | 4    | size                 | Size of chunk data in bytes. Represents compressed size if compression is nonzero. |
+| 28     | 4    | orig_size            | Original uncompressed size. Zero if same as size.                                  |
 
 ### Offset and Size Rules
 
@@ -3260,6 +3269,7 @@ After the entry array, each entry's data resides at `extra_offset + entry.offset
 ### Standard Namespaces
 
 <!-- markdownlint-disable MD055 -->
+
 | Namespace         | Purpose                                       |
 |-------------------|-----------------------------------------------|
 | `org.nisoku.anno` | Annotations stored as MessagePack             |
@@ -3419,7 +3429,7 @@ The streaming API (`HonzoStream`) reads and decompresses one chapter at a time. 
 Each TOC entry picks its compression independently:
 
 | Code | Algorithm | Use Case                               |
-|------|-----------|----------------------------------------|
+| ---- | --------- | -------------------------------------- |
 | 0    | None      | Images, fonts, already compressed data |
 | 1    | LZ4       | Chapter text, CSS, metadata            |
 
@@ -3442,7 +3452,7 @@ No bytes in DATA need rewriting. The same strategy powers MP4 and other streamin
 ## Chunk Types
 
 | Tag    | Type       | Description                              |
-|--------|------------|------------------------------------------|
+| ------ | ---------- | ---------------------------------------- |
 | `CHAP` | Chapter    | Book chapter content in Markdown or HTML |
 | `IMG_` | Image      | Inline image as JPEG, PNG, or WebP       |
 | `CSS_` | Stylesheet | CSS for chapter rendering                |
@@ -3460,7 +3470,7 @@ See [Chunk Types](../format/chunk-types) for the full reference.
 EXTRA entries use reverse domain namespacing for extensibility:
 
 | Namespace         | Purpose                                                       |
-|-------------------|---------------------------------------------------------------|
+| ----------------- | ------------------------------------------------------------- |
 | `org.nisoku.anno` | Portable annotations such as highlights, bookmarks, and notes |
 | `org.nisoku.drm`  | AES-256-GCM encryption envelope                               |
 | `org.nisoku.sync` | Audio, video, and text synchronization tracks                 |
@@ -3722,20 +3732,20 @@ You need Rust 1.75+ or Node.js 18+. See [Installation](./installation) to set th
    == tab "TypeScript"
 
    ```typescript
-   import { createReader } from '@nisoku/honzo';
+   import { createReader } from "@nisoku/honzo";
 
-   const response = await fetch('my_book.hzo');
+   const response = await fetch("my_book.hzo");
    const buf = new Uint8Array(await response.arrayBuffer());
    const reader = await createReader(buf);
 
    const meta = reader.getMeta();
-   console.log('Title:', meta.title?.en);
-   console.log('Chapters:', reader.chunkCount);
+   console.log("Title:", meta.title?.en);
+   console.log("Chapters:", reader.chunkCount);
 
    for (let i = 0; i < reader.chunkCount; i++) {
      const chunk = reader.readChunk(i);
      const text = new TextDecoder().decode(chunk);
-     console.log('Chapter:', text.substring(0, 100));
+     console.log("Chapter:", text.substring(0, 100));
    }
    ```
 
@@ -3788,6 +3798,7 @@ description: "A binary ebook format designed for simplicity, performance, and po
 ::: hero layout:split glow:true
 
 <!-- markdownlint-disable MD025 -->
+
 # Honzo
 
 A binary ebook format for simplicity, performance, and portability.
@@ -3798,6 +3809,7 @@ A binary ebook format for simplicity, performance, and portability.
 
 ::: button "Quick Start" ./getting-started/quickstart.md icon:play
 <!--markdownlint-disable MD034-->
+
 ::: button "GitHub" external:https://github.com/Nisoku/Honzo icon:github
 
 == side
@@ -3869,9 +3881,9 @@ for entry in p.toc_entries() {
 == tab "TypeScript"
 
 ```typescript
-import { createReader } from '@nisoku/honzo';
+import { createReader } from "@nisoku/honzo";
 
-const response = await fetch('book.hzo');
+const response = await fetch("book.hzo");
 const buf = new Uint8Array(await response.arrayBuffer());
 const reader = await createReader(buf);
 

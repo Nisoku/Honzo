@@ -10,8 +10,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.5.x">
+    <meta name="generator" content="docmd v0.9.4">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/Honzo/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/Honzo/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
     <script>/**
  * --------------------------------------------------------------------
  * docmd : the zero-config documentation engine.
@@ -29,9 +44,27 @@
 (function () {
   try {
     // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
     var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
 
     if (theme === 'system') {
       theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -65,32 +98,17 @@
         visibility: hidden;
       }
     </style>
-    
-    <script>
-      var root = "../../";
-      if (root && !root.endsWith('/')) root += '/';
-      if (root === '') root = './';
-      window.DOCMD_ROOT = root;
-
-      var siteRoot = "../../";
-      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
-      if (siteRoot === '') siteRoot = './';
-      window.DOCMD_SITE_ROOT = siteRoot;
-
-      window.DOCMD_APPEARANCE = "system";
-      window.DOCMD_VERSION_ROOT = "/";
-      window.DOCMD_BASE = "/";
-      window.DOCMD_LOCALE = "";
-      window.DOCMD_DEFAULT_LOCALE = "";
-    </script>
     <title>
       WASM / TypeScript API Reference : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=msy44anm">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=msy44anm" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=msy44anm" id="hljs-dark" disabled>
+
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mtb4na5q">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mtb4na5q">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mtb4na5q" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mtb4na5q" id="hljs-dark" disabled>
     
     
 <meta name="description" content="The TypeScript API for Honzo in browsers and Node.js via WebAssembly">
@@ -105,75 +123,33 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=msy44anm" >
+
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mtb4na5q" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=msy44anm">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mtb4na5q">
     
-    <script>/**
- * --------------------------------------------------------------------
- * docmd : the zero-config documentation engine.
- *
- * @package     @docmd/core (and ecosystem)
- * @website     https://docmd.io
- * @repository  https://github.com/docmd-io/docmd
- * @license     MIT
- * @copyright   Copyright (c) 2025-present docmd.io
- *
- * [docmd-source] - Please do not remove this header.
- * --------------------------------------------------------------------
- */
-
-(function () {
-  try {
-    // 1. Determine Theme
-    var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
-
-    if (theme === 'system') {
-      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    // 2. Apply to Root
-    document.documentElement.setAttribute('data-theme', theme);
-
-    // 3. Highlight.js Toggle Strategy
-    var lightLink = document.getElementById('hljs-light');
-    var darkLink = document.getElementById('hljs-dark');
-
-    if (lightLink && darkLink) {
-      if (theme === 'dark') {
-        lightLink.disabled = true;
-        darkLink.disabled = false;
-      } else {
-        lightLink.disabled = false;
-        darkLink.disabled = true;
-      }
-    }
-
-    document.documentElement.style.visibility = "visible";
-  } catch (e) {
-    document.documentElement.style.visibility = "visible";
-    console.error('Theme init failed', e);
-  }
-})();</script>
+    
   </head>
   <body
     class="sidebar-collapsible"
     data-default-collapsed="false"
     data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/api/wasm.md">
 
-    <a href="#main-content" class="skip-link">skipToContent</a>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
 
     
     
       <aside class="sidebar">
         <div class="sidebar-header">
           
-            <h1><a href="../../">
+<h1><a href="../../">
                 Honzo
               </a></h1>
           
@@ -206,7 +182,7 @@
         </div>
         
 
-<nav class="sidebar-nav" aria-label="mainNavigation">
+<nav class="sidebar-nav" aria-label="Main Navigation">
   <ul>
     
       <li class="" >
@@ -1489,11 +1465,12 @@
       <div class="main-content-wrapper">
         
         
+        
           <header class="page-header">
             <div class="header-left">
               
                 <button id="sidebar-toggle-button" class="sidebar-toggle-button"
-                  aria-label="toggleSidebar">
+                  aria-label="Toggle Sidebar">
                   
 <svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-left"
@@ -1525,7 +1502,7 @@
 
 <div class="docmd-options-menu">
     
-    <button class="docmd-search-trigger" aria-label="search">
+    <button class="docmd-search-trigger" aria-label="Search">
         
 <svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-search"
@@ -1543,7 +1520,7 @@
   <circle cx="11" cy="11" r="8" />
 </svg>
 
-        <span class="search-label">search</span>
+        <span class="search-label">Search</span>
         <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
     </button>
     
@@ -1553,7 +1530,7 @@
     
 
     
-    <button class="theme-toggle-button" aria-label="toggleTheme">
+    <button class="theme-toggle-button" aria-label="Toggle theme">
         
 <svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-sun"
@@ -1608,7 +1585,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22WASM%20%2F%20TypeScript%20API%20Reference%22%0Adescription%3A%20%22The%20TypeScript%20API%20for%20Honzo%20in%20browsers%20and%20Node.js%20via%20WebAssembly%22%0A---%0A%0AThe%20WASM%20binding%20wraps%20%60honzo-core%60%20and%20%60honzo-io%60%20into%20a%20JavaScript%20API%20usable%20from%20browsers%20and%20Node.js.%0A%0A%23%23%20Installation%0A%0A%60%60%60bash%0Anpm%20install%20%40nisoku%2Fhonzo%0A%60%60%60%0A%0A%23%23%20Exported%20types%0A%0A-%20%60createReader%60%20--%20Parse%20a%20Honzo%20file%20from%20bytes%0A-%20%60buildHonzo%60%20--%20Build%20a%20Honzo%20file%20from%20chunks%0A-%20%60HonzoReader%60%20--%20Reader%20instance%0A-%20%60HonzoHead%60%20--%20File%20header%20fields%0A-%20%60HonzoMeta%60%20--%20Metadata%20fields%0A-%20%60TocEntry%60%20--%20TOC%20entry%20fields%0A-%20%60DrmKeyPair%60%20--%20DRM%20key%20pair%20for%20encryption%0A-%20%60BuildConfig%60%20--%20Builder%20configuration%0A%0A%23%23%20createReader%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C----------------%7C------------------------------------------%7C------------------------%7C---------------------%7C%0A%7C%20%60createReader%60%20%7C%20%60(buffer%3A%20Uint8Array%2C%20version%3F%3A%20number)%60%20%7C%20%60Promise%3CHonzoReader%3E%60%20%7C%20Parse%20a%20Honzo%20file.%20%7C%0A%0A%23%23%20HonzoReader%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------------------------%7C----------------------------%7C--------------%7C-------------------------------------------%7C%0A%7C%20%60reader.chunkCount%60%20%20%20%20%7C%20%60get%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60number%60%20%20%20%20%20%7C%20Number%20of%20chunks.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.layoutMode%60%20%20%20%20%7C%20%60get%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60number%60%20%20%20%20%20%7C%20%600%60%3Dreflowable%2C%20%601%60%3Dfixed%2C%20%602%60%3Dscroll.%20%20%20%20%7C%0A%7C%20%60reader.formatVersion%60%20%7C%20%60get%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60number%60%20%20%20%20%20%7C%20Format%20version.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.getMeta%60%20%20%20%20%20%20%20%7C%20%60()%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60HonzoMeta%60%20%20%7C%20Book%20metadata%20(title%2C%20creator%2C%20etc.).%20%20%20%20%20%7C%0A%7C%20%60reader.readChunk%60%20%20%20%20%20%7C%20%60(index%3A%20number)%60%20%20%20%20%20%20%20%20%20%20%7C%20%60Uint8Array%60%20%7C%20Read%20and%20decompress%20a%20chunk%20by%20TOC%20index.%20%7C%0A%7C%20%60reader.readChunkRaw%60%20%20%7C%20%60(index%3A%20number)%60%20%20%20%20%20%20%20%20%20%20%7C%20%60Uint8Array%60%20%7C%20Read%20chunk%20without%20decompression.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.getTocEntry%60%20%20%20%7C%20%60(index%3A%20number)%60%20%20%20%20%20%20%20%20%20%20%7C%20%60TocEntry%60%20%20%20%7C%20Get%20TOC%20entry%20metadata.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.withDrmKey%60%20%20%20%20%7C%20%60(privateKey%3A%20Uint8Array)%60%20%7C%20%60void%60%20%20%20%20%20%20%20%7C%20Set%20X25519%20private%20key%20for%20DRM.%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20HonzoMeta%0A%0A%7C%20Field%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------------------%7C---------------------------------------%7C----------------------------%7C%0A%7C%20%60title%60%20%20%20%20%20%20%20%20%20%20%7C%20%60Record%3Cstring%2C%20string%3E%20%5C%7C%20undefined%60%20%7C%20Localized%20title%20map.%20%20%20%20%20%20%20%7C%0A%7C%20%60creator%60%20%20%20%20%20%20%20%20%7C%20%60Record%3Cstring%2C%20string%3E%20%5C%7C%20undefined%60%20%7C%20Localized%20creator%20map.%20%20%20%20%20%7C%0A%7C%20%60language%60%20%20%20%20%20%20%20%7C%20%60string%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Primary%20language%20(BCP%2047).%20%7C%0A%7C%20%60description%60%20%20%20%20%7C%20%60Record%3Cstring%2C%20string%3E%20%5C%7C%20undefined%60%20%7C%20Localized%20description.%20%20%20%20%20%7C%0A%7C%20%60publisher%60%20%20%20%20%20%20%7C%20%60string%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Publisher%20name.%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60published%60%20%20%20%20%20%20%7C%20%60string%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Publication%20date.%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60rights%60%20%20%20%20%20%20%20%20%20%7C%20%60string%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Copyright%20%2F%20license%20text.%20%20%7C%0A%7C%20%60subject%60%20%20%20%20%20%20%20%20%7C%20%60string%5B%5D%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Subject%20categories.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60series%60%20%20%20%20%20%20%20%20%20%7C%20%60string%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Series%20name.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60seriesPosition%60%20%7C%20%60number%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Position%20in%20series.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60edition%60%20%20%20%20%20%20%20%20%7C%20%60number%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Edition%20number.%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20TocEntry%0A%0A%7C%20Field%20%20%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C---------------%7C----------%7C-----------------------------------------%7C%0A%7C%20%60chunkType%60%20%20%20%7C%20%60string%60%20%7C%204-byte%20type%20tag%20(e.g.%2C%20%60%22CHAP%22%60).%20%20%20%20%20%20%20%7C%0A%7C%20%60compression%60%20%7C%20%60number%60%20%7C%20%600%60%3Dnone%2C%20%601%60%3Dlz4.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60markupType%60%20%20%7C%20%60number%60%20%7C%20%600%60%3Dmarkdown%2C%20%601%60%3Dhtml.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60size%60%20%20%20%20%20%20%20%20%7C%20%60number%60%20%7C%20Stored%20size%20(compressed%20if%20applicable).%20%7C%0A%7C%20%60origSize%60%20%20%20%20%7C%20%60number%60%20%7C%20Uncompressed%20size.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20buildHonzo%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C--------------%7C-------------------------%7C-----------------------%7C---------------------------------%7C%0A%7C%20%60buildHonzo%60%20%7C%20%60(config%3A%20BuildConfig)%60%20%7C%20%60Promise%3CUint8Array%3E%60%20%7C%20Build%20a%20Honzo%20file%20from%20config.%20%7C%0A%0A%23%23%23%20BuildConfig%0A%0A%7C%20Field%20%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Default%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C--------------%7C--------------------------%7C-------------%7C------------------------%7C%0A%7C%20%60chunks%60%20%20%20%20%20%7C%20%60ChunkInput%5B%5D%60%20%20%20%20%20%20%20%20%20%20%20%7C%20required%20%20%20%20%7C%20Array%20of%20chunk%20inputs.%20%7C%0A%7C%20%60meta%60%20%20%20%20%20%20%20%7C%20%60Partial%3CHonzoMeta%3E%60%20%20%20%20%20%7C%20%60%7B%7D%60%20%20%20%20%20%20%20%20%7C%20Book%20metadata.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60layoutMode%60%20%7C%20%60number%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%600%60%20%20%20%20%20%20%20%20%20%7C%20Layout%20mode.%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60drm%60%20%20%20%20%20%20%20%20%7C%20%60DrmConfig%20%5C%7C%20undefined%60%20%7C%20%60undefined%60%20%7C%20DRM%20configuration.%20%20%20%20%20%7C%0A%0A%23%23%23%20ChunkInput%0A%0A%7C%20Field%20%20%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C---------------%7C--------------%7C------------------------------%7C%0A%7C%20%60type%60%20%20%20%20%20%20%20%20%7C%20%60string%60%20%20%20%20%20%7C%204-byte%20type%20tag.%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60data%60%20%20%20%20%20%20%20%20%7C%20%60Uint8Array%60%20%7C%20Chunk%20content.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60compression%60%20%7C%20%60number%60%20%20%20%20%20%7C%20%600%60%3Dnone%2C%20%601%60%3Dlz4.%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60markupType%3F%60%20%7C%20%60number%60%20%20%20%20%20%7C%20Markup%20type%20for%20CHAP%20chunks.%20%7C%0A%7C%20%60coverType%3F%60%20%20%7C%20%60number%60%20%20%20%20%20%7C%20Cover%20type%20for%20COVR%2FCOVT.%20%20%20%20%7C%0A%0A%23%23%23%20DrmConfig%0A%0A%7C%20Field%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------------%7C---------------%7C-----------------------------%7C%0A%7C%20%60encryptedChunks%60%20%7C%20%60number%5B%5D%60%20%20%20%20%7C%20TOC%20indices%20to%20encrypt.%20%20%20%20%20%7C%0A%7C%20%60recipients%60%20%20%20%20%20%20%7C%20%60Recipient%5B%5D%60%20%7C%20Authorized%20recipients.%20%20%20%20%20%20%7C%0A%7C%20%60licenseUrl%3F%60%20%20%20%20%20%7C%20%60string%60%20%20%20%20%20%20%7C%20Optional%20license%20URL.%20%20%20%20%20%20%20%7C%0A%7C%20%60expiry%3F%60%20%20%20%20%20%20%20%20%20%7C%20%60string%60%20%20%20%20%20%20%7C%20Optional%20expiry%20(ISO%208601).%20%7C%0A%0A%23%23%23%20Recipient%0A%0A%7C%20Field%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------%7C--------------%7C-------------------------------%7C%0A%7C%20%60publicKey%60%20%7C%20%60Uint8Array%60%20%7C%20X25519%20public%20key%20(32%20bytes).%20%7C%0A%7C%20%60id%60%20%20%20%20%20%20%20%20%7C%20%60string%60%20%20%20%20%20%7C%20Recipient%20identifier.%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20Error%20handling%0A%0AAsync%20functions%20throw%20%60HonzoError%60%20with%20a%20%60code%60%20property%3A%0A%0A%7C%20Code%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Meaning%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------------------------------------------%7C----------------------------%7C%0A%7C%20%3A%3A%3A%20tag%20%22InvalidMagic%22%20color%3A%23ef4444%20%20%20%20%20%7C%20Not%20a%20Honzo%20file%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22InvalidVersion%22%20color%3A%23ef4444%20%20%20%7C%20Unsupported%20format%20version%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22DrmError%22%20color%3A%23ef4444%20%20%20%20%20%20%20%20%20%7C%20DRM-related%20failure%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22CompressionError%22%20color%3A%23ef4444%20%7C%20Decompression%20failure%20%20%20%20%20%20%7C%0A%0A%23%23%20Example%0A%0A%60%60%60typescript%0Aimport%20%7B%20createReader%2C%20buildHonzo%20%7D%20from%20&#039;%40nisoku%2Fhonzo&#039;%3B%0A%0A%2F%2F%20Read%0Aconst%20response%20%3D%20await%20fetch(&#039;book.hzo&#039;)%3B%0Aconst%20buf%20%3D%20new%20Uint8Array(await%20response.arrayBuffer())%3B%0Aconst%20reader%20%3D%20await%20createReader(buf)%3B%0Aconsole.log(reader.chunkCount%2C%20reader.getMeta().title%3F.en)%3B%0A%0A%2F%2F%20Build%0Aconst%20hzo%20%3D%20await%20buildHonzo(%7B%0A%20%20meta%3A%20%7B%20title%3A%20%7B%20en%3A%20&#039;My%20Book&#039;%20%7D%20%7D%2C%0A%20%20chunks%3A%20%5B%0A%20%20%20%20%7B%20type%3A%20&#039;CHAP&#039;%2C%20data%3A%20new%20TextEncoder().encode(&#039;%23%20Hello&#039;)%2C%20compression%3A%201%2C%20markupType%3A%200%20%7D%2C%0A%20%20%5D%2C%0A%7D)%3B%0A%60%60%60%0A%0A%23%23%20Related%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Rust%20API%22%20.%2Frust.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22C%20API%22%20.%2Fc.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Format%20Specification%22%20..%2Fformat%2F%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22WASM%20%2F%20TypeScript%20API%20Reference%22%0Adescription%3A%20%22The%20TypeScript%20API%20for%20Honzo%20in%20browsers%20and%20Node.js%20via%20WebAssembly%22%0A---%0A%0AThe%20WASM%20binding%20wraps%20%60honzo-core%60%20and%20%60honzo-io%60%20into%20a%20JavaScript%20API%20usable%20from%20browsers%20and%20Node.js.%0A%0A%23%23%20Installation%0A%0A%60%60%60bash%0Anpm%20install%20%40nisoku%2Fhonzo%0A%60%60%60%0A%0A%23%23%20Exported%20types%0A%0A-%20%60createReader%60%20--%20Parse%20a%20Honzo%20file%20from%20bytes%0A-%20%60buildHonzo%60%20--%20Build%20a%20Honzo%20file%20from%20chunks%0A-%20%60HonzoReader%60%20--%20Reader%20instance%0A-%20%60HonzoHead%60%20--%20File%20header%20fields%0A-%20%60HonzoMeta%60%20--%20Metadata%20fields%0A-%20%60TocEntry%60%20--%20TOC%20entry%20fields%0A-%20%60DrmKeyPair%60%20--%20DRM%20key%20pair%20for%20encryption%0A-%20%60BuildConfig%60%20--%20Builder%20configuration%0A%0A%23%23%20createReader%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20--------------%20%7C%20----------------------------------------%20%7C%20----------------------%20%7C%20-------------------%20%7C%0A%7C%20%60createReader%60%20%7C%20%60(buffer%3A%20Uint8Array%2C%20version%3F%3A%20number)%60%20%7C%20%60Promise%3CHonzoReader%3E%60%20%7C%20Parse%20a%20Honzo%20file.%20%7C%0A%0A%23%23%20HonzoReader%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----------------------%20%7C%20--------------------------%20%7C%20------------%20%7C%20-----------------------------------------%20%7C%0A%7C%20%60reader.chunkCount%60%20%20%20%20%7C%20%60get%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60number%60%20%20%20%20%20%7C%20Number%20of%20chunks.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.layoutMode%60%20%20%20%20%7C%20%60get%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60number%60%20%20%20%20%20%7C%20%600%60%3Dreflowable%2C%20%601%60%3Dfixed%2C%20%602%60%3Dscroll.%20%20%20%20%7C%0A%7C%20%60reader.formatVersion%60%20%7C%20%60get%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60number%60%20%20%20%20%20%7C%20Format%20version.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.getMeta%60%20%20%20%20%20%20%20%7C%20%60()%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60HonzoMeta%60%20%20%7C%20Book%20metadata%20(title%2C%20creator%2C%20etc.).%20%20%20%20%20%7C%0A%7C%20%60reader.readChunk%60%20%20%20%20%20%7C%20%60(index%3A%20number)%60%20%20%20%20%20%20%20%20%20%20%7C%20%60Uint8Array%60%20%7C%20Read%20and%20decompress%20a%20chunk%20by%20TOC%20index.%20%7C%0A%7C%20%60reader.readChunkRaw%60%20%20%7C%20%60(index%3A%20number)%60%20%20%20%20%20%20%20%20%20%20%7C%20%60Uint8Array%60%20%7C%20Read%20chunk%20without%20decompression.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.getTocEntry%60%20%20%20%7C%20%60(index%3A%20number)%60%20%20%20%20%20%20%20%20%20%20%7C%20%60TocEntry%60%20%20%20%7C%20Get%20TOC%20entry%20metadata.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60reader.withDrmKey%60%20%20%20%20%7C%20%60(privateKey%3A%20Uint8Array)%60%20%7C%20%60void%60%20%20%20%20%20%20%20%7C%20Set%20X25519%20private%20key%20for%20DRM.%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20HonzoMeta%0A%0A%7C%20Field%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----------------%20%7C%20-------------------------------------%20%7C%20--------------------------%20%7C%0A%7C%20%60title%60%20%20%20%20%20%20%20%20%20%20%7C%20%60Record%3Cstring%2C%20string%3E%20%5C%7C%20undefined%60%20%7C%20Localized%20title%20map.%20%20%20%20%20%20%20%7C%0A%7C%20%60creator%60%20%20%20%20%20%20%20%20%7C%20%60Record%3Cstring%2C%20string%3E%20%5C%7C%20undefined%60%20%7C%20Localized%20creator%20map.%20%20%20%20%20%7C%0A%7C%20%60language%60%20%20%20%20%20%20%20%7C%20%60string%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Primary%20language%20(BCP%2047).%20%7C%0A%7C%20%60description%60%20%20%20%20%7C%20%60Record%3Cstring%2C%20string%3E%20%5C%7C%20undefined%60%20%7C%20Localized%20description.%20%20%20%20%20%7C%0A%7C%20%60publisher%60%20%20%20%20%20%20%7C%20%60string%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Publisher%20name.%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60published%60%20%20%20%20%20%20%7C%20%60string%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Publication%20date.%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60rights%60%20%20%20%20%20%20%20%20%20%7C%20%60string%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Copyright%20%2F%20license%20text.%20%20%7C%0A%7C%20%60subject%60%20%20%20%20%20%20%20%20%7C%20%60string%5B%5D%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Subject%20categories.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60series%60%20%20%20%20%20%20%20%20%20%7C%20%60string%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Series%20name.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60seriesPosition%60%20%7C%20%60number%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Position%20in%20series.%20%20%20%20%20%20%20%20%7C%0A%7C%20%60edition%60%20%20%20%20%20%20%20%20%7C%20%60number%20%5C%7C%20undefined%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Edition%20number.%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20TocEntry%0A%0A%7C%20Field%20%20%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-------------%20%7C%20--------%20%7C%20---------------------------------------%20%7C%0A%7C%20%60chunkType%60%20%20%20%7C%20%60string%60%20%7C%204-byte%20type%20tag%20(e.g.%2C%20%60%22CHAP%22%60).%20%20%20%20%20%20%20%7C%0A%7C%20%60compression%60%20%7C%20%60number%60%20%7C%20%600%60%3Dnone%2C%20%601%60%3Dlz4.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60markupType%60%20%20%7C%20%60number%60%20%7C%20%600%60%3Dmarkdown%2C%20%601%60%3Dhtml.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60size%60%20%20%20%20%20%20%20%20%7C%20%60number%60%20%7C%20Stored%20size%20(compressed%20if%20applicable).%20%7C%0A%7C%20%60origSize%60%20%20%20%20%7C%20%60number%60%20%7C%20Uncompressed%20size.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20buildHonzo%0A%0A%7C%20Symbol%20%20%20%20%20%20%20%7C%20Signature%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Returns%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Notes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20------------%20%7C%20-----------------------%20%7C%20---------------------%20%7C%20-------------------------------%20%7C%0A%7C%20%60buildHonzo%60%20%7C%20%60(config%3A%20BuildConfig)%60%20%7C%20%60Promise%3CUint8Array%3E%60%20%7C%20Build%20a%20Honzo%20file%20from%20config.%20%7C%0A%0A%23%23%23%20BuildConfig%0A%0A%7C%20Field%20%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Default%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20------------%20%7C%20------------------------%20%7C%20-----------%20%7C%20----------------------%20%7C%0A%7C%20%60chunks%60%20%20%20%20%20%7C%20%60ChunkInput%5B%5D%60%20%20%20%20%20%20%20%20%20%20%20%7C%20required%20%20%20%20%7C%20Array%20of%20chunk%20inputs.%20%7C%0A%7C%20%60meta%60%20%20%20%20%20%20%20%7C%20%60Partial%3CHonzoMeta%3E%60%20%20%20%20%20%7C%20%60%7B%7D%60%20%20%20%20%20%20%20%20%7C%20Book%20metadata.%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60layoutMode%60%20%7C%20%60number%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%600%60%20%20%20%20%20%20%20%20%20%7C%20Layout%20mode.%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60drm%60%20%20%20%20%20%20%20%20%7C%20%60DrmConfig%20%5C%7C%20undefined%60%20%7C%20%60undefined%60%20%7C%20DRM%20configuration.%20%20%20%20%20%7C%0A%0A%23%23%23%20ChunkInput%0A%0A%7C%20Field%20%20%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-------------%20%7C%20------------%20%7C%20----------------------------%20%7C%0A%7C%20%60type%60%20%20%20%20%20%20%20%20%7C%20%60string%60%20%20%20%20%20%7C%204-byte%20type%20tag.%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60data%60%20%20%20%20%20%20%20%20%7C%20%60Uint8Array%60%20%7C%20Chunk%20content.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60compression%60%20%7C%20%60number%60%20%20%20%20%20%7C%20%600%60%3Dnone%2C%20%601%60%3Dlz4.%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60markupType%3F%60%20%7C%20%60number%60%20%20%20%20%20%7C%20Markup%20type%20for%20CHAP%20chunks.%20%7C%0A%7C%20%60coverType%3F%60%20%20%7C%20%60number%60%20%20%20%20%20%7C%20Cover%20type%20for%20COVR%2FCOVT.%20%20%20%20%7C%0A%0A%23%23%23%20DrmConfig%0A%0A%7C%20Field%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------------%20%7C%20-------------%20%7C%20---------------------------%20%7C%0A%7C%20%60encryptedChunks%60%20%7C%20%60number%5B%5D%60%20%20%20%20%7C%20TOC%20indices%20to%20encrypt.%20%20%20%20%20%7C%0A%7C%20%60recipients%60%20%20%20%20%20%20%7C%20%60Recipient%5B%5D%60%20%7C%20Authorized%20recipients.%20%20%20%20%20%20%7C%0A%7C%20%60licenseUrl%3F%60%20%20%20%20%20%7C%20%60string%60%20%20%20%20%20%20%7C%20Optional%20license%20URL.%20%20%20%20%20%20%20%7C%0A%7C%20%60expiry%3F%60%20%20%20%20%20%20%20%20%20%7C%20%60string%60%20%20%20%20%20%20%7C%20Optional%20expiry%20(ISO%208601).%20%7C%0A%0A%23%23%23%20Recipient%0A%0A%7C%20Field%20%20%20%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------%20%7C%20------------%20%7C%20-----------------------------%20%7C%0A%7C%20%60publicKey%60%20%7C%20%60Uint8Array%60%20%7C%20X25519%20public%20key%20(32%20bytes).%20%7C%0A%7C%20%60id%60%20%20%20%20%20%20%20%20%7C%20%60string%60%20%20%20%20%20%7C%20Recipient%20identifier.%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%20Error%20handling%0A%0AAsync%20functions%20throw%20%60HonzoError%60%20with%20a%20%60code%60%20property%3A%0A%0A%7C%20Code%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Meaning%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----------------------------------------%20%7C%20--------------------------%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22InvalidMagic%22%20color%3A%23ef4444%20%20%20%20%20%7C%20Not%20a%20Honzo%20file%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22InvalidVersion%22%20color%3A%23ef4444%20%20%20%7C%20Unsupported%20format%20version%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22DrmError%22%20color%3A%23ef4444%20%20%20%20%20%20%20%20%20%7C%20DRM-related%20failure%20%20%20%20%20%20%20%20%7C%0A%7C%20%3A%3A%3A%20tag%20%22CompressionError%22%20color%3A%23ef4444%20%7C%20Decompression%20failure%20%20%20%20%20%20%7C%0A%0A%23%23%20Example%0A%0A%60%60%60typescript%0Aimport%20%7B%20createReader%2C%20buildHonzo%20%7D%20from%20%22%40nisoku%2Fhonzo%22%3B%0A%0A%2F%2F%20Read%0Aconst%20response%20%3D%20await%20fetch(%22book.hzo%22)%3B%0Aconst%20buf%20%3D%20new%20Uint8Array(await%20response.arrayBuffer())%3B%0Aconst%20reader%20%3D%20await%20createReader(buf)%3B%0Aconsole.log(reader.chunkCount%2C%20reader.getMeta().title%3F.en)%3B%0A%0A%2F%2F%20Build%0Aconst%20hzo%20%3D%20await%20buildHonzo(%7B%0A%20%20meta%3A%20%7B%20title%3A%20%7B%20en%3A%20%22My%20Book%22%20%7D%20%7D%2C%0A%20%20chunks%3A%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20type%3A%20%22CHAP%22%2C%0A%20%20%20%20%20%20data%3A%20new%20TextEncoder().encode(%22%23%20Hello%22)%2C%0A%20%20%20%20%20%20compression%3A%201%2C%0A%20%20%20%20%20%20markupType%3A%200%2C%0A%20%20%20%20%7D%2C%0A%20%20%5D%2C%0A%7D)%3B%0A%60%60%60%0A%0A%23%23%20Related%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Rust%20API%22%20.%2Frust.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22C%20API%22%20.%2Fc.md%20icon%3Acode%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Format%20Specification%22%20..%2Fformat%2F%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1652,7 +1629,7 @@
                   
                     <div class="docmd-copy-widgets">
                       
-                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-copy"
@@ -1673,7 +1650,7 @@
                         </button>
                       
                       
-                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-message-square"
@@ -1690,7 +1667,7 @@
   <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
 </svg>
 </span>
-                          <span class="docmd-btn-text">copyContext</span>
+                          <span class="docmd-btn-text">Copy Context</span>
                         </button>
                       
                     </div>
@@ -1699,7 +1676,7 @@
                 
                 <p>The WASM binding wraps <code>honzo-core</code> and <code>honzo-io</code> into a JavaScript API usable from browsers and Node.js.</p>
 <h2 id="installation" class="docmd-heading"><a href="#installation" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Installation</h2>
-<pre class="hljs"><code><span class="hljs-keyword">npm</span> install @nisoku<span class="hljs-punctuation">/</span>honzo
+<pre class="hljs"><code class="language-bash"><span class="hljs-keyword">npm</span> install @nisoku<span class="hljs-operator">/</span>honzo
 </code></pre>
 <h2 id="exported-types" class="docmd-heading"><a href="#exported-types" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Exported types</h2>
 <ul>
@@ -2072,19 +2049,24 @@
 </tbody>
 </table>
 </div><h2 id="example" class="docmd-heading"><a href="#example" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Example</h2>
-<pre class="hljs"><code><span class="hljs-keyword">import</span> { createReader, buildHonzo } <span class="hljs-keyword">from</span> <span class="hljs-string">&#039;@nisoku/honzo&#039;</span>;
+<pre class="hljs"><code class="language-typescript"><span class="hljs-keyword">import</span> { createReader, buildHonzo } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@nisoku/honzo&quot;</span>;
 
 <span class="hljs-comment">// Read</span>
-<span class="hljs-keyword">const</span> response <span class="hljs-punctuation">=</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#039;book.hzo&#039;</span>);
-<span class="hljs-keyword">const</span> buf <span class="hljs-punctuation">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title function_">Uint8Array</span>(<span class="hljs-keyword">await</span> response.<span class="hljs-title function_">arrayBuffer</span>());
-<span class="hljs-keyword">const</span> reader <span class="hljs-punctuation">=</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">createReader</span>(buf);
-console.<span class="hljs-title function_">log</span>(reader.<span class="hljs-attr">chunkCount</span>, reader.<span class="hljs-title function_">getMeta</span>().<span class="hljs-attr">title</span><span class="hljs-punctuation">?</span>.<span class="hljs-attr">en</span>);
+<span class="hljs-keyword">const</span> response <span class="hljs-operator">=</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;book.hzo&quot;</span>);
+<span class="hljs-keyword">const</span> buf <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title function_">Uint8Array</span>(<span class="hljs-keyword">await</span> response.<span class="hljs-title function_">arrayBuffer</span>());
+<span class="hljs-keyword">const</span> reader <span class="hljs-operator">=</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">createReader</span>(buf);
+console.<span class="hljs-title function_">log</span>(reader.<span class="hljs-attr">chunkCount</span>, reader.<span class="hljs-title function_">getMeta</span>().<span class="hljs-attr">title</span><span class="hljs-operator">?</span>.<span class="hljs-attr">en</span>);
 
 <span class="hljs-comment">// Build</span>
-<span class="hljs-keyword">const</span> hzo <span class="hljs-punctuation">=</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">buildHonzo</span>({
-  meta<span class="hljs-punctuation">:</span> { title<span class="hljs-punctuation">:</span> { en<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;My Book&#039;</span> } },
-  chunks<span class="hljs-punctuation">:</span> [
-    { <span class="hljs-keyword">type</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;CHAP&#039;</span>, data<span class="hljs-punctuation">:</span> <span class="hljs-keyword">new</span> <span class="hljs-title function_">TextEncoder</span>().<span class="hljs-title function_">encode</span>(<span class="hljs-string">&#039;# Hello&#039;</span>), compression<span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>, markupType<span class="hljs-punctuation">:</span> <span class="hljs-number">0</span> },
+<span class="hljs-keyword">const</span> hzo <span class="hljs-operator">=</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">buildHonzo</span>({
+  meta<span class="hljs-operator">:</span> { title<span class="hljs-operator">:</span> { en<span class="hljs-operator">:</span> <span class="hljs-string">&quot;My Book&quot;</span> } },
+  chunks<span class="hljs-operator">:</span> [
+    {
+      <span class="hljs-keyword">type</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;CHAP&quot;</span>,
+      data<span class="hljs-operator">:</span> <span class="hljs-keyword">new</span> <span class="hljs-title function_">TextEncoder</span>().<span class="hljs-title function_">encode</span>(<span class="hljs-string">&quot;# Hello&quot;</span>),
+      compression<span class="hljs-operator">:</span> <span class="hljs-number">1</span>,
+      markupType<span class="hljs-operator">:</span> <span class="hljs-number">0</span>,
+    },
   ],
 });
 </code></pre>
@@ -2166,14 +2148,14 @@ Format Specification</a></div>
   <path d="M19 12H5" />
 </svg>
 
-                        <span><small>previous</small><strong>
+                        <span><small>Previous</small><strong>
                             Rust
                           </strong></span>
                       </a>
                     
                     
                       <a href="../../api/c/" class="next-page">
-                        <span><small>next</small>
+                        <span><small>Next</small>
                           <strong>
                             C
                           </strong></span>
@@ -2199,12 +2181,13 @@ Format Specification</a></div>
                   </div>
                 
               </div>
+              
               <div class="toc-sidebar">
                 
 
 
   <div class="toc-container">
-    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
 <svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-down"
   xmlns="http://www.w3.org/2000/svg"
@@ -2282,33 +2265,34 @@ Format Specification</a></div>
   </div>
 
               </div>
+              
             </div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1787023392000">
+                <span class="git-last-updated" data-timestamp="1787810890000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1787023392000"></span>
+                  <span class="git-time" data-timestamp="1787810890000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
                     <ul class="git-commit-list">
                       
                         <li class="git-commit-item">
-                          <div class="git-commit-avatar" title="dependabot[bot]">
+                          <div class="git-commit-avatar" title="NellowTCS">
                             
-                              <img src="https://www.gravatar.com/avatar/48ea49be76d0c68403a7f3df87e3487d?d=mp&amp;s=64" alt="dependabot[bot]">
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Bump brace-expansion (#65)">Bump brace-expansion (#65)</div>
+                            <div class="git-commit-message" title="Add hzo_extract_meta_from_file, markdown converter CLI, and update dependencies (#66)">Add hzo_extract_meta_from_file, markd...</div>
                             <div class="git-commit-meta">
-                              <span class="git-commit-author">dependabot[bot]</span>
-                              <span class="git-commit-date" data-timestamp="1787023392000"></span>
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1787810890000"></span>
                             </div>
                           </div>
                         </li>
@@ -2363,11 +2347,11 @@ Format Specification</a></div>
                 <span class="footer-column-title">Resources</span>
                 <ul>
                   
-                    <li><a href="../../getting-started/quickstart/" >Getting Started</a></li>
+                    <li><a href="getting-started/quickstart/" >Getting Started</a></li>
                   
-                    <li><a href="../../format/" >Format Spec</a></li>
+                    <li><a href="format/" >Format Spec</a></li>
                   
-                    <li><a href="../../cli/" >CLI Commands</a></li>
+                    <li><a href="cli/" >CLI Commands</a></li>
                   
                 </ul>
               </div>
@@ -2392,7 +2376,7 @@ Format Specification</a></div>
         <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/Nisoku/Honzo">View on GitHub</a>.</div>
         
           <div class="branding-footer">
-            builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
           </div>
         
       </div>
@@ -2401,20 +2385,22 @@ Format Specification</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=msy44anm"></script>
+      <script src="../../assets/js/docmd-main.js?v=mtb4na5q"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=msy44anm"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=msy44anm" ></script>
-<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=msy44anm" ></script>
-<script src="../../assets/js/init-mermaid.js?v=msy44anm" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=msy44anm" type="module"></script>
+      <script src="../../assets/js/docmd-git.js?v=mtb4na5q"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-search.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-git.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-ai.js?v=mtb4na5q" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
        data-search-placeholder="Search documentation..."
        data-search-no-results="No results found."
        data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
        data-search-initial="Type to start searching..."
        data-search-navigate="to navigate"
        data-search-escape="to close">
@@ -2482,6 +2468,9 @@ Format Specification</a></div>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/Nisoku/Honzo/edit/main/","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"Honzo","siteBase":"/Honzo/","siteUrl":"https://nisoku.org/Honzo","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Getting Started","icon":"rocket","collapsible":false,"children":[{"title":"Quick Start","path":"/getting-started/quickstart/","icon":"play"},{"title":"Installation","path":"/getting-started/installation/","icon":"download"},{"title":"Core Concepts","path":"/getting-started/concepts/","icon":"book"}]},{"title":"Format Specification","icon":"file-text","path":"/format/","collapsible":false,"children":[{"title":"Wire Format","path":"/format/wire-format/","icon":"binary"},{"title":"Chunk Types","path":"/format/chunk-types/","icon":"package"},{"title":"Compression","path":"/format/compression/","icon":"zap"},{"title":"DRM & Encryption","path":"/format/drm/","icon":"lock"},{"title":"Layout Modes","path":"/format/layout/","icon":"columns"}]},{"title":"API Reference","icon":"code","path":"/api/","collapsible":false,"children":[{"title":"Rust","path":"/api/rust/","icon":"box"},{"title":"WASM / TypeScript","path":"/api/wasm/","icon":"cpu"},{"title":"C","path":"/api/c/","icon":"terminal"}]},{"title":"CLI Reference","icon":"terminal","path":"/cli/","collapsible":false},{"title":"Features","icon":"star","path":"/features/","collapsible":false,"children":[{"title":"Annotations","path":"/features/annotations/","icon":"pen-tool"},{"title":"Search Index","path":"/features/search/","icon":"search"},{"title":"Sync Tracks","path":"/features/sync/","icon":"clock"},{"title":"Streaming","path":"/features/streaming/","icon":"wind"}]},{"title":"Conversion","icon":"git-merge","path":"/conversion/","collapsible":false,"children":[{"title":"EPUB","path":"/conversion/epub/","icon":"book"},{"title":"MOBI","path":"/conversion/mobi/","icon":"book-open"},{"title":"PDF","path":"/conversion/pdf/","icon":"file-text"}]},{"title":"Demo Apps","icon":"eye","path":"/demo-docs/","collapsible":false,"children":[{"title":"Reader","path":"/demo/","icon":"book","external":true},{"title":"Maker","path":"/demo/maker/","icon":"wrench","external":true},{"title":"Inspect","path":"/demo/inspect/","icon":"search","external":true},{"title":"Convert","path":"/demo/convert/","icon":"git-merge","external":true}]},{"title":"Contributing","icon":"heart","path":"/contributing/","collapsible":false,"children":[{"title":"Building","path":"/contributing/building/","icon":"network"},{"title":"Architecture","path":"/contributing/architecture/","icon":"git-commit"}]},{"title":"GitHub","path":"https://github.com/Nisoku/Honzo","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":true},"isWorkspace":false,"workspaceProjects":[]};</script>
+      
+      
       
   </body>
 </html>

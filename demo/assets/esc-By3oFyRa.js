@@ -1,0 +1,2 @@
+function e(e){return e==null?``:String(e).replace(/&/g,`&amp;`).replace(/</g,`&lt;`).replace(/>/g,`&gt;`).replace(/"/g,`&quot;`).replace(/'/g,`&#39;`)}export{e as t};
+//# sourceMappingURL=esc-By3oFyRa.js.map

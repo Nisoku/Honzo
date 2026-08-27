@@ -10,8 +10,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.5.x">
+    <meta name="generator" content="docmd v0.9.4">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/Honzo/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/Honzo/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
     <script>/**
  * --------------------------------------------------------------------
  * docmd : the zero-config documentation engine.
@@ -29,9 +44,27 @@
 (function () {
   try {
     // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
     var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
 
     if (theme === 'system') {
       theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -65,32 +98,17 @@
         visibility: hidden;
       }
     </style>
-    
-    <script>
-      var root = "../../";
-      if (root && !root.endsWith('/')) root += '/';
-      if (root === '') root = './';
-      window.DOCMD_ROOT = root;
-
-      var siteRoot = "../../";
-      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
-      if (siteRoot === '') siteRoot = './';
-      window.DOCMD_SITE_ROOT = siteRoot;
-
-      window.DOCMD_APPEARANCE = "system";
-      window.DOCMD_VERSION_ROOT = "/";
-      window.DOCMD_BASE = "/";
-      window.DOCMD_LOCALE = "";
-      window.DOCMD_DEFAULT_LOCALE = "";
-    </script>
     <title>
       Core Concepts : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=msy44anm">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=msy44anm" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=msy44anm" id="hljs-dark" disabled>
+
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mtb4na5q">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mtb4na5q">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mtb4na5q" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mtb4na5q" id="hljs-dark" disabled>
     
     
 <meta name="description" content="How Honzo works: zero-copy parsing, pull-based streaming, and tail mutability">
@@ -105,75 +123,33 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=msy44anm" >
+
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mtb4na5q" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=msy44anm">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mtb4na5q">
     
-    <script>/**
- * --------------------------------------------------------------------
- * docmd : the zero-config documentation engine.
- *
- * @package     @docmd/core (and ecosystem)
- * @website     https://docmd.io
- * @repository  https://github.com/docmd-io/docmd
- * @license     MIT
- * @copyright   Copyright (c) 2025-present docmd.io
- *
- * [docmd-source] - Please do not remove this header.
- * --------------------------------------------------------------------
- */
-
-(function () {
-  try {
-    // 1. Determine Theme
-    var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
-
-    if (theme === 'system') {
-      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    // 2. Apply to Root
-    document.documentElement.setAttribute('data-theme', theme);
-
-    // 3. Highlight.js Toggle Strategy
-    var lightLink = document.getElementById('hljs-light');
-    var darkLink = document.getElementById('hljs-dark');
-
-    if (lightLink && darkLink) {
-      if (theme === 'dark') {
-        lightLink.disabled = true;
-        darkLink.disabled = false;
-      } else {
-        lightLink.disabled = false;
-        darkLink.disabled = true;
-      }
-    }
-
-    document.documentElement.style.visibility = "visible";
-  } catch (e) {
-    document.documentElement.style.visibility = "visible";
-    console.error('Theme init failed', e);
-  }
-})();</script>
+    
   </head>
   <body
     class="sidebar-collapsible"
     data-default-collapsed="false"
     data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/getting-started/concepts.md">
 
-    <a href="#main-content" class="skip-link">skipToContent</a>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
 
     
     
       <aside class="sidebar">
         <div class="sidebar-header">
           
-            <h1><a href="../../">
+<h1><a href="../../">
                 Honzo
               </a></h1>
           
@@ -206,7 +182,7 @@
         </div>
         
 
-<nav class="sidebar-nav" aria-label="mainNavigation">
+<nav class="sidebar-nav" aria-label="Main Navigation">
   <ul>
     
       <li class="" >
@@ -1489,11 +1465,12 @@
       <div class="main-content-wrapper">
         
         
+        
           <header class="page-header">
             <div class="header-left">
               
                 <button id="sidebar-toggle-button" class="sidebar-toggle-button"
-                  aria-label="toggleSidebar">
+                  aria-label="Toggle Sidebar">
                   
 <svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-left"
@@ -1525,7 +1502,7 @@
 
 <div class="docmd-options-menu">
     
-    <button class="docmd-search-trigger" aria-label="search">
+    <button class="docmd-search-trigger" aria-label="Search">
         
 <svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-search"
@@ -1543,7 +1520,7 @@
   <circle cx="11" cy="11" r="8" />
 </svg>
 
-        <span class="search-label">search</span>
+        <span class="search-label">Search</span>
         <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
     </button>
     
@@ -1553,7 +1530,7 @@
     
 
     
-    <button class="theme-toggle-button" aria-label="toggleTheme">
+    <button class="theme-toggle-button" aria-label="Toggle theme">
         
 <svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-sun"
@@ -1608,7 +1585,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Core%20Concepts%22%0Adescription%3A%20%22How%20Honzo%20works%3A%20zero-copy%20parsing%2C%20pull-based%20streaming%2C%20and%20tail%20mutability%22%0A---%0A%0AA%20few%20core%20ideas%20make%20Honzo%20different%20from%20other%20ebook%20formats.%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Zero%20Copy%20Parsing%22%20icon%3Azap%0AParse%20the%20wire%20format%20by%20pointer%20cast.%20No%20allocation%2C%20no%20scanning.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Pull%20Based%20Streaming%22%20icon%3Awind%0ADecompress%20one%20chapter%20at%20a%20time.%20Memory%20proportional%20to%20the%20largest%20chunk.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Per%20Chunk%20Compression%22%20icon%3Acompress%0AEach%20chunk%20picks%20its%20own%20algorithm.%20Text%20compresses%2C%20images%20do%20not.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Tail%20Mutability%22%20icon%3Aedit%0AMETA%20sits%20at%20the%20end.%20Edit%20metadata%20without%20touching%20the%20data%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20The%20File%20Structure%0A%0AEvery%20Honzo%20file%20follows%20the%20same%20layout%3A%0A%0A%60%60%60txt%0A%2B------%2B-----%2B-------%2B------------%2B------%2B%0A%7C%20HEAD%20%7C%20TOC%20%7C%20DATA%20%20%7C%20EXTRA%20%20%20%20%20%20%7C%20META%20%7C%0A%7C%20%20%20%20%20%20%7C%20%20%20%20%20%7C%20%20%20%20%20%20%20%7C%20(optional)%20%7C%20%20%20%20%20%20%7C%0A%2B------%2B-----%2B-------%2B------------%2B------%2B%0A%60%60%60%0A%0A%3A%3A%3A%20steps%0A%0A1.%20%3A%3A%3A%20tag%20%22magic%22%204%20bytes%20%600x484F4E4F%60%20(%22HONO%22)%0A2.%20%3A%3A%3A%20tag%20%22HEAD%22%2048%20bytes.%20Format%20version%2C%20chunk%20count%2C%20layout%20mode%2C%20section%20offsets.%0A3.%20%3A%3A%3A%20tag%20%22TOC%22%20Variable.%20Fixed%20size%2032%20byte%20entries%2C%20one%20per%20chunk.%0A4.%20%3A%3A%3A%20tag%20%22DATA%22%20Variable.%20Raw%20chunk%20payloads.%0A5.%20%3A%3A%3A%20tag%20%22EXTRA%22%20Variable.%20Extensible%20metadata%20such%20as%20annotations%2C%20DRM%2C%20and%20sync%20tracks.%0A6.%20%3A%3A%3A%20tag%20%22META%22%20Variable.%20Book%20metadata%20encoded%20as%20MessagePack.%0A%0A%3A%3A%3A%0A%0AMETA%20is%20deliberately%20last.%20Edit%20the%20title%2C%20tags%2C%20or%20revision%20without%20touching%20DATA.%0A%0A%23%23%20Zero%20Copy%20Parsing%0A%0AThe%20wire%20format%20is%20designed%20for%20direct%20casting.%20You%20take%20the%20file%20bytes%20and%20overlay%20structs.%20No%20parsing%2C%20no%20allocation.%0A%0A%60%60%60rust%0Alet%20data%20%3D%20std%3A%3Afs%3A%3Aread(%22book.hzo%22).unwrap()%3B%0Alet%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0A%0A%2F%2F%20head()%20is%20a%20pointer%20cast%2C%20not%20a%20copy%0Alet%20head%20%3D%20p.head()%3B%0A%60%60%60%0A%0AWhen%20you%20memory%20map%20the%20file%2C%20parsing%20completes%20in%20O(1)%20time%20with%20zero%20heap%20allocation.%20This%20approach%20works%20in%20environments%20where%20every%20allocation%20counts.%20Think%20embedded%20devices%2C%20WASM%20runtimes%2C%20and%20kernel%20modules.%0A%0A%23%23%20Pull%20Based%20Streaming%0A%0AThe%20TOC%20tells%20you%20exactly%20where%20each%20chunk%20lives.%20You%20never%20have%20to%20read%20everything%20at%20once.%0A%0A-%20Parse%20only%20the%20header%20(48%20bytes)%20to%20open%20a%20file.%0A-%20Skip%20to%20META%20to%20read%20the%20title.%20No%20chunk%20data%20is%20parsed.%0A-%20Decompress%20chapters%20one%20at%20a%20time%20as%20the%20reader%20turns%20pages.%0A-%20Seek%20to%20a%20specific%20image%20by%20its%20TOC%20offset.%0A%0AThe%20streaming%20API%20(%60HonzoStream%60)%20reads%20and%20decompresses%20one%20chapter%20at%20a%20time.%20A%201GB%20book%20with%20100%20chapters%20uses%20memory%20proportional%20to%20the%20largest%20single%20chapter.%0A%0A%23%23%20Per%20Chunk%20Compression%0A%0AEach%20TOC%20entry%20picks%20its%20compression%20independently%3A%0A%0A%7C%20Code%20%7C%20Algorithm%20%7C%20Use%20Case%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C------%7C-----------%7C----------------------------------------%7C%0A%7C%200%20%20%20%20%7C%20None%20%20%20%20%20%20%7C%20Images%2C%20fonts%2C%20already%20compressed%20data%20%7C%0A%7C%201%20%20%20%20%7C%20LZ4%20%20%20%20%20%20%20%7C%20Chapter%20text%2C%20CSS%2C%20metadata%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0ALZ4%20favors%20decode%20speed%20over%20compression%20ratio.%20Text%20chapters%20typically%20compress%20to%2040-60%20percent%20of%20their%20original%20size.%20Since%20compression%20is%20per%20chunk%2C%20you%20control%20the%20tradeoff.%20Do%20not%20waste%20CPU%20decompressing%20JPEG%20images%20that%20will%20not%20shrink.%20Do%20compress%20chapters%20where%20the%20savings%20matter.%0A%0A%23%23%20Tail%20Mutability%0A%0AMETA%20lives%20at%20the%20end%20of%20the%20file.%20This%20design%20lets%20you%3A%0A%0A%3A%3A%3A%20steps%0A%0A1.%20Read%20the%20file%20structure%20by%20scanning%20HEAD%20and%20TOC.%0A2.%20Append%20a%20new%20META%20block%20at%20the%20end.%0A3.%20Update%20the%20%60meta_offset%60%20and%20%60meta_size%60%20fields%20in%20HEAD.%0A%0A%3A%3A%3A%0A%0ANo%20bytes%20in%20DATA%20need%20rewriting.%20The%20same%20strategy%20powers%20MP4%20and%20other%20streaming%20oriented%20formats.%20EXTRA%20entries%20sit%20between%20DATA%20and%20META.%20They%20are%20appendable%20too.%0A%0A%23%23%20Chunk%20Types%0A%0A%7C%20Tag%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C--------%7C------------%7C------------------------------------------%7C%0A%7C%20%60CHAP%60%20%7C%20Chapter%20%20%20%20%7C%20Book%20chapter%20content%20in%20Markdown%20or%20HTML%20%7C%0A%7C%20%60IMG_%60%20%7C%20Image%20%20%20%20%20%20%7C%20Inline%20image%20as%20JPEG%2C%20PNG%2C%20or%20WebP%20%20%20%20%20%20%20%7C%0A%7C%20%60CSS_%60%20%7C%20Stylesheet%20%7C%20CSS%20for%20chapter%20rendering%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60FONT%60%20%7C%20Font%20%20%20%20%20%20%20%7C%20Embedded%20font%20in%20WOFF2%20or%20TTF%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60COVR%60%20%7C%20Cover%20%20%20%20%20%20%7C%20Full%20size%20cover%20image%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60COVT%60%20%7C%20Thumbnail%20%20%7C%20Cover%20thumbnail%20for%20previews%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60NOTE%60%20%7C%20Annotation%20%7C%20Embedded%20annotation%20data%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60SIDX%60%20%7C%20Search%20%20%20%20%20%7C%20Inverted%20search%20index%20as%20MessagePack%20%20%20%20%20%7C%0A%7C%20%60MATH%60%20%7C%20Math%20%20%20%20%20%20%20%7C%20LaTeX%20or%20AsciiMath%20equation%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0ASee%20%5BChunk%20Types%5D(..%2Fformat%2Fchunk-types)%20for%20the%20full%20reference.%0A%0A%23%23%20EXTRA%20Namespaces%0A%0AEXTRA%20entries%20use%20reverse%20domain%20namespacing%20for%20extensibility%3A%0A%0A%7C%20Namespace%20%20%20%20%20%20%20%20%20%7C%20Purpose%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------------%7C---------------------------------------------------------------%7C%0A%7C%20%60org.nisoku.anno%60%20%7C%20Portable%20annotations%20such%20as%20highlights%2C%20bookmarks%2C%20and%20notes%20%7C%0A%7C%20%60org.nisoku.drm%60%20%20%7C%20AES-256-GCM%20encryption%20envelope%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60org.nisoku.sync%60%20%7C%20Audio%2C%20video%2C%20and%20text%20synchronization%20tracks%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AAnyone%20can%20define%20a%20custom%20namespace.%20Unrecognized%20entries%20are%20preserved%20during%20round%20trips.%20No%20data%20is%20lost.%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Quick%20Start%22%20.%2Fquickstart.md%20icon%3Aplay%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20..%2Fformat%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Streaming%22%20..%2Ffeatures%2Fstreaming.md%20icon%3Aplay%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Core%20Concepts%22%0Adescription%3A%20%22How%20Honzo%20works%3A%20zero-copy%20parsing%2C%20pull-based%20streaming%2C%20and%20tail%20mutability%22%0A---%0A%0AA%20few%20core%20ideas%20make%20Honzo%20different%20from%20other%20ebook%20formats.%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Zero%20Copy%20Parsing%22%20icon%3Azap%0AParse%20the%20wire%20format%20by%20pointer%20cast.%20No%20allocation%2C%20no%20scanning.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Pull%20Based%20Streaming%22%20icon%3Awind%0ADecompress%20one%20chapter%20at%20a%20time.%20Memory%20proportional%20to%20the%20largest%20chunk.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Per%20Chunk%20Compression%22%20icon%3Acompress%0AEach%20chunk%20picks%20its%20own%20algorithm.%20Text%20compresses%2C%20images%20do%20not.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Tail%20Mutability%22%20icon%3Aedit%0AMETA%20sits%20at%20the%20end.%20Edit%20metadata%20without%20touching%20the%20data%20section.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20The%20File%20Structure%0A%0AEvery%20Honzo%20file%20follows%20the%20same%20layout%3A%0A%0A%60%60%60txt%0A%2B------%2B-----%2B-------%2B------------%2B------%2B%0A%7C%20HEAD%20%7C%20TOC%20%7C%20DATA%20%20%7C%20EXTRA%20%20%20%20%20%20%7C%20META%20%7C%0A%7C%20%20%20%20%20%20%7C%20%20%20%20%20%7C%20%20%20%20%20%20%20%7C%20(optional)%20%7C%20%20%20%20%20%20%7C%0A%2B------%2B-----%2B-------%2B------------%2B------%2B%0A%60%60%60%0A%0A%3A%3A%3A%20steps%0A%0A1.%20%3A%3A%3A%20tag%20%22magic%22%204%20bytes%20%600x484F4E4F%60%20(%22HONO%22)%0A2.%20%3A%3A%3A%20tag%20%22HEAD%22%2048%20bytes.%20Format%20version%2C%20chunk%20count%2C%20layout%20mode%2C%20section%20offsets.%0A3.%20%3A%3A%3A%20tag%20%22TOC%22%20Variable.%20Fixed%20size%2032%20byte%20entries%2C%20one%20per%20chunk.%0A4.%20%3A%3A%3A%20tag%20%22DATA%22%20Variable.%20Raw%20chunk%20payloads.%0A5.%20%3A%3A%3A%20tag%20%22EXTRA%22%20Variable.%20Extensible%20metadata%20such%20as%20annotations%2C%20DRM%2C%20and%20sync%20tracks.%0A6.%20%3A%3A%3A%20tag%20%22META%22%20Variable.%20Book%20metadata%20encoded%20as%20MessagePack.%0A%0A%3A%3A%3A%0A%0AMETA%20is%20deliberately%20last.%20Edit%20the%20title%2C%20tags%2C%20or%20revision%20without%20touching%20DATA.%0A%0A%23%23%20Zero%20Copy%20Parsing%0A%0AThe%20wire%20format%20is%20designed%20for%20direct%20casting.%20You%20take%20the%20file%20bytes%20and%20overlay%20structs.%20No%20parsing%2C%20no%20allocation.%0A%0A%60%60%60rust%0Alet%20data%20%3D%20std%3A%3Afs%3A%3Aread(%22book.hzo%22).unwrap()%3B%0Alet%20p%20%3D%20HonzoParser%3A%3Anew(%26data%2C%201).unwrap()%3B%0A%0A%2F%2F%20head()%20is%20a%20pointer%20cast%2C%20not%20a%20copy%0Alet%20head%20%3D%20p.head()%3B%0A%60%60%60%0A%0AWhen%20you%20memory%20map%20the%20file%2C%20parsing%20completes%20in%20O(1)%20time%20with%20zero%20heap%20allocation.%20This%20approach%20works%20in%20environments%20where%20every%20allocation%20counts.%20Think%20embedded%20devices%2C%20WASM%20runtimes%2C%20and%20kernel%20modules.%0A%0A%23%23%20Pull%20Based%20Streaming%0A%0AThe%20TOC%20tells%20you%20exactly%20where%20each%20chunk%20lives.%20You%20never%20have%20to%20read%20everything%20at%20once.%0A%0A-%20Parse%20only%20the%20header%20(48%20bytes)%20to%20open%20a%20file.%0A-%20Skip%20to%20META%20to%20read%20the%20title.%20No%20chunk%20data%20is%20parsed.%0A-%20Decompress%20chapters%20one%20at%20a%20time%20as%20the%20reader%20turns%20pages.%0A-%20Seek%20to%20a%20specific%20image%20by%20its%20TOC%20offset.%0A%0AThe%20streaming%20API%20(%60HonzoStream%60)%20reads%20and%20decompresses%20one%20chapter%20at%20a%20time.%20A%201GB%20book%20with%20100%20chapters%20uses%20memory%20proportional%20to%20the%20largest%20single%20chapter.%0A%0A%23%23%20Per%20Chunk%20Compression%0A%0AEach%20TOC%20entry%20picks%20its%20compression%20independently%3A%0A%0A%7C%20Code%20%7C%20Algorithm%20%7C%20Use%20Case%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----%20%7C%20---------%20%7C%20--------------------------------------%20%7C%0A%7C%200%20%20%20%20%7C%20None%20%20%20%20%20%20%7C%20Images%2C%20fonts%2C%20already%20compressed%20data%20%7C%0A%7C%201%20%20%20%20%7C%20LZ4%20%20%20%20%20%20%20%7C%20Chapter%20text%2C%20CSS%2C%20metadata%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0ALZ4%20favors%20decode%20speed%20over%20compression%20ratio.%20Text%20chapters%20typically%20compress%20to%2040-60%20percent%20of%20their%20original%20size.%20Since%20compression%20is%20per%20chunk%2C%20you%20control%20the%20tradeoff.%20Do%20not%20waste%20CPU%20decompressing%20JPEG%20images%20that%20will%20not%20shrink.%20Do%20compress%20chapters%20where%20the%20savings%20matter.%0A%0A%23%23%20Tail%20Mutability%0A%0AMETA%20lives%20at%20the%20end%20of%20the%20file.%20This%20design%20lets%20you%3A%0A%0A%3A%3A%3A%20steps%0A%0A1.%20Read%20the%20file%20structure%20by%20scanning%20HEAD%20and%20TOC.%0A2.%20Append%20a%20new%20META%20block%20at%20the%20end.%0A3.%20Update%20the%20%60meta_offset%60%20and%20%60meta_size%60%20fields%20in%20HEAD.%0A%0A%3A%3A%3A%0A%0ANo%20bytes%20in%20DATA%20need%20rewriting.%20The%20same%20strategy%20powers%20MP4%20and%20other%20streaming%20oriented%20formats.%20EXTRA%20entries%20sit%20between%20DATA%20and%20META.%20They%20are%20appendable%20too.%0A%0A%23%23%20Chunk%20Types%0A%0A%7C%20Tag%20%20%20%20%7C%20Type%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20------%20%7C%20----------%20%7C%20----------------------------------------%20%7C%0A%7C%20%60CHAP%60%20%7C%20Chapter%20%20%20%20%7C%20Book%20chapter%20content%20in%20Markdown%20or%20HTML%20%7C%0A%7C%20%60IMG_%60%20%7C%20Image%20%20%20%20%20%20%7C%20Inline%20image%20as%20JPEG%2C%20PNG%2C%20or%20WebP%20%20%20%20%20%20%20%7C%0A%7C%20%60CSS_%60%20%7C%20Stylesheet%20%7C%20CSS%20for%20chapter%20rendering%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60FONT%60%20%7C%20Font%20%20%20%20%20%20%20%7C%20Embedded%20font%20in%20WOFF2%20or%20TTF%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60COVR%60%20%7C%20Cover%20%20%20%20%20%20%7C%20Full%20size%20cover%20image%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60COVT%60%20%7C%20Thumbnail%20%20%7C%20Cover%20thumbnail%20for%20previews%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60NOTE%60%20%7C%20Annotation%20%7C%20Embedded%20annotation%20data%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60SIDX%60%20%7C%20Search%20%20%20%20%20%7C%20Inverted%20search%20index%20as%20MessagePack%20%20%20%20%20%7C%0A%7C%20%60MATH%60%20%7C%20Math%20%20%20%20%20%20%20%7C%20LaTeX%20or%20AsciiMath%20equation%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0ASee%20%5BChunk%20Types%5D(..%2Fformat%2Fchunk-types)%20for%20the%20full%20reference.%0A%0A%23%23%20EXTRA%20Namespaces%0A%0AEXTRA%20entries%20use%20reverse%20domain%20namespacing%20for%20extensibility%3A%0A%0A%7C%20Namespace%20%20%20%20%20%20%20%20%20%7C%20Purpose%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------------%20%7C%20-------------------------------------------------------------%20%7C%0A%7C%20%60org.nisoku.anno%60%20%7C%20Portable%20annotations%20such%20as%20highlights%2C%20bookmarks%2C%20and%20notes%20%7C%0A%7C%20%60org.nisoku.drm%60%20%20%7C%20AES-256-GCM%20encryption%20envelope%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60org.nisoku.sync%60%20%7C%20Audio%2C%20video%2C%20and%20text%20synchronization%20tracks%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AAnyone%20can%20define%20a%20custom%20namespace.%20Unrecognized%20entries%20are%20preserved%20during%20round%20trips.%20No%20data%20is%20lost.%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Quick%20Start%22%20.%2Fquickstart.md%20icon%3Aplay%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Wire%20Format%22%20..%2Fformat%2Fwire-format.md%20icon%3Abinary%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Streaming%22%20..%2Ffeatures%2Fstreaming.md%20icon%3Aplay%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1652,7 +1629,7 @@
                   
                     <div class="docmd-copy-widgets">
                       
-                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-copy"
@@ -1673,7 +1650,7 @@
                         </button>
                       
                       
-                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-message-square"
@@ -1690,7 +1667,7 @@
   <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
 </svg>
 </span>
-                          <span class="docmd-btn-text">copyContext</span>
+                          <span class="docmd-btn-text">Copy Context</span>
                         </button>
                       
                     </div>
@@ -1715,10 +1692,8 @@
 >
   <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
 </svg>
-Zero Copy Parsing</div><div class="card-content">
-<p>Parse the wire format by pointer cast. No allocation, no scanning.</p>
-</div></div>
-</div>
+Zero Copy Parsing</div><div class="card-content"><p>Parse the wire format by pointer cast. No allocation, no scanning.</p>
+</div></div></div>
 <div class="docmd-container grid-item">
 <div class="docmd-container card"><div class="card-title">
 <svg class="lucide-icon icon-wind card-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1737,15 +1712,11 @@ Zero Copy Parsing</div><div class="card-content">
   <path d="M17.5 8a2.5 2.5 0 1 1 2 4H2" />
   <path d="M9.8 4.4A2 2 0 1 1 11 8H2" />
 </svg>
-Pull Based Streaming</div><div class="card-content">
-<p>Decompress one chapter at a time. Memory proportional to the largest chunk.</p>
-</div></div>
-</div>
+Pull Based Streaming</div><div class="card-content"><p>Decompress one chapter at a time. Memory proportional to the largest chunk.</p>
+</div></div></div>
 <div class="docmd-container grid-item">
-<div class="docmd-container card"><div class="card-title">Per Chunk Compression</div><div class="card-content">
-<p>Each chunk picks its own algorithm. Text compresses, images do not.</p>
-</div></div>
-</div>
+<div class="docmd-container card"><div class="card-title">Per Chunk Compression</div><div class="card-content"><p>Each chunk picks its own algorithm. Text compresses, images do not.</p>
+</div></div></div>
 <div class="docmd-container grid-item">
 <div class="docmd-container card"><div class="card-title">
 <svg class="lucide-icon icon-edit card-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1763,33 +1734,31 @@ Pull Based Streaming</div><div class="card-content">
   <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
   <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
 </svg>
-Tail Mutability</div><div class="card-content">
-<p>META sits at the end. Edit metadata without touching the data section.</p>
-</div></div>
-</div>
+Tail Mutability</div><div class="card-content"><p>META sits at the end. Edit metadata without touching the data section.</p>
+</div></div></div>
 </div>
 <h2 id="the-file-structure" class="docmd-heading"><a href="#the-file-structure" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>The File Structure</h2>
 <p>Every Honzo file follows the same layout:</p>
-<pre class="hljs"><code><span class="hljs-punctuation">+------+-----+-------+------------+------+</span>
-<span class="hljs-punctuation">|</span> HEAD <span class="hljs-punctuation">|</span> TOC <span class="hljs-punctuation">|</span> DATA  <span class="hljs-punctuation">|</span> EXTRA      <span class="hljs-punctuation">|</span> META <span class="hljs-punctuation">|</span>
-<span class="hljs-punctuation">|</span>      <span class="hljs-punctuation">|</span>     <span class="hljs-punctuation">|</span>       <span class="hljs-punctuation">|</span> (optional) <span class="hljs-punctuation">|</span>      <span class="hljs-punctuation">|</span>
-<span class="hljs-punctuation">+------+-----+-------+------------+------+</span>
+<pre class="hljs"><code class="language-txt"><span class="hljs-operator">+------+-----+-------+------------+------+</span>
+<span class="hljs-operator">|</span> HEAD <span class="hljs-operator">|</span> TOC <span class="hljs-operator">|</span> DATA  <span class="hljs-operator">|</span> EXTRA      <span class="hljs-operator">|</span> META <span class="hljs-operator">|</span>
+<span class="hljs-operator">|</span>      <span class="hljs-operator">|</span>     <span class="hljs-operator">|</span>       <span class="hljs-operator">|</span> (optional) <span class="hljs-operator">|</span>      <span class="hljs-operator">|</span>
+<span class="hljs-operator">+------+-----+-------+------------+------+</span>
 </code></pre>
-<div class="docmd-container steps steps-reset"><ol class="steps-list"><li class="step-item"><span class="docmd-tag">magic</span> 4 bytes <code>0x484F4E4F</code> (“HONO”)</li>
-<li class="step-item"><span class="docmd-tag">HEAD</span> 48 bytes. Format version, chunk count, layout mode, section offsets.</li>
-<li class="step-item"><span class="docmd-tag">TOC</span> Variable. Fixed size 32 byte entries, one per chunk.</li>
-<li class="step-item"><span class="docmd-tag">DATA</span> Variable. Raw chunk payloads.</li>
-<li class="step-item"><span class="docmd-tag">EXTRA</span> Variable. Extensible metadata such as annotations, DRM, and sync tracks.</li>
-<li class="step-item"><span class="docmd-tag">META</span> Variable. Book metadata encoded as MessagePack.</li>
+<div class="docmd-container steps steps-reset"><ol class="steps-list"><li class="step-item" id="step-23"><a href="#step-23" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><a href="../4/" class="docmd-tag-link"><span class="docmd-tag">magic</span></a></li>
+<li class="step-item" id="step-24"><a href="#step-24" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><a href="../48/" class="docmd-tag-link"><span class="docmd-tag">HEAD</span></a></li>
+<li class="step-item" id="step-25"><a href="#step-25" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><a href="../Variable./" class="docmd-tag-link"><span class="docmd-tag">TOC</span></a></li>
+<li class="step-item" id="step-26"><a href="#step-26" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><a href="../Variable./" class="docmd-tag-link"><span class="docmd-tag">DATA</span></a></li>
+<li class="step-item" id="step-27"><a href="#step-27" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><a href="../Variable./" class="docmd-tag-link"><span class="docmd-tag">EXTRA</span></a></li>
+<li class="step-item" id="step-28"><a href="#step-28" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><a href="../Variable./" class="docmd-tag-link"><span class="docmd-tag">META</span></a></li>
 </ol>
 </div><p>META is deliberately last. Edit the title, tags, or revision without touching DATA.</p>
 <h2 id="zero-copy-parsing" class="docmd-heading"><a href="#zero-copy-parsing" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Zero Copy Parsing</h2>
 <p>The wire format is designed for direct casting. You take the file bytes and overlay structs. No parsing, no allocation.</p>
-<pre class="hljs"><code><span class="hljs-keyword">let</span> data <span class="hljs-punctuation">=</span> std<span class="hljs-punctuation">::</span>fs<span class="hljs-punctuation">::</span><span class="hljs-keyword">read</span>(<span class="hljs-string">&quot;book.hzo&quot;</span>).<span class="hljs-title function_">unwrap</span>();
-<span class="hljs-keyword">let</span> p <span class="hljs-punctuation">=</span> HonzoParser<span class="hljs-punctuation">::</span><span class="hljs-keyword">new</span>(<span class="hljs-punctuation">&amp;</span>data, <span class="hljs-number">1</span>).<span class="hljs-title function_">unwrap</span>();
+<pre class="hljs"><code class="language-rust"><span class="hljs-keyword">let</span> data <span class="hljs-operator">=</span> std<span class="hljs-operator">::</span>fs<span class="hljs-operator">::</span><span class="hljs-keyword">read</span>(<span class="hljs-string">&quot;book.hzo&quot;</span>).<span class="hljs-title function_">unwrap</span>();
+<span class="hljs-keyword">let</span> p <span class="hljs-operator">=</span> HonzoParser<span class="hljs-operator">::</span><span class="hljs-keyword">new</span>(<span class="hljs-operator">&amp;</span>data, <span class="hljs-number">1</span>).<span class="hljs-title function_">unwrap</span>();
 
 <span class="hljs-comment">// head() is a pointer cast, not a copy</span>
-<span class="hljs-keyword">let</span> head <span class="hljs-punctuation">=</span> p.<span class="hljs-title function_">head</span>();
+<span class="hljs-keyword">let</span> head <span class="hljs-operator">=</span> p.<span class="hljs-title function_">head</span>();
 </code></pre>
 <p>When you memory map the file, parsing completes in O(1) time with zero heap allocation. This approach works in environments where every allocation counts. Think embedded devices, WASM runtimes, and kernel modules.</p>
 <h2 id="pull-based-streaming" class="docmd-heading"><a href="#pull-based-streaming" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Pull Based Streaming</h2>
@@ -1827,9 +1796,9 @@ Tail Mutability</div><div class="card-content">
 </div><p>LZ4 favors decode speed over compression ratio. Text chapters typically compress to 40-60 percent of their original size. Since compression is per chunk, you control the tradeoff. Do not waste CPU decompressing JPEG images that will not shrink. Do compress chapters where the savings matter.</p>
 <h2 id="tail-mutability" class="docmd-heading"><a href="#tail-mutability" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Tail Mutability</h2>
 <p>META lives at the end of the file. This design lets you:</p>
-<div class="docmd-container steps steps-reset"><ol class="steps-list"><li class="step-item">Read the file structure by scanning HEAD and TOC.</li>
-<li class="step-item">Append a new META block at the end.</li>
-<li class="step-item">Update the <code>meta_offset</code> and <code>meta_size</code> fields in HEAD.</li>
+<div class="docmd-container steps steps-reset"><ol class="steps-list"><li class="step-item" id="step-29"><a href="#step-29" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Read the file structure by scanning HEAD and TOC.</li>
+<li class="step-item" id="step-30"><a href="#step-30" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Append a new META block at the end.</li>
+<li class="step-item" id="step-31"><a href="#step-31" class="step-permalink" aria-label="Permalink to this step"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Update the <code>meta_offset</code> and <code>meta_size</code> fields in HEAD.</li>
 </ol>
 </div><p>No bytes in DATA need rewriting. The same strategy powers MP4 and other streaming oriented formats. EXTRA entries sit between DATA and META. They are appendable too.</p>
 <h2 id="chunk-types" class="docmd-heading"><a href="#chunk-types" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Chunk Types</h2>
@@ -1996,14 +1965,14 @@ Streaming</a></div>
   <path d="M19 12H5" />
 </svg>
 
-                        <span><small>previous</small><strong>
+                        <span><small>Previous</small><strong>
                             Installation
                           </strong></span>
                       </a>
                     
                     
                       <a href="../../format/" class="next-page">
-                        <span><small>next</small>
+                        <span><small>Next</small>
                           <strong>
                             Format Specification
                           </strong></span>
@@ -2029,12 +1998,13 @@ Streaming</a></div>
                   </div>
                 
               </div>
+              
               <div class="toc-sidebar">
                 
 
 
   <div class="toc-container">
-    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
 <svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-down"
   xmlns="http://www.w3.org/2000/svg"
@@ -2088,33 +2058,34 @@ Streaming</a></div>
   </div>
 
               </div>
+              
             </div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1787023392000">
+                <span class="git-last-updated" data-timestamp="1787810890000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1787023392000"></span>
+                  <span class="git-time" data-timestamp="1787810890000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
                     <ul class="git-commit-list">
                       
                         <li class="git-commit-item">
-                          <div class="git-commit-avatar" title="dependabot[bot]">
+                          <div class="git-commit-avatar" title="NellowTCS">
                             
-                              <img src="https://www.gravatar.com/avatar/48ea49be76d0c68403a7f3df87e3487d?d=mp&amp;s=64" alt="dependabot[bot]">
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Bump brace-expansion (#65)">Bump brace-expansion (#65)</div>
+                            <div class="git-commit-message" title="Add hzo_extract_meta_from_file, markdown converter CLI, and update dependencies (#66)">Add hzo_extract_meta_from_file, markd...</div>
                             <div class="git-commit-meta">
-                              <span class="git-commit-author">dependabot[bot]</span>
-                              <span class="git-commit-date" data-timestamp="1787023392000"></span>
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1787810890000"></span>
                             </div>
                           </div>
                         </li>
@@ -2169,11 +2140,11 @@ Streaming</a></div>
                 <span class="footer-column-title">Resources</span>
                 <ul>
                   
-                    <li><a href="../../getting-started/quickstart/" >Getting Started</a></li>
+                    <li><a href="getting-started/quickstart/" >Getting Started</a></li>
                   
-                    <li><a href="../../format/" >Format Spec</a></li>
+                    <li><a href="format/" >Format Spec</a></li>
                   
-                    <li><a href="../../cli/" >CLI Commands</a></li>
+                    <li><a href="cli/" >CLI Commands</a></li>
                   
                 </ul>
               </div>
@@ -2198,7 +2169,7 @@ Streaming</a></div>
         <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/Nisoku/Honzo">View on GitHub</a>.</div>
         
           <div class="branding-footer">
-            builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
           </div>
         
       </div>
@@ -2207,20 +2178,22 @@ Streaming</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=msy44anm"></script>
+      <script src="../../assets/js/docmd-main.js?v=mtb4na5q"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=msy44anm"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=msy44anm" ></script>
-<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=msy44anm" ></script>
-<script src="../../assets/js/init-mermaid.js?v=msy44anm" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=msy44anm" type="module"></script>
+      <script src="../../assets/js/docmd-git.js?v=mtb4na5q"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-search.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-git.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-ai.js?v=mtb4na5q" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
        data-search-placeholder="Search documentation..."
        data-search-no-results="No results found."
        data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
        data-search-initial="Type to start searching..."
        data-search-navigate="to navigate"
        data-search-escape="to close">
@@ -2288,6 +2261,9 @@ Streaming</a></div>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/Nisoku/Honzo/edit/main/","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"Honzo","siteBase":"/Honzo/","siteUrl":"https://nisoku.org/Honzo","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Getting Started","icon":"rocket","collapsible":false,"children":[{"title":"Quick Start","path":"/getting-started/quickstart/","icon":"play"},{"title":"Installation","path":"/getting-started/installation/","icon":"download"},{"title":"Core Concepts","path":"/getting-started/concepts/","icon":"book"}]},{"title":"Format Specification","icon":"file-text","path":"/format/","collapsible":false,"children":[{"title":"Wire Format","path":"/format/wire-format/","icon":"binary"},{"title":"Chunk Types","path":"/format/chunk-types/","icon":"package"},{"title":"Compression","path":"/format/compression/","icon":"zap"},{"title":"DRM & Encryption","path":"/format/drm/","icon":"lock"},{"title":"Layout Modes","path":"/format/layout/","icon":"columns"}]},{"title":"API Reference","icon":"code","path":"/api/","collapsible":false,"children":[{"title":"Rust","path":"/api/rust/","icon":"box"},{"title":"WASM / TypeScript","path":"/api/wasm/","icon":"cpu"},{"title":"C","path":"/api/c/","icon":"terminal"}]},{"title":"CLI Reference","icon":"terminal","path":"/cli/","collapsible":false},{"title":"Features","icon":"star","path":"/features/","collapsible":false,"children":[{"title":"Annotations","path":"/features/annotations/","icon":"pen-tool"},{"title":"Search Index","path":"/features/search/","icon":"search"},{"title":"Sync Tracks","path":"/features/sync/","icon":"clock"},{"title":"Streaming","path":"/features/streaming/","icon":"wind"}]},{"title":"Conversion","icon":"git-merge","path":"/conversion/","collapsible":false,"children":[{"title":"EPUB","path":"/conversion/epub/","icon":"book"},{"title":"MOBI","path":"/conversion/mobi/","icon":"book-open"},{"title":"PDF","path":"/conversion/pdf/","icon":"file-text"}]},{"title":"Demo Apps","icon":"eye","path":"/demo-docs/","collapsible":false,"children":[{"title":"Reader","path":"/demo/","icon":"book","external":true},{"title":"Maker","path":"/demo/maker/","icon":"wrench","external":true},{"title":"Inspect","path":"/demo/inspect/","icon":"search","external":true},{"title":"Convert","path":"/demo/convert/","icon":"git-merge","external":true}]},{"title":"Contributing","icon":"heart","path":"/contributing/","collapsible":false,"children":[{"title":"Building","path":"/contributing/building/","icon":"network"},{"title":"Architecture","path":"/contributing/architecture/","icon":"git-commit"}]},{"title":"GitHub","path":"https://github.com/Nisoku/Honzo","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":true},"isWorkspace":false,"workspaceProjects":[]};</script>
+      
+      
       
   </body>
 </html>

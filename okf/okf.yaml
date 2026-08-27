@@ -1,0 +1,249 @@
+okf_version: 0.9.4
+bundle:
+  name: honzo
+  title: Honzo
+  description: ""
+  url: "https://nisoku.org/Honzo"
+  generated_by: "@docmd/plugin-okf"
+  generated_at: "2026-08-27T06:14:08.702Z"
+  default_type: concept
+stats:
+  concepts: 29
+  by_type:
+    api: 5
+    concept: 24
+  locales: 
+  versions: 
+concepts:
+  - id: api-c
+    type: api
+    title: "C API Reference"
+    path: /api/c/
+    file: concepts/api-c.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-cpp
+    type: api
+    title: "C++ API Reference"
+    path: /api/cpp/
+    file: concepts/api-cpp.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api
+    type: api
+    title: "API Reference"
+    path: /api/
+    file: concepts/api.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-rust
+    type: api
+    title: "Rust API Reference"
+    path: /api/rust/
+    file: concepts/api-rust.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-wasm
+    type: api
+    title: "WASM / TypeScript API Reference"
+    path: /api/wasm/
+    file: concepts/api-wasm.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: cli
+    type: concept
+    title: "CLI Reference"
+    path: /cli/
+    file: concepts/cli.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: contributing-architecture
+    type: concept
+    title: Architecture
+    path: /contributing/architecture/
+    file: concepts/contributing-architecture.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: contributing-building
+    type: concept
+    title: Building
+    path: /contributing/building/
+    file: concepts/contributing-building.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: contributing
+    type: concept
+    title: Contributing
+    path: /contributing/
+    file: concepts/contributing.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: conversion-epub
+    type: concept
+    title: "EPUB Conversion"
+    path: /conversion/epub/
+    file: concepts/conversion-epub.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: conversion
+    type: concept
+    title: Conversion
+    path: /conversion/
+    file: concepts/conversion.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: conversion-mobi
+    type: concept
+    title: "MOBI Conversion"
+    path: /conversion/mobi/
+    file: concepts/conversion-mobi.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: conversion-pdf
+    type: concept
+    title: "PDF Conversion"
+    path: /conversion/pdf/
+    file: concepts/conversion-pdf.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: demo-docs
+    type: concept
+    title: "Demo Apps"
+    path: /demo-docs/
+    file: concepts/demo-docs.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: features-annotations
+    type: concept
+    title: Annotations
+    path: /features/annotations/
+    file: concepts/features-annotations.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: features
+    type: concept
+    title: Features
+    path: /features/
+    file: concepts/features.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: features-search
+    type: concept
+    title: "Search Index"
+    path: /features/search/
+    file: concepts/features-search.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: features-streaming
+    type: concept
+    title: Streaming
+    path: /features/streaming/
+    file: concepts/features-streaming.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: features-sync
+    type: concept
+    title: "Sync Tracks"
+    path: /features/sync/
+    file: concepts/features-sync.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: format-chunk-types
+    type: concept
+    title: "Chunk Types"
+    path: /format/chunk-types/
+    file: concepts/format-chunk-types.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: format-compression
+    type: concept
+    title: Compression
+    path: /format/compression/
+    file: concepts/format-compression.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: format-drm
+    type: concept
+    title: "DRM & Encryption"
+    path: /format/drm/
+    file: concepts/format-drm.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: format
+    type: concept
+    title: "Format Specification"
+    path: /format/
+    file: concepts/format.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: format-layout
+    type: concept
+    title: "Layout Modes"
+    path: /format/layout/
+    file: concepts/format-layout.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: format-wire-format
+    type: concept
+    title: "Wire Format"
+    path: /format/wire-format/
+    file: concepts/format-wire-format.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: getting-started-concepts
+    type: concept
+    title: "Core Concepts"
+    path: /getting-started/concepts/
+    file: concepts/getting-started-concepts.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: getting-started-installation
+    type: concept
+    title: Installation
+    path: /getting-started/installation/
+    file: concepts/getting-started-installation.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: getting-started-quickstart
+    type: concept
+    title: "Quick Start"
+    path: /getting-started/quickstart/
+    file: concepts/getting-started-quickstart.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: root
+    type: concept
+    title: Honzo
+    path: /
+    file: concepts/root.md
+    locale: ""
+    version: ""
+    tags: 

@@ -1,10 +1,14 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta http-equiv="Content-Security-Policy" content="
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
     default-src 'self' blob: data:;
     script-src 'self' 'unsafe-eval';
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
@@ -14,346 +18,506 @@
     frame-src 'self' blob: data:;
     worker-src 'self';
     manifest-src 'self';
-    upgrade-insecure-requests; block-all-mixed-content;" />
-  <title>HonzoMaker</title>
-  <link rel="icon" href="/Honzo/demo/source.svg" type="image/svg+xml" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=Merriweather:wght@300;400;700&family=IBM+Plex+Serif:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet" />
-  <script type="module" crossorigin src="/Honzo/demo/assets/maker-Bdy7Wq91.js"></script>
-  <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/honzo_wasm-uBj0Yqo7.js">
-  <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/satori-O_Q_IFtY.js">
-  <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/esc-Bzx7pNv8.js">
-  <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/download-DA2FER3_.js">
-  <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/honzo_wasm-DokVk88q.css">
-  <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/maker-9RK6MRfG.css">
-<link rel="manifest" href="/Honzo/demo/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Honzo/demo/registerSW.js"></script></head>
+    upgrade-insecure-requests; block-all-mixed-content;"
+    />
+    <title>HonzoMaker</title>
+    <link rel="icon" href="/Honzo/demo/source.svg" type="image/svg+xml" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=Merriweather:wght@300;400;700&family=IBM+Plex+Serif:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="/Honzo/demo/assets/maker-DmibpTz_.js"></script>
+    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/honzo_wasm-BixQLJEI.js">
+    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/satori-BOADu6cw.js">
+    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/esc-By3oFyRa.js">
+    <link rel="modulepreload" crossorigin href="/Honzo/demo/assets/download-DA2FER3_.js">
+    <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/honzo_wasm-CP08f4hw.css">
+    <link rel="stylesheet" crossorigin href="/Honzo/demo/assets/maker-9RK6MRfG.css">
+  <link rel="manifest" href="/Honzo/demo/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Honzo/demo/registerSW.js"></script></head>
 
-<body class="page-scroll">
-  <header id="app-header">
-    <div class="header-left">
-      <span class="app-title">HonzoMaker</span>
-    </div>
-    <div class="header-center">
-      <span class="title-separator">·</span>
-      <span class="book-title">Book Maker</span>
-    </div>
-    <div class="header-right">
-      <nav class="header-nav">
-        <a href="/Honzo/demo/">Reader</a>
-        <a href="/Honzo/demo/convert.html">Convert</a>
-        <a href="/Honzo/demo/inspect.html">Inspect</a>
-      </nav>
-    </div>
-  </header>
-
-  <div class="container maker-layout">
-    <h1 class="page-title">Book Maker</h1>
-    <!-- Saves -->
-    <div class="maker-saves" id="savesSection">
-      <div class="maker-saves-bar">
-        <span class="maker-saves-title">
-          <i data-lucide="archive" width="16" height="16"></i>
-          Saves
-        </span>
-        <input type="text" id="saveNameInput" placeholder="Save name..." class="maker-save-input" />
-        <button class="btn btn-secondary maker-save-btn" id="saveBtn">
-          <i data-lucide="save" width="14" height="14"></i>
-          Save
-        </button>
+  <body class="page-scroll">
+    <header id="app-header">
+      <div class="header-left">
+        <span class="app-title">HonzoMaker</span>
       </div>
-      <div id="savesList"></div>
-    </div>
-
-    <div class="status" id="status"><span id="statusText"></span></div>
-
-    <div class="maker-body">
-
-      <!-- Book Info -->
-      <div class="panel maker-section visible" id="metaPanel">
-        <h2>
-          <i data-lucide="file-text" width="20" height="20"></i>
-          Book Info
-        </h2>
-        <div class="scroll-content">
-          <div class="maker-meta-grid">
-            <div class="field"><label for="mf_title">Title</label><input type="text" id="mf_title"
-                placeholder="My Book" /></div>
-            <div class="field"><label for="mf_authors">Authors</label><input type="text" id="mf_authors"
-                placeholder="Author1, Author2" /></div>
-            <div class="field"><label for="mf_language">Language</label><input type="text" id="mf_language" value="en"
-                placeholder="en, ja, ar..." /></div>
-            <div class="field"><label for="mf_publisher">Publisher</label><input type="text" id="mf_publisher"
-                placeholder="Optional" /></div>
-          </div>
-          <div class="field"><label for="mf_description">Description</label><textarea id="mf_description"
-              placeholder="Book description..." rows="3"></textarea></div>
-
-          <details class="maker-details">
-            <summary class="maker-details-summary">Advanced Metadata</summary>
-            <div class="maker-details-body">
-              <div class="maker-meta-grid">
-                <div class="field"><label for="mf_subtitle">Subtitle</label><input type="text" id="mf_subtitle"
-                    placeholder="Optional" /></div>
-                <div class="field"><label for="mf_edition">Edition</label><input type="text" id="mf_edition"
-                    placeholder="First Edition" /></div>
-                <div class="field"><label for="mf_word_count">Word Count</label><input type="number" id="mf_word_count"
-                    placeholder="0" /></div>
-                <div class="field"><label for="mf_reading_time">Reading Time (min)</label><input type="number"
-                    id="mf_reading_time" placeholder="0" /></div>
-                <div class="field"><label for="mf_source_url">Source URL</label><input type="text" id="mf_source_url"
-                    placeholder="https://..." /></div>
-                <div class="field"><label for="mf_license">License</label><input type="text" id="mf_license"
-                    placeholder="CC BY-SA 4.0" /></div>
-                <div class="field"><label for="mf_original_title">Original Title</label><input type="text"
-                    id="mf_original_title" placeholder="For translations" /></div>
-                <div class="field"><label for="mf_original_lang">Original Lang</label><input type="text"
-                    id="mf_original_lang" placeholder="fr, de..." /></div>
-                <div class="field"><label for="mf_original_authors">Original Authors</label><input type="text"
-                    id="mf_original_authors" placeholder="Original Author" /></div>
-              </div>
-
-              <div class="field">
-                <label>Direction</label>
-                <div class="settings-options" id="directionOptions">
-                  <div class="setting-option active" data-value="ltr">LTR</div>
-                  <div class="setting-option" data-value="rtl">RTL</div>
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="mf_series_title">Series</label>
-                <div style="display:flex;gap:8px">
-                  <input type="text" id="mf_series_title" placeholder="Series title" style="flex:2" />
-                  <input type="text" id="mf_series_pos" placeholder="Position" style="flex:1" />
-                  <input type="text" id="mf_series_arc" placeholder="Arc" style="flex:1" />
-                </div>
-              </div>
-
-              <!-- Identifiers -->
-              <div class="field">
-                <label>Identifiers</label>
-                <div id="idList"></div>
-                <button class="btn btn-secondary" style="font-size:0.85rem;margin-top:4px" id="addIdBtn">+ Add
-                  Identifier</button>
-              </div>
-
-              <!-- Contributors -->
-              <div class="field">
-                <label>Contributors</label>
-                <div id="contributorList"></div>
-                <button class="btn btn-secondary" style="font-size:0.85rem;margin-top:4px" id="addContribBtn">+ Add
-                  Contributor</button>
-              </div>
-
-              <!-- Genres & Tags -->
-              <div class="maker-meta-grid">
-                <div class="field">
-                  <label>Genres</label>
-                  <div class="tag-list" id="tags_genres"></div>
-                  <div class="tag-input"><input type="text" id="new_genres" placeholder="Add genre" /><button
-                      data-tag-add="genres">Add</button></div>
-                </div>
-                <div class="field">
-                  <label>Tags</label>
-                  <div class="tag-list" id="tags_tags"></div>
-                  <div class="tag-input"><input type="text" id="new_tags" placeholder="Add tag" /><button
-                      data-tag-add="tags">Add</button></div>
-                </div>
-              </div>
-            </div>
-          </details>
-        </div>
+      <div class="header-center">
+        <span class="title-separator">·</span>
+        <span class="book-title">Book Maker</span>
       </div>
-
-      <!-- Content Chunks -->
-      <div class="panel maker-section visible" id="chunksPanel">
-        <h2>
-          <i data-lucide="file" width="20" height="20"></i>
-          Content
-        </h2>
-        <div class="scroll-content">
-          <div id="chunksList"></div>
-          <div class="maker-chunk-add-row">
-            <button class="btn btn-secondary" id="addChapBtn">
-              <i data-lucide="plus" width="16" height="16"></i>
-              Chapter
-            </button>
-            <button class="btn btn-secondary" id="addImageBtn">
-              <i data-lucide="image" width="16" height="16"></i>
-              Image
-            </button>
-            <button class="btn btn-secondary" id="addCssBtn">
-              <i data-lucide="code-2" width="16" height="16"></i>
-              CSS
-            </button>
-            <button class="btn btn-secondary" id="addFontBtn">
-              <i data-lucide="type" width="16" height="16"></i>
-              Font
-            </button>
-            <button class="btn btn-secondary" id="addCoverBtn">
-              <i data-lucide="image" width="16" height="16"></i>
-              Cover
-            </button>
-            <button class="btn btn-secondary" id="addMathBtn">
-              <i data-lucide="sigma" width="16" height="16"></i>
-              Math
-            </button>
-            <button class="btn btn-secondary" id="addNoteBtn">
-              <i data-lucide="file-text" width="16" height="16"></i>
-              Note
-            </button>
-          </div>
-        </div>
+      <div class="header-right">
+        <nav class="header-nav">
+          <a href="/Honzo/demo/">Reader</a>
+          <a href="/Honzo/demo/convert.html">Convert</a>
+          <a href="/Honzo/demo/inspect.html">Inspect</a>
+        </nav>
       </div>
+    </header>
 
-      <!-- Page Map -->
-      <div class="panel maker-section visible" id="pmapPanel">
-        <h2>
-          <i data-lucide="grid-3x3" width="20" height="20"></i>
-          Page Map
-          <span class="chip" id="pmapCount">0 entries</span>
-        </h2>
-        <div class="scroll-content">
-          <div id="pmapEmpty" class="maker-empty">No page map entries. Map print page numbers to content chunks.</div>
-          <div class="pmap-table-wrap" id="pmapTableWrap">
-            <table class="pmap-table">
-              <thead>
-                <tr>
-                  <th>Print Page</th>
-                  <th>Chunk ID</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="pmapBody"></tbody>
-            </table>
-          </div>
-          <button class="btn btn-secondary" id="addPmapBtn">
-            <i data-lucide="plus" width="16" height="16"></i>
-            Add Entry
+    <div class="container maker-layout">
+      <h1 class="page-title">Book Maker</h1>
+      <!-- Saves -->
+      <div class="maker-saves" id="savesSection">
+        <div class="maker-saves-bar">
+          <span class="maker-saves-title">
+            <i data-lucide="archive" width="16" height="16"></i>
+            Saves
+          </span>
+          <input
+            type="text"
+            id="saveNameInput"
+            placeholder="Save name..."
+            class="maker-save-input"
+          />
+          <button class="btn btn-secondary maker-save-btn" id="saveBtn">
+            <i data-lucide="save" width="14" height="14"></i>
+            Save
           </button>
         </div>
+        <div id="savesList"></div>
       </div>
 
-      <!-- Build Settings -->
-      <div class="panel maker-section visible" id="settingsPanel">
-        <h2>
-          <i data-lucide="settings" width="20" height="20"></i>
-          Build Settings
-        </h2>
-        <div class="scroll-content">
-          <div class="maker-meta-grid">
-            <div class="field">
-              <label>Layout</label>
-              <div class="settings-options" id="layoutOptions">
-                <div class="setting-option active" data-value="0">Reflowable</div>
-                <div class="setting-option" data-value="1">Fixed</div>
-                <div class="setting-option" data-value="2">Scroll</div>
+      <div class="status" id="status"><span id="statusText"></span></div>
+
+      <div class="maker-body">
+        <!-- Book Info -->
+        <div class="panel maker-section visible" id="metaPanel">
+          <h2>
+            <i data-lucide="file-text" width="20" height="20"></i>
+            Book Info
+          </h2>
+          <div class="scroll-content">
+            <div class="maker-meta-grid">
+              <div class="field">
+                <label for="mf_title">Title</label
+                ><input type="text" id="mf_title" placeholder="My Book" />
+              </div>
+              <div class="field">
+                <label for="mf_authors">Authors</label
+                ><input
+                  type="text"
+                  id="mf_authors"
+                  placeholder="Author1, Author2"
+                />
+              </div>
+              <div class="field">
+                <label for="mf_language">Language</label
+                ><input
+                  type="text"
+                  id="mf_language"
+                  value="en"
+                  placeholder="en, ja, ar..."
+                />
+              </div>
+              <div class="field">
+                <label for="mf_publisher">Publisher</label
+                ><input type="text" id="mf_publisher" placeholder="Optional" />
               </div>
             </div>
             <div class="field">
-              <label>Default Compression</label>
-              <div class="settings-options" id="compressionOptions">
-                <div class="setting-option active" data-value="0">None</div>
-                <div class="setting-option" data-value="1">LZ4</div>
-              </div>
-            </div>
-            <div class="field">
-              <label>Min Reader Version</label>
-              <input type="number" id="mf_minVer" value="1" min="1" />
-            </div>
-            <div class="field">
-              <label>Flags</label>
-              <div class="maker-flags">
-                <label class="maker-check"><input type="checkbox" id="flagDrm" /> DRM</label>
-                <label class="maker-check"><input type="checkbox" id="flagAnno" /> Annotations</label>
-                <label class="maker-check"><input type="checkbox" id="flagSync" /> Sync</label>
-              </div>
+              <label for="mf_description">Description</label
+              ><textarea
+                id="mf_description"
+                placeholder="Book description..."
+                rows="3"
+              ></textarea>
             </div>
 
-            <!-- DRM Panel -->
-            <div class="feature-panel" id="drmPanel">
-              <h3><i data-lucide="shield" width="16" height="16"></i> DRM Settings</h3>
-              <div class="feature-panel-body">
-                <div class="field">
-                  <label for="drmLicenseUrl">License Server URL</label>
-                  <input type="text" id="drmLicenseUrl" placeholder="https://license.example.com" />
+            <details class="maker-details">
+              <summary class="maker-details-summary">Advanced Metadata</summary>
+              <div class="maker-details-body">
+                <div class="maker-meta-grid">
+                  <div class="field">
+                    <label for="mf_subtitle">Subtitle</label
+                    ><input
+                      type="text"
+                      id="mf_subtitle"
+                      placeholder="Optional"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="mf_edition">Edition</label
+                    ><input
+                      type="text"
+                      id="mf_edition"
+                      placeholder="First Edition"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="mf_word_count">Word Count</label
+                    ><input type="number" id="mf_word_count" placeholder="0" />
+                  </div>
+                  <div class="field">
+                    <label for="mf_reading_time">Reading Time (min)</label
+                    ><input
+                      type="number"
+                      id="mf_reading_time"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="mf_source_url">Source URL</label
+                    ><input
+                      type="text"
+                      id="mf_source_url"
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="mf_license">License</label
+                    ><input
+                      type="text"
+                      id="mf_license"
+                      placeholder="CC BY-SA 4.0"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="mf_original_title">Original Title</label
+                    ><input
+                      type="text"
+                      id="mf_original_title"
+                      placeholder="For translations"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="mf_original_lang">Original Lang</label
+                    ><input
+                      type="text"
+                      id="mf_original_lang"
+                      placeholder="fr, de..."
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="mf_original_authors">Original Authors</label
+                    ><input
+                      type="text"
+                      id="mf_original_authors"
+                      placeholder="Original Author"
+                    />
+                  </div>
                 </div>
-                <div class="field">
-                  <label for="drmPublicKey">Public Key (base64, 32 bytes)</label>
-                  <input type="text" id="drmPublicKey" placeholder="Base64-encoded X25519 public key" />
-                </div>
-                <div class="field">
-                  <label for="drmExpires">Expires At</label>
-                  <input type="date" id="drmExpires" />
-                </div>
-                <label class="maker-check"><input type="checkbox" id="drmEncryptAll" checked /> Encrypt all
-                  chunks</label>
-              </div>
-            </div>
 
-            <!-- ANNO Panel -->
-            <div class="feature-panel" id="annoPanel">
-              <h3><i data-lucide="message-square" width="16" height="16"></i> Annotation Settings</h3>
-              <div class="feature-panel-body">
                 <div class="field">
-                  <label for="annoStyle">Default Style</label>
-                  <select id="annoStyle">
-                    <option value="inline">Inline</option>
-                    <option value="popup">Popup</option>
-                    <option value="sidebar">Sidebar</option>
-                  </select>
+                  <label>Direction</label>
+                  <div class="settings-options" id="directionOptions">
+                    <div class="setting-option active" data-value="ltr">
+                      LTR
+                    </div>
+                    <div class="setting-option" data-value="rtl">RTL</div>
+                  </div>
                 </div>
-                <div class="field">
-                  <label for="annoColor">Default Color</label>
-                  <input type="color" id="annoColor" value="#ffd700" />
-                </div>
-                <label class="maker-check"><input type="checkbox" id="annoUserAnno" checked /> Allow user
-                  annotations</label>
-              </div>
-            </div>
 
-            <!-- SYNC Panel -->
-            <div class="feature-panel" id="syncPanel">
-              <h3><i data-lucide="refresh-cw" width="16" height="16"></i> Sync Settings</h3>
-              <div class="feature-panel-body">
                 <div class="field">
-                  <label for="syncUrl">Provider URL</label>
-                  <input type="text" id="syncUrl" placeholder="https://sync.example.com" />
+                  <label for="mf_series_title">Series</label>
+                  <div style="display: flex; gap: 8px">
+                    <input
+                      type="text"
+                      id="mf_series_title"
+                      placeholder="Series title"
+                      style="flex: 2"
+                    />
+                    <input
+                      type="text"
+                      id="mf_series_pos"
+                      placeholder="Position"
+                      style="flex: 1"
+                    />
+                    <input
+                      type="text"
+                      id="mf_series_arc"
+                      placeholder="Arc"
+                      style="flex: 1"
+                    />
+                  </div>
                 </div>
-                <label class="maker-check"><input type="checkbox" id="syncAuto" checked /> Auto sync</label>
+
+                <!-- Identifiers -->
                 <div class="field">
-                  <label for="syncInterval">Sync Interval (minutes)</label>
-                  <input type="number" id="syncInterval" value="5" min="1" />
+                  <label>Identifiers</label>
+                  <div id="idList"></div>
+                  <button
+                    class="btn btn-secondary"
+                    style="font-size: 0.85rem; margin-top: 4px"
+                    id="addIdBtn"
+                  >
+                    + Add Identifier
+                  </button>
+                </div>
+
+                <!-- Contributors -->
+                <div class="field">
+                  <label>Contributors</label>
+                  <div id="contributorList"></div>
+                  <button
+                    class="btn btn-secondary"
+                    style="font-size: 0.85rem; margin-top: 4px"
+                    id="addContribBtn"
+                  >
+                    + Add Contributor
+                  </button>
+                </div>
+
+                <!-- Genres & Tags -->
+                <div class="maker-meta-grid">
+                  <div class="field">
+                    <label>Genres</label>
+                    <div class="tag-list" id="tags_genres"></div>
+                    <div class="tag-input">
+                      <input
+                        type="text"
+                        id="new_genres"
+                        placeholder="Add genre"
+                      /><button data-tag-add="genres">Add</button>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label>Tags</label>
+                    <div class="tag-list" id="tags_tags"></div>
+                    <div class="tag-input">
+                      <input
+                        type="text"
+                        id="new_tags"
+                        placeholder="Add tag"
+                      /><button data-tag-add="tags">Add</button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-
+            </details>
           </div>
-          <div class="maker-meta-grid">
-            <label class="maker-check"><input type="checkbox" id="optSidx" checked /> Auto SIDX (search index)</label>
-            <label class="maker-check"><input type="checkbox" id="optCovt" checked /> Auto COVT (cover
-              thumbnail)</label>
+        </div>
+
+        <!-- Content Chunks -->
+        <div class="panel maker-section visible" id="chunksPanel">
+          <h2>
+            <i data-lucide="file" width="20" height="20"></i>
+            Content
+          </h2>
+          <div class="scroll-content">
+            <div id="chunksList"></div>
+            <div class="maker-chunk-add-row">
+              <button class="btn btn-secondary" id="addChapBtn">
+                <i data-lucide="plus" width="16" height="16"></i>
+                Chapter
+              </button>
+              <button class="btn btn-secondary" id="addImageBtn">
+                <i data-lucide="image" width="16" height="16"></i>
+                Image
+              </button>
+              <button class="btn btn-secondary" id="addCssBtn">
+                <i data-lucide="code-2" width="16" height="16"></i>
+                CSS
+              </button>
+              <button class="btn btn-secondary" id="addFontBtn">
+                <i data-lucide="type" width="16" height="16"></i>
+                Font
+              </button>
+              <button class="btn btn-secondary" id="addCoverBtn">
+                <i data-lucide="image" width="16" height="16"></i>
+                Cover
+              </button>
+              <button class="btn btn-secondary" id="addMathBtn">
+                <i data-lucide="sigma" width="16" height="16"></i>
+                Math
+              </button>
+              <button class="btn btn-secondary" id="addNoteBtn">
+                <i data-lucide="file-text" width="16" height="16"></i>
+                Note
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Page Map -->
+        <div class="panel maker-section visible" id="pmapPanel">
+          <h2>
+            <i data-lucide="grid-3x3" width="20" height="20"></i>
+            Page Map
+            <span class="chip" id="pmapCount">0 entries</span>
+          </h2>
+          <div class="scroll-content">
+            <div id="pmapEmpty" class="maker-empty">
+              No page map entries. Map print page numbers to content chunks.
+            </div>
+            <div class="pmap-table-wrap" id="pmapTableWrap">
+              <table class="pmap-table">
+                <thead>
+                  <tr>
+                    <th>Print Page</th>
+                    <th>Chunk ID</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="pmapBody"></tbody>
+              </table>
+            </div>
+            <button class="btn btn-secondary" id="addPmapBtn">
+              <i data-lucide="plus" width="16" height="16"></i>
+              Add Entry
+            </button>
+          </div>
+        </div>
+
+        <!-- Build Settings -->
+        <div class="panel maker-section visible" id="settingsPanel">
+          <h2>
+            <i data-lucide="settings" width="20" height="20"></i>
+            Build Settings
+          </h2>
+          <div class="scroll-content">
+            <div class="maker-meta-grid">
+              <div class="field">
+                <label>Layout</label>
+                <div class="settings-options" id="layoutOptions">
+                  <div class="setting-option active" data-value="0">
+                    Reflowable
+                  </div>
+                  <div class="setting-option" data-value="1">Fixed</div>
+                  <div class="setting-option" data-value="2">Scroll</div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Default Compression</label>
+                <div class="settings-options" id="compressionOptions">
+                  <div class="setting-option active" data-value="0">None</div>
+                  <div class="setting-option" data-value="1">LZ4</div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Min Reader Version</label>
+                <input type="number" id="mf_minVer" value="1" min="1" />
+              </div>
+              <div class="field">
+                <label>Flags</label>
+                <div class="maker-flags">
+                  <label class="maker-check"
+                    ><input type="checkbox" id="flagDrm" /> DRM</label
+                  >
+                  <label class="maker-check"
+                    ><input type="checkbox" id="flagAnno" /> Annotations</label
+                  >
+                  <label class="maker-check"
+                    ><input type="checkbox" id="flagSync" /> Sync</label
+                  >
+                </div>
+              </div>
+
+              <!-- DRM Panel -->
+              <div class="feature-panel" id="drmPanel">
+                <h3>
+                  <i data-lucide="shield" width="16" height="16"></i> DRM
+                  Settings
+                </h3>
+                <div class="feature-panel-body">
+                  <div class="field">
+                    <label for="drmLicenseUrl">License Server URL</label>
+                    <input
+                      type="text"
+                      id="drmLicenseUrl"
+                      placeholder="https://license.example.com"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="drmPublicKey"
+                      >Public Key (base64, 32 bytes)</label
+                    >
+                    <input
+                      type="text"
+                      id="drmPublicKey"
+                      placeholder="Base64-encoded X25519 public key"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="drmExpires">Expires At</label>
+                    <input type="date" id="drmExpires" />
+                  </div>
+                  <label class="maker-check"
+                    ><input type="checkbox" id="drmEncryptAll" checked />
+                    Encrypt all chunks</label
+                  >
+                </div>
+              </div>
+
+              <!-- ANNO Panel -->
+              <div class="feature-panel" id="annoPanel">
+                <h3>
+                  <i data-lucide="message-square" width="16" height="16"></i>
+                  Annotation Settings
+                </h3>
+                <div class="feature-panel-body">
+                  <div class="field">
+                    <label for="annoStyle">Default Style</label>
+                    <select id="annoStyle">
+                      <option value="inline">Inline</option>
+                      <option value="popup">Popup</option>
+                      <option value="sidebar">Sidebar</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="annoColor">Default Color</label>
+                    <input type="color" id="annoColor" value="#ffd700" />
+                  </div>
+                  <label class="maker-check"
+                    ><input type="checkbox" id="annoUserAnno" checked /> Allow
+                    user annotations</label
+                  >
+                </div>
+              </div>
+
+              <!-- SYNC Panel -->
+              <div class="feature-panel" id="syncPanel">
+                <h3>
+                  <i data-lucide="refresh-cw" width="16" height="16"></i> Sync
+                  Settings
+                </h3>
+                <div class="feature-panel-body">
+                  <div class="field">
+                    <label for="syncUrl">Provider URL</label>
+                    <input
+                      type="text"
+                      id="syncUrl"
+                      placeholder="https://sync.example.com"
+                    />
+                  </div>
+                  <label class="maker-check"
+                    ><input type="checkbox" id="syncAuto" checked /> Auto
+                    sync</label
+                  >
+                  <div class="field">
+                    <label for="syncInterval">Sync Interval (minutes)</label>
+                    <input type="number" id="syncInterval" value="5" min="1" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="maker-meta-grid">
+              <label class="maker-check"
+                ><input type="checkbox" id="optSidx" checked /> Auto SIDX
+                (search index)</label
+              >
+              <label class="maker-check"
+                ><input type="checkbox" id="optCovt" checked /> Auto COVT (cover
+                thumbnail)</label
+              >
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- Build bar -->
+      <div class="maker-build-bar" id="buildBar">
+        <div class="maker-build-info" id="buildInfo"></div>
+        <button class="btn btn-success maker-build-btn" id="buildBtn">
+          <i data-lucide="wrench" width="18" height="18"></i>
+          Build &amp; Download
+        </button>
+      </div>
     </div>
 
-    <!-- Build bar -->
-    <div class="maker-build-bar" id="buildBar">
-      <div class="maker-build-info" id="buildInfo"></div>
-      <button class="btn btn-success maker-build-btn" id="buildBtn">
-        <i data-lucide="wrench" width="18" height="18"></i>
-        Build &amp; Download
-      </button>
-    </div>
-  </div>
+    <footer class="powered-by">
+      Powered by <a href="https://nisoku.org/Sairin/">Sairin</a
+      ><span class="sep">·</span
+      ><a href="https://nisoku.org/Satori/docs/">Satori</a>
+    </footer>
 
-  <footer class="powered-by">
-    Powered by <a href="https://nisoku.org/Sairin/">Sairin</a><span class="sep">·</span><a href="https://nisoku.org/Satori/docs/">Satori</a>
-  </footer>
-
-</body>
-
+  </body>
 </html>

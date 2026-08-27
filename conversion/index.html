@@ -10,8 +10,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.5.x">
+    <meta name="generator" content="docmd v0.9.4">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/Honzo/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/Honzo/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
     <script>/**
  * --------------------------------------------------------------------
  * docmd : the zero-config documentation engine.
@@ -29,9 +44,27 @@
 (function () {
   try {
     // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
     var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
 
     if (theme === 'system') {
       theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -65,32 +98,17 @@
         visibility: hidden;
       }
     </style>
-    
-    <script>
-      var root = "../";
-      if (root && !root.endsWith('/')) root += '/';
-      if (root === '') root = './';
-      window.DOCMD_ROOT = root;
-
-      var siteRoot = "../";
-      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
-      if (siteRoot === '') siteRoot = './';
-      window.DOCMD_SITE_ROOT = siteRoot;
-
-      window.DOCMD_APPEARANCE = "system";
-      window.DOCMD_VERSION_ROOT = "/";
-      window.DOCMD_BASE = "/";
-      window.DOCMD_LOCALE = "";
-      window.DOCMD_DEFAULT_LOCALE = "";
-    </script>
     <title>
       Conversion : Honzo
     </title>
     
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=msy44anm">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=msy44anm" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=msy44anm" id="hljs-dark" disabled>
+
+    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mtb4na5q">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mtb4na5q">
+    
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mtb4na5q" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mtb4na5q" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Convert existing ebook formats to Honzo">
@@ -105,75 +123,33 @@
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=msy44anm" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=msy44anm" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=msy44anm" >
+
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mtb4na5q" >
 
     
-      <link rel="stylesheet" href="../assets/css/theme.css?v=msy44anm">
+      <link rel="stylesheet" href="../assets/css/theme.css?v=mtb4na5q">
     
-    <script>/**
- * --------------------------------------------------------------------
- * docmd : the zero-config documentation engine.
- *
- * @package     @docmd/core (and ecosystem)
- * @website     https://docmd.io
- * @repository  https://github.com/docmd-io/docmd
- * @license     MIT
- * @copyright   Copyright (c) 2025-present docmd.io
- *
- * [docmd-source] - Please do not remove this header.
- * --------------------------------------------------------------------
- */
-
-(function () {
-  try {
-    // 1. Determine Theme
-    var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
-
-    if (theme === 'system') {
-      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    // 2. Apply to Root
-    document.documentElement.setAttribute('data-theme', theme);
-
-    // 3. Highlight.js Toggle Strategy
-    var lightLink = document.getElementById('hljs-light');
-    var darkLink = document.getElementById('hljs-dark');
-
-    if (lightLink && darkLink) {
-      if (theme === 'dark') {
-        lightLink.disabled = true;
-        darkLink.disabled = false;
-      } else {
-        lightLink.disabled = false;
-        darkLink.disabled = true;
-      }
-    }
-
-    document.documentElement.style.visibility = "visible";
-  } catch (e) {
-    document.documentElement.style.visibility = "visible";
-    console.error('Theme init failed', e);
-  }
-})();</script>
+    
   </head>
   <body
     class="sidebar-collapsible"
     data-default-collapsed="false"
     data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/conversion/index.md">
 
-    <a href="#main-content" class="skip-link">skipToContent</a>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
 
     
     
       <aside class="sidebar">
         <div class="sidebar-header">
           
-            <h1><a href="../">
+<h1><a href="../">
                 Honzo
               </a></h1>
           
@@ -206,7 +182,7 @@
         </div>
         
 
-<nav class="sidebar-nav" aria-label="mainNavigation">
+<nav class="sidebar-nav" aria-label="Main Navigation">
   <ul>
     
       <li class="" >
@@ -1489,11 +1465,12 @@
       <div class="main-content-wrapper">
         
         
+        
           <header class="page-header">
             <div class="header-left">
               
                 <button id="sidebar-toggle-button" class="sidebar-toggle-button"
-                  aria-label="toggleSidebar">
+                  aria-label="Toggle Sidebar">
                   
 <svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-left"
@@ -1525,7 +1502,7 @@
 
 <div class="docmd-options-menu">
     
-    <button class="docmd-search-trigger" aria-label="search">
+    <button class="docmd-search-trigger" aria-label="Search">
         
 <svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-search"
@@ -1543,7 +1520,7 @@
   <circle cx="11" cy="11" r="8" />
 </svg>
 
-        <span class="search-label">search</span>
+        <span class="search-label">Search</span>
         <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
     </button>
     
@@ -1553,7 +1530,7 @@
     
 
     
-    <button class="theme-toggle-button" aria-label="toggleTheme">
+    <button class="theme-toggle-button" aria-label="Toggle theme">
         
 <svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-sun"
@@ -1608,7 +1585,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Conversion%22%0Adescription%3A%20%22Convert%20existing%20ebook%20formats%20to%20Honzo%22%0A---%0A%0AHonzo%20includes%20conversion%20tools%20for%20EPUB%2C%20MOBI%2C%20and%20PDF%20formats.%20Conversion%20preserves%20chapter%20structure%2C%20metadata%2C%20images%2C%20stylesheets%2C%20and%20fonts%20where%20possible.%0A%0A%23%23%20Supported%20formats%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22EPUB%202%2F3%22%20icon%3Abook%0ATable%20of%20contents%2C%20metadata%2C%20images%2C%20CSS%2C%20and%20fonts%20supported.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22MOBI%22%20icon%3Abook-open%0AText%2C%20metadata%2C%20and%20basic%20formatting.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22PDF%22%20icon%3Afile-text%0AText%20extraction%20only.%20No%20reflow%20preservation.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Converting%20files%0A%0A%3A%3A%3A%20tabs%0A%0A%3D%3D%20tab%20%22CLI%22%0A%0A%60%60%60bash%0A%23%20EPUB%20to%20Honzo%0Ahonzo-cli%20convert%20book.epub%20book.hzo%0A%0A%23%20MOBI%20to%20Honzo%0Ahonzo-cli%20convert%20book.mobi%20book.hzo%0A%0A%23%20PDF%20to%20Honzo%0Ahonzo-cli%20convert%20book.pdf%20book.hzo%0A%60%60%60%0A%0A%3D%3D%20tab%20%22Rust%20API%22%0A%0A%60%60%60rust%0Ause%20honzo_convert%3A%3Aconvert_epub%3B%0A%0Alet%20hzo%20%3D%20convert_epub(%22book.epub%22).unwrap()%3B%0Astd%3A%3Afs%3A%3Awrite(%22book.hzo%22%2C%20hzo).unwrap()%3B%0A%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20What%20gets%20converted%0A%0A%23%23%23%20EPUB%0A%0A%7C%20Source%20%20%20%20%20%20%20%20%7C%20Honzo%20target%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Details%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C---------------%7C---------------------------%7C-------------------------------------------------%7C%0A%7C%20OPF%20metadata%20%20%7C%20META%20section%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Title%2C%20creator%2C%20language%2C%20identifiers%2C%20subjects%20%7C%0A%7C%20NCX%20%2F%20nav%20%20%20%20%20%7C%20CHAP%20chunks%20%2B%20TOC%20%20%20%20%20%20%20%20%20%7C%20Chapter%20splitting%20follows%20the%20EPUB%20spine%20%20%20%20%20%20%20%20%7C%0A%7C%20XHTML%20content%20%7C%20CHAP%20chunks%20(HTML)%20%20%20%20%20%20%20%20%7C%20Full%20HTML%20preserved%2C%20including%20in-line%20images%20%20%20%7C%0A%7C%20Images%20%20%20%20%20%20%20%20%7C%20IMG_%20chunks%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20JPEG%2C%20PNG%2C%20WebP%20embedded%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20CSS%20%20%20%20%20%20%20%20%20%20%20%7C%20CSS_%20chunks%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Stylesheets%20preserved%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Fonts%20%20%20%20%20%20%20%20%20%7C%20FONT%20chunks%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Embedded%20fonts%20carried%20over%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Cover%20%20%20%20%20%20%20%20%20%7C%20COVR%20%2B%20COVT%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Full%20cover%20%2B%20thumbnail%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Page%20breaks%20%20%20%7C%20EXTRA%20(via%20pagebreaks.rs)%20%7C%20EPUB%20pagebreak%20markers%20converted%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%23%20MOBI%0A%0A%7C%20Source%20%20%20%20%20%20%20%7C%20Honzo%20target%20%20%20%20%20%20%20%7C%20Details%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C--------------%7C--------------------%7C-------------------------%7C%0A%7C%20Metadata%20%20%20%20%20%7C%20META%20section%20%20%20%20%20%20%20%7C%20Title%2C%20author%2C%20language%20%7C%0A%7C%20Text%20content%20%7C%20CHAP%20chunks%20(HTML)%20%7C%20Basic%20HTML%20conversion%20%20%20%7C%0A%7C%20Images%20%20%20%20%20%20%20%7C%20IMG_%20chunks%20%20%20%20%20%20%20%20%7C%20Embedded%20images%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%23%20PDF%0A%0A%7C%20Source%20%20%20%20%20%20%20%20%20%7C%20Honzo%20target%20%20%20%20%20%20%20%20%20%20%20%7C%20Details%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C----------------%7C------------------------%7C-----------------------------------%7C%0A%7C%20Extracted%20text%20%7C%20CHAP%20chunks%20(Markdown)%20%7C%20Text%20flow%2C%20no%20layout%20preservation%20%7C%0A%7C%20Page%20breaks%20%20%20%20%7C%20Chapter%20splitting%20%20%20%20%20%20%7C%20One%20PDF%20page%20per%20chapter%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%3A%3A%3A%20collapsible%20%22Page%20break%20detection%22%0A%0AFor%20EPUBs%20without%20explicit%20pagebreak%20markers%2C%20Honzo%20uses%20a%20character%20count%20heuristic%3A%0A%0A%60%60%60rust%0Ause%20honzo_convert%3A%3Apagebreaks%3A%3Aestimate_page_breaks%3B%0A%0Alet%20breaks%20%3D%20estimate_page_breaks(%26content%2C%20None)%3B%0A%2F%2F%20Returns%20around%202000%20character%20intervals%20for%20English%20text%0A%60%60%60%0A%0AExplicit%20EPUB%20pagebreak%20patterns%20are%20also%20detected%3A%0A%0A%60%60%60html%0A%3C!--%20These%20are%20all%20recognized%20--%3E%0A%3Cspan%20epub%3Atype%3D%22pagebreak%22%20id%3D%22pg42%22%20title%3D%2242%22%2F%3E%0A%3Cspan%20class%3D%22pagebreak%22%20id%3D%22page-42%22%2F%3E%0A%3Ca%20id%3D%22page42%22%20class%3D%22pagebreak%22%3E%3C%2Fa%3E%0A%3Chr%20class%3D%22pagebreak%22%2F%3E%0A%3Cdiv%20class%3D%22pagebreak%22%20title%3D%2242%22%2F%3E%0A%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20Conversion%20options%0A%0AOverride%20metadata%20during%20conversion%3A%0A%0A%60%60%60bash%0Ahonzo-cli%20convert%20book.epub%20book.hzo%20%5C%0A%20%20--title%20%22Custom%20Title%22%20%5C%0A%20%20--author%20%22Custom%20Author%22%20%5C%0A%20%20--language%20%22fr%22%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Quick%20Start%22%20..%2Fgetting-started%2Fquickstart.md%20icon%3Aplay%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Format%20Specification%22%20..%2Fformat%2F%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Detailed%20guides%0A%0AFor%20format-specific%20conversion%20details%3A%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22EPUB%22%20icon%3Abook%0AFull-featured%20EPUB%202%2F3%20converter%20with%20metadata%2C%20images%2C%20CSS%2C%20and%20fonts.%0A%0A%3A%3A%3A%20button%20%22Read%20more%22%20.%2Fepub.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22MOBI%22%20icon%3Abook-open%0AAmazon%20Kindle%20format%20import%20with%20text%20and%20basic%20formatting.%0A%0A%3A%3A%3A%20button%20%22Read%20more%22%20.%2Fmobi.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22PDF%22%20icon%3Afile-text%0ABasic%20text%20extraction.%20No%20reflow%20or%20layout%20preservation.%0A%0A%3A%3A%3A%20button%20%22Read%20more%22%20.%2Fpdf.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Conversion%22%0Adescription%3A%20%22Convert%20existing%20ebook%20formats%20to%20Honzo%22%0A---%0A%0AHonzo%20includes%20conversion%20tools%20for%20EPUB%2C%20MOBI%2C%20and%20PDF%20formats.%20Conversion%20preserves%20chapter%20structure%2C%20metadata%2C%20images%2C%20stylesheets%2C%20and%20fonts%20where%20possible.%0A%0A%23%23%20Supported%20formats%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22EPUB%202%2F3%22%20icon%3Abook%0ATable%20of%20contents%2C%20metadata%2C%20images%2C%20CSS%2C%20and%20fonts%20supported.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22MOBI%22%20icon%3Abook-open%0AText%2C%20metadata%2C%20and%20basic%20formatting.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22PDF%22%20icon%3Afile-text%0AText%20extraction%20only.%20No%20reflow%20preservation.%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Converting%20files%0A%0A%3A%3A%3A%20tabs%0A%0A%3D%3D%20tab%20%22CLI%22%0A%0A%60%60%60bash%0A%23%20EPUB%20to%20Honzo%0Ahonzo-cli%20convert%20book.epub%20book.hzo%0A%0A%23%20MOBI%20to%20Honzo%0Ahonzo-cli%20convert%20book.mobi%20book.hzo%0A%0A%23%20PDF%20to%20Honzo%0Ahonzo-cli%20convert%20book.pdf%20book.hzo%0A%60%60%60%0A%0A%3D%3D%20tab%20%22Rust%20API%22%0A%0A%60%60%60rust%0Ause%20honzo_convert%3A%3Aconvert_epub%3B%0A%0Alet%20hzo%20%3D%20convert_epub(%22book.epub%22).unwrap()%3B%0Astd%3A%3Afs%3A%3Awrite(%22book.hzo%22%2C%20hzo).unwrap()%3B%0A%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20What%20gets%20converted%0A%0A%23%23%23%20EPUB%0A%0A%7C%20Source%20%20%20%20%20%20%20%20%7C%20Honzo%20target%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Details%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-------------%20%7C%20-------------------------%20%7C%20-----------------------------------------------%20%7C%0A%7C%20OPF%20metadata%20%20%7C%20META%20section%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Title%2C%20creator%2C%20language%2C%20identifiers%2C%20subjects%20%7C%0A%7C%20NCX%20%2F%20nav%20%20%20%20%20%7C%20CHAP%20chunks%20%2B%20TOC%20%20%20%20%20%20%20%20%20%7C%20Chapter%20splitting%20follows%20the%20EPUB%20spine%20%20%20%20%20%20%20%20%7C%0A%7C%20XHTML%20content%20%7C%20CHAP%20chunks%20(HTML)%20%20%20%20%20%20%20%20%7C%20Full%20HTML%20preserved%2C%20including%20in-line%20images%20%20%20%7C%0A%7C%20Images%20%20%20%20%20%20%20%20%7C%20IMG_%20chunks%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20JPEG%2C%20PNG%2C%20WebP%20embedded%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20CSS%20%20%20%20%20%20%20%20%20%20%20%7C%20CSS_%20chunks%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Stylesheets%20preserved%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Fonts%20%20%20%20%20%20%20%20%20%7C%20FONT%20chunks%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Embedded%20fonts%20carried%20over%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Cover%20%20%20%20%20%20%20%20%20%7C%20COVR%20%2B%20COVT%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Full%20cover%20%2B%20thumbnail%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Page%20breaks%20%20%20%7C%20EXTRA%20(via%20pagebreaks.rs)%20%7C%20EPUB%20pagebreak%20markers%20converted%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%23%20MOBI%0A%0A%7C%20Source%20%20%20%20%20%20%20%7C%20Honzo%20target%20%20%20%20%20%20%20%7C%20Details%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20------------%20%7C%20------------------%20%7C%20-----------------------%20%7C%0A%7C%20Metadata%20%20%20%20%20%7C%20META%20section%20%20%20%20%20%20%20%7C%20Title%2C%20author%2C%20language%20%7C%0A%7C%20Text%20content%20%7C%20CHAP%20chunks%20(HTML)%20%7C%20Basic%20HTML%20conversion%20%20%20%7C%0A%7C%20Images%20%20%20%20%20%20%20%7C%20IMG_%20chunks%20%20%20%20%20%20%20%20%7C%20Embedded%20images%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%23%20PDF%0A%0A%7C%20Source%20%20%20%20%20%20%20%20%20%7C%20Honzo%20target%20%20%20%20%20%20%20%20%20%20%20%7C%20Details%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20--------------%20%7C%20----------------------%20%7C%20---------------------------------%20%7C%0A%7C%20Extracted%20text%20%7C%20CHAP%20chunks%20(Markdown)%20%7C%20Text%20flow%2C%20no%20layout%20preservation%20%7C%0A%7C%20Page%20breaks%20%20%20%20%7C%20Chapter%20splitting%20%20%20%20%20%20%7C%20One%20PDF%20page%20per%20chapter%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%3A%3A%3A%20collapsible%20%22Page%20break%20detection%22%0A%0AFor%20EPUBs%20without%20explicit%20pagebreak%20markers%2C%20Honzo%20uses%20a%20character%20count%20heuristic%3A%0A%0A%60%60%60rust%0Ause%20honzo_convert%3A%3Apagebreaks%3A%3Aestimate_page_breaks%3B%0A%0Alet%20breaks%20%3D%20estimate_page_breaks(%26content%2C%20None)%3B%0A%2F%2F%20Returns%20around%202000%20character%20intervals%20for%20English%20text%0A%60%60%60%0A%0AExplicit%20EPUB%20pagebreak%20patterns%20are%20also%20detected%3A%0A%0A%60%60%60html%0A%3C!--%20These%20are%20all%20recognized%20--%3E%0A%3Cspan%20epub%3Atype%3D%22pagebreak%22%20id%3D%22pg42%22%20title%3D%2242%22%20%2F%3E%0A%3Cspan%20class%3D%22pagebreak%22%20id%3D%22page-42%22%20%2F%3E%0A%3Ca%20id%3D%22page42%22%20class%3D%22pagebreak%22%3E%3C%2Fa%3E%0A%3Chr%20class%3D%22pagebreak%22%20%2F%3E%0A%3Cdiv%20class%3D%22pagebreak%22%20title%3D%2242%22%20%2F%3E%0A%60%60%60%0A%0A%3A%3A%3A%0A%0A%23%23%20Conversion%20options%0A%0AOverride%20metadata%20during%20conversion%3A%0A%0A%60%60%60bash%0Ahonzo-cli%20convert%20book.epub%20book.hzo%20%5C%0A%20%20--title%20%22Custom%20Title%22%20%5C%0A%20%20--author%20%22Custom%20Author%22%20%5C%0A%20%20--language%20%22fr%22%0A%60%60%60%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Quick%20Start%22%20..%2Fgetting-started%2Fquickstart.md%20icon%3Aplay%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Format%20Specification%22%20..%2Fformat%2F%20icon%3Abook%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Detailed%20guides%0A%0AFor%20format-specific%20conversion%20details%3A%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22EPUB%22%20icon%3Abook%0AFull-featured%20EPUB%202%2F3%20converter%20with%20metadata%2C%20images%2C%20CSS%2C%20and%20fonts.%0A%0A%3A%3A%3A%20button%20%22Read%20more%22%20.%2Fepub.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22MOBI%22%20icon%3Abook-open%0AAmazon%20Kindle%20format%20import%20with%20text%20and%20basic%20formatting.%0A%0A%3A%3A%3A%20button%20%22Read%20more%22%20.%2Fmobi.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22PDF%22%20icon%3Afile-text%0ABasic%20text%20extraction.%20No%20reflow%20or%20layout%20preservation.%0A%0A%3A%3A%3A%20button%20%22Read%20more%22%20.%2Fpdf.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1628,7 +1605,7 @@
                   
                     <div class="docmd-copy-widgets">
                       
-                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-copy"
@@ -1649,7 +1626,7 @@
                         </button>
                       
                       
-                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-message-square"
@@ -1666,7 +1643,7 @@
   <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
 </svg>
 </span>
-                          <span class="docmd-btn-text">copyContext</span>
+                          <span class="docmd-btn-text">Copy Context</span>
                         </button>
                       
                     </div>
@@ -1692,10 +1669,8 @@
 >
   <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
 </svg>
-EPUB 2/3</div><div class="card-content">
-<p>Table of contents, metadata, images, CSS, and fonts supported.</p>
-</div></div>
-</div>
+EPUB 2/3</div><div class="card-content"><p>Table of contents, metadata, images, CSS, and fonts supported.</p>
+</div></div></div>
 <div class="docmd-container grid-item">
 <div class="docmd-container card"><div class="card-title">
 <svg class="lucide-icon icon-book-open card-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1713,10 +1688,8 @@ EPUB 2/3</div><div class="card-content">
   <path d="M12 7v14" />
   <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
 </svg>
-MOBI</div><div class="card-content">
-<p>Text, metadata, and basic formatting.</p>
-</div></div>
-</div>
+MOBI</div><div class="card-content"><p>Text, metadata, and basic formatting.</p>
+</div></div></div>
 <div class="docmd-container grid-item">
 <div class="docmd-container card"><div class="card-title">
 <svg class="lucide-icon icon-file-text card-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1737,26 +1710,24 @@ MOBI</div><div class="card-content">
   <path d="M16 13H8" />
   <path d="M16 17H8" />
 </svg>
-PDF</div><div class="card-content">
-<p>Text extraction only. No reflow preservation.</p>
-</div></div>
-</div>
+PDF</div><div class="card-content"><p>Text extraction only. No reflow preservation.</p>
+</div></div></div>
 </div>
 <h2 id="converting-files" class="docmd-heading"><a href="#converting-files" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Converting files</h2>
 <div class="docmd-tabs">
-<div class="docmd-tabs-nav"><div class="docmd-tabs-nav-item active"><span>CLI</span></div><div class="docmd-tabs-nav-item "><span>Rust API</span></div></div><div class="docmd-tabs-content"><div class="docmd-tab-pane active"><pre class="hljs"><code><span class="hljs-comment"># EPUB to Honzo</span>
-honzo<span class="hljs-punctuation">-</span>cli convert book.<span class="hljs-attr">epub</span> book.<span class="hljs-attr">hzo</span>
+<div class="docmd-tabs-nav"><div class="docmd-tabs-nav-item active"><span>CLI</span></div><div class="docmd-tabs-nav-item "><span>Rust API</span></div></div><div class="docmd-tabs-content"><div class="docmd-tab-pane active"><pre class="hljs"><code class="language-bash"><span class="hljs-comment"># EPUB to Honzo</span>
+honzo<span class="hljs-operator">-</span>cli convert book.<span class="hljs-attr">epub</span> book.<span class="hljs-attr">hzo</span>
 
 <span class="hljs-comment"># MOBI to Honzo</span>
-honzo<span class="hljs-punctuation">-</span>cli convert book.<span class="hljs-attr">mobi</span> book.<span class="hljs-attr">hzo</span>
+honzo<span class="hljs-operator">-</span>cli convert book.<span class="hljs-attr">mobi</span> book.<span class="hljs-attr">hzo</span>
 
 <span class="hljs-comment"># PDF to Honzo</span>
-honzo<span class="hljs-punctuation">-</span>cli convert book.<span class="hljs-attr">pdf</span> book.<span class="hljs-attr">hzo</span>
+honzo<span class="hljs-operator">-</span>cli convert book.<span class="hljs-attr">pdf</span> book.<span class="hljs-attr">hzo</span>
 </code></pre>
-</div><div class="docmd-tab-pane "><pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_convert<span class="hljs-punctuation">::</span>convert_epub;
+</div><div class="docmd-tab-pane "><pre class="hljs"><code class="language-rust"><span class="hljs-keyword">use</span> honzo_convert<span class="hljs-operator">::</span>convert_epub;
 
-<span class="hljs-keyword">let</span> hzo <span class="hljs-punctuation">=</span> <span class="hljs-title function_">convert_epub</span>(<span class="hljs-string">&quot;book.epub&quot;</span>).<span class="hljs-title function_">unwrap</span>();
-std<span class="hljs-punctuation">::</span>fs<span class="hljs-punctuation">::</span><span class="hljs-title function_">write</span>(<span class="hljs-string">&quot;book.hzo&quot;</span>, hzo).<span class="hljs-title function_">unwrap</span>();
+<span class="hljs-keyword">let</span> hzo <span class="hljs-operator">=</span> <span class="hljs-title function_">convert_epub</span>(<span class="hljs-string">&quot;book.epub&quot;</span>).<span class="hljs-title function_">unwrap</span>();
+std<span class="hljs-operator">::</span>fs<span class="hljs-operator">::</span><span class="hljs-title function_">write</span>(<span class="hljs-string">&quot;book.hzo&quot;</span>, hzo).<span class="hljs-title function_">unwrap</span>();
 </code></pre>
 </div></div></div><h2 id="what-gets-converted" class="docmd-heading"><a href="#what-gets-converted" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>What gets converted</h2>
 <h3 id="what-gets-converted-epub" class="docmd-heading"><a href="#what-gets-converted-epub" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>EPUB</h3>
@@ -1867,26 +1838,26 @@ std<span class="hljs-punctuation">::</span>fs<span class="hljs-punctuation">::</
         </summary>
         <div class="collapsible-content">
 <p>For EPUBs without explicit pagebreak markers, Honzo uses a character count heuristic:</p>
-<pre class="hljs"><code><span class="hljs-keyword">use</span> honzo_convert<span class="hljs-punctuation">::</span>pagebreaks<span class="hljs-punctuation">::</span>estimate_page_breaks;
+<pre class="hljs"><code class="language-rust"><span class="hljs-keyword">use</span> honzo_convert<span class="hljs-operator">::</span>pagebreaks<span class="hljs-operator">::</span>estimate_page_breaks;
 
-<span class="hljs-keyword">let</span> breaks <span class="hljs-punctuation">=</span> <span class="hljs-title function_">estimate_page_breaks</span>(<span class="hljs-punctuation">&amp;</span>content, <span class="hljs-keyword">None</span>);
+<span class="hljs-keyword">let</span> breaks <span class="hljs-operator">=</span> <span class="hljs-title function_">estimate_page_breaks</span>(<span class="hljs-operator">&amp;</span>content, <span class="hljs-literal">None</span>);
 <span class="hljs-comment">// Returns around 2000 character intervals for English text</span>
 </code></pre>
 <p>Explicit EPUB pagebreak patterns are also detected:</p>
-<pre class="hljs"><code><span class="hljs-comment">&lt;!-- These are all recognized --&gt;</span>
-<span class="hljs-punctuation">&lt;</span>span epub<span class="hljs-punctuation">:</span><span class="hljs-keyword">type</span><span class="hljs-punctuation">=</span><span class="hljs-string">&quot;pagebreak&quot;</span> <span class="hljs-keyword">id</span><span class="hljs-punctuation">=</span><span class="hljs-string">&quot;pg42&quot;</span> title<span class="hljs-punctuation">=</span><span class="hljs-string">&quot;42&quot;</span><span class="hljs-punctuation">/&gt;</span>
-<span class="hljs-punctuation">&lt;</span>span <span class="hljs-keyword">class</span><span class="hljs-punctuation">=</span><span class="hljs-string">&quot;pagebreak&quot;</span> <span class="hljs-keyword">id</span><span class="hljs-punctuation">=</span><span class="hljs-string">&quot;page-42&quot;</span><span class="hljs-punctuation">/&gt;</span>
-<span class="hljs-punctuation">&lt;</span>a <span class="hljs-keyword">id</span><span class="hljs-punctuation">=</span><span class="hljs-string">&quot;page42&quot;</span> <span class="hljs-keyword">class</span><span class="hljs-punctuation">=</span><span class="hljs-string">&quot;pagebreak&quot;</span><span class="hljs-punctuation">&gt;&lt;/</span>a<span class="hljs-punctuation">&gt;</span>
-<span class="hljs-punctuation">&lt;</span>hr <span class="hljs-keyword">class</span><span class="hljs-punctuation">=</span><span class="hljs-string">&quot;pagebreak&quot;</span><span class="hljs-punctuation">/&gt;</span>
-<span class="hljs-punctuation">&lt;</span>div <span class="hljs-keyword">class</span><span class="hljs-punctuation">=</span><span class="hljs-string">&quot;pagebreak&quot;</span> title<span class="hljs-punctuation">=</span><span class="hljs-string">&quot;42&quot;</span><span class="hljs-punctuation">/&gt;</span>
+<pre class="hljs"><code class="language-html"><span class="hljs-comment">&lt;!-- These are all recognized --&gt;</span>
+<span class="hljs-operator">&lt;</span>span epub<span class="hljs-operator">:</span><span class="hljs-keyword">type</span><span class="hljs-operator">=</span><span class="hljs-string">&quot;pagebreak&quot;</span> <span class="hljs-keyword">id</span><span class="hljs-operator">=</span><span class="hljs-string">&quot;pg42&quot;</span> title<span class="hljs-operator">=</span><span class="hljs-string">&quot;42&quot;</span> <span class="hljs-operator">/&gt;</span>
+<span class="hljs-operator">&lt;</span>span <span class="hljs-keyword">class</span><span class="hljs-operator">=</span><span class="hljs-string">&quot;pagebreak&quot;</span> <span class="hljs-keyword">id</span><span class="hljs-operator">=</span><span class="hljs-string">&quot;page-42&quot;</span> <span class="hljs-operator">/&gt;</span>
+<span class="hljs-operator">&lt;</span>a <span class="hljs-keyword">id</span><span class="hljs-operator">=</span><span class="hljs-string">&quot;page42&quot;</span> <span class="hljs-keyword">class</span><span class="hljs-operator">=</span><span class="hljs-string">&quot;pagebreak&quot;</span><span class="hljs-operator">&gt;&lt;/</span>a<span class="hljs-operator">&gt;</span>
+<span class="hljs-operator">&lt;</span>hr <span class="hljs-keyword">class</span><span class="hljs-operator">=</span><span class="hljs-string">&quot;pagebreak&quot;</span> <span class="hljs-operator">/&gt;</span>
+<span class="hljs-operator">&lt;</span>div <span class="hljs-keyword">class</span><span class="hljs-operator">=</span><span class="hljs-string">&quot;pagebreak&quot;</span> title<span class="hljs-operator">=</span><span class="hljs-string">&quot;42&quot;</span> <span class="hljs-operator">/&gt;</span>
 </code></pre>
 </div></details>
 <h2 id="conversion-options" class="docmd-heading"><a href="#conversion-options" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Conversion options</h2>
 <p>Override metadata during conversion:</p>
-<pre class="hljs"><code>honzo<span class="hljs-punctuation">-</span>cli convert book.<span class="hljs-attr">epub</span> book.<span class="hljs-attr">hzo</span> \
-  <span class="hljs-punctuation">--</span>title <span class="hljs-string">&quot;Custom Title&quot;</span> \
-  <span class="hljs-punctuation">--</span>author <span class="hljs-string">&quot;Custom Author&quot;</span> \
-  <span class="hljs-punctuation">--</span>language <span class="hljs-string">&quot;fr&quot;</span>
+<pre class="hljs"><code class="language-bash">honzo<span class="hljs-operator">-</span>cli convert book.<span class="hljs-attr">epub</span> book.<span class="hljs-attr">hzo</span> \
+  <span class="hljs-operator">--</span>title <span class="hljs-string">&quot;Custom Title&quot;</span> \
+  <span class="hljs-operator">--</span>author <span class="hljs-string">&quot;Custom Author&quot;</span> \
+  <span class="hljs-operator">--</span>language <span class="hljs-string">&quot;fr&quot;</span>
 </code></pre>
 <h2 id="next-steps" class="docmd-heading"><a href="#next-steps" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Next Steps</h2>
 <div class="docmd-container grids">
@@ -1944,9 +1915,8 @@ Format Specification</a></div>
 >
   <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
 </svg>
-EPUB</div><div class="card-content">
-<p>Full-featured EPUB 2/3 converter with metadata, images, CSS, and fonts.</p>
-<a href="./epub/" class="docmd-button">
+EPUB</div><div class="card-content"><p>Full-featured EPUB 2/3 converter with metadata, images, CSS, and fonts.</p>
+<a href="epub/" class="docmd-button">
 <svg class="lucide-icon icon-arrow-right button-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-arrow-right"
   xmlns="http://www.w3.org/2000/svg"
@@ -1962,8 +1932,7 @@ EPUB</div><div class="card-content">
   <path d="M5 12h14" />
   <path d="m12 5 7 7-7 7" />
 </svg>
-Read more</a></div></div>
-</div>
+Read more</a></div></div></div>
 <div class="docmd-container grid-item">
 <div class="docmd-container card"><div class="card-title">
 <svg class="lucide-icon icon-book-open card-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1981,9 +1950,8 @@ Read more</a></div></div>
   <path d="M12 7v14" />
   <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
 </svg>
-MOBI</div><div class="card-content">
-<p>Amazon Kindle format import with text and basic formatting.</p>
-<a href="./mobi/" class="docmd-button">
+MOBI</div><div class="card-content"><p>Amazon Kindle format import with text and basic formatting.</p>
+<a href="mobi/" class="docmd-button">
 <svg class="lucide-icon icon-arrow-right button-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-arrow-right"
   xmlns="http://www.w3.org/2000/svg"
@@ -1999,8 +1967,7 @@ MOBI</div><div class="card-content">
   <path d="M5 12h14" />
   <path d="m12 5 7 7-7 7" />
 </svg>
-Read more</a></div></div>
-</div>
+Read more</a></div></div></div>
 <div class="docmd-container grid-item">
 <div class="docmd-container card"><div class="card-title">
 <svg class="lucide-icon icon-file-text card-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -2021,9 +1988,8 @@ Read more</a></div></div>
   <path d="M16 13H8" />
   <path d="M16 17H8" />
 </svg>
-PDF</div><div class="card-content">
-<p>Basic text extraction. No reflow or layout preservation.</p>
-<a href="./pdf/" class="docmd-button">
+PDF</div><div class="card-content"><p>Basic text extraction. No reflow or layout preservation.</p>
+<a href="pdf/" class="docmd-button">
 <svg class="lucide-icon icon-arrow-right button-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-arrow-right"
   xmlns="http://www.w3.org/2000/svg"
@@ -2039,8 +2005,7 @@ PDF</div><div class="card-content">
   <path d="M5 12h14" />
   <path d="m12 5 7 7-7 7" />
 </svg>
-Read more</a></div></div>
-</div>
+Read more</a></div></div></div>
 </div>
 
                 
@@ -2064,14 +2029,14 @@ Read more</a></div></div>
   <path d="M19 12H5" />
 </svg>
 
-                        <span><small>previous</small><strong>
+                        <span><small>Previous</small><strong>
                             Streaming
                           </strong></span>
                       </a>
                     
                     
                       <a href="../conversion/epub/" class="next-page">
-                        <span><small>next</small>
+                        <span><small>Next</small>
                           <strong>
                             EPUB
                           </strong></span>
@@ -2097,12 +2062,13 @@ Read more</a></div></div>
                   </div>
                 
               </div>
+              
               <div class="toc-sidebar">
                 
 
 
   <div class="toc-container">
-    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
 <svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-down"
   xmlns="http://www.w3.org/2000/svg"
@@ -2160,33 +2126,34 @@ Read more</a></div></div>
   </div>
 
               </div>
+              
             </div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1787023392000">
+                <span class="git-last-updated" data-timestamp="1787810890000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1787023392000"></span>
+                  <span class="git-time" data-timestamp="1787810890000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
                     <ul class="git-commit-list">
                       
                         <li class="git-commit-item">
-                          <div class="git-commit-avatar" title="dependabot[bot]">
+                          <div class="git-commit-avatar" title="NellowTCS">
                             
-                              <img src="https://www.gravatar.com/avatar/48ea49be76d0c68403a7f3df87e3487d?d=mp&amp;s=64" alt="dependabot[bot]">
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Bump brace-expansion (#65)">Bump brace-expansion (#65)</div>
+                            <div class="git-commit-message" title="Add hzo_extract_meta_from_file, markdown converter CLI, and update dependencies (#66)">Add hzo_extract_meta_from_file, markd...</div>
                             <div class="git-commit-meta">
-                              <span class="git-commit-author">dependabot[bot]</span>
-                              <span class="git-commit-date" data-timestamp="1787023392000"></span>
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1787810890000"></span>
                             </div>
                           </div>
                         </li>
@@ -2241,11 +2208,11 @@ Read more</a></div></div>
                 <span class="footer-column-title">Resources</span>
                 <ul>
                   
-                    <li><a href="../getting-started/quickstart/" >Getting Started</a></li>
+                    <li><a href="getting-started/quickstart/" >Getting Started</a></li>
                   
-                    <li><a href="../format/" >Format Spec</a></li>
+                    <li><a href="format/" >Format Spec</a></li>
                   
-                    <li><a href="../cli/" >CLI Commands</a></li>
+                    <li><a href="cli/" >CLI Commands</a></li>
                   
                 </ul>
               </div>
@@ -2270,7 +2237,7 @@ Read more</a></div></div>
         <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/Nisoku/Honzo">View on GitHub</a>.</div>
         
           <div class="branding-footer">
-            builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
           </div>
         
       </div>
@@ -2279,20 +2246,22 @@ Read more</a></div></div>
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=msy44anm"></script>
+      <script src="../assets/js/docmd-main.js?v=mtb4na5q"></script>
       
-      <script src="../assets/js/docmd-git.js?v=msy44anm"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=msy44anm" ></script>
-<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../assets/js/docmd-search.js?v=msy44anm" ></script>
-<script src="../assets/js/init-mermaid.js?v=msy44anm" type="module"></script>
-<script src="../assets/js/docmd-git.js?v=msy44anm" type="module"></script>
+      <script src="../assets/js/docmd-git.js?v=mtb4na5q"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=mtb4na5q" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=mtb4na5q" ></script>
+<script src="../assets/js/docmd-search.js?v=mtb4na5q" ></script>
+<script src="../assets/js/docmd-git.js?v=mtb4na5q" ></script>
+<script src="../assets/js/docmd-ai.js?v=mtb4na5q" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
        data-search-placeholder="Search documentation..."
        data-search-no-results="No results found."
        data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
        data-search-initial="Type to start searching..."
        data-search-navigate="to navigate"
        data-search-escape="to close">
@@ -2360,6 +2329,9 @@ Read more</a></div></div>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/Nisoku/Honzo/edit/main/","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"Honzo","siteBase":"/Honzo/","siteUrl":"https://nisoku.org/Honzo","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Getting Started","icon":"rocket","collapsible":false,"children":[{"title":"Quick Start","path":"/getting-started/quickstart/","icon":"play"},{"title":"Installation","path":"/getting-started/installation/","icon":"download"},{"title":"Core Concepts","path":"/getting-started/concepts/","icon":"book"}]},{"title":"Format Specification","icon":"file-text","path":"/format/","collapsible":false,"children":[{"title":"Wire Format","path":"/format/wire-format/","icon":"binary"},{"title":"Chunk Types","path":"/format/chunk-types/","icon":"package"},{"title":"Compression","path":"/format/compression/","icon":"zap"},{"title":"DRM & Encryption","path":"/format/drm/","icon":"lock"},{"title":"Layout Modes","path":"/format/layout/","icon":"columns"}]},{"title":"API Reference","icon":"code","path":"/api/","collapsible":false,"children":[{"title":"Rust","path":"/api/rust/","icon":"box"},{"title":"WASM / TypeScript","path":"/api/wasm/","icon":"cpu"},{"title":"C","path":"/api/c/","icon":"terminal"}]},{"title":"CLI Reference","icon":"terminal","path":"/cli/","collapsible":false},{"title":"Features","icon":"star","path":"/features/","collapsible":false,"children":[{"title":"Annotations","path":"/features/annotations/","icon":"pen-tool"},{"title":"Search Index","path":"/features/search/","icon":"search"},{"title":"Sync Tracks","path":"/features/sync/","icon":"clock"},{"title":"Streaming","path":"/features/streaming/","icon":"wind"}]},{"title":"Conversion","icon":"git-merge","path":"/conversion/","collapsible":false,"children":[{"title":"EPUB","path":"/conversion/epub/","icon":"book"},{"title":"MOBI","path":"/conversion/mobi/","icon":"book-open"},{"title":"PDF","path":"/conversion/pdf/","icon":"file-text"}]},{"title":"Demo Apps","icon":"eye","path":"/demo-docs/","collapsible":false,"children":[{"title":"Reader","path":"/demo/","icon":"book","external":true},{"title":"Maker","path":"/demo/maker/","icon":"wrench","external":true},{"title":"Inspect","path":"/demo/inspect/","icon":"search","external":true},{"title":"Convert","path":"/demo/convert/","icon":"git-merge","external":true}]},{"title":"Contributing","icon":"heart","path":"/contributing/","collapsible":false,"children":[{"title":"Building","path":"/contributing/building/","icon":"network"},{"title":"Architecture","path":"/contributing/architecture/","icon":"git-commit"}]},{"title":"GitHub","path":"https://github.com/Nisoku/Honzo","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":true},"isWorkspace":false,"workspaceProjects":[]};</script>
+      
+      
       
   </body>
 </html>

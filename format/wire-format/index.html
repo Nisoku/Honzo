@@ -10,8 +10,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.5.x">
+    <meta name="generator" content="docmd v0.9.4">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/Honzo/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/Honzo/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
     <script>/**
  * --------------------------------------------------------------------
  * docmd : the zero-config documentation engine.
@@ -29,9 +44,27 @@
 (function () {
   try {
     // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
     var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
 
     if (theme === 'system') {
       theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -65,32 +98,17 @@
         visibility: hidden;
       }
     </style>
-    
-    <script>
-      var root = "../../";
-      if (root && !root.endsWith('/')) root += '/';
-      if (root === '') root = './';
-      window.DOCMD_ROOT = root;
-
-      var siteRoot = "../../";
-      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
-      if (siteRoot === '') siteRoot = './';
-      window.DOCMD_SITE_ROOT = siteRoot;
-
-      window.DOCMD_APPEARANCE = "system";
-      window.DOCMD_VERSION_ROOT = "/";
-      window.DOCMD_BASE = "/";
-      window.DOCMD_LOCALE = "";
-      window.DOCMD_DEFAULT_LOCALE = "";
-    </script>
     <title>
       Wire Format : Honzo
     </title>
     
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=msy44anm">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=msy44anm" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=msy44anm" id="hljs-dark" disabled>
+
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mtb4na5q">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mtb4na5q">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mtb4na5q" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mtb4na5q" id="hljs-dark" disabled>
     
     
 <meta name="description" content="The binary layout of HEAD, TOC, DATA, EXTRA, and META">
@@ -105,75 +123,33 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=msy44anm" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=msy44anm" >
+
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mtb4na5q" >
+<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mtb4na5q" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=msy44anm">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mtb4na5q">
     
-    <script>/**
- * --------------------------------------------------------------------
- * docmd : the zero-config documentation engine.
- *
- * @package     @docmd/core (and ecosystem)
- * @website     https://docmd.io
- * @repository  https://github.com/docmd-io/docmd
- * @license     MIT
- * @copyright   Copyright (c) 2025-present docmd.io
- *
- * [docmd-source] - Please do not remove this header.
- * --------------------------------------------------------------------
- */
-
-(function () {
-  try {
-    // 1. Determine Theme
-    var localValue = localStorage.getItem('docmd-theme');
-    var configValue = window.DOCMD_DEFAULT_MODE || 'light';
-    var theme = localValue ? localValue : configValue;
-
-    if (theme === 'system') {
-      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    // 2. Apply to Root
-    document.documentElement.setAttribute('data-theme', theme);
-
-    // 3. Highlight.js Toggle Strategy
-    var lightLink = document.getElementById('hljs-light');
-    var darkLink = document.getElementById('hljs-dark');
-
-    if (lightLink && darkLink) {
-      if (theme === 'dark') {
-        lightLink.disabled = true;
-        darkLink.disabled = false;
-      } else {
-        lightLink.disabled = false;
-        darkLink.disabled = true;
-      }
-    }
-
-    document.documentElement.style.visibility = "visible";
-  } catch (e) {
-    document.documentElement.style.visibility = "visible";
-    console.error('Theme init failed', e);
-  }
-})();</script>
+    
   </head>
   <body
     class="sidebar-collapsible"
     data-default-collapsed="false"
     data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/format/wire-format.md">
 
-    <a href="#main-content" class="skip-link">skipToContent</a>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
 
     
     
       <aside class="sidebar">
         <div class="sidebar-header">
           
-            <h1><a href="../../">
+<h1><a href="../../">
                 Honzo
               </a></h1>
           
@@ -206,7 +182,7 @@
         </div>
         
 
-<nav class="sidebar-nav" aria-label="mainNavigation">
+<nav class="sidebar-nav" aria-label="Main Navigation">
   <ul>
     
       <li class="" >
@@ -1489,11 +1465,12 @@
       <div class="main-content-wrapper">
         
         
+        
           <header class="page-header">
             <div class="header-left">
               
                 <button id="sidebar-toggle-button" class="sidebar-toggle-button"
-                  aria-label="toggleSidebar">
+                  aria-label="Toggle Sidebar">
                   
 <svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-left"
@@ -1525,7 +1502,7 @@
 
 <div class="docmd-options-menu">
     
-    <button class="docmd-search-trigger" aria-label="search">
+    <button class="docmd-search-trigger" aria-label="Search">
         
 <svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-search"
@@ -1543,7 +1520,7 @@
   <circle cx="11" cy="11" r="8" />
 </svg>
 
-        <span class="search-label">search</span>
+        <span class="search-label">Search</span>
         <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
     </button>
     
@@ -1553,7 +1530,7 @@
     
 
     
-    <button class="theme-toggle-button" aria-label="toggleTheme">
+    <button class="theme-toggle-button" aria-label="Toggle theme">
         
 <svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-sun"
@@ -1608,7 +1585,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Wire%20Format%22%0Adescription%3A%20%22The%20binary%20layout%20of%20HEAD%2C%20TOC%2C%20DATA%2C%20EXTRA%2C%20and%20META%22%0A---%0A%0A%23%23%20HEAD%20(48%20bytes)%0A%0AThe%20first%204%20bytes%20of%20HEAD%20are%20always%20the%20ASCII%20bytes%20%60HONO%60%20(%600x484F4F4E%60).%20Any%20file%20that%20does%20not%20start%20with%20these%20bytes%20is%20not%20a%20Honzo%20file.%0A%0AOffset%20%7C%20Size%20%7C%20Field%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%0A-------%7C------%7C--------------------%7C------------------------------------------------------------%0A0%20%20%20%20%20%20%7C%204%20%20%20%20%7C%20magic%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%22HONO%22%60%20magic%20bytes%0A4%20%20%20%20%20%20%7C%204%20%20%20%20%7C%20format_version%20%20%20%20%20%7C%20Format%20version%2C%20currently%20%601%60%0A8%20%20%20%20%20%20%7C%202%20%20%20%20%7C%20chunk_count%20%20%20%20%20%20%20%20%7C%20Number%20of%20TOC%20entries%0A10%20%20%20%20%20%7C%201%20%20%20%20%7C%20layout_mode%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20reflowable%2C%20%601%60%20for%20fixed%2C%20%602%60%20for%20scroll%0A11%20%20%20%20%20%7C%201%20%20%20%20%7C%20flags%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Bit%20flags%20where%20bit%200%20indicates%20has_extra%0A12%20%20%20%20%20%7C%208%20%20%20%20%7C%20data_offset%20%20%20%20%20%20%20%20%7C%20Byte%20offset%20from%20file%20start%20to%20DATA%20section%0A20%20%20%20%20%20%7C%208%20%20%20%20%7C%20extra_offset%20%20%20%20%20%20%20%7C%20Byte%20offset%20from%20file%20start%20to%20EXTRA%20section.%20Zero%20if%20none.%0A28%20%20%20%20%20%7C%208%20%20%20%20%7C%20meta_offset%20%20%20%20%20%20%20%20%7C%20Byte%20offset%20from%20file%20start%20to%20META%20section%0A36%20%20%20%20%20%7C%204%20%20%20%20%7C%20meta_size%20%20%20%20%20%20%20%20%20%20%7C%20Size%20of%20META%20section%20in%20bytes%0A40%20%20%20%20%20%7C%204%20%20%20%20%7C%20chunk_table_offset%20%7C%20Byte%20offset%20of%20TOC%20within%20the%20file%2C%20relative%20to%20DATA%20start%0A44%20%20%20%20%20%7C%204%20%20%20%20%7C%20reserved%20%20%20%20%20%20%20%20%20%20%20%7C%20Reserved%20for%20future%20use%2C%20zero%20padded%0A%0AAll%20offsets%20are%20absolute%20from%20the%20start%20of%20the%20file.%0A%0A%23%23%20TOC%20(32%20bytes%20x%20chunk_count)%0A%0AEach%20TOC%20entry%20is%20exactly%2032%20bytes%3A%0A%0AOffset%20%7C%20Size%20%7C%20Field%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%0A-------%7C------%7C----------------------%7C-----------------------------------------------------------------------------------%0A0%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B0%5D%20%20%20%20%20%20%20%20%20%20%7C%20First%20byte%20of%20the%204-byte%20chunk%20type%20tag%0A1%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B1%5D%20%20%20%20%20%20%20%20%20%20%7C%20Second%20byte%0A2%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B2%5D%20%20%20%20%20%20%20%20%20%20%7C%20Third%20byte%0A3%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B3%5D%20%20%20%20%20%20%20%20%20%20%7C%20Fourth%20byte%2C%20for%20example%20%60CHAP%60%20or%20%60IMG_%60%0A4%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20content_type%20%20%20%20%20%20%20%20%20%7C%20Content%20type%20kind%0A5%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20compression%20%20%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20none%2C%20%601%60%20for%20lz4%0A6%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20markup_type%20%20%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20markdown%2C%20%601%60%20for%20html%2C%20applies%20to%20CHAP%20chunks%0A7%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20cover_type%20%20%20%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20none%2C%20%601%60%20for%20front%2C%20%602%60%20for%20back%2C%20applies%20to%20COVR%20or%20COVT%0A8%20%20%20%20%20%20%7C%202%20%20%20%20%7C%20language%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20BCP%2047%20language%20tag%20index%0A10%20%20%20%20%20%7C%202%20%20%20%20%7C%20font_embedding%20%20%20%20%20%20%20%7C%20Font%20embedding%20mode%2C%20applies%20to%20FONT%20chunks%0A12%20%20%20%20%20%7C%202%20%20%20%20%7C%20font_license_url_len%20%7C%20Length%20of%20font%20license%20URL%2C%20zero%20if%20none%0A14%20%20%20%20%20%7C%202%20%20%20%20%7C%20reserved%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Reserved%2C%20zero%20padded%0A16%20%20%20%20%20%7C%208%20%20%20%20%7C%20offset%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Byte%20offset%20within%20DATA%20section%0A24%20%20%20%20%20%7C%204%20%20%20%20%7C%20size%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Size%20of%20chunk%20data%20in%20bytes.%20Represents%20compressed%20size%20if%20compression%20is%20nonzero.%0A28%20%20%20%20%20%7C%204%20%20%20%20%7C%20orig_size%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Original%20uncompressed%20size.%20Zero%20if%20same%20as%20size.%0A%0A%23%23%23%20Offset%20and%20Size%20Rules%0A%0A%60offset%60%20is%20relative%20to%20%60data_offset%60%20from%20HEAD.%20The%20absolute%20file%20position%20of%20a%20chunk%20is%20%60data_offset%20%2B%20entry.offset%60.%0A%0AIf%20%60compression%60%20is%200%2C%20%60size%60%20equals%20%60orig_size%60.%20Alternatively%20%60orig_size%60%20is%200.%0A%0AIf%20%60compression%60%20is%201%2C%20%60size%60%20represents%20the%20compressed%20length.%20%60orig_size%60%20represents%20the%20decompressed%20length.%0A%0A%23%23%20DATA%20Section%0A%0AThe%20DATA%20section%20starts%20at%20%60data_offset%60.%20It%20is%20a%20flat%20array%20of%20chunk%20payloads.%20Each%20chunk&#039;s%20position%20and%20size%20are%20defined%20by%20its%20TOC%20entry.%20No%20separator%20or%20framing%20exists%20between%20chunks.%20The%20TOC%20serves%20as%20the%20authoritative%20index.%0A%0A%60%60%60txt%0Adata_offset%20%2B%200%3A%20%20%20%20%20chunk%200%20data%20(entry%5B0%5D.size%20bytes)%0Adata_offset%20%2B%20off1%3A%20%20chunk%201%20data%20(entry%5B1%5D.size%20bytes)%0Adata_offset%20%2B%20off2%3A%20%20chunk%202%20data%20(entry%5B2%5D.size%20bytes)%0A...%0A%60%60%60%0A%0A%3A%3A%3A%20collapsible%20%22EXTRA%20Section%20(optional)%22%0A%0AThe%20EXTRA%20section%20is%20variable%20length%20and%20optional.%20If%20%60flags%20%26%201%60%20equals%200%2C%20there%20is%20no%20EXTRA%20section%20and%20%60extra_offset%60%20is%200.%0A%0A%60%60%60txt%0AOffset%20%20Size%20%20Field%0A0%20%20%20%20%20%20%204%20%20%20%20%20extra_count%3A%20u32%0A4%20%20%20%20%20%20%20variable%20%20Array%20of%20ExtraEntry%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%202%20bytes%3A%20namespace%20length%20(u16)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%20N%20bytes%3A%20namespace%20(UTF-8)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%208%20bytes%3A%20offset%20(u64%2C%20relative%20to%20extra_offset)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%204%20bytes%3A%20size%20(u32)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20(entry%20repeats%20extra_count%20times)%0A%60%60%60%0A%0AAfter%20the%20entry%20array%2C%20each%20entry&#039;s%20data%20resides%20at%20%60extra_offset%20%2B%20entry.offset%60.%0A%0A%23%23%23%20Standard%20Namespaces%0A%0A%3C!--%20markdownlint-disable%20MD055%20--%3E%0A%7C%20Namespace%20%20%20%20%20%20%20%20%20%7C%20Purpose%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------------%7C-----------------------------------------------%7C%0A%7C%20%60org.nisoku.anno%60%20%7C%20Annotations%20stored%20as%20MessagePack%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60org.nisoku.drm%60%20%20%7C%20DRM%20envelope%20stored%20as%20MessagePack%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60org.nisoku.sync%60%20%7C%20Audio%2Fvideo%20sync%20tracks%20stored%20as%20MessagePack%20%7C%0A%0A%3A%3A%3A%0A%0A%23%23%20META%20Section%0A%0AThe%20META%20section%20is%20a%20MessagePack%20map.%20It%20starts%20at%20%60meta_offset%60%20and%20spans%20%60meta_size%60%20bytes.%20Only%20%60title%60%20and%20%60language%60%20are%20required.%20Everything%20else%20is%20optional.%0A%0A%3A%3A%3A%20collapsible%20%22Example%20META%20payload%22%0A%0A%60%60%60text%0A%7B%0A%20%20%22honzo%22%3A%20%7B%0A%20%20%20%20%22version%22%3A%201%2C%0A%20%20%20%20%22converter%22%3A%20%22honzo-convert%200.1.0%22%2C%0A%20%20%20%20%22created%22%3A%20%222025-01-15T10%3A30%3A00Z%22%2C%0A%20%20%20%20%22modified%22%3A%20%222025-01-15T10%3A30%3A00Z%22%0A%20%20%7D%2C%0A%20%20%22title%22%3A%20%7B%0A%20%20%20%20%22en%22%3A%20%22The%20Example%20Book%22%2C%0A%20%20%20%20%22fr%22%3A%20%22Le%20Livre%20Exemple%22%0A%20%20%7D%2C%0A%20%20%22creator%22%3A%20%7B%0A%20%20%20%20%22en%22%3A%20%22Author%20Name%22%0A%20%20%7D%2C%0A%20%20%22language%22%3A%20%22en%22%2C%0A%20%20%22description%22%3A%20%7B%0A%20%20%20%20%22en%22%3A%20%22A%20short%20description%20of%20the%20book.%22%0A%20%20%7D%2C%0A%20%20%22publisher%22%3A%20%22Publisher%20Name%22%2C%0A%20%20%22published%22%3A%20%222024-01-01%22%2C%0A%20%20%22rights%22%3A%20%22Copyright%202024%22%2C%0A%20%20%22identifiers%22%3A%20%7B%0A%20%20%20%20%22isbn%22%3A%20%22978-0-00-000000-0%22%2C%0A%20%20%20%20%22doi%22%3A%20%2210.0000%2Fexample%22%0A%20%20%7D%2C%0A%20%20%22subject%22%3A%20%5B%22Fiction%22%2C%20%22Adventure%22%5D%2C%0A%20%20%22series%22%3A%20%22Series%20Name%22%2C%0A%20%20%22series_position%22%3A%201%2C%0A%20%20%22edition%22%3A%201%2C%0A%20%20%22page_progression_direction%22%3A%20%22ltr%22%2C%0A%20%20%22toc%22%3A%20%5B%0A%20%20%20%20%7B%22title%22%3A%20%22Chapter%201%22%2C%20%22src%22%3A%200%7D%2C%0A%20%20%20%20%7B%22title%22%3A%20%22Chapter%202%22%2C%20%22src%22%3A%201%7D%0A%20%20%5D%0A%7D%0A%60%60%60%0A%0A%3A%3A%3A%0A%0AAll%20field%20names%20use%20lowercase%20with%20underscores.%20All%20text%20values%20are%20maps%20keyed%20by%20BCP%2047%20language%20tags.%20This%20enables%20multi%20language%20support.%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Chunk%20Types%22%20.%2Fchunk-types.md%20icon%3Apackage%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Compression%22%20.%2Fcompression.md%20icon%3Azap%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22DRM%20%26%20Encryption%22%20.%2Fdrm.md%20icon%3Alock%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Wire%20Format%22%0Adescription%3A%20%22The%20binary%20layout%20of%20HEAD%2C%20TOC%2C%20DATA%2C%20EXTRA%2C%20and%20META%22%0A---%0A%0A%23%23%20HEAD%20(48%20bytes)%0A%0AThe%20first%204%20bytes%20of%20HEAD%20are%20always%20the%20ASCII%20bytes%20%60HONO%60%20(%600x484F4F4E%60).%20Any%20file%20that%20does%20not%20start%20with%20these%20bytes%20is%20not%20a%20Honzo%20file.%0A%0A%7C%20Offset%20%7C%20Size%20%7C%20Field%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Description%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C--------%7C------%7C--------------------%7C-------------------------------------------------------------%7C%0A%7C%200%20%20%20%20%20%20%7C%204%20%20%20%20%7C%20magic%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%60%22HONO%22%60%20magic%20bytes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%204%20%20%20%20%20%20%7C%204%20%20%20%20%7C%20format_version%20%20%20%20%20%7C%20Format%20version%2C%20currently%20%601%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%208%20%20%20%20%20%20%7C%202%20%20%20%20%7C%20chunk_count%20%20%20%20%20%20%20%20%7C%20Number%20of%20TOC%20entries%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%2010%20%20%20%20%20%7C%201%20%20%20%20%7C%20layout_mode%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20reflowable%2C%20%601%60%20for%20fixed%2C%20%602%60%20for%20scroll%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%2011%20%20%20%20%20%7C%201%20%20%20%20%7C%20flags%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Bit%20flags%20where%20bit%200%20indicates%20has_extra%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%2012%20%20%20%20%20%7C%208%20%20%20%20%7C%20data_offset%20%20%20%20%20%20%20%20%7C%20Byte%20offset%20from%20file%20start%20to%20DATA%20section%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%2020%20%20%20%20%20%7C%208%20%20%20%20%7C%20extra_offset%20%20%20%20%20%20%20%7C%20Byte%20offset%20from%20file%20start%20to%20EXTRA%20section.%20Zero%20if%20none.%20%7C%0A%7C%2028%20%20%20%20%20%7C%208%20%20%20%20%7C%20meta_offset%20%20%20%20%20%20%20%20%7C%20Byte%20offset%20from%20file%20start%20to%20META%20section%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%2036%20%20%20%20%20%7C%204%20%20%20%20%7C%20meta_size%20%20%20%20%20%20%20%20%20%20%7C%20Size%20of%20META%20section%20in%20bytes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%2040%20%20%20%20%20%7C%204%20%20%20%20%7C%20chunk_table_offset%20%7C%20Byte%20offset%20of%20TOC%20within%20the%20file%2C%20relative%20to%20DATA%20start%20%20%7C%0A%7C%2044%20%20%20%20%20%7C%204%20%20%20%20%7C%20reserved%20%20%20%20%20%20%20%20%20%20%20%7C%20Reserved%20for%20future%20use%2C%20zero%20padded%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AAll%20offsets%20are%20absolute%20from%20the%20start%20of%20the%20file.%0A%0A%23%23%20TOC%20(32%20bytes%20x%20chunk_count)%0A%0AEach%20TOC%20entry%20is%20exactly%2032%20bytes%3A%0A%0A%7C%20Offset%20%7C%20Size%20%7C%20Field%20%7C%20Description%20%7C%0A%7C--------%7C------%7C-------%7C-------------%7C%0A%3C!--%20eslint-disable-next-line%20markdown%2Fno-missing-label-refs%20--%3E%0A%7C%200%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B0%5D%20%20%20%20%20%20%20%20%20%20%7C%20First%20byte%20of%20the%204-byte%20chunk%20type%20tag%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%3C!--%20eslint-disable-next-line%20markdown%2Fno-missing-label-refs%20--%3E%0A%7C%201%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B1%5D%20%20%20%20%20%20%20%20%20%20%7C%20Second%20byte%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%3C!--%20eslint-disable-next-line%20markdown%2Fno-missing-label-refs%20--%3E%0A%7C%202%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B2%5D%20%20%20%20%20%20%20%20%20%20%7C%20Third%20byte%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%3C!--%20eslint-disable-next-line%20markdown%2Fno-missing-label-refs%20--%3E%0A%7C%203%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20chunk_id%5B3%5D%20%20%20%20%20%20%20%20%20%20%7C%20Fourth%20byte%2C%20for%20example%20%60CHAP%60%20or%20%60IMG_%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%204%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20content_type%20%20%20%20%20%20%20%20%20%7C%20Content%20type%20kind%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%205%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20compression%20%20%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20none%2C%20%601%60%20for%20lz4%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%206%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20markup_type%20%20%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20markdown%2C%20%601%60%20for%20html%2C%20applies%20to%20CHAP%20chunks%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%207%20%20%20%20%20%20%7C%201%20%20%20%20%7C%20cover_type%20%20%20%20%20%20%20%20%20%20%20%7C%20%600%60%20for%20none%2C%20%601%60%20for%20front%2C%20%602%60%20for%20back%2C%20applies%20to%20COVR%20or%20COVT%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%208%20%20%20%20%20%20%7C%202%20%20%20%20%7C%20language%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20BCP%2047%20language%20tag%20index%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%2010%20%20%20%20%20%7C%202%20%20%20%20%7C%20font_embedding%20%20%20%20%20%20%20%7C%20Font%20embedding%20mode%2C%20applies%20to%20FONT%20chunks%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%2012%20%20%20%20%20%7C%202%20%20%20%20%7C%20font_license_url_len%20%7C%20Length%20of%20font%20license%20URL%2C%20zero%20if%20none%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%2014%20%20%20%20%20%7C%202%20%20%20%20%7C%20reserved%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Reserved%2C%20zero%20padded%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%2016%20%20%20%20%20%7C%208%20%20%20%20%7C%20offset%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Byte%20offset%20within%20DATA%20section%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%2024%20%20%20%20%20%7C%204%20%20%20%20%7C%20size%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Size%20of%20chunk%20data%20in%20bytes.%20Represents%20compressed%20size%20if%20compression%20is%20nonzero.%20%7C%0A%7C%2028%20%20%20%20%20%7C%204%20%20%20%20%7C%20orig_size%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Original%20uncompressed%20size.%20Zero%20if%20same%20as%20size.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%23%23%23%20Offset%20and%20Size%20Rules%0A%0A%60offset%60%20is%20relative%20to%20%60data_offset%60%20from%20HEAD.%20The%20absolute%20file%20position%20of%20a%20chunk%20is%20%60data_offset%20%2B%20entry.offset%60.%0A%0AIf%20%60compression%60%20is%200%2C%20%60size%60%20equals%20%60orig_size%60.%20Alternatively%20%60orig_size%60%20is%200.%0A%0AIf%20%60compression%60%20is%201%2C%20%60size%60%20represents%20the%20compressed%20length.%20%60orig_size%60%20represents%20the%20decompressed%20length.%0A%0A%23%23%20DATA%20Section%0A%0AThe%20DATA%20section%20starts%20at%20%60data_offset%60.%20It%20is%20a%20flat%20array%20of%20chunk%20payloads.%20Each%20chunk&#039;s%20position%20and%20size%20are%20defined%20by%20its%20TOC%20entry.%20No%20separator%20or%20framing%20exists%20between%20chunks.%20The%20TOC%20serves%20as%20the%20authoritative%20index.%0A%0A%60%60%60txt%0Adata_offset%20%2B%200%3A%20%20%20%20%20chunk%200%20data%20(entry%5B0%5D.size%20bytes)%0Adata_offset%20%2B%20off1%3A%20%20chunk%201%20data%20(entry%5B1%5D.size%20bytes)%0Adata_offset%20%2B%20off2%3A%20%20chunk%202%20data%20(entry%5B2%5D.size%20bytes)%0A...%0A%60%60%60%0A%0A%3A%3A%3A%20collapsible%20%22EXTRA%20Section%20(optional)%22%0A%0AThe%20EXTRA%20section%20is%20variable%20length%20and%20optional.%20If%20%60flags%20%26%201%60%20equals%200%2C%20there%20is%20no%20EXTRA%20section%20and%20%60extra_offset%60%20is%200.%0A%0A%60%60%60txt%0AOffset%20%20Size%20%20Field%0A0%20%20%20%20%20%20%204%20%20%20%20%20extra_count%3A%20u32%0A4%20%20%20%20%20%20%20variable%20%20Array%20of%20ExtraEntry%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%202%20bytes%3A%20namespace%20length%20(u16)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%20N%20bytes%3A%20namespace%20(UTF-8)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%208%20bytes%3A%20offset%20(u64%2C%20relative%20to%20extra_offset)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20-%204%20bytes%3A%20size%20(u32)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20(entry%20repeats%20extra_count%20times)%0A%60%60%60%0A%0AAfter%20the%20entry%20array%2C%20each%20entry&#039;s%20data%20resides%20at%20%60extra_offset%20%2B%20entry.offset%60.%0A%0A%23%23%23%20Standard%20Namespaces%0A%0A%3C!--%20markdownlint-disable%20MD055%20--%3E%0A%0A%7C%20Namespace%20%20%20%20%20%20%20%20%20%7C%20Purpose%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C-------------------%7C-----------------------------------------------%7C%0A%7C%20%60org.nisoku.anno%60%20%7C%20Annotations%20stored%20as%20MessagePack%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60org.nisoku.drm%60%20%20%7C%20DRM%20envelope%20stored%20as%20MessagePack%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60org.nisoku.sync%60%20%7C%20Audio%2Fvideo%20sync%20tracks%20stored%20as%20MessagePack%20%7C%0A%0A%3A%3A%3A%0A%0A%23%23%20META%20Section%0A%0AThe%20META%20section%20is%20a%20MessagePack%20map.%20It%20starts%20at%20%60meta_offset%60%20and%20spans%20%60meta_size%60%20bytes.%20Only%20%60title%60%20and%20%60language%60%20are%20required.%20Everything%20else%20is%20optional.%0A%0A%3A%3A%3A%20collapsible%20%22Example%20META%20payload%22%0A%0A%60%60%60text%0A%7B%0A%20%20%22honzo%22%3A%20%7B%0A%20%20%20%20%22version%22%3A%201%2C%0A%20%20%20%20%22converter%22%3A%20%22honzo-convert%200.1.0%22%2C%0A%20%20%20%20%22created%22%3A%20%222025-01-15T10%3A30%3A00Z%22%2C%0A%20%20%20%20%22modified%22%3A%20%222025-01-15T10%3A30%3A00Z%22%0A%20%20%7D%2C%0A%20%20%22title%22%3A%20%7B%0A%20%20%20%20%22en%22%3A%20%22The%20Example%20Book%22%2C%0A%20%20%20%20%22fr%22%3A%20%22Le%20Livre%20Exemple%22%0A%20%20%7D%2C%0A%20%20%22creator%22%3A%20%7B%0A%20%20%20%20%22en%22%3A%20%22Author%20Name%22%0A%20%20%7D%2C%0A%20%20%22language%22%3A%20%22en%22%2C%0A%20%20%22description%22%3A%20%7B%0A%20%20%20%20%22en%22%3A%20%22A%20short%20description%20of%20the%20book.%22%0A%20%20%7D%2C%0A%20%20%22publisher%22%3A%20%22Publisher%20Name%22%2C%0A%20%20%22published%22%3A%20%222024-01-01%22%2C%0A%20%20%22rights%22%3A%20%22Copyright%202024%22%2C%0A%20%20%22identifiers%22%3A%20%7B%0A%20%20%20%20%22isbn%22%3A%20%22978-0-00-000000-0%22%2C%0A%20%20%20%20%22doi%22%3A%20%2210.0000%2Fexample%22%0A%20%20%7D%2C%0A%20%20%22subject%22%3A%20%5B%22Fiction%22%2C%20%22Adventure%22%5D%2C%0A%20%20%22series%22%3A%20%22Series%20Name%22%2C%0A%20%20%22series_position%22%3A%201%2C%0A%20%20%22edition%22%3A%201%2C%0A%20%20%22page_progression_direction%22%3A%20%22ltr%22%2C%0A%20%20%22toc%22%3A%20%5B%0A%20%20%20%20%7B%22title%22%3A%20%22Chapter%201%22%2C%20%22src%22%3A%200%7D%2C%0A%20%20%20%20%7B%22title%22%3A%20%22Chapter%202%22%2C%20%22src%22%3A%201%7D%0A%20%20%5D%0A%7D%0A%60%60%60%0A%0A%3A%3A%3A%0A%0AAll%20field%20names%20use%20lowercase%20with%20underscores.%20All%20text%20values%20are%20maps%20keyed%20by%20BCP%2047%20language%20tags.%20This%20enables%20multi%20language%20support.%0A%0A%23%23%20Next%20Steps%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Chunk%20Types%22%20.%2Fchunk-types.md%20icon%3Apackage%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22Compression%22%20.%2Fcompression.md%20icon%3Azap%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20button%20%22DRM%20%26%20Encryption%22%20.%2Fdrm.md%20icon%3Alock%0A%3A%3A%3A%0A%3A%3A%3A%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1652,7 +1629,7 @@
                   
                     <div class="docmd-copy-widgets">
                       
-                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-copy"
@@ -1673,7 +1650,7 @@
                         </button>
                       
                       
-                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
                           <span class="docmd-btn-icon">
 <svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-message-square"
@@ -1690,7 +1667,7 @@
   <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
 </svg>
 </span>
-                          <span class="docmd-btn-text">copyContext</span>
+                          <span class="docmd-btn-text">Copy Context</span>
                         </button>
                       
                     </div>
@@ -1791,10 +1768,22 @@
 </thead>
 <tbody>
 <tr>
+<td><!-- eslint-disable-next-line markdown/no-missing-label-refs --></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
 <td>0</td>
 <td>1</td>
 <td>chunk_id[0]</td>
 <td>First byte of the 4-byte chunk type tag</td>
+</tr>
+<tr>
+<td><!-- eslint-disable-next-line markdown/no-missing-label-refs --></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr>
 <td>1</td>
@@ -1803,10 +1792,22 @@
 <td>Second byte</td>
 </tr>
 <tr>
+<td><!-- eslint-disable-next-line markdown/no-missing-label-refs --></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
 <td>2</td>
 <td>1</td>
 <td>chunk_id[2]</td>
 <td>Third byte</td>
+</tr>
+<tr>
+<td><!-- eslint-disable-next-line markdown/no-missing-label-refs --></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr>
 <td>3</td>
@@ -1888,9 +1889,9 @@
 <p>If <code>compression</code> is 1, <code>size</code> represents the compressed length. <code>orig_size</code> represents the decompressed length.</p>
 <h2 id="data-section" class="docmd-heading"><a href="#data-section" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>DATA Section</h2>
 <p>The DATA section starts at <code>data_offset</code>. It is a flat array of chunk payloads. Each chunk’s position and size are defined by its TOC entry. No separator or framing exists between chunks. The TOC serves as the authoritative index.</p>
-<pre class="hljs"><code>data_offset <span class="hljs-punctuation">+</span> <span class="hljs-number">0</span><span class="hljs-punctuation">:</span>     chunk <span class="hljs-number">0</span> <span class="hljs-title function_">data</span> (entry[<span class="hljs-number">0</span>].<span class="hljs-attr">size</span> bytes)
-data_offset <span class="hljs-punctuation">+</span> off1<span class="hljs-punctuation">:</span>  chunk <span class="hljs-number">1</span> <span class="hljs-title function_">data</span> (entry[<span class="hljs-number">1</span>].<span class="hljs-attr">size</span> bytes)
-data_offset <span class="hljs-punctuation">+</span> off2<span class="hljs-punctuation">:</span>  chunk <span class="hljs-number">2</span> <span class="hljs-title function_">data</span> (entry[<span class="hljs-number">2</span>].<span class="hljs-attr">size</span> bytes)
+<pre class="hljs"><code class="language-txt">data_offset <span class="hljs-operator">+</span> <span class="hljs-number">0</span><span class="hljs-operator">:</span>     chunk <span class="hljs-number">0</span> <span class="hljs-title function_">data</span> (entry[<span class="hljs-number">0</span>].<span class="hljs-attr">size</span> bytes)
+data_offset <span class="hljs-operator">+</span> off1<span class="hljs-operator">:</span>  chunk <span class="hljs-number">1</span> <span class="hljs-title function_">data</span> (entry[<span class="hljs-number">1</span>].<span class="hljs-attr">size</span> bytes)
+data_offset <span class="hljs-operator">+</span> off2<span class="hljs-operator">:</span>  chunk <span class="hljs-number">2</span> <span class="hljs-title function_">data</span> (entry[<span class="hljs-number">2</span>].<span class="hljs-attr">size</span> bytes)
 ...
 </code></pre>
 <details class="docmd-container collapsible">
@@ -1900,13 +1901,13 @@ data_offset <span class="hljs-punctuation">+</span> off2<span class="hljs-punctu
         </summary>
         <div class="collapsible-content">
 <p>The EXTRA section is variable length and optional. If <code>flags &amp; 1</code> equals 0, there is no EXTRA section and <code>extra_offset</code> is 0.</p>
-<pre class="hljs"><code>Offset  Size  Field
-<span class="hljs-number">0</span>       <span class="hljs-number">4</span>     extra_count<span class="hljs-punctuation">:</span> u32
-<span class="hljs-number">4</span>       variable  Array <span class="hljs-keyword">of</span> ExtraEntry<span class="hljs-punctuation">:</span>
-                  <span class="hljs-punctuation">-</span> <span class="hljs-number">2</span> bytes<span class="hljs-punctuation">:</span> <span class="hljs-keyword">namespace</span> <span class="hljs-title function_">length</span> (u16)
-                  <span class="hljs-punctuation">-</span> N bytes<span class="hljs-punctuation">:</span> <span class="hljs-keyword">namespace</span> (UTF<span class="hljs-punctuation">-</span><span class="hljs-number">8</span>)
-                  <span class="hljs-punctuation">-</span> <span class="hljs-number">8</span> bytes<span class="hljs-punctuation">:</span> <span class="hljs-title function_">offset</span> (u64, relative to extra_offset)
-                  <span class="hljs-punctuation">-</span> <span class="hljs-number">4</span> bytes<span class="hljs-punctuation">:</span> <span class="hljs-title function_">size</span> (u32)
+<pre class="hljs"><code class="language-txt">Offset  Size  Field
+<span class="hljs-number">0</span>       <span class="hljs-number">4</span>     extra_count<span class="hljs-operator">:</span> u32
+<span class="hljs-number">4</span>       variable  Array <span class="hljs-keyword">of</span> ExtraEntry<span class="hljs-operator">:</span>
+                  <span class="hljs-operator">-</span> <span class="hljs-number">2</span> bytes<span class="hljs-operator">:</span> <span class="hljs-keyword">namespace</span> <span class="hljs-title function_">length</span> (u16)
+                  <span class="hljs-operator">-</span> N bytes<span class="hljs-operator">:</span> <span class="hljs-keyword">namespace</span> (UTF<span class="hljs-operator">-</span><span class="hljs-number">8</span>)
+                  <span class="hljs-operator">-</span> <span class="hljs-number">8</span> bytes<span class="hljs-operator">:</span> <span class="hljs-title function_">offset</span> (u64, relative to extra_offset)
+                  <span class="hljs-operator">-</span> <span class="hljs-number">4</span> bytes<span class="hljs-operator">:</span> <span class="hljs-title function_">size</span> (u32)
                   (entry repeats extra_count times)
 </code></pre>
 <p>After the entry array, each entry’s data resides at <code>extra_offset + entry.offset</code>.</p>
@@ -1943,39 +1944,39 @@ data_offset <span class="hljs-punctuation">+</span> off2<span class="hljs-punctu
             <span class="collapsible-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
         </summary>
         <div class="collapsible-content">
-<pre class="hljs"><code>{
-  <span class="hljs-string">&quot;honzo&quot;</span><span class="hljs-punctuation">:</span> {
-    <span class="hljs-string">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>,
-    <span class="hljs-string">&quot;converter&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;honzo-convert 0.1.0&quot;</span>,
-    <span class="hljs-string">&quot;created&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-01-15T10:30:00Z&quot;</span>,
-    <span class="hljs-string">&quot;modified&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-01-15T10:30:00Z&quot;</span>
+<pre class="hljs"><code class="language-text">{
+  <span class="hljs-string">&quot;honzo&quot;</span><span class="hljs-operator">:</span> {
+    <span class="hljs-string">&quot;version&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">1</span>,
+    <span class="hljs-string">&quot;converter&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;honzo-convert 0.1.0&quot;</span>,
+    <span class="hljs-string">&quot;created&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;2025-01-15T10:30:00Z&quot;</span>,
+    <span class="hljs-string">&quot;modified&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;2025-01-15T10:30:00Z&quot;</span>
   },
-  <span class="hljs-string">&quot;title&quot;</span><span class="hljs-punctuation">:</span> {
-    <span class="hljs-string">&quot;en&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;The Example Book&quot;</span>,
-    <span class="hljs-string">&quot;fr&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Le Livre Exemple&quot;</span>
+  <span class="hljs-string">&quot;title&quot;</span><span class="hljs-operator">:</span> {
+    <span class="hljs-string">&quot;en&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;The Example Book&quot;</span>,
+    <span class="hljs-string">&quot;fr&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;Le Livre Exemple&quot;</span>
   },
-  <span class="hljs-string">&quot;creator&quot;</span><span class="hljs-punctuation">:</span> {
-    <span class="hljs-string">&quot;en&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Author Name&quot;</span>
+  <span class="hljs-string">&quot;creator&quot;</span><span class="hljs-operator">:</span> {
+    <span class="hljs-string">&quot;en&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;Author Name&quot;</span>
   },
-  <span class="hljs-string">&quot;language&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;en&quot;</span>,
-  <span class="hljs-string">&quot;description&quot;</span><span class="hljs-punctuation">:</span> {
-    <span class="hljs-string">&quot;en&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;A short description of the book.&quot;</span>
+  <span class="hljs-string">&quot;language&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;en&quot;</span>,
+  <span class="hljs-string">&quot;description&quot;</span><span class="hljs-operator">:</span> {
+    <span class="hljs-string">&quot;en&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;A short description of the book.&quot;</span>
   },
-  <span class="hljs-string">&quot;publisher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Publisher Name&quot;</span>,
-  <span class="hljs-string">&quot;published&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2024-01-01&quot;</span>,
-  <span class="hljs-string">&quot;rights&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Copyright 2024&quot;</span>,
-  <span class="hljs-string">&quot;identifiers&quot;</span><span class="hljs-punctuation">:</span> {
-    <span class="hljs-string">&quot;isbn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;978-0-00-000000-0&quot;</span>,
-    <span class="hljs-string">&quot;doi&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;10.0000/example&quot;</span>
+  <span class="hljs-string">&quot;publisher&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;Publisher Name&quot;</span>,
+  <span class="hljs-string">&quot;published&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;2024-01-01&quot;</span>,
+  <span class="hljs-string">&quot;rights&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;Copyright 2024&quot;</span>,
+  <span class="hljs-string">&quot;identifiers&quot;</span><span class="hljs-operator">:</span> {
+    <span class="hljs-string">&quot;isbn&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;978-0-00-000000-0&quot;</span>,
+    <span class="hljs-string">&quot;doi&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;10.0000/example&quot;</span>
   },
-  <span class="hljs-string">&quot;subject&quot;</span><span class="hljs-punctuation">:</span> [<span class="hljs-string">&quot;Fiction&quot;</span>, <span class="hljs-string">&quot;Adventure&quot;</span>],
-  <span class="hljs-string">&quot;series&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Series Name&quot;</span>,
-  <span class="hljs-string">&quot;series_position&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>,
-  <span class="hljs-string">&quot;edition&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>,
-  <span class="hljs-string">&quot;page_progression_direction&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ltr&quot;</span>,
-  <span class="hljs-string">&quot;toc&quot;</span><span class="hljs-punctuation">:</span> [
-    {<span class="hljs-string">&quot;title&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Chapter 1&quot;</span>, <span class="hljs-string">&quot;src&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span>},
-    {<span class="hljs-string">&quot;title&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Chapter 2&quot;</span>, <span class="hljs-string">&quot;src&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>}
+  <span class="hljs-string">&quot;subject&quot;</span><span class="hljs-operator">:</span> [<span class="hljs-string">&quot;Fiction&quot;</span>, <span class="hljs-string">&quot;Adventure&quot;</span>],
+  <span class="hljs-string">&quot;series&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;Series Name&quot;</span>,
+  <span class="hljs-string">&quot;series_position&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">1</span>,
+  <span class="hljs-string">&quot;edition&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">1</span>,
+  <span class="hljs-string">&quot;page_progression_direction&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;ltr&quot;</span>,
+  <span class="hljs-string">&quot;toc&quot;</span><span class="hljs-operator">:</span> [
+    {<span class="hljs-string">&quot;title&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;Chapter 1&quot;</span>, <span class="hljs-string">&quot;src&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">0</span>},
+    {<span class="hljs-string">&quot;title&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;Chapter 2&quot;</span>, <span class="hljs-string">&quot;src&quot;</span><span class="hljs-operator">:</span> <span class="hljs-number">1</span>}
   ]
 }
 </code></pre>
@@ -2061,14 +2062,14 @@ DRM &amp; Encryption</a></div>
   <path d="M19 12H5" />
 </svg>
 
-                        <span><small>previous</small><strong>
+                        <span><small>Previous</small><strong>
                             Format Specification
                           </strong></span>
                       </a>
                     
                     
                       <a href="../../format/chunk-types/" class="next-page">
-                        <span><small>next</small>
+                        <span><small>Next</small>
                           <strong>
                             Chunk Types
                           </strong></span>
@@ -2094,12 +2095,13 @@ DRM &amp; Encryption</a></div>
                   </div>
                 
               </div>
+              
               <div class="toc-sidebar">
                 
 
 
   <div class="toc-container">
-    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
 <svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-chevron-down"
   xmlns="http://www.w3.org/2000/svg"
@@ -2145,33 +2147,34 @@ DRM &amp; Encryption</a></div>
   </div>
 
               </div>
+              
             </div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1787023392000">
+                <span class="git-last-updated" data-timestamp="1787810890000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1787023392000"></span>
+                  <span class="git-time" data-timestamp="1787810890000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
                     <ul class="git-commit-list">
                       
                         <li class="git-commit-item">
-                          <div class="git-commit-avatar" title="dependabot[bot]">
+                          <div class="git-commit-avatar" title="NellowTCS">
                             
-                              <img src="https://www.gravatar.com/avatar/48ea49be76d0c68403a7f3df87e3487d?d=mp&amp;s=64" alt="dependabot[bot]">
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Bump brace-expansion (#65)">Bump brace-expansion (#65)</div>
+                            <div class="git-commit-message" title="Add hzo_extract_meta_from_file, markdown converter CLI, and update dependencies (#66)">Add hzo_extract_meta_from_file, markd...</div>
                             <div class="git-commit-meta">
-                              <span class="git-commit-author">dependabot[bot]</span>
-                              <span class="git-commit-date" data-timestamp="1787023392000"></span>
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1787810890000"></span>
                             </div>
                           </div>
                         </li>
@@ -2226,11 +2229,11 @@ DRM &amp; Encryption</a></div>
                 <span class="footer-column-title">Resources</span>
                 <ul>
                   
-                    <li><a href="../../getting-started/quickstart/" >Getting Started</a></li>
+                    <li><a href="getting-started/quickstart/" >Getting Started</a></li>
                   
-                    <li><a href="../../format/" >Format Spec</a></li>
+                    <li><a href="format/" >Format Spec</a></li>
                   
-                    <li><a href="../../cli/" >CLI Commands</a></li>
+                    <li><a href="cli/" >CLI Commands</a></li>
                   
                 </ul>
               </div>
@@ -2255,7 +2258,7 @@ DRM &amp; Encryption</a></div>
         <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/Nisoku/Honzo">View on GitHub</a>.</div>
         
           <div class="branding-footer">
-            builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
           </div>
         
       </div>
@@ -2264,20 +2267,22 @@ DRM &amp; Encryption</a></div>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=msy44anm"></script>
+      <script src="../../assets/js/docmd-main.js?v=mtb4na5q"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=msy44anm"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=msy44anm" ></script>
-<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
-<script src="../../assets/js/docmd-search.js?v=msy44anm" ></script>
-<script src="../../assets/js/init-mermaid.js?v=msy44anm" type="module"></script>
-<script src="../../assets/js/docmd-git.js?v=msy44anm" type="module"></script>
+      <script src="../../assets/js/docmd-git.js?v=mtb4na5q"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-search.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-git.js?v=mtb4na5q" ></script>
+<script src="../../assets/js/docmd-ai.js?v=mtb4na5q" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-semantic="true" data-show-confidence="true" data-show-filters="true"
        data-search-placeholder="Search documentation..."
        data-search-no-results="No results found."
        data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
        data-search-initial="Type to start searching..."
        data-search-navigate="to navigate"
        data-search-escape="to close">
@@ -2345,6 +2350,9 @@ DRM &amp; Encryption</a></div>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/Nisoku/Honzo/edit/main/","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"Honzo","siteBase":"/Honzo/","siteUrl":"https://nisoku.org/Honzo","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Getting Started","icon":"rocket","collapsible":false,"children":[{"title":"Quick Start","path":"/getting-started/quickstart/","icon":"play"},{"title":"Installation","path":"/getting-started/installation/","icon":"download"},{"title":"Core Concepts","path":"/getting-started/concepts/","icon":"book"}]},{"title":"Format Specification","icon":"file-text","path":"/format/","collapsible":false,"children":[{"title":"Wire Format","path":"/format/wire-format/","icon":"binary"},{"title":"Chunk Types","path":"/format/chunk-types/","icon":"package"},{"title":"Compression","path":"/format/compression/","icon":"zap"},{"title":"DRM & Encryption","path":"/format/drm/","icon":"lock"},{"title":"Layout Modes","path":"/format/layout/","icon":"columns"}]},{"title":"API Reference","icon":"code","path":"/api/","collapsible":false,"children":[{"title":"Rust","path":"/api/rust/","icon":"box"},{"title":"WASM / TypeScript","path":"/api/wasm/","icon":"cpu"},{"title":"C","path":"/api/c/","icon":"terminal"}]},{"title":"CLI Reference","icon":"terminal","path":"/cli/","collapsible":false},{"title":"Features","icon":"star","path":"/features/","collapsible":false,"children":[{"title":"Annotations","path":"/features/annotations/","icon":"pen-tool"},{"title":"Search Index","path":"/features/search/","icon":"search"},{"title":"Sync Tracks","path":"/features/sync/","icon":"clock"},{"title":"Streaming","path":"/features/streaming/","icon":"wind"}]},{"title":"Conversion","icon":"git-merge","path":"/conversion/","collapsible":false,"children":[{"title":"EPUB","path":"/conversion/epub/","icon":"book"},{"title":"MOBI","path":"/conversion/mobi/","icon":"book-open"},{"title":"PDF","path":"/conversion/pdf/","icon":"file-text"}]},{"title":"Demo Apps","icon":"eye","path":"/demo-docs/","collapsible":false,"children":[{"title":"Reader","path":"/demo/","icon":"book","external":true},{"title":"Maker","path":"/demo/maker/","icon":"wrench","external":true},{"title":"Inspect","path":"/demo/inspect/","icon":"search","external":true},{"title":"Convert","path":"/demo/convert/","icon":"git-merge","external":true}]},{"title":"Contributing","icon":"heart","path":"/contributing/","collapsible":false,"children":[{"title":"Building","path":"/contributing/building/","icon":"network"},{"title":"Architecture","path":"/contributing/architecture/","icon":"git-commit"}]},{"title":"GitHub","path":"https://github.com/Nisoku/Honzo","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":true},"isWorkspace":false,"workspaceProjects":[]};</script>
+      
+      
       
   </body>
 </html>
