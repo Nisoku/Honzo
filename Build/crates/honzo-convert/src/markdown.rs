@@ -50,9 +50,9 @@ pub fn from_markdown_dir(path: &Path) -> Result<Vec<u8>, ConvertError> {
         .map_err(|e| ConvertError::IoError(e.to_string()))?
         .filter_map(|e| e.ok())
         .filter(|e| {
-            e.path()
-                .extension()
-                .is_some_and(|ext| ext.eq_ignore_ascii_case("md") || ext.eq_ignore_ascii_case("markdown"))
+            e.path().extension().is_some_and(|ext| {
+                ext.eq_ignore_ascii_case("md") || ext.eq_ignore_ascii_case("markdown")
+            })
         })
         .collect();
     md_files.sort_by_key(|e| e.file_name());
