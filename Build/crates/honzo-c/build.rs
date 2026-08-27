@@ -5,7 +5,7 @@ fn main() {
     // Header generation is opt-out. Disable it with HONZO_GENERATE_BINDINGS=0
     let generate = std::env::var("HONZO_GENERATE_BINDINGS")
         .ok()
-        .map_or(true, |v| v != "0");
+        .is_none_or(|v| v != "0");
     if !generate {
         return;
     }

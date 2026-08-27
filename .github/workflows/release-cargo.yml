@@ -77,6 +77,10 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
+      - name: Install diplomat-tool
+        if: env.DO_C == 'true'
+        run: cargo install diplomat-tool --version 0.16.0 --locked
+
       - name: Build honzo-c (refresh bindings)
         if: env.DO_C == 'true'
         run: cargo build -p honzo-c
