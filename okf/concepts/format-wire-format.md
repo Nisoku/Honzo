@@ -7,7 +7,7 @@ path: /format/wire-format/
 updated: 2026-08-27
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-27T07:01:52.224Z"
+  generated_at: "2026-08-27T07:04:26.185Z"
 ---
 ---
 title: "Wire Format"
