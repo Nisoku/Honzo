@@ -9,147 +9,147 @@
   "batchCount": 2,
   "files": {
     "api/c.md": {
-      "mtime": 1787813540992.1887,
+      "mtime": 1787813741684.1865,
       "size": 13689,
       "batches": []
     },
     "api/cpp.md": {
-      "mtime": 1787813540992.3298,
+      "mtime": 1787813741684.2837,
       "size": 18604,
       "batches": []
     },
     "api/index.md": {
-      "mtime": 1787813540992.3298,
+      "mtime": 1787813741684.2837,
       "size": 3268,
       "batches": []
     },
     "api/rust.md": {
-      "mtime": 1787813540992.3298,
+      "mtime": 1787813741684.2837,
       "size": 8952,
       "batches": []
     },
     "api/wasm.md": {
-      "mtime": 1787813540992.3298,
+      "mtime": 1787813741684.2837,
       "size": 7086,
       "batches": []
     },
     "cli/index.md": {
-      "mtime": 1787813540992.3298,
+      "mtime": 1787813741684.2837,
       "size": 3931,
       "batches": []
     },
     "contributing/architecture.md": {
-      "mtime": 1787813540992.3298,
+      "mtime": 1787813741684.2837,
       "size": 4409,
       "batches": []
     },
     "contributing/building.md": {
-      "mtime": 1787813540992.7651,
+      "mtime": 1787813741684.5977,
       "size": 2967,
       "batches": []
     },
     "contributing/index.md": {
-      "mtime": 1787813540992.7651,
+      "mtime": 1787813741684.5977,
       "size": 1554,
       "batches": []
     },
     "conversion/epub.md": {
-      "mtime": 1787813540992.7651,
+      "mtime": 1787813741684.5977,
       "size": 3613,
       "batches": []
     },
     "conversion/index.md": {
-      "mtime": 1787813540992.9224,
+      "mtime": 1787813741684.7075,
       "size": 4127,
       "batches": []
     },
     "conversion/mobi.md": {
-      "mtime": 1787813540992.9224,
+      "mtime": 1787813741684.7075,
       "size": 2570,
       "batches": []
     },
     "conversion/pdf.md": {
-      "mtime": 1787813540992.9224,
+      "mtime": 1787813741684.7075,
       "size": 2279,
       "batches": []
     },
     "demo-docs/index.md": {
-      "mtime": 1787813540992.9224,
+      "mtime": 1787813741684.7075,
       "size": 2413,
       "batches": []
     },
     "features/annotations.md": {
-      "mtime": 1787813540992.9224,
+      "mtime": 1787813741684.7075,
       "size": 3027,
       "batches": []
     },
     "features/index.md": {
-      "mtime": 1787813540993.1965,
+      "mtime": 1787813741684.8823,
       "size": 1364,
       "batches": []
     },
     "features/search.md": {
-      "mtime": 1787813540993.1965,
+      "mtime": 1787813741684.8823,
       "size": 2248,
       "batches": []
     },
     "features/streaming.md": {
-      "mtime": 1787813540993.1965,
+      "mtime": 1787813741684.8823,
       "size": 4533,
       "batches": []
     },
     "features/sync.md": {
-      "mtime": 1787813540993.1965,
+      "mtime": 1787813741684.8823,
       "size": 3608,
       "batches": []
     },
     "format/chunk-types.md": {
-      "mtime": 1787813540993.1965,
+      "mtime": 1787813741684.8823,
       "size": 5765,
       "batches": []
     },
     "format/compression.md": {
-      "mtime": 1787813540993.511,
+      "mtime": 1787813741685.065,
       "size": 3022,
       "batches": []
     },
     "format/drm.md": {
-      "mtime": 1787813540993.511,
+      "mtime": 1787813741685.065,
       "size": 3266,
       "batches": []
     },
     "format/index.md": {
-      "mtime": 1787813540993.511,
+      "mtime": 1787813741685.065,
       "size": 1829,
       "batches": []
     },
     "format/layout.md": {
-      "mtime": 1787813540993.511,
+      "mtime": 1787813741685.065,
       "size": 2375,
       "batches": []
     },
     "format/wire-format.md": {
-      "mtime": 1787813540993.511,
+      "mtime": 1787813741685.1448,
       "size": 7132,
       "batches": []
     },
     "getting-started/concepts.md": {
-      "mtime": 1787813540993.511,
+      "mtime": 1787813741685.1448,
       "size": 5235,
       "batches": []
     },
     "getting-started/installation.md": {
-      "mtime": 1787813540993.8262,
+      "mtime": 1787813741685.2998,
       "size": 1746,
       "batches": []
     },
     "getting-started/quickstart.md": {
-      "mtime": 1787813540993.8262,
+      "mtime": 1787813741685.2998,
       "size": 4135,
       "batches": []
     },
     "index.md": {
-      "mtime": 1787813540993.8262,
+      "mtime": 1787813741685.2998,
       "size": 3503,
       "batches": []
     }
