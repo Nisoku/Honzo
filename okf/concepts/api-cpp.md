@@ -7,7 +7,7 @@ path: /api/cpp/
 updated: 2026-08-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-30T03:35:08.801Z"
+  generated_at: "2026-08-30T03:35:43.346Z"
 ---
 ---
 title: "C++ API Reference"
