@@ -4,10 +4,10 @@ title: Annotations
 description: "Portable highlights, bookmarks, and notes via org.nisoku.anno"
 source: "https://nisoku.org/Honzo/features/annotations/"
 path: /features/annotations/
-updated: 2026-08-27
+updated: 2026-08-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-27T07:04:26.181Z"
+  generated_at: "2026-08-30T03:34:24.077Z"
 ---
 ---
 title: "Annotations"

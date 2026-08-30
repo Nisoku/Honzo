@@ -4,10 +4,10 @@ title: Features
 description: "Advanced Honzo features: annotations, search, sync, and streaming"
 source: "https://nisoku.org/Honzo/features/"
 path: /features/
-updated: 2026-08-27
+updated: 2026-08-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-27T07:04:26.181Z"
+  generated_at: "2026-08-30T03:34:24.078Z"
 ---
 ---
 title: "Features"

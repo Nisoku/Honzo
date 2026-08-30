@@ -4,10 +4,10 @@ title: "EPUB Conversion"
 description: "Converting EPUB 2/3 files to Honzo format"
 source: "https://nisoku.org/Honzo/conversion/epub/"
 path: /conversion/epub/
-updated: 2026-08-27
+updated: 2026-08-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-27T07:04:26.179Z"
+  generated_at: "2026-08-30T03:34:24.075Z"
 ---
 ---
 title: "EPUB Conversion"

@@ -4,10 +4,10 @@ title: "Core Concepts"
 description: "How Honzo works: zero-copy parsing, pull-based streaming, and tail mutability"
 source: "https://nisoku.org/Honzo/getting-started/concepts/"
 path: /getting-started/concepts/
-updated: 2026-08-27
+updated: 2026-08-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-27T07:04:26.185Z"
+  generated_at: "2026-08-30T03:34:24.082Z"
 ---
 ---
 title: "Core Concepts"
