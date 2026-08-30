@@ -7,7 +7,7 @@ path: /format/compression/
 updated: 2026-08-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-30T04:01:53.785Z"
+  generated_at: "2026-08-30T04:03:12.068Z"
 ---
 ---
 title: "Compression"
