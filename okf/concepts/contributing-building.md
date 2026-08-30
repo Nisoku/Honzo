@@ -7,7 +7,7 @@ path: /contributing/building/
 updated: 2026-08-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-30T03:35:43.350Z"
+  generated_at: "2026-08-30T03:36:25.951Z"
 ---
 ---
 title: "Building"
