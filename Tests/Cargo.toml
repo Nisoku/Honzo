@@ -18,5 +18,5 @@ lopdf = { version = "0.44.0", default-features = false, features = ["chrono"] }
 image = { version = "0.25.10", default-features = false, features = ["jpeg"] }
 diplomat-runtime = "0.16.0"
 zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
-quick-xml = "0.41"
+quick-xml = "0.42"
 x25519-dalek = { version = "3", default-features = false, features = ["static_secrets", "getrandom"] }
