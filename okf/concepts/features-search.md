@@ -4,10 +4,10 @@ title: "Search Index"
 description: "Full-text search via the SIDX inverted index chunk"
 source: "https://nisoku.org/Honzo/features/search/"
 path: /features/search/
-updated: 2026-08-30
+updated: 2026-09-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-30T04:03:40.901Z"
+  generated_at: "2026-09-05T22:08:41.765Z"
 ---
 ---
 title: "Search Index"

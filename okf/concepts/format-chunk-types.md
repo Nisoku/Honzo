@@ -4,10 +4,10 @@ title: "Chunk Types"
 description: "All Honzo chunk type tags and their semantics"
 source: "https://nisoku.org/Honzo/format/chunk-types/"
 path: /format/chunk-types/
-updated: 2026-08-30
+updated: 2026-09-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-30T04:03:40.903Z"
+  generated_at: "2026-09-05T22:08:41.767Z"
 ---
 ---
 title: "Chunk Types"

@@ -4,10 +4,10 @@ title: "Layout Modes"
 description: "Reflowable, fixed, and scroll layout modes in Honzo"
 source: "https://nisoku.org/Honzo/format/layout/"
 path: /format/layout/
-updated: 2026-08-30
+updated: 2026-09-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-08-30T04:03:40.905Z"
+  generated_at: "2026-09-05T22:08:41.769Z"
 ---
 ---
 title: "Layout Modes"
