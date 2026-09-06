@@ -7,7 +7,7 @@ path: /api/rust/
 updated: 2026-09-06
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-06T02:53:03.573Z"
+  generated_at: "2026-09-06T02:53:35.285Z"
 ---
 ---
 title: "Rust API Reference"
