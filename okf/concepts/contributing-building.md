@@ -4,10 +4,10 @@ title: Building
 description: "Building Honzo from source for all targets"
 source: "https://nisoku.org/Honzo/contributing/building/"
 path: /contributing/building/
-updated: 2026-09-06
+updated: 2026-09-07
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-06T02:55:52.052Z"
+  generated_at: "2026-09-07T17:45:14.213Z"
 ---
 ---
 title: "Building"

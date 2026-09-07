@@ -4,10 +4,10 @@ title: "Demo Apps"
 description: "Web-based demo applications for the Honzo ecosystem"
 source: "https://nisoku.org/Honzo/demo-docs/"
 path: /demo-docs/
-updated: 2026-09-06
+updated: 2026-09-07
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-06T02:55:52.054Z"
+  generated_at: "2026-09-07T17:45:14.216Z"
 ---
 ---
 title: "Demo Apps"

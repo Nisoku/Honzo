@@ -4,10 +4,10 @@ title: "Wire Format"
 description: "The binary layout of HEAD, TOC, DATA, EXTRA, and META"
 source: "https://nisoku.org/Honzo/format/wire-format/"
 path: /format/wire-format/
-updated: 2026-09-06
+updated: 2026-09-07
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-06T02:55:52.057Z"
+  generated_at: "2026-09-07T17:45:14.221Z"
 ---
 ---
 title: "Wire Format"
