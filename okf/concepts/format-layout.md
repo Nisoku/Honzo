@@ -7,7 +7,7 @@ path: /format/layout/
 updated: 2026-09-16
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-16T18:58:18.105Z"
+  generated_at: "2026-09-16T18:59:17.626Z"
 ---
 ---
 title: "Layout Modes"
