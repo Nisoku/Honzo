@@ -7,7 +7,7 @@ path: /demo-docs/
 updated: 2026-09-16
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-16T18:59:39.512Z"
+  generated_at: "2026-09-16T19:04:16.480Z"
 ---
 ---
 title: "Demo Apps"
