@@ -7,7 +7,7 @@ path: /conversion/
 updated: 2026-09-16
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-16T18:59:17.620Z"
+  generated_at: "2026-09-16T18:59:39.511Z"
 ---
 ---
 title: "Conversion"
