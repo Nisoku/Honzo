@@ -17,7 +17,7 @@ honzo-io = { path = "../honzo-io", version = "0.1" }
 honzo-chunks = { path = "../honzo-chunks", version = "0.1" }
 lexepub = "0.1"
 bytes = "1"
-quick-xml = "0.41"
+quick-xml = "0.42"
 rmp-serde = "1"
 tl = "0.7"
 html-escape = "0.2"
