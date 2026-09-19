@@ -28,7 +28,7 @@
     "esbuild": "^0.28.2",
     "eslint": "^10.10.0",
     "globals": "^17.12.0",
-    "prettier": "^3.9.6",
+    "prettier": "^3.9.7",
     "vite-plugin-pwa": "^1.0.0"
   },
   "private": true,
