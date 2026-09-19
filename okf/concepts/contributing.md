@@ -4,10 +4,10 @@ title: Contributing
 description: "How to contribute to the Honzo project"
 source: "https://nisoku.org/Honzo/contributing/"
 path: /contributing/
-updated: 2026-09-16
+updated: 2026-09-19
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-16T19:04:16.478Z"
+  generated_at: "2026-09-19T23:57:00.236Z"
 ---
 ---
 title: "Contributing"

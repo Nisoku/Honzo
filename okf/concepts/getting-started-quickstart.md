@@ -4,10 +4,10 @@ title: "Quick Start"
 description: "Create, read, and inspect a Honzo file in 5 minutes"
 source: "https://nisoku.org/Honzo/getting-started/quickstart/"
 path: /getting-started/quickstart/
-updated: 2026-09-16
+updated: 2026-09-19
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-16T19:04:16.486Z"
+  generated_at: "2026-09-19T23:57:00.242Z"
 ---
 ---
 title: "Quick Start"

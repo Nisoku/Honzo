@@ -4,10 +4,10 @@ title: "C API Reference"
 description: "The C binding for Honzo via Diplomat"
 source: "https://nisoku.org/Honzo/api/c/"
 path: /api/c/
-updated: 2026-09-16
+updated: 2026-09-19
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-16T19:04:16.475Z"
+  generated_at: "2026-09-19T23:57:00.233Z"
 ---
 ---
 title: "C API Reference"
