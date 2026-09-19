@@ -7,7 +7,7 @@ path: /features/streaming/
 updated: 2026-09-19
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-19T23:57:00.239Z"
+  generated_at: "2026-09-19T23:58:59.777Z"
 ---
 ---
 title: "Streaming"
