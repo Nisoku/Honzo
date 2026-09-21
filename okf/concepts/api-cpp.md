@@ -4,10 +4,10 @@ title: "C++ API Reference"
 description: "The C++ binding for Honzo via Diplomat"
 source: "https://nisoku.org/Honzo/api/cpp/"
 path: /api/cpp/
-updated: 2026-09-19
+updated: 2026-09-21
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-19T23:59:28.388Z"
+  generated_at: "2026-09-21T15:39:22.703Z"
 ---
 ---
 title: "C++ API Reference"

@@ -4,10 +4,10 @@ title: "CLI Reference"
 description: "Command-line tools for working with Honzo files"
 source: "https://nisoku.org/Honzo/cli/"
 path: /cli/
-updated: 2026-09-19
+updated: 2026-09-21
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-19T23:59:28.390Z"
+  generated_at: "2026-09-21T15:39:22.704Z"
 ---
 ---
 title: "CLI Reference"

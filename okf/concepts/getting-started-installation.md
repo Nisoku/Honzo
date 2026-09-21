@@ -4,10 +4,10 @@ title: Installation
 description: "Install Honzo on your platform"
 source: "https://nisoku.org/Honzo/getting-started/installation/"
 path: /getting-started/installation/
-updated: 2026-09-19
+updated: 2026-09-21
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-19T23:59:28.400Z"
+  generated_at: "2026-09-21T15:39:22.710Z"
 ---
 ---
 title: "Installation"
