@@ -7,7 +7,7 @@ path: /format/drm/
 updated: 2026-10-02
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-02T18:40:01.760Z"
+  generated_at: "2026-10-02T18:41:58.228Z"
 ---
 ---
 title: "DRM & Encryption"
