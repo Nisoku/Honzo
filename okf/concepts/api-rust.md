@@ -4,10 +4,10 @@ title: "Rust API Reference"
 description: "The Rust API for parsing, building, and streaming Honzo files"
 source: "https://nisoku.org/Honzo/api/rust/"
 path: /api/rust/
-updated: 2026-10-01
+updated: 2026-10-02
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-01T22:43:30.298Z"
+  generated_at: "2026-10-02T18:29:58.086Z"
 ---
 ---
 title: "Rust API Reference"

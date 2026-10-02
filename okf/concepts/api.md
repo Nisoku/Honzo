@@ -4,10 +4,10 @@ title: "API Reference"
 description: "Language-specific API guides for Honzo"
 source: "https://nisoku.org/Honzo/api/"
 path: /api/
-updated: 2026-10-01
+updated: 2026-10-02
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-01T22:43:30.297Z"
+  generated_at: "2026-10-02T18:29:58.085Z"
 ---
 ---
 title: "API Reference"
