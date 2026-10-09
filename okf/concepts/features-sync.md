@@ -4,10 +4,10 @@ title: "Sync Tracks"
 description: "Audio, video, and animation synchronization via org.nisoku.sync"
 source: "https://nisoku.org/Honzo/features/sync/"
 path: /features/sync/
-updated: 2026-10-02
+updated: 2026-10-09
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-02T18:41:58.227Z"
+  generated_at: "2026-10-09T11:39:40.250Z"
 ---
 ---
 title: "Sync Tracks"

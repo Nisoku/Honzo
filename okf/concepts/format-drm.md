@@ -4,10 +4,10 @@ title: "DRM & Encryption"
 description: "AES-256-GCM content protection with ECDH key exchange"
 source: "https://nisoku.org/Honzo/format/drm/"
 path: /format/drm/
-updated: 2026-10-02
+updated: 2026-10-09
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-02T18:41:58.228Z"
+  generated_at: "2026-10-09T11:39:40.251Z"
 ---
 ---
 title: "DRM & Encryption"
