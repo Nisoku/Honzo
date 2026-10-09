@@ -7,7 +7,7 @@ path: /api/c/
 updated: 2026-10-09
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-09T11:46:36.221Z"
+  generated_at: "2026-10-09T11:59:40.095Z"
 ---
 ---
 title: "C API Reference"
