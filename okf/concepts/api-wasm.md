@@ -7,7 +7,7 @@ path: /api/wasm/
 updated: 2026-10-09
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-09T11:42:24.575Z"
+  generated_at: "2026-10-09T11:46:36.224Z"
 ---
 ---
 title: "WASM / TypeScript API Reference"
