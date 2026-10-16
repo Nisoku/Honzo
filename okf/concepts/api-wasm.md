@@ -4,10 +4,10 @@ title: "WASM / TypeScript API Reference"
 description: "The TypeScript API for Honzo in browsers and Node.js via WebAssembly"
 source: "https://nisoku.org/Honzo/api/wasm/"
 path: /api/wasm/
-updated: 2026-10-09
+updated: 2026-10-16
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-09T12:02:59.154Z"
+  generated_at: "2026-10-16T00:00:22.175Z"
 ---
 ---
 title: "WASM / TypeScript API Reference"

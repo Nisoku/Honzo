@@ -4,10 +4,10 @@ title: Architecture
 description: "The Honzo workspace structure and crate design"
 source: "https://nisoku.org/Honzo/contributing/architecture/"
 path: /contributing/architecture/
-updated: 2026-10-09
+updated: 2026-10-16
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-09T12:02:59.155Z"
+  generated_at: "2026-10-16T00:00:22.176Z"
 ---
 ---
 title: "Architecture"

@@ -4,10 +4,10 @@ title: "Format Specification"
 description: "Honzo binary format overview"
 source: "https://nisoku.org/Honzo/format/"
 path: /format/
-updated: 2026-10-09
+updated: 2026-10-16
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-09T12:02:59.164Z"
+  generated_at: "2026-10-16T00:00:22.186Z"
 ---
 ---
 title: "Format Specification"

@@ -4,10 +4,10 @@ title: Conversion
 description: "Convert existing ebook formats to Honzo"
 source: "https://nisoku.org/Honzo/conversion/"
 path: /conversion/
-updated: 2026-10-09
+updated: 2026-10-16
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-09T12:02:59.157Z"
+  generated_at: "2026-10-16T00:00:22.179Z"
 ---
 ---
 title: "Conversion"

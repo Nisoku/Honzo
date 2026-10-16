@@ -4,10 +4,10 @@ title: Streaming
 description: "Pull-based chapter decoding for minimal memory usage"
 source: "https://nisoku.org/Honzo/features/streaming/"
 path: /features/streaming/
-updated: 2026-10-09
+updated: 2026-10-16
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-09T12:02:59.161Z"
+  generated_at: "2026-10-16T00:00:22.183Z"
 ---
 ---
 title: "Streaming"
