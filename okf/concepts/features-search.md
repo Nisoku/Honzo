@@ -7,7 +7,7 @@ path: /features/search/
 updated: 2026-10-16
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-16T00:05:00.934Z"
+  generated_at: "2026-10-16T00:05:47.507Z"
 ---
 ---
 title: "Search Index"
