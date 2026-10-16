@@ -7,7 +7,7 @@ path: /format/
 updated: 2026-10-16
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-16T00:00:22.186Z"
+  generated_at: "2026-10-16T00:00:40.873Z"
 ---
 ---
 title: "Format Specification"
