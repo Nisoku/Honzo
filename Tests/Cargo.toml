@@ -17,6 +17,6 @@ serde = { version = "1.0.228", features = ["derive"] }
 lopdf = { version = "0.45.0", default-features = false, features = ["chrono"] }
 image = { version = "0.25.10", default-features = false, features = ["jpeg"] }
 diplomat-runtime = "0.16.0"
-zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
+zip = { version = "9.0.3", default-features = false, features = ["deflate"] }
 quick-xml = "0.41"
 x25519-dalek = { version = "3", default-features = false, features = ["static_secrets", "getrandom"] }
