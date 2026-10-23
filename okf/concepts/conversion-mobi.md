@@ -4,10 +4,10 @@ title: "MOBI Conversion"
 description: "Converting MOBI (Amazon Kindle) files to Honzo format"
 source: "https://nisoku.org/Honzo/conversion/mobi/"
 path: /conversion/mobi/
-updated: 2026-10-16
+updated: 2026-10-23
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-16T00:12:40.624Z"
+  generated_at: "2026-10-23T04:33:00.726Z"
 ---
 ---
 title: "MOBI Conversion"

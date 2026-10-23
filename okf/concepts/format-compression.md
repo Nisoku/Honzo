@@ -4,10 +4,10 @@ title: Compression
 description: "Per-chunk LZ4 compression in Honzo files"
 source: "https://nisoku.org/Honzo/format/compression/"
 path: /format/compression/
-updated: 2026-10-16
+updated: 2026-10-23
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-16T00:12:40.629Z"
+  generated_at: "2026-10-23T04:33:00.728Z"
 ---
 ---
 title: "Compression"
