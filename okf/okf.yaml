@@ -1,11 +1,11 @@
-okf_version: 0.9.4
+okf_version: 0.9.8
 bundle:
   name: honzo
   title: Honzo
   description: ""
   url: "https://nisoku.org/Honzo"
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-26T18:53:17.289Z"
+  generated_at: "2026-11-02T18:37:05.341Z"
   default_type: concept
 stats:
   concepts: 29
@@ -18,6 +18,7 @@ concepts:
   - id: api-c
     type: api
     title: "C API Reference"
+    description: "The C binding for Honzo via Diplomat"
     path: /api/c/
     file: concepts/api-c.md
     locale: ""
@@ -26,6 +27,7 @@ concepts:
   - id: api-cpp
     type: api
     title: "C++ API Reference"
+    description: "The C++ binding for Honzo via Diplomat"
     path: /api/cpp/
     file: concepts/api-cpp.md
     locale: ""
@@ -34,6 +36,7 @@ concepts:
   - id: api
     type: api
     title: "API Reference"
+    description: "Language-specific API guides for Honzo"
     path: /api/
     file: concepts/api.md
     locale: ""
@@ -42,6 +45,7 @@ concepts:
   - id: api-rust
     type: api
     title: "Rust API Reference"
+    description: "The Rust API for parsing, building, and streaming Honzo files"
     path: /api/rust/
     file: concepts/api-rust.md
     locale: ""
@@ -50,6 +54,7 @@ concepts:
   - id: api-wasm
     type: api
     title: "WASM / TypeScript API Reference"
+    description: "The TypeScript API for Honzo in browsers and Node.js via WebAssembly"
     path: /api/wasm/
     file: concepts/api-wasm.md
     locale: ""
@@ -58,6 +63,7 @@ concepts:
   - id: cli
     type: concept
     title: "CLI Reference"
+    description: "Command-line tools for working with Honzo files"
     path: /cli/
     file: concepts/cli.md
     locale: ""
@@ -66,6 +72,7 @@ concepts:
   - id: contributing-architecture
     type: concept
     title: Architecture
+    description: "The Honzo workspace structure and crate design"
     path: /contributing/architecture/
     file: concepts/contributing-architecture.md
     locale: ""
@@ -74,6 +81,7 @@ concepts:
   - id: contributing-building
     type: concept
     title: Building
+    description: "Building Honzo from source for all targets"
     path: /contributing/building/
     file: concepts/contributing-building.md
     locale: ""
@@ -82,6 +90,7 @@ concepts:
   - id: contributing
     type: concept
     title: Contributing
+    description: "How to contribute to the Honzo project"
     path: /contributing/
     file: concepts/contributing.md
     locale: ""
@@ -90,6 +99,7 @@ concepts:
   - id: conversion-epub
     type: concept
     title: "EPUB Conversion"
+    description: "Converting EPUB 2/3 files to Honzo format"
     path: /conversion/epub/
     file: concepts/conversion-epub.md
     locale: ""
@@ -98,6 +108,7 @@ concepts:
   - id: conversion
     type: concept
     title: Conversion
+    description: "Convert existing ebook formats to Honzo"
     path: /conversion/
     file: concepts/conversion.md
     locale: ""
@@ -106,6 +117,7 @@ concepts:
   - id: conversion-mobi
     type: concept
     title: "MOBI Conversion"
+    description: "Converting MOBI (Amazon Kindle) files to Honzo format"
     path: /conversion/mobi/
     file: concepts/conversion-mobi.md
     locale: ""
@@ -114,6 +126,7 @@ concepts:
   - id: conversion-pdf
     type: concept
     title: "PDF Conversion"
+    description: "Converting PDF files to Honzo format"
     path: /conversion/pdf/
     file: concepts/conversion-pdf.md
     locale: ""
@@ -122,6 +135,7 @@ concepts:
   - id: demo-docs
     type: concept
     title: "Demo Apps"
+    description: "Web-based demo applications for the Honzo ecosystem"
     path: /demo-docs/
     file: concepts/demo-docs.md
     locale: ""
@@ -130,6 +144,7 @@ concepts:
   - id: features-annotations
     type: concept
     title: Annotations
+    description: "Portable highlights, bookmarks, and notes via org.nisoku.anno"
     path: /features/annotations/
     file: concepts/features-annotations.md
     locale: ""
@@ -138,6 +153,7 @@ concepts:
   - id: features
     type: concept
     title: Features
+    description: "Advanced Honzo features: annotations, search, sync, and streaming"
     path: /features/
     file: concepts/features.md
     locale: ""
@@ -146,6 +162,7 @@ concepts:
   - id: features-search
     type: concept
     title: "Search Index"
+    description: "Full-text search via the SIDX inverted index chunk"
     path: /features/search/
     file: concepts/features-search.md
     locale: ""
@@ -154,6 +171,7 @@ concepts:
   - id: features-streaming
     type: concept
     title: Streaming
+    description: "Pull-based chapter decoding for minimal memory usage"
     path: /features/streaming/
     file: concepts/features-streaming.md
     locale: ""
@@ -162,6 +180,7 @@ concepts:
   - id: features-sync
     type: concept
     title: "Sync Tracks"
+    description: "Audio, video, and animation synchronization via org.nisoku.sync"
     path: /features/sync/
     file: concepts/features-sync.md
     locale: ""
@@ -170,6 +189,7 @@ concepts:
   - id: format-chunk-types
     type: concept
     title: "Chunk Types"
+    description: "All Honzo chunk type tags and their semantics"
     path: /format/chunk-types/
     file: concepts/format-chunk-types.md
     locale: ""
@@ -178,6 +198,7 @@ concepts:
   - id: format-compression
     type: concept
     title: Compression
+    description: "Per-chunk LZ4 compression in Honzo files"
     path: /format/compression/
     file: concepts/format-compression.md
     locale: ""
@@ -186,6 +207,7 @@ concepts:
   - id: format-drm
     type: concept
     title: "DRM & Encryption"
+    description: "AES-256-GCM content protection with ECDH key exchange"
     path: /format/drm/
     file: concepts/format-drm.md
     locale: ""
@@ -194,6 +216,7 @@ concepts:
   - id: format
     type: concept
     title: "Format Specification"
+    description: "Honzo binary format overview"
     path: /format/
     file: concepts/format.md
     locale: ""
@@ -202,6 +225,7 @@ concepts:
   - id: format-layout
     type: concept
     title: "Layout Modes"
+    description: "Reflowable, fixed, and scroll layout modes in Honzo"
     path: /format/layout/
     file: concepts/format-layout.md
     locale: ""
@@ -210,6 +234,7 @@ concepts:
   - id: format-wire-format
     type: concept
     title: "Wire Format"
+    description: "The binary layout of HEAD, TOC, DATA, EXTRA, and META"
     path: /format/wire-format/
     file: concepts/format-wire-format.md
     locale: ""
@@ -218,6 +243,7 @@ concepts:
   - id: getting-started-concepts
     type: concept
     title: "Core Concepts"
+    description: "How Honzo works: zero-copy parsing, pull-based streaming, and tail mutability"
     path: /getting-started/concepts/
     file: concepts/getting-started-concepts.md
     locale: ""
@@ -226,6 +252,7 @@ concepts:
   - id: getting-started-installation
     type: concept
     title: Installation
+    description: "Install Honzo on your platform"
     path: /getting-started/installation/
     file: concepts/getting-started-installation.md
     locale: ""
@@ -234,6 +261,7 @@ concepts:
   - id: getting-started-quickstart
     type: concept
     title: "Quick Start"
+    description: "Create, read, and inspect a Honzo file in 5 minutes"
     path: /getting-started/quickstart/
     file: concepts/getting-started-quickstart.md
     locale: ""
@@ -242,6 +270,7 @@ concepts:
   - id: root
     type: concept
     title: Honzo
+    description: "A binary ebook format designed for simplicity, performance, and portability"
     path: /
     file: concepts/root.md
     locale: ""

@@ -6,174 +6,203 @@
       "title": "C API Reference",
       "url": "https://nisoku.org/Honzo/api/c/",
       "description": "The C binding for Honzo via Diplomat",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "C++ API Reference",
       "url": "https://nisoku.org/Honzo/api/cpp/",
       "description": "The C++ binding for Honzo via Diplomat",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "API Reference",
       "url": "https://nisoku.org/Honzo/api/",
       "description": "Language-specific API guides for Honzo",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "Rust API Reference",
       "url": "https://nisoku.org/Honzo/api/rust/",
       "description": "The Rust API for parsing, building, and streaming Honzo files",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "WASM / TypeScript API Reference",
       "url": "https://nisoku.org/Honzo/api/wasm/",
       "description": "The TypeScript API for Honzo in browsers and Node.js via WebAssembly",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "CLI Reference",
       "url": "https://nisoku.org/Honzo/cli/",
       "description": "Command-line tools for working with Honzo files",
+      "section": "Cli",
       "priority": "medium"
     },
     {
       "title": "Architecture",
       "url": "https://nisoku.org/Honzo/contributing/architecture/",
       "description": "The Honzo workspace structure and crate design",
+      "section": "Contributing",
       "priority": "medium"
     },
     {
       "title": "Building",
       "url": "https://nisoku.org/Honzo/contributing/building/",
       "description": "Building Honzo from source for all targets",
+      "section": "Contributing",
       "priority": "medium"
     },
     {
       "title": "Contributing",
       "url": "https://nisoku.org/Honzo/contributing/",
       "description": "How to contribute to the Honzo project",
+      "section": "Contributing",
       "priority": "medium"
     },
     {
       "title": "EPUB Conversion",
       "url": "https://nisoku.org/Honzo/conversion/epub/",
       "description": "Converting EPUB 2/3 files to Honzo format",
+      "section": "Conversion",
       "priority": "medium"
     },
     {
       "title": "Conversion",
       "url": "https://nisoku.org/Honzo/conversion/",
       "description": "Convert existing ebook formats to Honzo",
+      "section": "Conversion",
       "priority": "medium"
     },
     {
       "title": "MOBI Conversion",
       "url": "https://nisoku.org/Honzo/conversion/mobi/",
       "description": "Converting MOBI (Amazon Kindle) files to Honzo format",
+      "section": "Conversion",
       "priority": "medium"
     },
     {
       "title": "PDF Conversion",
       "url": "https://nisoku.org/Honzo/conversion/pdf/",
       "description": "Converting PDF files to Honzo format",
+      "section": "Conversion",
       "priority": "medium"
     },
     {
       "title": "Demo Apps",
       "url": "https://nisoku.org/Honzo/demo-docs/",
       "description": "Web-based demo applications for the Honzo ecosystem",
+      "section": "Demo Docs",
       "priority": "medium"
     },
     {
       "title": "Annotations",
       "url": "https://nisoku.org/Honzo/features/annotations/",
       "description": "Portable highlights, bookmarks, and notes via org.nisoku.anno",
+      "section": "Features",
       "priority": "medium"
     },
     {
       "title": "Features",
       "url": "https://nisoku.org/Honzo/features/",
       "description": "Advanced Honzo features: annotations, search, sync, and streaming",
+      "section": "Features",
       "priority": "medium"
     },
     {
       "title": "Search Index",
       "url": "https://nisoku.org/Honzo/features/search/",
       "description": "Full-text search via the SIDX inverted index chunk",
+      "section": "Features",
       "priority": "medium"
     },
     {
       "title": "Streaming",
       "url": "https://nisoku.org/Honzo/features/streaming/",
       "description": "Pull-based chapter decoding for minimal memory usage",
+      "section": "Features",
       "priority": "medium"
     },
     {
       "title": "Sync Tracks",
       "url": "https://nisoku.org/Honzo/features/sync/",
       "description": "Audio, video, and animation synchronization via org.nisoku.sync",
+      "section": "Features",
       "priority": "medium"
     },
     {
       "title": "Chunk Types",
       "url": "https://nisoku.org/Honzo/format/chunk-types/",
       "description": "All Honzo chunk type tags and their semantics",
+      "section": "Format",
       "priority": "medium"
     },
     {
       "title": "Compression",
       "url": "https://nisoku.org/Honzo/format/compression/",
       "description": "Per-chunk LZ4 compression in Honzo files",
+      "section": "Format",
       "priority": "medium"
     },
     {
       "title": "DRM & Encryption",
       "url": "https://nisoku.org/Honzo/format/drm/",
       "description": "AES-256-GCM content protection with ECDH key exchange",
+      "section": "Format",
       "priority": "medium"
     },
     {
       "title": "Format Specification",
       "url": "https://nisoku.org/Honzo/format/",
       "description": "Honzo binary format overview",
+      "section": "Format",
       "priority": "medium"
     },
     {
       "title": "Layout Modes",
       "url": "https://nisoku.org/Honzo/format/layout/",
       "description": "Reflowable, fixed, and scroll layout modes in Honzo",
+      "section": "Format",
       "priority": "medium"
     },
     {
       "title": "Wire Format",
       "url": "https://nisoku.org/Honzo/format/wire-format/",
       "description": "The binary layout of HEAD, TOC, DATA, EXTRA, and META",
+      "section": "Format",
       "priority": "medium"
     },
     {
       "title": "Core Concepts",
       "url": "https://nisoku.org/Honzo/getting-started/concepts/",
       "description": "How Honzo works: zero-copy parsing, pull-based streaming, and tail mutability",
+      "section": "Getting Started",
       "priority": "medium"
     },
     {
       "title": "Installation",
       "url": "https://nisoku.org/Honzo/getting-started/installation/",
       "description": "Install Honzo on your platform",
+      "section": "Getting Started",
       "priority": "medium"
     },
     {
       "title": "Quick Start",
       "url": "https://nisoku.org/Honzo/getting-started/quickstart/",
       "description": "Create, read, and inspect a Honzo file in 5 minutes",
+      "section": "Getting Started",
       "priority": "medium"
     },
     {
       "title": "Honzo",
       "url": "https://nisoku.org/Honzo/",
       "description": "A binary ebook format designed for simplicity, performance, and portability",
+      "section": null,
       "priority": "high"
     }
   ]

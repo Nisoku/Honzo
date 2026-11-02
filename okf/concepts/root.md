@@ -4,10 +4,10 @@ title: Honzo
 description: "A binary ebook format designed for simplicity, performance, and portability"
 source: "https://nisoku.org/Honzo/"
 path: /
-updated: 2026-10-26
+updated: 2026-11-02
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-26T18:53:17.289Z"
+  generated_at: "2026-11-02T18:37:05.340Z"
 ---
 ---
 title: "Honzo"
